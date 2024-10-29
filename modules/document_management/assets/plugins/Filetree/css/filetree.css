@@ -1,0 +1,58 @@
+.main-tree{
+    text-align: left;
+}
+
+.tree-title.active:before{
+    content: "\f07c" !important;
+}
+
+.tree-title:before{
+    content: "\f07b";
+    font-family: FontAwesome;
+    display: inline-block;
+    width: 20px;
+    color: #f7c10c;
+}
+
+.tree-title{
+    list-style-type: none;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    padding-left: 0px;
+    padding-right: 10px;
+    word-wrap: break-word;
+}
+
+.tree-item:before{
+    content: "\f15b";
+    font-family: FontAwesome;
+    font-size: 12px;
+    display: inline-block;
+    width: 20px;
+    color: #337ab7;
+}
+
+.tree-item:hover, .tree-title:hover{
+    opacity: 0.6;
+}
+
+.tree-item{
+    word-wrap: break-word;
+    white-space: -moz-pre-wrap;
+    white-space: pre-wrap;
+    cursor: pointer;
+    list-style-type: none;
+    margin-left: 25px;
+    display: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    padding-left: 10px;
+}
+ul.tree {
+    margin-left: 35px;
+}
