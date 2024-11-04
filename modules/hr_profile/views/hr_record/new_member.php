@@ -405,6 +405,19 @@
 												$days_for_identity = (isset($member) ? $member->days_for_identity : '');
 												echo render_date_input('days_for_identity','hr_license_date',_d($days_for_identity)); ?>
 											</div>
+										</div>
+
+										<div class="row">
+											<div class="col-md-6">
+												<?php
+												$joining_date = (isset($member) ? $member->joining_date : '');
+												echo render_date_input('joining_date','joining_date',_d($joining_date)); ?>
+											</div>
+											<div class="col-md-6">
+												<?php
+												$exit_date = (isset($member) ? $member->exit_date : '');
+												echo render_date_input('exit_date','exit_date',_d($exit_date)); ?>
+											</div>
 										</div> 
 
 										<div class="row">
@@ -460,20 +473,25 @@
 
 										<div class="row">
 											<div class="col-md-6">
+												<?php
+												$esi = (isset($member) ? $member->esi : '');
+												echo render_input('esi','esi',$esi, 'text'); ?>
+											</div>
+											<div class="col-md-6">
 												<div class="form-group">
 													<label for="facebook" class="control-label"><i class="fa-brands fa-facebook"></i> <?php echo _l('staff_add_edit_facebook'); ?></label>
 													<input type="text" class="form-control" name="facebook" value="<?php if(isset($member)){echo new_html_entity_decode($member->facebook);} ?>">
 												</div>
 											</div>
+										</div>
+
+										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="linkedin" class="control-label"><i class="fa-brands fa-linkedin"></i> <?php echo _l('staff_add_edit_linkedin'); ?></label>
 													<input type="text" class="form-control" name="linkedin" value="<?php if(isset($member)){echo new_html_entity_decode($member->linkedin);} ?>">
 												</div>
 											</div>
-										</div>
-
-										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="skype" class="control-label"><i class="fa-brands fa-skype"></i> <?php echo _l('staff_add_edit_skype'); ?></label>

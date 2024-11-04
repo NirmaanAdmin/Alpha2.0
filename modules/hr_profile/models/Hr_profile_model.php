@@ -3399,6 +3399,18 @@ public function get_job_position_arrayid()
 			$data['days_for_identity'] = null;
 		}
 
+		if (isset($data['joining_date'])) {
+			$data['joining_date'] = to_sql_date($data['joining_date']);
+		}else{
+			$data['joining_date'] = null;
+		}
+
+		if (isset($data['exit_date'])) {
+			$data['exit_date'] = to_sql_date($data['exit_date']);
+		}else{
+			$data['exit_date'] = null;
+		}
+
 		$this->db->insert(db_prefix() . 'staff', $data);
 		$staffid = $this->db->insert_id();
 		if ($staffid) {
@@ -3560,6 +3572,18 @@ public function get_job_position_arrayid()
 			$data['days_for_identity'] = to_sql_date($data['days_for_identity']);
 		}else{
 			$data['days_for_identity'] = null;
+		}
+
+		if (isset($data['joining_date'])) {
+			$data['joining_date'] = to_sql_date($data['joining_date']);
+		}else{
+			$data['joining_date'] = null;
+		}
+
+		if (isset($data['exit_date'])) {
+			$data['exit_date'] = to_sql_date($data['exit_date']);
+		}else{
+			$data['exit_date'] = null;
 		}
 
 		$data['date_update'] = date('Y-m-d');

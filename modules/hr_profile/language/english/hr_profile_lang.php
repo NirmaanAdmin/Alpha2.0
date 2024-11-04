@@ -480,7 +480,10 @@ $lang['hr_not_staff_member_label']	 									 = 'Do not show left menu, Staff pr
 $lang['hr_not_staff_member_tooltip']	 								 = 'If this employee is Not a staff Member and this setting is enabled, when the employee logs in, the left menu bar, Staff profile will not be visible.';
 $lang['No_employee_information_related_to_the_contract_was_found']             							 = 'No employee information related to the contract was found';
 $lang['epf_no']	 								 = 'EPF No';
-$lang['social_security_no']	 								 = 'Social Security No';
+$lang['social_security_no']	 								 = 'UAN No';
+$lang['esi']	 								 	 	 = 'ESI';
+$lang['joining_date']	 								 = 'Date of Joining';
+$lang['exit_date']	 								 	 = 'Date of Exit';
 
 
 
