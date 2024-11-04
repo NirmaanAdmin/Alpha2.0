@@ -8726,4 +8726,34 @@ class purchase extends AdminController
         redirect($_SERVER['HTTP_REFERER']);
     }
 
+    public function cron_emails()
+    {
+        $cron_emails = $this->purchase_model->check_cron_emails();
+        if(!empty($cron_emails)) {
+            foreach ($cron_emails as $key => $value) {
+                if($value['type'] == "purchase" && !empty($value['options'])) {
+                    $options = json_decode($value['options'], true);
+                    $rel_name = $options['rel_name'];
+                    $insert_id = $options['insert_id'];
+                    $user_id = $options['user_id'];
+                    $status = $options['status'];
+                    if(isset($options['approver'])) {
+                        $rel_type = $options['rel_type'];
+                        $project = $options['project'];
+                        $requester = $options['requester'];
+
+                        $this->purchase_model->send_mail_to_approver($rel_type, $rel_name, $insert_id, $user_id, $status, $project, $requester);
+                    }
+                    if(isset($options['sender'])) {
+                        if($status == 2 || $status == 3) {
+                            $this->purchase_model->send_mail_to_sender($rel_name, $status, $insert_id, $user_id);
+                        }
+                    }
+                    $this->purchase_model->delete_cron_email_option($value['id']);
+                }
+            }
+        }
+        return true;
+    }
+
 }

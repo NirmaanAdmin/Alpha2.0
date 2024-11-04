@@ -1188,10 +1188,24 @@ class Purchase_model extends App_Model
       
         $this->db->insert(db_prefix().'pur_request',$data);
         $insert_id = $this->db->insert_id();
-        $this->send_mail_to_approver($data, 'pur_request', 'purchase_request', $insert_id);
-        if($data['status'] == 2) {
-            $this->send_mail_to_sender('purchase_request', $data['status'], $insert_id);
-        }
+        // $this->send_mail_to_approver($data, 'pur_request', 'purchase_request', $insert_id);
+        // if($data['status'] == 2) {
+        //     $this->send_mail_to_sender('purchase_request', $data['status'], $insert_id);
+        // }
+        $cron_email = array();
+        $cron_email_options = array();
+        $cron_email['type'] = "purchase";
+        $cron_email_options['rel_type'] = 'pur_request';
+        $cron_email_options['rel_name'] = 'purchase_request';
+        $cron_email_options['insert_id'] = $insert_id;
+        $cron_email_options['user_id'] = get_staff_user_id();
+        $cron_email_options['status'] = $data['status'];
+        $cron_email_options['approver'] = 'yes';
+        $cron_email_options['sender'] = 'yes';
+        $cron_email_options['project'] = $data['project'];
+        $cron_email_options['requester'] = $data['requester'];
+        $cron_email['options'] = json_encode($cron_email_options, true);
+        $this->db->insert(db_prefix().'cron_email', $cron_email);
         $this->save_purchase_files('pur_request', $insert_id);
         if($insert_id){
 
@@ -1514,7 +1528,18 @@ class Purchase_model extends App_Model
         $this->db->update(db_prefix().'pur_request',['status' => $status]);
         if($this->db->affected_rows() > 0){
             if($status == 2 || $status == 3) {
-                $this->send_mail_to_sender('purchase_request', $status, $id);
+                // $this->send_mail_to_sender('purchase_request', $status, $id);
+                $cron_email = array();
+                $cron_email_options = array();
+                $cron_email['type'] = "purchase";
+                $cron_email_options['rel_type'] = 'pur_request';
+                $cron_email_options['rel_name'] = 'purchase_request';
+                $cron_email_options['insert_id'] = $id;
+                $cron_email_options['user_id'] = get_staff_user_id();
+                $cron_email_options['status'] = $status;
+                $cron_email_options['sender'] = 'yes';
+                $cron_email['options'] = json_encode($cron_email_options, true);
+                $this->db->insert(db_prefix().'cron_email', $cron_email);
             }
             return true;
         }
@@ -1735,10 +1760,24 @@ class Purchase_model extends App_Model
 
         $this->db->insert(db_prefix() . 'pur_estimates', $data);
         $insert_id = $this->db->insert_id();
-        $this->send_mail_to_approver($data, 'pur_quotation', 'quotation', $insert_id);
-        if($data['status'] == 2) {
-            $this->send_mail_to_sender('quotation', $data['status'], $insert_id);
-        }
+        // $this->send_mail_to_approver($data, 'pur_quotation', 'quotation', $insert_id);
+        // if($data['status'] == 2) {
+        //     $this->send_mail_to_sender('quotation', $data['status'], $insert_id);
+        // }
+        $cron_email = array();
+        $cron_email_options = array();
+        $cron_email['type'] = "purchase";
+        $cron_email_options['rel_type'] = 'pur_quotation';
+        $cron_email_options['rel_name'] = 'quotation';
+        $cron_email_options['insert_id'] = $insert_id;
+        $cron_email_options['user_id'] = get_staff_user_id();
+        $cron_email_options['status'] = $data['status'];
+        $cron_email_options['approver'] = 'yes';
+        $cron_email_options['sender'] = 'yes';
+        $cron_email_options['project'] = $data['project'];
+        $cron_email_options['requester'] = $data['requester'];
+        $cron_email['options'] = json_encode($cron_email_options, true);
+        $this->db->insert(db_prefix().'cron_email', $cron_email);
         $this->save_purchase_files('pur_quotation', $insert_id);
 
         if ($insert_id) {
@@ -2151,7 +2190,18 @@ class Purchase_model extends App_Model
         $this->db->update(db_prefix().'pur_estimates',['status' => $status]);
         if($this->db->affected_rows() > 0){
             if($status == 2 || $status == 3) {
-                $this->send_mail_to_sender('quotation', $status, $id);
+                // $this->send_mail_to_sender('quotation', $status, $id);
+                $cron_email = array();
+                $cron_email_options = array();
+                $cron_email['type'] = "purchase";
+                $cron_email_options['rel_type'] = 'pur_quotation';
+                $cron_email_options['rel_name'] = 'quotation';
+                $cron_email_options['insert_id'] = $id;
+                $cron_email_options['user_id'] = get_staff_user_id();
+                $cron_email_options['status'] = $status;
+                $cron_email_options['sender'] = 'yes';
+                $cron_email['options'] = json_encode($cron_email_options, true);
+                $this->db->insert(db_prefix().'cron_email', $cron_email);
             }
             return true;
         }
@@ -2173,7 +2223,18 @@ class Purchase_model extends App_Model
 
             hooks()->do_action('after_purchase_order_approve', $id);
             if($status == 2 || $status == 3) {
-                $this->send_mail_to_sender('purchase_order', $status, $id);
+                // $this->send_mail_to_sender('purchase_order', $status, $id);
+                $cron_email = array();
+                $cron_email_options = array();
+                $cron_email['type'] = "purchase";
+                $cron_email_options['rel_type'] = 'pur_order';
+                $cron_email_options['rel_name'] = 'purchase_order';
+                $cron_email_options['insert_id'] = $id;
+                $cron_email_options['user_id'] = get_staff_user_id();
+                $cron_email_options['status'] = $status;
+                $cron_email_options['sender'] = 'yes';
+                $cron_email['options'] = json_encode($cron_email_options, true);
+                $this->db->insert(db_prefix().'cron_email', $cron_email);
             }
 
             // hooks()->apply_filters('create_goods_receipt',['status' => $status,'id' => $id]);
@@ -2333,10 +2394,24 @@ class Purchase_model extends App_Model
 
         $this->db->insert(db_prefix() . 'pur_orders', $data);
         $insert_id = $this->db->insert_id();
-        $this->send_mail_to_approver($data, 'pur_order', 'purchase_order', $insert_id);
-        if($data['approve_status'] == 2) {
-            $this->send_mail_to_sender('purchase_order', $data['approve_status'], $insert_id);
-        }
+        // $this->send_mail_to_approver($data, 'pur_order', 'purchase_order', $insert_id);
+        // if($data['approve_status'] == 2) {
+        //     $this->send_mail_to_sender('purchase_order', $data['approve_status'], $insert_id);
+        // }
+        $cron_email = array();
+        $cron_email_options = array();
+        $cron_email['type'] = "purchase";
+        $cron_email_options['rel_type'] = 'pur_order';
+        $cron_email_options['rel_name'] = 'purchase_order';
+        $cron_email_options['insert_id'] = $insert_id;
+        $cron_email_options['user_id'] = get_staff_user_id();
+        $cron_email_options['status'] = $data['approve_status'];
+        $cron_email_options['approver'] = 'yes';
+        $cron_email_options['sender'] = 'yes';
+        $cron_email_options['project'] = $data['project'];
+        $cron_email_options['requester'] = $data['requester'];
+        $cron_email['options'] = json_encode($cron_email_options, true);
+        $this->db->insert(db_prefix().'cron_email', $cron_email);
         $this->save_purchase_files('pur_order', $insert_id);
         if ($insert_id) {
             // Update next purchase order number in settings
@@ -13733,8 +13808,9 @@ class Purchase_model extends App_Model
         return $response;
     }
 
-    public function check_approval_setting($project, $related, $response = 0)
+    public function check_approval_setting($project, $related, $response = 0, $user_id = 1)
     {
+        $user_id = !empty(get_staff_user_id()) ? get_staff_user_id() : $user_id;
         $check_status = false;
         $intersect = array();
         $this->db->select('*');
@@ -13766,7 +13842,7 @@ class Purchase_model extends App_Model
         } else {
             if(!empty($intersect)) {
                 $intersect = array_filter($intersect, function ($var) {
-                    return ($var['id'] == get_staff_user_id());
+                    return ($var['id'] == $user_id);
                 });
                 if(!empty($intersect)) {
                     $check_status = true;
@@ -13775,7 +13851,7 @@ class Purchase_model extends App_Model
         }
 
         $this->db->select('staffid as id', 'email', 'firstname', 'lastname');
-        $this->db->where('staffid', get_staff_user_id());
+        $this->db->where('staffid', $user_id);
         $this->db->where('admin', 1);
         $staffs = $this->db->get('tblstaff')->result_array();
         if(count($staffs) > 0) {
@@ -13784,12 +13860,12 @@ class Purchase_model extends App_Model
         return $check_status;
     }
 
-    public function send_mail_to_approver($fdata, $related, $type, $id)
+    public function send_mail_to_approver($rel_type, $rel_name, $id, $user_id, $status, $project, $requester)
     {
-        $approver_list = $this->check_approval_setting($fdata['project'], $related, 1);
+        $approver_list = $this->check_approval_setting($project, $rel_type, 1, $user_id);
         $this->db->select('staffid as id, "approve" as action', FALSE);
         $this->db->where('admin', 1);
-        $this->db->or_where('staffid', $fdata['requester']);
+        $this->db->or_where('staffid', $user_id);
         $this->db->order_by('staffid','desc');
         $staffs = $this->db->get('tblstaff')->result_array();
         $approver_list = array_merge($approver_list, $staffs);
@@ -13802,7 +13878,7 @@ class Purchase_model extends App_Model
             $this->db->where_in('staffid', $approver_list);
             $approver_list = $this->db->get('tblstaff')->result_array();
 
-            $this->db->where('staffid', get_staff_user_id());
+            $this->db->where('staffid', $user_id);
             $login_staff = $this->db->get('tblstaff')->row();
             
             foreach ($approver_list as $key => $value) {
@@ -13810,7 +13886,7 @@ class Purchase_model extends App_Model
                 $data['contact_firstname'] = $login_staff->firstname;
                 $data['contact_lastname'] = $login_staff->lastname;
 
-                if($type == 'purchase_request') {
+                if($rel_name == 'purchase_request') {
                     $data['mail_to'] = $value['email'];
                     $data['pur_request_id'] = $id;
                     $data = (object) $data;
@@ -13818,7 +13894,7 @@ class Purchase_model extends App_Model
                     $template->send();
                 }
 
-                if($type == 'purchase_order') {
+                if($rel_name == 'purchase_order') {
                     $data['mail_to'] = $value['email'];
                     $data['po_id'] = $id;
                     $data = (object) $data;
@@ -13826,7 +13902,7 @@ class Purchase_model extends App_Model
                     $template->send();
                 }
 
-                if($type == 'quotation') {
+                if($rel_name == 'quotation') {
                     $data['mail_to'] = $value['email'];
                     $data['pur_estimate_id'] = $id;
                     $data = (object) $data;
@@ -13837,7 +13913,7 @@ class Purchase_model extends App_Model
         }
     }
 
-    public function send_mail_to_sender($type, $status, $id)
+    public function send_mail_to_sender($type, $status, $id, $user_id)
     {
         $requester = 0;
         $vendor_id = 0;
@@ -13869,7 +13945,7 @@ class Purchase_model extends App_Model
         $this->db->select('email, firstname, lastname');
         $this->db->where('admin', 1);
         $this->db->or_where('staffid', $requester);
-        $this->db->or_where('staffid', get_staff_user_id());
+        $this->db->or_where('staffid', $user_id);
         $staffs = $this->db->get('tblstaff')->result_array();
 
         if($type == 'purchase_order') {
@@ -13883,7 +13959,7 @@ class Purchase_model extends App_Model
 
         if(!empty($staffs)) {
 
-            $this->db->where('staffid', get_staff_user_id());
+            $this->db->where('staffid', $user_id);
             $login_staff = $this->db->get('tblstaff')->row();
 
             foreach ($staffs as $key => $value) {
@@ -13971,5 +14047,17 @@ class Purchase_model extends App_Model
         }
 
         return $deleted;
+    }
+
+    public function check_cron_emails()
+    {
+        return $this->db->get(db_prefix() . 'cron_email')->result_array();
+    }
+
+    public function delete_cron_email_option($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'cron_email');
+        return true; 
     }
 }
