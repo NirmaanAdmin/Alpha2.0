@@ -1051,7 +1051,11 @@ class Accounting extends AdminController
                 if($aRow['account_type_id'] == 11 || $aRow['account_type_id'] == 12 || $aRow['account_type_id'] == 8 || $aRow['account_type_id'] == 9 || $aRow['account_type_id'] == 10 || $aRow['account_type_id'] == 7){
                     $row[] = app_format_money($aRow['credit'] - $aRow['debit'], $currency->name);
                 }else{
-                    $row[] = app_format_money($aRow['debit'] - $aRow['credit'], $currency->name);
+                    if($aRow['parent_account'] == '0') {
+                        $row[] = app_format_money(get_total_primary_balance($accounting_method, $aRow['id']), $currency->name);
+                    } else {
+                        $row[] = app_format_money($aRow['debit'] - $aRow['credit'], $currency->name);
+                    }
                 }
                 $row[] = '';
 

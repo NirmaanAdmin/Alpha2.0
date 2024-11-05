@@ -966,3 +966,21 @@ function acc_check_csrf_protection()
     }
     return 'false';
 }
+
+function get_total_primary_balance($accounting_method, $parent_account)
+{
+	$CI = & get_instance();
+	if($accounting_method == 'cash'){
+        $debit = '(SELECT sum(debit) as debit FROM '.db_prefix().'acc_account_history where (account = aa.id or parent_account = aa.id) AND (('.db_prefix().'acc_account_history.rel_type = "invoice" AND '.db_prefix().'acc_account_history.paid = 1) or rel_type != "invoice"))';
+        $credit = '(SELECT sum(credit) as credit FROM '.db_prefix().'acc_account_history where (account = aa.id or parent_account = aa.id) AND (('.db_prefix().'acc_account_history.rel_type = "invoice" AND '.db_prefix().'acc_account_history.paid = 1) or rel_type != "invoice"))';
+    }else{
+        $debit = '(SELECT sum(debit) as debit FROM '.db_prefix().'acc_account_history where (account = aa.id or parent_account = aa.id))';
+        $credit = '(SELECT sum(credit) as credit FROM '.db_prefix().'acc_account_history where (account = aa.id or parent_account = aa.id))';
+    }
+
+    $debit_result = $CI->db->query("SELECT SUM(".$debit.") as debit FROM tblacc_accounts as aa WHERE parent_account = ".$parent_account."")->row();
+    $credit_result = $CI->db->query("SELECT SUM(".$credit.") as credit FROM tblacc_accounts as aa WHERE parent_account = ".$parent_account."")->row();
+    $debit_count = !empty($debit_result) ? $debit_result->debit : 0;
+    $credit_count = !empty($credit_result) ? $credit_result->credit : 0;
+    return $debit_count - $credit_count;
+}
