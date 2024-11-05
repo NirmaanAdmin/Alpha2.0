@@ -740,4 +740,11 @@ class Invoices extends AdminController
             }
         }
     }
+
+    public function get_payment_modes_by_project($project_id)
+    {
+        if ($this->input->is_ajax_request()) {
+            echo json_encode($this->invoices_model->get_payment_modes_by_project($project_id));
+        }
+    }
 }

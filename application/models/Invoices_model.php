@@ -1877,4 +1877,16 @@ class Invoices_model extends App_Model
             'active' => 1, 'invoice_emails' => 1,
         ]);
     }
+
+    public function get_payment_modes_by_project($project_id)
+    {
+        $result = array();
+        $payment_modes = $this->db->query("SELECT GROUP_CONCAT(id SEPARATOR ',') as payment_mode_id FROM ".db_prefix()."payment_modes WHERE FIND_IN_SET(".$project_id.", project)")->row();
+        if(!empty($payment_modes)) {
+            $result['data'] = $payment_modes->payment_mode_id;
+        } else {
+            $result['data'] = NULL;
+        }
+        return $result;
+    }
 }

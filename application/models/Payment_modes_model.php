@@ -96,6 +96,11 @@ class Payment_modes_model extends App_Model
         if (isset($data['id'])) {
             unset($data['id']);
         }
+        if(isset($data['selected_by_default']) && isset($data['project'])) {
+            $project = implode(',', $data['project']);
+        } else {
+            $project = NULL;
+        }
 
         foreach (['active', 'show_on_pdf', 'selected_by_default', 'invoices_only', 'expenses_only'] as $check) {
             $data[$check] = !isset($data[$check]) ? 0 : 1;
@@ -111,6 +116,7 @@ class Payment_modes_model extends App_Model
             'invoices_only'       => $data['invoices_only'],
             'show_on_pdf'         => $data['show_on_pdf'],
             'selected_by_default' => $data['selected_by_default'],
+            'project'             => $project,
         ]);
 
         $insert_id = $this->db->insert_id();
@@ -139,6 +145,11 @@ class Payment_modes_model extends App_Model
         $id      = $data['paymentmodeid'];
         $updated = false;
         unset($data['paymentmodeid']);
+        if(isset($data['selected_by_default']) && isset($data['project'])) {
+            $project = implode(',', $data['project']);
+        } else {
+            $project = NULL;
+        }
 
         foreach (['active', 'show_on_pdf', 'selected_by_default', 'invoices_only', 'expenses_only'] as $check) {
             $data[$check] = !isset($data[$check]) ? 0 : 1;
@@ -153,6 +164,7 @@ class Payment_modes_model extends App_Model
             'invoices_only'       => $data['invoices_only'],
             'show_on_pdf'         => $data['show_on_pdf'],
             'selected_by_default' => $data['selected_by_default'],
+            'project'             => $project,
         ]);
 
         if ($this->db->affected_rows() > 0) {

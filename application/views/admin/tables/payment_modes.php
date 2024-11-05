@@ -16,6 +16,7 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, [], [], [
     'invoices_only',
     'show_on_pdf',
     'selected_by_default',
+    'project',
     ]);
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -35,7 +36,7 @@ foreach ($rResult as $aRow) {
             // For exporting
             $_data .= '<span class="hide">' . ($checked == 'checked' ? _l('is_active_export') : _l('is_not_active_export')) . '</span>';
         } elseif ($aColumns[$i] == 'name' || $aColumns[$i] == 'id') {
-            $_data = '<a href="#" data-toggle="modal" data-default-selected="' . e($aRow['selected_by_default']) . '" data-show-on-pdf="' . e($aRow['show_on_pdf']) . '" data-target="#payment_mode_modal" data-expenses-only="' . e($aRow['expenses_only']) . '" data-invoices-only="' . e($aRow['invoices_only']) . '" data-id="' . e($aRow['id']) . '">' . e($_data) . '</a>';
+            $_data = '<a href="#" data-toggle="modal" data-default-selected="' . e($aRow['selected_by_default']) . '" data-show-on-pdf="' . e($aRow['show_on_pdf']) . '" data-target="#payment_mode_modal" data-expenses-only="' . e($aRow['expenses_only']) . '" data-invoices-only="' . e($aRow['invoices_only']) . '" data-id="' . e($aRow['id']) . '" data-project="' . e($aRow['project']) . '">' . e($_data) . '</a>';
         } elseif ($aColumns[$i] == 'description') {
             $_data = process_text_content_for_display($_data);
         }
@@ -52,6 +53,7 @@ foreach ($rResult as $aRow) {
         'data-invoices-only'    => e($aRow['invoices_only']),
         'data-show-on-pdf'      => e($aRow['show_on_pdf']),
         'data-default-selected' => e($aRow['selected_by_default']),
+        'data-project'          => e($aRow['project']),
         ]) . '>
         <i class="fa-regular fa-pen-to-square fa-lg"></i>
     </a>';

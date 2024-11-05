@@ -37,6 +37,11 @@
                             <input type="checkbox" name="expenses_only" id="expenses_only">
                             <label for="expenses_only"><?php echo _l('payment_mode_expenses_only'); ?></label>
                         </div>
+                        <div class="project-list hide">
+                            <?php
+                            echo render_select('project[]', $projects, ['id', 'name'], 'project', array(), ['multiple' => true, 'data-actions-box' => true], [], '', '', false);
+                            ?>
+                        </div>
                         <?php hooks()->do_action('before_paymentmode_modal_form_close'); ?>
                     </div>
                 </div>
@@ -78,6 +83,7 @@
             var selected_by_default = button.data('default-selected');
             var invoices_only = button.data('invoices-only');
             var show_on_pdf = button.data('show-on-pdf');
+            var project = button.data('project');
             $('#payment_mode_modal input[name="name"]').val('');
             $('#payment_mode_modal input[name="paymentmodeid"]').val('');
             $('#payment_mode_modal input[name="active"]').prop('checked', true);
@@ -103,8 +109,28 @@
                 $('#payment_mode_modal .edit-title').removeClass('hide');
                 $('#payment_mode_modal input[name="name"]').val(name);
                 $('#payment_mode_modal textarea[name="description"]').val(description.trim().replace(/(<|&lt;)br\s*\/*(>|&gt;)/g, " "));
+                if(project) {
+                    $('#payment_mode_modal select[name="project[]"]').val(project.toString().split(',')).trigger('change');
+                } else {
+                    $('#payment_mode_modal select[name="project[]"]').val([]).trigger('change');
+                }
+            }
+
+            if(selected_by_default) {
+                $(".project-list").removeClass("hide");
+            } else {
+                $(".project-list").addClass("hide");
             }
         });
+
+        $("#selected_by_default").change(function() {
+            var ischecked = $(this).is(':checked');
+            if(ischecked) {
+                $(".project-list").removeClass("hide");
+            } else {
+                $(".project-list").addClass("hide");
+            }
+        });   
     });
     function manage_payment_modes(form) {
         var data = $(form).serialize();

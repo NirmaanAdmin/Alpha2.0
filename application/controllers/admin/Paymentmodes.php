@@ -16,9 +16,11 @@ class Paymentmodes extends AdminController
     /* List all peyment modes*/
     public function index()
     {
+        $this->load->model('projects_model');
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('payment_modes');
         }
+        $data['projects'] = $this->projects_model->get_items();
         $data['title'] = _l('payment_modes');
         $this->load->view('admin/paymentmodes/manage', $data);
     }
