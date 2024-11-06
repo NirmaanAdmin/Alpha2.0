@@ -107,13 +107,21 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
-foreach ($rResult as $aRow) {
+$table_order = $this->ci->input->post('order');
+$column = isset($table_order[0]['column']) ? $table_order[0]['column'] : '';
+$dir = isset($table_order[0]['dir']) ? $table_order[0]['dir'] : '';
+
+foreach ($rResult as $key => $aRow) {
     $row = [];
 
     // Bulk actions
     $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['userid'] . '"><label></label></div>';
     // User id
-    $row[] = $aRow['userid'];
+    if($column == 1 && $dir == "desc") {
+        $row[] = $output['iTotalDisplayRecords'] - $this->ci->input->post('start') - $key;
+    } else {
+        $row[] = $this->ci->input->post('start') + $key + 1;
+    }
 
     // Company
     $company  = $aRow['company'];
