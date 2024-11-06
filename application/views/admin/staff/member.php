@@ -247,13 +247,24 @@
                                         <?php } ?>
                                     </div>
                                 </div>
+
+                                <?php if(empty($member->staffid)) { ?>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <?php
+                                            echo render_select('project[]', $projects, ['id', 'name'], 'project', array(), ['multiple' => true, 'data-actions-box' => true], [], '', '', false);
+                                            ?>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+
                                 <?php if (!isset($member) || is_admin() || !is_admin() && $member->admin == 0) { ?>
                                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
                                 <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value=''
                                     tabindex="-1" />
                                 <input type="password" class="fake-autofill-field" name="fakepasswordremembered"
                                     value='' tabindex="-1" />
-                                <div class="clearfix form-group"></div>
+                                <div class="clearfix"></div>
                                 <label for="password"
                                     class="control-label"><?php echo _l('staff_add_edit_password'); ?></label>
                                 <div class="input-group">

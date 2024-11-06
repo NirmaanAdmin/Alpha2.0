@@ -450,6 +450,11 @@ class Staff_model extends App_Model
             $data['is_not_staff'] = 0;
         }
 
+        if (isset($data['project'])) {
+            $project_assign = $data['project'];
+            unset($data['project']);
+        }
+
         $this->db->insert(db_prefix() . 'staff', $data);
         $staffid = $this->db->insert_id();
         if ($staffid) {
@@ -496,6 +501,16 @@ class Staff_model extends App_Model
                     'staff'          => 1,
                     'userid'         => $staffid,
                 ]);
+            }
+            if(isset($project_assign)) {
+                if(!empty($project_assign)) {
+                    foreach ($project_assign as $key => $value) {
+                        $member = array();
+                        $member['project_id'] = $value;
+                        $member['staff_id'] = $staffid;
+                        $this->db->insert(db_prefix() . 'project_members', $member);
+                    }
+                }
             }
             hooks()->do_action('staff_member_created', $staffid);
 

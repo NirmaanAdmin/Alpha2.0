@@ -99,6 +99,7 @@ class Staff extends AdminController
         $data['roles']         = $this->roles_model->get();
         $data['user_notes']    = $this->misc_model->get_notes($id, 'staff');
         $data['departments']   = $this->departments_model->get();
+        $data['projects']      = $this->projects_model->get_items();
         $data['title']         = $title;
 
         $this->load->view('admin/staff/member', $data);
