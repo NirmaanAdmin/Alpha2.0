@@ -107,13 +107,13 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
-foreach ($rResult as $key => $aRow) {
+foreach ($rResult as $aRow) {
     $row = [];
 
     // Bulk actions
     $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['userid'] . '"><label></label></div>';
     // User id
-    $row[] = $this->ci->input->post('start') + $key + 1;
+    $row[] = $aRow['userid'];
 
     // Company
     $company  = $aRow['company'];
