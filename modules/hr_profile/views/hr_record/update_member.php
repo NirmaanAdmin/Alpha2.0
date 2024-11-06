@@ -181,6 +181,19 @@ echo render_date_input('birthday', 'hr_hr_birthday', _d($birthday));?>
                            </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php
+                                $joining_date = (isset($member) ? $member->joining_date : '');
+                                echo render_date_input('joining_date','joining_date',_d($joining_date)); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php
+                                $exit_date = (isset($member) ? $member->exit_date : '');
+                                echo render_date_input('exit_date','exit_date',_d($exit_date)); ?>
+                            </div>
+                        </div>
+
                         <?php if (is_admin() || has_permission('hrm_hr_records', '', 'edit')) {
 	?>
                           <?php
@@ -421,19 +434,6 @@ $days_for_identity = (isset($member) ? $member->days_for_identity : '');
 echo render_date_input('days_for_identity', 'hr_license_date', _d($days_for_identity));?>
                         </div>
                      </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php
-                            $joining_date = (isset($member) ? $member->joining_date : '');
-                            echo render_date_input('joining_date','joining_date',_d($joining_date)); ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?php
-                            $exit_date = (isset($member) ? $member->exit_date : '');
-                            echo render_date_input('exit_date','exit_date',_d($exit_date)); ?>
-                        </div>
-                    </div>
 
                      <div class="row">
                         <div class="col-md-6">
