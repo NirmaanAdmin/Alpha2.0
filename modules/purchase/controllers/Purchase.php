@@ -4705,7 +4705,7 @@ class purchase extends AdminController
         $data['taxes'] = $this->purchase_model->get_taxes();
         $this->load->model('currencies_model');
         $data['currencies'] = $this->currencies_model->get();
-
+        $data['projects'] = $this->projects_model->get_items();
         $data['vendors'] = $this->purchase_model->get_vendor();
         $pur_invoice_row_template = $this->purchase_model->create_purchase_invoice_row_template();
 

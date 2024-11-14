@@ -54,6 +54,7 @@
                         _l('invoice_code'),
                         _l('invoice_number'),
                         _l('vendor'),
+                        _l('project'),
                         _l('contract'),
                         _l('pur_order'),
                         _l('invoice_date'),

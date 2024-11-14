@@ -696,3 +696,4 @@ $lang['purchase_request_change_approve_status'] = 'Change the approval status of
 $lang['purchase_quotations_change_approve_status'] = 'Change the approval status of purchase quotations';
 $lang['convert_to_po'] = 'Convert to PO';
 $lang['delivery_person'] = 'Delivered by';
+$lang['signature_pur_order'] = 'Signature';

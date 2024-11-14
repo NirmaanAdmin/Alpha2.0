@@ -19,7 +19,7 @@
               <h4 class="no-margin font-bold"><i class="fa <?php if(isset($pur_invoice)){ echo 'fa-pencil-square';}else{ echo 'fa-plus';} ?>" aria-hidden="true"></i> <?php echo _l($title); ?> <?php if(isset($pur_invoice)){ echo ' '.pur_html_entity_decode($pur_invoice->invoice_number); } ?></h4>
               <hr />
              </div>
-            </div>
+            </div> 
 
             <div class="row">
             	<?php $additional_discount = 0; ?>
@@ -83,6 +83,17 @@
 	                	<label for="invoice_date"><?php echo _l('pur_due_date'); ?></label>
 	                	<?php $duedate = ( isset($pur_invoice) ? _d($pur_invoice->duedate) : _d(date('Y-m-d')) );
 	                	 echo render_date_input('duedate','',$duedate); ?>
+	                </div>
+					<div class="col-md-6 pad_right_0">
+						<label for="project"><span class="text-danger">* </span><?php echo _l('project'); ?></label>
+	                	<select name="project_id" id="project" class="selectpicker" data-live-search="true" data-width="100%" required="true" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+                          <option value=""></option>
+                          <?php foreach ($projects as $s) { ?>
+                            <option value="<?php echo pur_html_entity_decode($s['id']); ?>" <?php if (isset($pur_invoice) && $s['id'] == $pur_invoice->project_id) {                                                                                              echo 'selected';
+                            } else if (!isset($pur_invoice) && $s['id'] == $project_id) {                                                                                              echo 'selected';
+                            } ?>><?php echo pur_html_entity_decode($s['name']); ?></option>
+                          <?php } ?>
+                        </select>
 	                </div>
 
 	                <div id="recurring_div" class="<?php if(isset($pur_invoice) && $pur_invoice->pur_order != null){ echo 'hide';} ?>">

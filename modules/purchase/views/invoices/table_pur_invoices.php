@@ -11,6 +11,7 @@ $aColumns = [
     'invoice_number',
     'vendor_invoice_number',
     db_prefix().'pur_invoices.vendor',
+    db_prefix().'projects.name',
     'contract',
     db_prefix().'pur_invoices.pur_order',
     'invoice_date',
@@ -25,7 +26,10 @@ $aColumns = [
     ];
 $sIndexColumn = 'id';
 $sTable       = db_prefix().'pur_invoices';
-$join         = [ 'LEFT JOIN '.db_prefix().'pur_contracts ON '.db_prefix().'pur_contracts.id = '.db_prefix().'pur_invoices.contract' ];
+$join         = [ 
+    'LEFT JOIN '.db_prefix().'pur_contracts ON '.db_prefix().'pur_contracts.id = '.db_prefix().'pur_invoices.contract',
+    'LEFT JOIN '.db_prefix().'projects ON '.db_prefix().'pur_invoices.project_id = '.db_prefix().'projects.id',
+];
 
 $i = 0;
 foreach ($custom_fields as $field) {
