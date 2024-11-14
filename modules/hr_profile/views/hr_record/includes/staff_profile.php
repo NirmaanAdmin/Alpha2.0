@@ -1,32 +1,32 @@
 <div class="row">
 
-	<?php if (($staff_p->staffid == get_staff_user_id() || is_admin()) && !$this->input->get('notifications')) {?>
-      <div class="col-md-12">
-          <div class="panel-body no-padding-bottom">
-           <?php $this->load->view('hr_record/includes/stats');?>
-         </div>
-     </div>
-     <?php }?>
+	<?php if (($staff_p->staffid == get_staff_user_id() || is_admin()) && !$this->input->get('notifications')) { ?>
+		<div class="col-md-12">
+			<div class="panel-body no-padding-bottom">
+				<?php $this->load->view('hr_record/includes/stats'); ?>
+			</div>
+		</div>
+	<?php } ?>
 
 	<br>
 	<br>
 	<?php
-if ($member->active == 0) {?>
+	if ($member->active == 0) { ?>
 		<div class="alert alert-danger text-center"><?php echo _l('staff_profile_inactive_account'); ?></div>
 		<hr />
-	<?php }?>
-	<div class="col-md-12 pl-0" >
+	<?php } ?>
+	<div class="col-md-12 pl-0">
 		<div class="col-md-5">
 			<div class="row">
 				<div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
 					<div class="card box-shadow-0 overflow-hidden">
-						<?php if ($member->status_work == 'working') {?>
+						<?php if ($member->status_work == 'working') { ?>
 							<div class="ribbon ribbon-top-right text-info"><span class="bg_working"><?php echo _l('hr_working'); ?></span></div>
-						<?php } elseif ($member->status_work == 'maternity_leave') {?>
+						<?php } elseif ($member->status_work == 'maternity_leave') { ?>
 							<div class="ribbon ribbon-top-right text-info"><span class="bg_maternity_leave"><?php echo _l('hr_maternity_leave'); ?></span></div>
-						<?php } elseif ($member->status_work == 'inactivity') {?>
+						<?php } elseif ($member->status_work == 'inactivity') { ?>
 							<div class="ribbon ribbon-top-right text-info"><span class="bg_inactivity"><?php echo _l('hr_inactivity'); ?></span></div>
-						<?php }?>
+						<?php } ?>
 						<div class="card-body">
 							<div class="text-center">
 								<div class="userprofile">
@@ -78,22 +78,22 @@ if ($member->active == 0) {?>
 						<li class="list-group-item">
 
 							<?php if (count($staff_departments) > 0) {
-	?>
+							?>
 								<div class="form-group mtop10">
 									<div class="clearfix"></div>
 									<?php
-foreach ($departments as $department) {
-		?>
+									foreach ($departments as $department) {
+									?>
 										<?php
-foreach ($staff_departments as $staff_department) {
-			if ($staff_department['departmentid'] == $department['departmentid']) {?>
+										foreach ($staff_departments as $staff_department) {
+											if ($staff_department['departmentid'] == $department['departmentid']) { ?>
 												<div class="chip-circle"><?php echo new_html_entity_decode($staff_department['name']); ?></div>
-											<?php }
-		}
-		?>
-									<?php }?>
+										<?php }
+										}
+										?>
+									<?php } ?>
 								</div>
-							<?php }?>
+							<?php } ?>
 
 						</li>
 					</ul>
@@ -130,7 +130,7 @@ foreach ($staff_departments as $staff_department) {
 							<td><?php echo _l($member->sex ?? ''); ?></td>
 						</tr>
 						<tr class="project-overview">
-							<td class="bold" ><?php echo _l('hr_hr_birthday'); ?></td>
+							<td class="bold"><?php echo _l('hr_hr_birthday'); ?></td>
 							<td><?php echo _d($member->birthday ?? ''); ?></td>
 						</tr>
 						<tr class="project-overview">
@@ -153,15 +153,35 @@ foreach ($staff_departments as $staff_department) {
 							<td class="bold" width="40%"><?php echo _l('hr_hr_job_position'); ?></td>
 							<td>
 								<?php
-if ($member->job_position > 0) {
-	$job_position_name = new_html_entity_decode(hr_profile_get_job_position_name($member->job_position))
-	?>
-	<a href="<?php echo admin_url() . 'hr_profile/job_position_view_edit/' . $member->job_position; ?>"><?php echo $job_position_name; ?></a>
-										<?php
-}
+								if ($member->job_position > 0) {
+									$job_position_name = new_html_entity_decode(hr_profile_get_job_position_name($member->job_position))
+								?>
+									<a href="<?php echo admin_url() . 'hr_profile/job_position_view_edit/' . $member->job_position; ?>"><?php echo $job_position_name; ?></a>
+								<?php
+								}
 
-?>
+								?>
 							</td>
+						</tr>
+						<tr class="project-overview">
+							<td class="bold"><?php echo _l('joining_date'); ?></td>
+							<?php
+							$joindate = '';
+							if (!empty($member->joining_date)) {
+								$joindate = date('d M Y', strtotime($member->joining_date));
+							}
+							?>
+							<td><?php echo $joindate ?: ' '; ?></td>
+						</tr>
+						<tr class="project-overview">
+							<td class="bold"><?php echo _l('exit_date'); ?></td>
+							<?php
+							$joindate = '';
+							if (!empty($member->exit_date)) {
+								$exitdate = date('d M Y', strtotime($member->exit_date));
+							}
+							?>
+							<td><?php echo $exitdate ?: ' '; ?></td>
 						</tr>
 						<tr class="project-overview">
 							<td class="bold" width="40%"><?php echo _l('hr_hr_literacy'); ?></td>
@@ -251,7 +271,7 @@ if ($member->job_position > 0) {
 							<td class="bold"><?php echo _l('social_security_no'); ?></td>
 							<td><?php echo new_html_entity_decode($member->social_security_no); ?></td>
 						</tr>
-						
+
 					</tbody>
 				</table>
 			</div>
