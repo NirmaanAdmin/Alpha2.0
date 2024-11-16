@@ -12,7 +12,7 @@ return App_table::find('invoices')
         $aColumns = [
             'number',
             'total',
-            'total_tax',
+            'total_tax', 
             'YEAR(date) as year',
             'date',
             get_sql_select_client_company(),
@@ -83,7 +83,7 @@ return App_table::find('invoices')
             $row = [];
 
             $numberOutput = '';
-
+            $total_left_to_pay = get_invoice_total_left_to_pay($aRow['id'], $aRow['total']);
             // If is from client area table
             if (is_numeric($clientid) || $project_id) {
                 $numberOutput = '<a href="' . admin_url('invoices/list_invoices/' . $aRow['id']) . '" target="_blank">' . e(format_invoice_number($aRow['id'])) . '</a>';
@@ -107,7 +107,7 @@ return App_table::find('invoices')
 
             $row[] = e(app_format_money($aRow['total'], $aRow['currency_name']));
 
-            $row[] = e(app_format_money($aRow['total_tax'], $aRow['currency_name']));
+            $row[] = e(app_format_money($total_left_to_pay, $aRow['currency_name']));
 
             $row[] = e($aRow['year']);
 
