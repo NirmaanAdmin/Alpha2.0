@@ -583,7 +583,7 @@
   } else {
     $('#project').attr('disabled', false);
     $('#pur_request').attr('disabled', false);
-    $('#project_val').css('display', 'none');
+    $('#project_val').remove();
   }
   
 
