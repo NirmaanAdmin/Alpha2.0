@@ -137,6 +137,7 @@
                       ?>
                       <div class="row">
                         <div class="col-md-6 form-group">
+                          <input type="hidden" name="project" id="project_val" value="">
                           <label for="project"><?php echo _l('project'); ?></label>
                             <select name="project" id="project" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
                               <option value=""></option>
@@ -577,10 +578,14 @@
   if(convert_po) {
     $('#project').attr('disabled', true);
     $('#pur_request').attr('disabled', true);
+    $('#project_val').css('display', 'block');
+    $('#project_val').val($('#project').val());
   } else {
     $('#project').attr('disabled', false);
     $('#pur_request').attr('disabled', false);
+    $('#project_val').css('display', 'none');
   }
+  
 
   var pur_request = $('select[name="pur_request"]').val();
   var vendor = $('select[name="vendor"]').val();

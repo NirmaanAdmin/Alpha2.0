@@ -4420,80 +4420,98 @@ class Purchase_model extends App_Model
       $html .=  '<table class="table purorder-item" style="width: 100%">
         <thead>
           <tr>
-            <th class="thead-dark" style="width: 15%">'._l('items').'</th>
-            <th class="thead-dark" align="left" style="width: 25%">'._l('item_description').'</th>
-            <th class="thead-dark" align="right" style="width: 12%">'._l('unit_price').'</th>
-            <th class="thead-dark" align="right" style="width: 12%">'._l('quantity').'</th>
-         
-            <th class="thead-dark" align="right" style="width: 12%">'._l('tax').'</th>
+            <th class="thead-dark" style="width: 15%">' . _l('items') . '</th>
+            <th class="thead-dark" align="left" style="width: 30%">' . _l('item_description') . '</th>
+            <th class="thead-dark" align="right" style="width: 10%">' . _l('quantity') . '</th>
+            <th class="thead-dark" align="right" style="width: 11%">' . _l('unit_price') . '</th>
+            
+            <th class="thead-dark" align="right" style="width: 10%">' . _l('tax_percentage') . '</th>
+            <th class="thead-dark" align="right" style="width: 12%">' . _l('tax') . '</th>
  
-            <th class="thead-dark" align="right" style="width: 12%">'._l('discount').'</th>
-            <th class="thead-dark" align="right" style="width: 12%">'._l('total').'</th>
+            
+            <th class="thead-dark" align="right" style="width: 12%">' . _l('total') . '</th>
           </tr>
           </thead>
           <tbody>';
+        $sub_total_amn = 0;
+        $tax_total = 0;
         $t_mn = 0;
-      foreach($pur_order_detail as $row){
-        $items = $this->get_items_by_id($row['item_code']);
-        $units = $this->get_units_by_id($row['unit_id']);
-        $html .= '<tr nobr="true" class="sortable">
-            <td style="width: 15%">'.$items->commodity_code.' - '.$items->description.'</td>
-            <td align="left" style="width: 25%">'.str_replace("<br />"," ",$row['description']).'</td>
-            <td align="right" style="width: 12%">'.app_format_money($row['unit_price'],'').'</td>
-            <td align="right" style="width: 12%">'.$row['quantity'].'</td>
-         
-            <td align="right" style="width: 12%">'.app_format_money($row['total'] - $row['into_money'],'').'</td>
-       
-            <td align="right" style="width: 12%">'.app_format_money($row['discount_money'],'').'</td>
-            <td align="right" style="width: 12%">'.app_format_money($row['total_money'],'').'</td>
+        $discount_total = 0;
+        foreach ($pur_order_detail as $row) {
+            $items = $this->get_items_by_id($row['item_code']);
+            $units = $this->get_units_by_id($row['unit_id']);
+            $unit_name = pur_get_unit_name($row['unit_id']);
+            $html .= '<tr nobr="true" class="sortable">
+            <td style="width: 15%">' . $items->commodity_code . ' - ' . $items->description . '</td>
+            <td align="left" style="width: 30%">' . str_replace("<br />", " ", $row['description']) . '</td>
+            <td align="right" style="width: 10%">' . $row['quantity']  .' ' .$unit_name .'</td>
+            <td align="right" style="width: 11%">' . '₹ '. app_format_money($row['unit_price'], '') . '</td>
+            
+            <td align="right" style="width: 10%">'. app_format_money($row['tax_rate'], '') . '</td>
+            <td align="right" style="width: 12%">' . '₹ '. app_format_money($row['total'] - $row['into_money'], '') . '</td>
+            <td align="right" style="width: 12%">' . '₹ '. app_format_money($row['total_money'], '') . '</td>
           </tr>';
 
-        $t_mn += $row['total_money'];
-      }  
-      $html .=  '</tbody>
+            $t_mn += $row['total_money'];
+            $tax_total += $row['total'] - $row['into_money'];
+            $sub_total_amn += $row['total_money'] - $tax_total;
+        }
+        $html .=  '</tbody>
       </table><br><br>';
-
-      $html .= '<table class="table text-right"><tbody>';
-      if($pur_order->discount_total > 0){
-        $html .= '<tr id="subtotal">
-                    <td width="33%"></td>
-                     <td>'._l('subtotal').' </td>
+      
+        $html .= '<table class="table text-right"><tbody>';
+        if ($pur_order->discount_total > 0 || $tax_total > 0) {
+            $html .= '<tr id="subtotal">
+            <td width="33%"></td>
+            <td>' . _l('subtotal') . ' </td>
+            <td class="subtotal">
+            ' .'₹ '. app_format_money($pur_order->subtotal, '') . '
+            </td>
+            </tr>';
+        }
+        if ($tax_total > 0) {
+            $html .= '<tr id="tax">
+            <td width="33%"></td>
+            <td>' . _l('Tax') . ' </td>
+            <td class="taxtotal">
+            ' .'₹ '. app_format_money($tax_total, '') . '
+            </td>
+            </tr>';
+        }
+        if ($pur_order->discount_total > 0) {
+            $html .= '<tr id="subtotal">
+                  <td width="33%"></td>
+                     <td>' . _l('discount(%)') . '(%)' . '</td>
                      <td class="subtotal">
-                        '.app_format_money($t_mn,'').'
+                        ' . app_format_money($pur_order->discount_percent, '') . ' %' . '
                      </td>
                   </tr>
                   <tr id="subtotal">
                   <td width="33%"></td>
-                     <td>'._l('discount(%)').'(%)'.'</td>
+                     <td>' . _l('discount(money)') . '</td>
                      <td class="subtotal">
-                        '.app_format_money($pur_order->discount_percent,'').' %'.'
-                     </td>
-                  </tr>
-                  <tr id="subtotal">
-                  <td width="33%"></td>
-                     <td>'._l('discount(money)').'</td>
-                     <td class="subtotal">
-                        '.app_format_money($pur_order->discount_total, '').'
+                        ' .'₹ '. app_format_money($pur_order->discount_total, '') . '
                      </td>
                   </tr>';
-      }
-      $html .= '<tr id="subtotal">
+        }
+        $html .= '<tr id="subtotal">
                  <td width="33%"></td>
-                 <td>'. _l('total').'</td>
+                 <td><strong>' . _l('total') . '</strong></td>
                  <td class="subtotal">
-                    '. app_format_money($pur_order->total, '').'
+                    ' .'₹ '. app_format_money($pur_order->total, '') . '
                  </td>
               </tr>';
 
-      $html .= ' </tbody></table>';
+        $html .= ' </tbody></table>';
 
-      $html .= '<div style="page-break-before:always">&nbsp;</div>';
-
-      $html .= '<div class="col-md-12 mtop15">
-            <p class="bold"><b>'. _l('estimate_add_edit_vendor_note').':</b> '. nl2br($pur_order->vendornote).'</p>
-            <p class="bold"><b>'. _l('terms_and_conditions').':</b> '. nl2br($pur_order->terms).'</p>
+        $html .= '<div>&nbsp;</div>';
+        $vendornote_with_break = str_replace('ANNEXURE - B', '<div style="page-break-after:always"></div><div style="text-align:center; ">ANNEXURE - B</div>', $pur_order->vendornote);
+        $html .= '<div class="col-md-12 mtop15">
+            <p class="bold">' . nl2br($vendornote_with_break) . '</p>';
+        $html .= '<div style="page-break-before:always"></div>';
+        $html .= '<p class="bold">' . nl2br($pur_order->terms) . '</p>
             </div>';
-      $html .= '<br>
+        $html .= '<br>
       <br>
       <br>
       <br>
