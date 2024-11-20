@@ -11,6 +11,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  */
 function get_relation_data($type, $rel_id = '', $extra = [])
 {
+   
     $CI = & get_instance();
     $q  = '';
     if ($CI->input->post('q')) {
@@ -48,6 +49,7 @@ function get_relation_data($type, $rel_id = '', $extra = [])
             $data   = $search['result'];
         }
     } elseif ($type == 'invoice') {
+    
         if ($rel_id != '') {
             $CI->load->model('invoices_model');
             $data = $CI->invoices_model->get($rel_id);
@@ -95,7 +97,7 @@ function get_relation_data($type, $rel_id = '', $extra = [])
             $data = $CI->expenses_model->get($rel_id);
         } else {
             $search = $CI->misc_model->_search_expenses($q);
-            $data   = $search['result'];
+            $data   = $search['result']; 
         }
     } elseif ($type == 'lead' || $type == 'leads') {
         if ($rel_id != '') {
@@ -116,6 +118,7 @@ function get_relation_data($type, $rel_id = '', $extra = [])
             $data   = $search['result'];
         }
     } elseif ($type == 'project') {
+    
         if ($rel_id != '') {
             $CI->load->model('projects_model');
             $data = $CI->projects_model->get($rel_id);
@@ -140,6 +143,14 @@ function get_relation_data($type, $rel_id = '', $extra = [])
         if ($rel_id != '') {
             $data = $CI->tasks_model->get($rel_id);
         }
+    } elseif ($type == 'pur_order') {             
+        if ($rel_id != '') {
+            $CI->load->model('purchase_model');
+            $data = $CI->purchase_model->get_pur_order($rel_id);
+        }else{
+            $search = $CI->misc_model->_search_purchase_orders($q);
+            $data   = $search['result'];
+        }
     }
 
     $data = hooks()->apply_filters('get_relation_data', $data, compact('type', 'rel_id', 'extra'));
@@ -156,6 +167,7 @@ function get_relation_data($type, $rel_id = '', $extra = [])
  */
 function get_relation_values($relation, $type)
 {
+    
     if ($relation == '') {
         return [
             'name'      => '',
@@ -322,21 +334,45 @@ function get_relation_values($relation, $type)
             $name     = $relation->name;
             $clientId = $relation->clientid;
         }
-
+        
         $name = '#' . $id . ' - ' . $name . ' - ' . get_company_name($clientId);
 
         $link = admin_url('projects/view/' . $id);
+    } elseif ($type == 'pur_order') {   
+            
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $name      = $relation['pur_order_name'];
+        } else {
+            $id        = $relation->id;
+            $name      = $relation->pur_order_name;
+        }
+       $link = admin_url('purchase/purchase_order/' . $id);
+      
     }
-
-    return hooks()->apply_filters('relation_values', [
-        'id'        => $id,
-        'name'      => $name,
-        'link'      => $link,
-        'addedfrom' => $addedfrom,
-        'subtext'   => $subtext,
-        'type'      => $type,
-        'relation'  => $relation,
-    ]);
+    
+    if($type == 'pur_order'){
+        return [
+            'id'        => $id,
+            'name'      => $name,
+            'link'      => $link,
+            'addedfrom' => $addedfrom,
+            'subtext'   => $subtext,
+            'type'      => $type,
+            'relation'  => $relation,
+        ];
+    }else{
+        return hooks()->apply_filters('relation_values', [
+            'id'        => $id,
+            'name'      => $name,
+            'link'      => $link,
+            'addedfrom' => $addedfrom,
+            'subtext'   => $subtext,
+            'type'      => $type,
+            'relation'  => $relation,
+        ]);
+    }
+    
 }
 
 /**
@@ -364,6 +400,7 @@ function init_relation_options($data, $type, $rel_id = '')
 
     foreach ($data as $relation) {
         $relation_values = get_relation_values($relation, $type);
+        
         if ($type == 'project') {
             if (!$has_permission_projects_view) {
                 if (!$CI->projects_model->is_member($relation_values['id']) && $rel_id != $relation_values['id']) {
@@ -404,7 +441,7 @@ function init_relation_options($data, $type, $rel_id = '')
             if (!$has_permission_proposals_view && $rel_id != $relation_values['id'] && $relation_values['addedfrom'] != get_staff_user_id()) {
                 continue;
             }
-        }
+        } 
 
         $_data[] = $relation_values;
         //  echo '<option value="' . $relation_values['id'] . '"' . $selected . '>' . $relation_values['name'] . '</option>';

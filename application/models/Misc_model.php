@@ -241,7 +241,7 @@ class Misc_model extends App_Model
                 $this->leads_model->log_lead_activity($data['rel_id'], 'not_activity_new_reminder_created', false, serialize([
                     get_staff_full_name($data['staff']),
                     _dt($data['date']),
-                    ]));
+                ]));
             }
             log_activity('New Reminder Added [' . ucfirst($data['rel_type']) . 'ID: ' . $data['rel_id'] . ' Description: ' . $data['description'] . ']');
 
@@ -1134,6 +1134,35 @@ class Misc_model extends App_Model
 
         return $result;
     }
+    public function _search_purchase_orders($q, $limit = 0)
+    {
+            $result = [
+                'result'         => [],
+                'type'           => 'pur_order',
+                'search_heading' => _l('purchase_orders'),
+            ];
+    
+
+            // Purchase Orders
+            $this->db->select();
+            $this->db->from(db_prefix() . 'pur_orders');
+    
+            $this->db->where('(pur_order_name LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+                OR pur_order_number LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+                OR vendor LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
+    
+            if ($limit != 0) {
+                $this->db->limit($limit);
+            }
+    
+            $this->db->order_by('pur_order_name', 'ASC');
+            $result['result'] = $this->db->get()->result_array();
+            
+    
+        return $result;
+    }
+    
+
 
     public function _search_invoices($q, $limit = 0)
     {
