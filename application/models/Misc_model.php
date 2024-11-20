@@ -1136,32 +1136,32 @@ class Misc_model extends App_Model
     }
     public function _search_purchase_orders($q, $limit = 0)
     {
-            $result = [
-                'result'         => [],
-                'type'           => 'pur_order',
-                'search_heading' => _l('purchase_orders'),
-            ];
-    
+        $result = [
+            'result'         => [],
+            'type'           => 'pur_order',
+            'search_heading' => _l('purchase_orders'),
+        ];
 
-            // Purchase Orders
-            $this->db->select();
-            $this->db->from(db_prefix() . 'pur_orders');
-    
-            $this->db->where('(pur_order_name LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+
+        // Purchase Orders
+        $this->db->select();
+        $this->db->from(db_prefix() . 'pur_orders');
+
+        $this->db->where('(pur_order_name LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
                 OR pur_order_number LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
                 OR vendor LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
-    
-            if ($limit != 0) {
-                $this->db->limit($limit);
-            }
-    
-            $this->db->order_by('pur_order_name', 'ASC');
-            $result['result'] = $this->db->get()->result_array();
-            
-    
+
+        if ($limit != 0) {
+            $this->db->limit($limit);
+        }
+
+        $this->db->order_by('pur_order_name', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
+
+
         return $result;
     }
-    
+
 
 
     public function _search_invoices($q, $limit = 0)
@@ -1520,6 +1520,133 @@ class Misc_model extends App_Model
             $this->db->order_by('date', 'DESC');
             $result['result'] = $this->db->get()->result_array();
         }
+
+        return $result;
+    }
+    public function _search_quotations($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'quotation',
+            'search_heading' => _l('quotations'),
+        ];
+    
+        // Quotations
+        $this->db->select();
+        $this->db->from(db_prefix() . 'pur_estimates'); // Table for quotations
+    
+        // Search in the specified columns
+        $this->db->where('(prefix LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
+        if ($limit != 0) {
+            $this->db->limit($limit);
+        }
+    
+        $this->db->order_by('prefix', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
+    
+        return $result;
+    }
+    
+    public function _search_pur_contracts($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'contract',
+            'search_heading' => _l('contracts'),
+        ];
+
+        // Contracts
+        $this->db->select();
+        $this->db->from(db_prefix() . 'pur_contracts'); // Table name for contracts
+
+        // Search in the specified columns
+        $this->db->where('(contract_number LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+        OR contract_name LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+        OR vendor LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
+
+        if ($limit != 0) {
+            $this->db->limit($limit);
+        }
+
+        $this->db->order_by('contract_name', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
+
+        return $result;
+    }
+    public function _search_pur_invoices($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'pur_invoices',
+            'search_heading' => _l('invoices'),
+        ];
+
+        // Invoices
+        $this->db->select();
+        $this->db->from(db_prefix() . 'pur_invoices');
+
+        // Search in the specified columns
+        $this->db->where('(CAST(invoice_number AS CHAR) LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\' 
+        
+        )');
+
+        if ($limit != 0) {
+            $this->db->limit($limit);
+        }
+
+        // Ensure sorting works with TEXT
+        $this->db->order_by('CAST(invoice_number AS CHAR)', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
+
+        return $result;
+    }
+    public function _search_stock_import($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'stock_import',
+            'search_heading' => _l('stock_import'),
+        ];
+
+        // Goods Receipt
+        $this->db->select();
+        $this->db->from(db_prefix() . 'goods_receipt');
+
+        // Search in the specified column with safe escaping
+        $this->db->where('(goods_receipt_code LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
+
+        if ($limit > 0) {
+            $this->db->limit($limit);
+        }
+
+        // Order by goods receipt code
+        $this->db->order_by('goods_receipt_code', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
+
+        return $result;
+    }
+    public function _search_goods_delivery($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'stock_export',
+            'search_heading' => _l('stock_export'),
+        ];
+
+        // Goods Receipt
+        $this->db->select();
+        $this->db->from(db_prefix() . 'goods_delivery');
+
+        // Search in the specified column with safe escaping
+        $this->db->where('(goods_delivery_code LIKE "%' . $this->db->escape_like_str($q) . '%" ESCAPE \'!\')');
+
+        if ($limit > 0) {
+            $this->db->limit($limit);
+        }
+
+        // Order by goods receipt code
+        $this->db->order_by('goods_delivery_code', 'ASC');
+        $result['result'] = $this->db->get()->result_array();
 
         return $result;
     }

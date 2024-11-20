@@ -145,13 +145,52 @@ function get_relation_data($type, $rel_id = '', $extra = [])
         }
     } elseif ($type == 'pur_order') {             
         if ($rel_id != '') {
-            $CI->load->model('purchase_model');
-            $data = $CI->purchase_model->get_pur_order($rel_id);
+            // $CI->load->model('purchase_model');
+            // $data = $CI->purchase_model->get_pur_order($rel_id);
         }else{
             $search = $CI->misc_model->_search_purchase_orders($q);
             $data   = $search['result'];
         }
+    }elseif ($type == 'pur_quotation') {
+        if ($rel_id != '') {
+            
+        }else{
+            $search = $CI->misc_model->_search_quotations($q);
+            $data   = $search['result'];
+        }
+    }elseif ($type == 'pur_contract') {
+        if ($rel_id != '') {
+            
+        }else{
+            $search = $CI->misc_model->_search_pur_contracts($q);
+            $data   = $search['result'];
+        }
+    } elseif ($type == 'pur_invoice') {
+        if ($rel_id != '') {
+            
+        }else{
+            $search = $CI->misc_model->_search_pur_invoices($q);
+            $data   = $search['result'];
+        }
+    } elseif ($type == 'stock_import') {
+        
+        if ($rel_id != '') {
+            
+        }else{
+            $search = $CI->misc_model->_search_stock_import($q);
+            $data   = $search['result'];
+        }
+    }elseif ($type == 'stock_export') {
+        
+        if ($rel_id != '') {
+            
+        }else{
+            $search = $CI->misc_model->_search_goods_delivery($q);
+            $data   = $search['result'];
+        }
     }
+    
+    
 
     $data = hooks()->apply_filters('get_relation_data', $data, compact('type', 'rel_id', 'extra'));
 
@@ -349,9 +388,62 @@ function get_relation_values($relation, $type)
         }
        $link = admin_url('purchase/purchase_order/' . $id);
       
+    }elseif ($type == 'pur_quotation') {   
+            
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $addedfrom = $relation['addedfrom'];
+        } else {
+            $id        = $relation->id;
+            $addedfrom = $relation->addedfrom;
+        }
+        $name = format_invoice_number($id);
+        $link = admin_url('purchase/quotations/' . $id);
+      
+    }elseif ($type == 'pur_contract') {
+              
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $name      = $relation['contract_name'];
+        } else {
+            $id        = $relation->id;
+            $name      = $relation->contract_name;
+        }
+       $link = admin_url('purchase/contract/' . $id);
+    } elseif ($type == 'pur_invoice') {
+              
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $name      = $relation['invoice_number'];
+        } else {
+            $id        = $relation->id;
+            $name      = $relation->invoice_number;
+        }
+       $link = admin_url('purchase/invoices/' . $id);
+    } elseif ($type == 'stock_import') {
+        
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $name      = $relation['goods_receipt_code'];
+        } else {
+            $id        = $relation->id;
+            $name      = $relation->goods_receipt_code;
+        }
+       $link = admin_url('warehouse/manage_purchase/' . $id);
+    }elseif ($type == 'stock_export') {
+      
+        if (is_array($relation)) {
+            $id        = $relation['id'];
+            $name      = $relation['goods_delivery_code'];
+        } else {
+            $id        = $relation->id;
+            $name      = $relation->goods_delivery_code;
+        }
+       $link = admin_url('warehouse/manage_delivery/' . $id);
     }
     
-    if($type == 'pur_order'){
+    if($type == 'pur_order' || $type == 'pur_quotation' || $type == 'pur_contract' || $type == 'pur_invoice' || $type == 'stock_import' || $type == 'stock_export'){
+        
         return [
             'id'        => $id,
             'name'      => $name,
@@ -397,10 +489,15 @@ function init_relation_options($data, $type, $rel_id = '')
     $is_admin                      = is_admin();
     $CI                            = & get_instance();
     $CI->load->model('projects_model');
-
+    echo '<pre>';
+    print_r($data);
+    die;
     foreach ($data as $relation) {
+       
         $relation_values = get_relation_values($relation, $type);
-        
+        echo '<pre>'; 
+        print_r($relation_values);
+        die;
         if ($type == 'project') {
             if (!$has_permission_projects_view) {
                 if (!$CI->projects_model->is_member($relation_values['id']) && $rel_id != $relation_values['id']) {
@@ -446,6 +543,7 @@ function init_relation_options($data, $type, $rel_id = '')
         $_data[] = $relation_values;
         //  echo '<option value="' . $relation_values['id'] . '"' . $selected . '>' . $relation_values['name'] . '</option>';
     }
+    
 
     $_data = hooks()->apply_filters('init_relation_options', $_data, compact('data', 'type', 'rel_id'));
 
