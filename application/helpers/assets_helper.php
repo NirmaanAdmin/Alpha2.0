@@ -218,6 +218,17 @@ function add_admin_tickets_js_assets()
     );
 }
 
+function add_admin_forms_js_assets()
+{
+    $CI = &get_instance();
+    $CI->app_scripts->add(
+        'forms-js',
+        base_url($CI->app_scripts->core_file('assets/js', 'forms.js')) . '?v=' . $CI->app_scripts->core_version(),
+        'admin',
+        ['app-js']
+    );
+}
+
 function add_datatables_js_assets($group = 'admin')
 {
     get_instance()->app_scripts->add('datatables-js', 'assets/plugins/datatables/datatables.min.js', $group);

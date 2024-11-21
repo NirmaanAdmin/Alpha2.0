@@ -181,6 +181,14 @@ function app_init_admin_sidebar_menu_items()
         }
     }
 
+    $CI->app_menu->add_sidebar_menu_item('forms', [
+        'name'     => 'Forms',
+        'href'     => admin_url('forms'),
+        'icon'     => 'fa-regular fa-life-ring',
+        'position' => 41,
+        'badge'    => [],
+    ]);
+
     if (is_staff_member()) {
         $CI->app_menu->add_sidebar_menu_item('leads', [
             'name'     => _l('als_leads'),

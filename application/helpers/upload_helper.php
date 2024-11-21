@@ -836,6 +836,74 @@ function handle_ticket_attachments($ticketid, $index_name = 'attachments')
 }
 
 /**
+ * Check for form attachment after inserting form to database
+ * @param  mixed $formid
+ * @return mixed           false if no attachment || array uploaded attachments
+ */
+function handle_form_attachments($formid, $index_name = 'attachments')
+{
+
+    $hookData = hooks()->apply_filters('before_handle_form_attachment', [
+        'form_id' => $formid,
+        'index_name' => $index_name,
+        'uploaded_files' => [],
+        'handled_externally' => false, // e.g. module upload to s3
+        'files' => $_FILES
+    ]);
+
+    if ($hookData['handled_externally']) {
+        return count($hookData['uploaded_files']) > 0 ? $hookData['uploaded_files'] : false;
+    }
+
+    if (!is_dir(get_upload_path_by_type('form'))) {
+        mkdir(get_upload_path_by_type('form'), 0755);
+    }
+    $path           = get_upload_path_by_type('form') . $formid . '/';
+    $uploaded_files = [];
+
+    if (isset($_FILES[$index_name])) {
+        _file_attachments_index_fix($index_name);
+
+        for ($i = 0; $i < count($_FILES[$index_name]['name']); $i++) {
+            hooks()->do_action('before_upload_form_attachment', $formid);
+
+            if ($i <= get_option('maximum_allowed_form_attachments')) {
+                // Get the temp file path
+                $tmpFilePath = $_FILES[$index_name]['tmp_name'][$i];
+                // Make sure we have a filepath
+                if (!empty($tmpFilePath) && $tmpFilePath != '') {
+                    // Getting file extension
+                    $extension = strtolower(pathinfo($_FILES[$index_name]['name'][$i], PATHINFO_EXTENSION));
+
+                    $allowed_extensions = explode(',', get_option('form_attachments_file_extensions'));
+                    $allowed_extensions = array_map('trim', $allowed_extensions);
+                    // Check for all cases if this extension is allowed
+                    if (!in_array('.' . $extension, $allowed_extensions)) {
+                        continue;
+                    }
+                    _maybe_create_upload_path($path);
+                    $filename    = unique_filename($path, $_FILES[$index_name]['name'][$i]);
+                    $newFilePath = $path . $filename;
+                    // Upload the file into the temp dir
+                    if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                        array_push($uploaded_files, [
+                                'file_name' => $filename,
+                                'filetype'  => $_FILES[$index_name]['type'][$i],
+                                ]);
+                    }
+                }
+            }
+        }
+    }
+
+    if (count($uploaded_files) > 0) {
+        return $uploaded_files;
+    }
+
+    return false;
+}
+
+/**
  * Check for company logo upload
  * @return boolean
  */
@@ -1410,6 +1478,10 @@ function get_upload_path_by_type($type)
         break;
         case 'ticket':
         $path = TICKET_ATTACHMENTS_FOLDER;
+
+        break;
+        case 'form':
+        $path = FORM_ATTACHMENTS_FOLDER;
 
         break;
         case 'contact_profile_images':

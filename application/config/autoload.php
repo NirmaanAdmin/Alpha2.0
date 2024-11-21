@@ -149,6 +149,7 @@ $autoload['helper'] = [
         'fields',
         'leads',
         'tickets',
+        'forms',
         'relation',
         'tags',
         'pdf',

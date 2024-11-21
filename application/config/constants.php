@@ -138,6 +138,10 @@ define('CLIENT_ATTACHMENTS_FOLDER', FCPATH . 'uploads/clients' . '/');
  */
 define('TICKET_ATTACHMENTS_FOLDER', FCPATH . 'uploads/ticket_attachments' . '/');
 /**
+ * All tickets attachments
+ */
+define('FORM_ATTACHMENTS_FOLDER', FCPATH . 'uploads/form_attachments' . '/');
+/**
  * Company attachments, favicon, logo etc..
  */
 define('COMPANY_FILES_FOLDER', FCPATH . 'uploads/company' . '/');
