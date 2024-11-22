@@ -87,6 +87,7 @@ class Misc extends AdminController
 
     public function get_relation_data()
     {
+        
         if ($this->input->post()) {
             $type = $this->input->post('type');
             $data = get_relation_data($type, '', $this->input->post('extra'));
@@ -95,7 +96,6 @@ class Misc extends AdminController
             } else {
                 $rel_id = '';
             }
-
             $relOptions = init_relation_options($data, $type, $rel_id);
             echo json_encode($relOptions);
             die;
