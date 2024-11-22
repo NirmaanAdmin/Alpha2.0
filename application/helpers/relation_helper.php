@@ -489,15 +489,11 @@ function init_relation_options($data, $type, $rel_id = '')
     $is_admin                      = is_admin();
     $CI                            = & get_instance();
     $CI->load->model('projects_model');
-    echo '<pre>';
-    print_r($data);
-    die;
+    
     foreach ($data as $relation) {
        
         $relation_values = get_relation_values($relation, $type);
-        echo '<pre>'; 
-        print_r($relation_values);
-        die;
+       
         if ($type == 'project') {
             if (!$has_permission_projects_view) {
                 if (!$CI->projects_model->is_member($relation_values['id']) && $rel_id != $relation_values['id']) {
