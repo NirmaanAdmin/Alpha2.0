@@ -93,7 +93,55 @@
 				});
 			}
 
-			tinymce.init(editor_settings);
+			if(tinymce.majorVersion + '.' + tinymce.minorVersion == '6.8.3'){
+					tinymce.init({
+						selector: 'div.editable',
+						promotion: false,
+						inline: true,
+						browser_spellcheck: true,
+						branding: false,
+						plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
+						toolbar: 'undo redo | formatselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | table | charmap | fullscreen | help',
+						insert_toolbar: 'image media quicktable | bullist numlist | h2 h3 | hr',
+						selection_toolbar: 'save_button bold italic underline superscript | forecolor backcolor link | alignleft aligncenter alignright alignjustify | fontselect fontsizeselect h2 h3',
+						contextmenu: "image media inserttable | cell row column deletetable | paste pastetext searchreplace | visualblocks pagebreak charmap | code",
+						setup: function (editor) {
+
+							editor.addCommand('mceSave', function () {
+								save_contract_content(true);
+							});
+
+							editor.addShortcut('Meta+S', '', 'mceSave');
+
+							editor.on('MouseLeave blur', function () {
+								if (tinymce.activeEditor.isDirty()) {
+									save_contract_content();
+								}
+							});
+
+							editor.on('MouseDown ContextMenu', function () {
+								if (!is_mobile() && !$('.left-column').hasClass('hide')) {
+									contract_full_view();
+								}
+							});
+
+							editor.on('blur', function () {
+								$.Shortcuts.start();
+							});
+
+							editor.on('focus', function () {
+								$.Shortcuts.stop();
+							});
+
+						}
+					});
+
+					$('.tox-promotion').css('display', 'none');
+
+
+				}else{
+					tinymce.init(editor_settings);
+				}
 
 
 			function insert_merge_field(field) {
