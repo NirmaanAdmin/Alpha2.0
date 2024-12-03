@@ -39,60 +39,113 @@
   $('.account-template-form-submiter').on('click', function() {
     $('input[name="account_template"]').val(account_template.getData());
   });
+
+  $("body").on('change', '#project_id', function() {
+    var project_id = $(this).val();
+    if(project_id) {
+        $('#approver').empty().selectpicker('refresh');
+        $.post(admin_url+'warehouse/find_project_members',{'project_id':project_id}).done(function(response){
+            response = JSON.parse(response);
+            if(response.length > 0) {
+                $.each(response, function(idx, member) {
+                    var approver = $('#approver');
+                    approver.prepend('<option value="'+member.id+'">'+member.full_name+'</option>');
+                });
+                $('#approver').selectpicker('refresh');
+            }
+        });
+    }
+  });
+
+  $(document).on('change', '#project_id, #related', function() {
+    var data = {};
+    data.approval_setting_id = $('input[name="approval_setting_id"]').val();
+    data.project_id = $('select[id="project_id"]').val();
+    data.related = $('select[name="related"]').val();
+    $('.submit_approval_setting').prop('disabled', false);
+    if(data.project_id && data.related) {
+        $.post(admin_url+'warehouse/find_approval_setting',data).done(function(response){
+            response = JSON.parse(response);
+            if(response.success == true) {
+                alert_float('warning', 'Approval settings already exists on this project');
+                $('.submit_approval_setting').prop('disabled', true);
+            } else {
+                $('.submit_approval_setting').prop('disabled', false);
+            }
+        });
+    }
+  });
+
 })(jQuery);
 
+function edit_approval_setting(invoker,id){
+  "use strict";
+  appValidateForm($('#approval-setting-form'),{name:'required', related:'required', project_id:'required', "approver[]": "required"});
 
-  function new_approval_setting(){
-    "use strict";
-      appValidateForm($('#approval-setting-form'),{name:'required', related:'required'});
+  var name = $(invoker).data('name');
+  var related = $(invoker).data('related');
+  var project_id = $(invoker).data('project');
+  
+  $('input[name="approval_setting_id"]').val(id);
+  $('#approval_setting_modal input[name="name"]').val(name);
+  $('select[name="related"]').val(related).selectpicker('refresh');
+  $('select[id="project_id"]').val(project_id).selectpicker('refresh');
 
-        $('#approval_id').html('');
-        $('#approval_id').append(hidden_input('approval_setting_id',''));
+  var approver = $(invoker).data('approver');
+  var approver_array = [];
+  if(approver) {
+    approver_array = approver.toString().split(',');
+  }
 
-      $('select[name="related"]').val('').change();
-      $('input[name="name"]').val('');
-
-      $.post(admin_url + 'warehouse/get_html_approval_setting').done(function(response) {
-         response = JSON.parse(response);
-
-          $('.list_approve').html('');
-          $('.list_approve').append(response.html);
-          init_selectpicker();
-
-      });
-
-
-      $('#approval_setting_modal').modal('show');
-      $('#approval_setting_modal .add-title').removeClass('hide');
-      $('#approval_setting_modal .edit-title').addClass('hide');
-   }
-
-  function edit_approval_setting(invoker,id){
-      "use strict";
-        appValidateForm($('#approval-setting-form'),{name:'required', related:'required'});
-
-        var name = $(invoker).data('name');
-        var related = $(invoker).data('related');
-        var setting = $(invoker).data('setting');
-        
-         $('#approval_id').empty();
-        $('#approval_id').append(hidden_input('approval_setting_id',id));
-
-        $('#approval_setting_modal input[name="name"]').val(name);
-        $('select[name="related"]').val(related).change();
-        
-        $.post(admin_url + 'warehouse/get_html_approval_setting/'+ id).done(function(response) {
-           response = JSON.parse(response);
-
-            $('.list_approve').html('');
-            $('.list_approve').append(response.html);
-            addMoreVendorsInputKey = response.index;
-        init_selectpicker();
-
+  $('#approver').empty().selectpicker('refresh');
+  $.post(admin_url+'warehouse/find_project_members',{'project_id':project_id}).done(function(response){
+    response = JSON.parse(response);
+    if(response.length > 0) {
+        $.each(response, function(idx, member) {
+            var approver_view = $('#approver');
+            if(approver_array.includes(member.id)) {
+                approver_view.prepend('<option value="'+member.id+'" selected>'+member.full_name+'</option>');
+            } else {
+                approver_view.prepend('<option value="'+member.id+'">'+member.full_name+'</option>');
+            }
         });
-        
-        $('#approval_setting_modal').modal('show');
-        $('#approval_setting_modal .add-title').addClass('hide');
-        $('#approval_setting_modal .edit-title').removeClass('hide');
-        
-   }
+        $('#approver').selectpicker('refresh');
+    }
+  });
+
+  // $.post(admin_url + 'warehouse/get_html_approval_setting/'+ id).done(function(response) {
+  //    response = JSON.parse(response);
+
+  //     $('.list_approve').html('');
+  //     $('.list_approve').append(response);
+  // init_selectpicker();
+
+  // });
+  
+  $('#approval_setting_modal').modal('show');
+  $('#approval_setting_modal .add-title').addClass('hide');
+  $('#approval_setting_modal .edit-title').removeClass('hide');
+}
+
+function new_approval_setting(){
+  "use strict";
+  appValidateForm($('#approval-setting-form'),{name:'required', related:'required', project_id:'required', "approver[]": "required"});
+
+  $('#approval_setting_modal input[name="name"]').val('');
+  $('select[name="related"]').val('').selectpicker('refresh');
+  $('select[id="project_id"]').val('').selectpicker('refresh');
+  $('#approver').empty().selectpicker('refresh');
+  
+  // $.post(admin_url + 'warehouse/get_html_approval_setting').done(function(response) {
+  //    response = JSON.parse(response);
+
+  //     $('.list_approve').html('');
+  //     $('.list_approve').append(response);
+  //     init_selectpicker();
+
+  // });
+
+  $('#approval_setting_modal').modal('show');
+  $('#approval_setting_modal .add-title').removeClass('hide');
+  $('#approval_setting_modal .edit-title').addClass('hide');
+}

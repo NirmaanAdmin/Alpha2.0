@@ -112,6 +112,7 @@ class warehouse extends AdminController {
 		}
 
 		$data['tabs']['view'] = 'includes/' . $data['group'];
+		$data['projects'] = $this->projects_model->get_items(); 
 
 		$this->load->view('manage_setting', $data);
 	}
@@ -9191,5 +9192,26 @@ if(strlen($data['inventory_filter']) > 0){
 		]);
 
 	}
+
+	public function find_project_members() 
+    {
+        $response = array();
+        if ($this->input->post()) {
+            $data = $this->input->post();
+            if(!empty($data['project_id'])) {
+                $response = $this->staff_model->find_project_members($data['project_id']);
+            }
+        }
+        echo json_encode($response);
+    }
+
+    public function find_approval_setting()
+    {
+        $response['success'] = false;
+        if ($this->input->post()) {
+            $response = $this->warehouse_model->find_approval_setting($this->input->post());
+        }
+        echo json_encode($response);
+    }
 
 }
