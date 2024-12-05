@@ -837,12 +837,76 @@ class Forms_model extends App_Model
             unset($data['tags']);
         }
 
+        if (isset($data['form_type'])) {
+            if($data['form_type'] == "dpr") {
+                $dpr_form = array();
+                $dpr_form['client_id'] = $data['client_id'];
+                $dpr_form['pmc'] = $data['pmc'];
+                $dpr_form['weather'] = $data['weather'];
+                $dpr_form['consultant'] = $data['consultant'];
+                $dpr_form['contractor'] = $data['contractor'];
+                $dpr_form['work_stop'] = $data['work_stop'];
+                unset($data['client_id']);
+                unset($data['pmc']);
+                unset($data['weather']);
+                unset($data['consultant']);
+                unset($data['contractor']);
+                unset($data['work_stop']);
+                unset($data['location']);
+                unset($data['agency']);
+                unset($data['type']);
+                unset($data['work_execute']);
+                unset($data['material_consumption']);
+                unset($data['machinery']);
+                unset($data['skilled']);
+                unset($data['unskilled']);
+                unset($data['depart']);
+                unset($data['total']);
+                unset($data['male']);
+                unset($data['female']);
+                $new_order = [];
+                if(isset($data['newitems'])){
+                    $new_order = $data['newitems'];
+                    unset($data['newitems']);
+                }
+            }
+        }
+
         // $data['message'] = remove_emojis($data['message']);
         $data            = hooks()->apply_filters('before_form_created', $data, $admin);
 
         $this->db->insert(db_prefix() . 'forms', $data);
         $formid = $this->db->insert_id();
         if ($formid) {
+            if($data['form_type'] == "dpr") {
+                if(isset($dpr_form)) {
+                    if(!empty($dpr_form)) {
+                        $dpr_form['form_id'] = $formid;
+                        $this->db->insert(db_prefix().$data['form_type'].'_form', $dpr_form);
+                    }
+                }
+                if(isset($new_order)) {
+                    if(!empty($new_order)) {
+                        foreach($new_order as $key => $value){ 
+                            $dt_data = [];
+                            $dt_data['form_id'] = $formid;
+                            $dt_data['location'] = $value['location'];
+                            $dt_data['agency'] = $value['agency'];
+                            $dt_data['type'] = $value['type'];
+                            $dt_data['work_execute'] = $value['work_execute'];
+                            $dt_data['material_consumption'] = $value['material_consumption'];
+                            $dt_data['machinery'] = $value['machinery'];
+                            $dt_data['skilled'] = $value['skilled'];
+                            $dt_data['unskilled'] = $value['unskilled'];
+                            $dt_data['depart'] = $value['depart'];
+                            $dt_data['total'] = $value['total'];
+                            $dt_data['male'] = $value['male'];
+                            $dt_data['female'] = $value['female'];
+                            $this->db->insert(db_prefix().$data['form_type'].'_form_detail', $dt_data);
+                        }
+                    }
+                }
+            }
             handle_tags_save($tags, $formid, 'form');
 
             if (isset($custom_fields)) {
@@ -1102,6 +1166,51 @@ class Forms_model extends App_Model
             unset($data['contact_db_id']);
         }
 
+        if($formBeforeUpdate->form_type == "dpr") {
+            $dpr_form = array();
+            $dpr_form['client_id'] = $data['client_id'];
+            $dpr_form['pmc'] = $data['pmc'];
+            $dpr_form['weather'] = $data['weather'];
+            $dpr_form['consultant'] = $data['consultant'];
+            $dpr_form['contractor'] = $data['contractor'];
+            $dpr_form['work_stop'] = $data['work_stop'];
+            unset($data['client_id']);
+            unset($data['pmc']);
+            unset($data['weather']);
+            unset($data['consultant']);
+            unset($data['contractor']);
+            unset($data['work_stop']);
+            unset($data['location']);
+            unset($data['agency']);
+            unset($data['type']);
+            unset($data['work_execute']);
+            unset($data['material_consumption']);
+            unset($data['machinery']);
+            unset($data['skilled']);
+            unset($data['unskilled']);
+            unset($data['depart']);
+            unset($data['total']);
+            unset($data['male']);
+            unset($data['female']);
+            $new_order = [];
+            if(isset($data['newitems'])){
+                $new_order = $data['newitems'];
+                unset($data['newitems']);
+            }
+
+            $update_order = [];
+            if(isset($data['items'])) {
+                $update_order = $data['items'];
+                unset($data['items']);
+            }
+
+            $remove_order = [];
+            if(isset($data['removed_items'])){
+                $remove_order = $data['removed_items'];
+                unset($data['removed_items']);
+            }
+        }
+
         $this->db->where('formid', $data['formid']);
         $this->db->update(db_prefix() . 'forms', $data);
         if ($this->db->affected_rows() > 0) {
@@ -1114,6 +1223,81 @@ class Forms_model extends App_Model
                 ]
             );
             $affectedRows++;
+        }
+
+        if($formBeforeUpdate->form_type == "dpr") {
+            if(isset($dpr_form)) {
+                if(!empty($dpr_form)) {
+                    $this->db->where('form_id', $data['formid']);
+                    $this->db->update(db_prefix().$formBeforeUpdate->form_type.'_form', $dpr_form);
+                    if($this->db->affected_rows() > 0){
+                        $affectedRows++;
+                    }
+                }
+            }
+
+            if(isset($new_order)) {
+                if(!empty($new_order)) {
+                    foreach($new_order as $key => $value){ 
+                        $dt_data = [];
+                        $dt_data['form_id'] = $data['formid'];
+                        $dt_data['location'] = $value['location'];
+                        $dt_data['agency'] = $value['agency'];
+                        $dt_data['type'] = $value['type'];
+                        $dt_data['work_execute'] = $value['work_execute'];
+                        $dt_data['material_consumption'] = $value['material_consumption'];
+                        $dt_data['machinery'] = $value['machinery'];
+                        $dt_data['skilled'] = $value['skilled'];
+                        $dt_data['unskilled'] = $value['unskilled'];
+                        $dt_data['depart'] = $value['depart'];
+                        $dt_data['total'] = $value['total'];
+                        $dt_data['male'] = $value['male'];
+                        $dt_data['female'] = $value['female'];
+                        $this->db->insert(db_prefix().$formBeforeUpdate->form_type.'_form_detail', $dt_data);
+                        $new_insert_id = $this->db->insert_id();
+                        if($new_insert_id){
+                            $affectedRows++;
+                        }
+                    }
+                }
+            }
+
+            if(isset($update_order)) {
+                if(!empty($update_order)) {
+                    foreach($update_order as $key => $value){ 
+                        $dt_data = [];
+                        $dt_data['form_id'] = $data['formid'];
+                        $dt_data['location'] = $value['location'];
+                        $dt_data['agency'] = $value['agency'];
+                        $dt_data['type'] = $value['type'];
+                        $dt_data['work_execute'] = $value['work_execute'];
+                        $dt_data['material_consumption'] = $value['material_consumption'];
+                        $dt_data['machinery'] = $value['machinery'];
+                        $dt_data['skilled'] = $value['skilled'];
+                        $dt_data['unskilled'] = $value['unskilled'];
+                        $dt_data['depart'] = $value['depart'];
+                        $dt_data['total'] = $value['total'];
+                        $dt_data['male'] = $value['male'];
+                        $dt_data['female'] = $value['female'];
+                        $this->db->where('id', $value['id']);
+                        $this->db->update(db_prefix().$formBeforeUpdate->form_type.'_form_detail', $dt_data);
+                        if($this->db->affected_rows() > 0){
+                            $affectedRows++;
+                        }
+                    }
+                }
+            }
+
+            if(isset($remove_order)) {
+                if(!empty($remove_order)) {
+                    foreach($remove_order as $key => $value){ 
+                        $this->db->where('id', $value);
+                        if ($this->db->delete(db_prefix().$formBeforeUpdate->form_type.'_form_detail')) {
+                            $affectedRows++;
+                        }
+                    }
+                }
+            }
         }
 
         $sendAssignedEmail = false;
@@ -1739,5 +1923,90 @@ class Forms_model extends App_Model
         $this->db->where(db_prefix() . 'projects.id', $project_id);
         $contacts = $this->db->get(db_prefix() . 'contacts')->result_array();
         return $contacts;
+    }
+
+    /**
+     * Creates a Daily Progress Report row template.
+     *
+     * @param      array   $unit_data  The unit data
+     * @param      string  $name       The name
+     */
+    public function create_dpr_row_template($name = '', $location = '', $agency = '', $type = '', $work_execute = '', $material_consumption = '', $machinery = '', $skilled = '', $unskilled = '', $depart = '', $total = '', $male = '', $female = '', $is_edit = false, $item_key = '') 
+    {
+        $row = '';
+
+        $name_location = 'location';
+        $name_agency = 'agency';
+        $name_type = 'type';
+        $name_work_execute = 'work_execute';
+        $name_material_consumption = 'material_consumption';
+        $name_machinery = 'machinery';
+        $name_skilled = 'skilled';
+        $name_unskilled = 'unskilled';
+        $name_depart = 'depart';
+        $name_total = 'total';
+        $name_male = 'male';
+        $name_female = 'female';
+
+        if ($name == '') {
+            $row .= '<tr class="main">';
+            $manual = true;
+        } else {
+            $manual = false;
+            $row .= '<tr><input type="hidden" class="ids" name="' . $name . '[id]" value="' . $item_key . '">';
+            $name_location = $name . '[location]';
+            $name_agency = $name . '[agency]';
+            $name_type = $name . '[type]';
+            $name_work_execute = $name . '[work_execute]';
+            $name_material_consumption = $name . '[material_consumption]';
+            $name_machinery = $name . '[machinery]';
+            $name_skilled = $name . '[skilled]';
+            $name_unskilled = $name . '[unskilled]';
+            $name_depart = $name . '[depart]';
+            $name_total = $name . '[total]';
+            $name_male = $name . '[male]';
+            $name_female = $name . '[female]';
+        }
+
+        $skilled = !empty($skilled) ? $skilled : 0;
+        $unskilled = !empty($unskilled) ? $unskilled : 0;
+        $depart = !empty($depart) ? $depart : 0;
+        $total = !empty($total) ? $total : 0;
+        $male = !empty($male) ? $male : 0;
+        $female = !empty($female) ? $female : 0;
+
+        $row .= '<td class="location">' . render_input($name_location, '', $location) . '</td>';
+        $row .= '<td class="agency">' . get_vendor($name_agency, $agency) . '</td>';
+        $row .= '<td class="laber-type">' . get_laber_type_listing($name_type, $type) . '</td>';
+        $row .= '<td class="work_execute">' . render_input($name_work_execute, '', $work_execute) . '</td>';
+        $row .= '<td class="material_consumption">' . render_input($name_material_consumption, '', $material_consumption) . '</td>';
+        $row .= '<td class="machinery">' . render_input($name_machinery, '', $machinery) . '</td>';
+        $row .= '<td class="skilled">' . render_input($name_skilled, '', $skilled, 'nubmer') . '</td>';
+        $row .= '<td class="unskilled">' . render_input($name_unskilled, '', $unskilled, 'nubmer') . '</td>';
+        $row .= '<td class="depart">' . render_input($name_depart, '', $depart, 'nubmer') . '</td>';
+        $row .= '<td class="total">' . render_input($name_total, '', $total, 'nubmer') . '</td>';
+        $row .= '<td class="male">' . render_input($name_male, '', $male, 'nubmer') . '</td>';
+        $row .= '<td class="female">' . render_input($name_female, '', $female, 'nubmer') . '</td>';
+
+        if ($name == '') {
+            $row .= '<td><button type="button" class="btn pull-right btn-info dpr-add-item-to-table"><i class="fa fa-check"></i></button></td>';
+        } else {
+            $row .= '<td><a href="#" class="btn btn-danger pull-right" onclick="dpr_delete_item(this,' . $item_key . ',\'.invoice-item\'); return false;"><i class="fa fa-trash"></i></a></td>';
+        }
+
+        $row .= '</tr>';
+        return $row;
+    }
+
+    public function get_dpr_form($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix().'dpr_form')->row();
+    }
+
+    public function get_dpr_form_detail($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix().'dpr_form_detail')->result_array();
     }
 }

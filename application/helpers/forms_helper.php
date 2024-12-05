@@ -393,3 +393,142 @@ $(function() {
 </script>
 <?php
 }
+
+function get_form_listing()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 'dpr',
+            'name' => 'Daily Progress Report',
+        ],
+    ];
+    return $result;
+}
+
+function get_weather_listing()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 'Clear',
+            'name' => 'Clear',
+        ],
+        [
+            'id' => 'Cloudy',
+            'name' => 'Cloudy',
+        ],
+        [
+            'id' => 'Rain',
+            'name' => 'Rain',
+        ],
+    ];
+    return $result;
+}
+
+function get_work_stop_listing()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 'Y',
+            'name' => 'Y',
+        ],
+        [
+            'id' => 'N',
+            'name' => 'N',
+        ],
+    ];
+    return $result;
+}
+
+function get_laber_type_listing($name_type, $type)
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Departmental - labor',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Departmental- janitorial',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Reinforcement - Skilled - bar benders',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Reinforcement - semi- Skilled',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Reinforcement - unskilled ',
+        ],
+    ];
+
+    return render_select($name_type, $result, array('id', 'name'), '', $type);
+}
+
+function get_vendor($name_agency, $agency)
+{
+    $id = '';
+    $where = [];
+    $CI = &get_instance();
+
+    $CI->db->select(implode(',', prefixed_table_fields_array(db_prefix() . 'pur_vendor')) . ',' . get_sql_select_vendor_company());
+
+    if (is_numeric($id)) {
+
+        $CI->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'pur_vendor.country', 'left');
+        $CI->db->join(db_prefix() . 'pur_contacts', '' . db_prefix() . 'pur_contacts.userid = ' . db_prefix() . 'pur_vendor.userid AND is_primary = 1', 'left');
+
+        if ((is_array($where) && count($where) > 0) || (is_string($where) && $where != '')) {
+            $CI->db->where($where);
+        }
+
+        $CI->db->where(db_prefix().'pur_vendor.userid', $id);
+        $vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+
+        if ($vendor && get_option('company_requires_vat_number_field') == 0) {
+            $vendor->vat = null;
+        }
+
+        return $vendor;
+
+    } else {
+
+        if(!has_permission('purchase_vendors', '', 'view') && is_staff_logged_in()){
+
+            $CI->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'pur_vendor.country', 'left');
+            $CI->db->join(db_prefix() . 'pur_contacts', '' . db_prefix() . 'pur_contacts.userid = ' . db_prefix() . 'pur_vendor.userid AND is_primary = 1', 'left');
+
+            if ((is_array($where) && count($where) > 0) || (is_string($where) && $where != '')) {
+                $CI->db->where($where);
+            }
+
+            $CI->db->where(db_prefix().'pur_vendor.userid IN (SELECT vendor_id FROM '.db_prefix().'pur_vendor_admin WHERE staff_id=' . get_staff_user_id() . ')');
+        }else{
+            $CI->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'pur_vendor.country', 'left');
+            $CI->db->join(db_prefix() . 'pur_contacts', '' . db_prefix() . 'pur_contacts.userid = ' . db_prefix() . 'pur_vendor.userid AND is_primary = 1', 'left');
+
+            if ((is_array($where) && count($where) > 0) || (is_string($where) && $where != '')) {
+                $CI->db->where($where);
+            }
+        }
+    }
+
+    $CI->db->order_by('company', 'asc');
+
+    $result = $CI->db->get(db_prefix() . 'pur_vendor')->result_array();
+
+    return render_select($name_agency, $result, array('userid', 'company'), '', $agency);
+}
+
+function get_client_listing()
+{
+    $CI = &get_instance();
+    $CI->db->select('userid,company');
+    return $CI->db->get(db_prefix().'clients')->result_array();
+}

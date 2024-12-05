@@ -801,4 +801,47 @@ class Forms extends AdminController
         }
         echo json_encode($response);
     }
+
+    public function find_form_design($form_type, $form_id = 0) {
+        $data = array();
+        if($form_type == "dpr") {
+            $dpr_row_template = $this->forms_model->create_dpr_row_template();
+            if($form_id != 0) {
+                $dpr_form = $this->forms_model->get_dpr_form($form_id);
+                $dpr_form_detail = $this->forms_model->get_dpr_form_detail($form_id);
+                if(!empty($dpr_form_detail)) {
+                    $index_order = 0;
+                    foreach ($dpr_form_detail as $value) {
+                        $index_order++;
+                        $dpr_row_template .= $this->forms_model->create_dpr_row_template('items[' . $index_order . ']', $value['location'], $value['agency'], $value['type'], $value['work_execute'], $value['material_consumption'], $value['machinery'], $value['skilled'], $value['unskilled'], $value['depart'], $value['total'], $value['male'], $value['female'], true, $value['id']);
+                    }
+                }
+                $data['dpr_form'] = $dpr_form;
+            }
+            $data['dpr_row_template'] = $dpr_row_template;
+            $this->load->view('admin/forms/form_design/dpr', $data);
+        }
+    }
+
+    /**
+     * Gets the Daily Progress Report row template.
+     */
+    public function get_dpr_row_template(){
+        $name = $this->input->post('name');
+        $location = $this->input->post('location');
+        $agency = $this->input->post('agency');
+        $type = $this->input->post('type');
+        $work_execute = $this->input->post('work_execute');
+        $material_consumption = $this->input->post('material_consumption');
+        $machinery = $this->input->post('machinery');
+        $skilled = $this->input->post('skilled');
+        $unskilled = $this->input->post('unskilled');
+        $depart = $this->input->post('depart');
+        $total = $this->input->post('total');
+        $male = $this->input->post('male');
+        $female = $this->input->post('female');
+        $item_key = $this->input->post('item_key');
+        
+        echo $this->forms_model->create_dpr_row_template($name, $location, $agency, $type, $work_execute, $material_consumption, $machinery, $skilled, $unskilled, $depart, $total, $male, $female, false, $item_key);
+    }
 }
