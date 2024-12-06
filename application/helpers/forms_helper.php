@@ -399,9 +399,37 @@ function get_form_listing()
     $result = array();
     $result = [
         [
-            'id' => 'dpr',
-            'name' => 'Daily Progress Report',
+            'id' => 1,
+            'name' => 'Report',
+            'options' => [
+                [
+                    'id' => 'dpr',
+                    'name' => 'Daily Progress Report',
+                ]
+            ],
         ],
+        [
+            'id' => 2,
+            'name' => 'Checklist',
+            'options' => [
+                [
+                    'id' => 'apc',
+                    'name' => 'Air Pollution Control',
+                ],
+                [
+                    'id' => 'lc',
+                    'name' => 'Labour Camp',
+                ],
+                [
+                    'id' => 'excavation',
+                    'name' => 'Excavation',
+                ],
+                [
+                    'id' => 'mee',
+                    'name' => 'Monthly Electrical Equipment',
+                ],
+            ]
+        ]
     ];
     return $result;
 }
