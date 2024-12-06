@@ -44,7 +44,7 @@
 
 							<div class="col-md-3 pull-right">
 								<select name="status_work[]" class="selectpicker" multiple="true" id="status_work" data-width="100%" data-none-selected-text="<?php echo _l('hr_status_label'); ?>"> 
-									<option value="<?php echo 'working' ?>"><?php echo _l('hr_working'); ?></option>
+									<option value="<?php echo 'working' ?>" selected><?php echo _l('hr_working'); ?></option>
 									<option value="<?php echo 'maternity_leave'; ?>"><?php echo _l('hr_maternity_leave'); ?></option>
 									<option value="<?php echo 'inactivity'; ?>"><?php echo _l('hr_inactivity'); ?></option>
 								</select>
