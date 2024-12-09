@@ -32,7 +32,7 @@ $sTable = db_prefix() . 'items';
 
 $where = [];
 
-$where[] = 'AND '.db_prefix().'items.active = 1';
+// $where[] = 'AND '.db_prefix().'items.active = 1';
 $warehouse_ft = $this->ci->input->post('warehouse_ft');
 $commodity_ft = $this->ci->input->post('commodity_ft');
 $alert_filter = $this->ci->input->post('alert_filter');
@@ -165,7 +165,7 @@ if (isset($can_be_value_filter)) {
 			}
 		}elseif($can_be_value == 'can_be_inventory'){
 			if ($where_can_be_ft == '') {
-				$where_can_be_ft .= 'AND ('.db_prefix().'items.can_be_inventory = "can_be_inventory"';
+				// $where_can_be_ft .= 'AND ('.db_prefix().'items.can_be_inventory = "can_be_inventory"';
 			} else {
 				$where_can_be_ft .= ' or '.db_prefix().'items.can_be_inventory = "can_be_inventory"';
 			}
