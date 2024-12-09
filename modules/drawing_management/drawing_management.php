@@ -49,11 +49,11 @@ register_activation_hook(DRAWING_MANAGEMENT_MODULE_NAME, 'drawing_management_mod
 /**
  * activation hook
  */
-// function drawing_management_module_activation_hook()
-// {
+function drawing_management_module_activation_hook()
+{
 	$CI = &get_instance();
 	require_once(__DIR__ . '/install.php');
-// }
+}
 
 
 $CI = & get_instance();
