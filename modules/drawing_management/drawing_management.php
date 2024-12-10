@@ -153,7 +153,7 @@ function drawing_management_load_js(){
 		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/js/settings/approval_setting.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
 	}
 	if (!(strpos($viewuri, '/admin/drawing_management') === false)) {
-		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/filetree/js/filetree.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
+		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/Filetree/js/filetree.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
 	}
 	if (!(strpos($viewuri, '/admin/drawing_management/detail_approve/') === false)) {
 		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/js/file_managements/detail_request.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
@@ -172,7 +172,7 @@ function drawing_management_add_head_components(){
 	echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/css/style.css').'?v='.DRAWING_MANAGEMENT_REVISION.'"  rel="stylesheet" type="text/css" />';
 	echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/sweetalerts/sweetalert2.min.css').'?v='.DRAWING_MANAGEMENT_REVISION.'"  rel="stylesheet" type="text/css" />';
 	if (!(strpos($viewuri, '/admin/drawing_management') === false)) {
-		echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/filetree/css/filetree.css') . '"  rel="stylesheet" type="text/css" />';
+		echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/Filetree/css/filetree.css') . '"  rel="stylesheet" type="text/css" />';
 	}
 	if (!(strpos($viewuri, '/admin/editdocument/') === false)) {
 		echo '<script src="https://cdn.ckeditor.com/ckeditor5/35.2.1/decoupled-document/ckeditor.js"></script>';
@@ -274,7 +274,7 @@ function drawing_management_add_head_component_client(){
 	echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/tags/bootstrap-tagsinput.css').'?v='.DRAWING_MANAGEMENT_REVISION.'"  rel="stylesheet" type="text/css" />';
 	if (!(strpos($viewuri, '/drawing_management/drawing_management_client') === false)) {
 		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/tags/bootstrap-tagsinput.min.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
-		echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/filetree/css/filetree.css') . '"  rel="stylesheet" type="text/css" />';
+		echo '<link href="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/Filetree/css/filetree.css') . '"  rel="stylesheet" type="text/css" />';
 	}
 
 
@@ -333,7 +333,7 @@ function drawing_management_load_js_client(){
 	</script>';
 
 	if (!(strpos($viewuri, '/drawing_management/drawing_management_client') === false)) {
-		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/filetree/js/filetree.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
+		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/plugins/Filetree/js/filetree.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
 	}
 	if (!(strpos($viewuri, '/drawing_management/drawing_management_client/detail_approve/') === false)) {
 		echo '<script src="' . module_dir_url(DRAWING_MANAGEMENT_MODULE_NAME, 'assets/js/clients/file_managements/detail_request.js').'?v='.DRAWING_MANAGEMENT_REVISION.'"></script>';
