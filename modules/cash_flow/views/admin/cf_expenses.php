@@ -14,7 +14,7 @@ $aColumns = [
     'expense_name',
     'amount',
     get_sql_select_client_company(),
-    db_prefix() . 'clients.balance as balance',
+    db_prefix() . 'cf_expenses.balance as balance',
     'reference_no',
 ];
 

@@ -417,17 +417,18 @@ function get_form_listing()
                     'name' => 'Air Pollution Control',
                 ],
                 [
-                    'id' => 'lc',
-                    'name' => 'Labour Camp',
+                    'id' => 'wpc',
+                    'name' => 'Water Pollution Control',
                 ],
                 [
-                    'id' => 'excavation',
-                    'name' => 'Excavation',
+                    'id' => 'mfa',
+                    'name' => 'Monthly First Aid Box Inspection',
                 ],
                 [
-                    'id' => 'mee',
-                    'name' => 'Monthly Electrical Equipment',
+                    'id' => 'mlg',
+                    'name' => 'Monthly Lifting Gear and Appliance Inspection',
                 ],
+                
             ]
         ]
     ];
@@ -494,8 +495,67 @@ function get_laber_type_listing($name_type, $type)
             'id' => 5,
             'name' => 'Reinforcement - unskilled ',
         ],
+        [
+            'id' => 6,
+            'name' => 'Shuttering - skilled carpenter',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Shuttering - unskilled',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Masonary - skilled',
+        ],
+        [
+            'id' => 9,
+            'name' => 'Masonary - unskilled -masonry helper',
+        ],
+        [
+            'id' => 10,
+            'name' => 'Fabrication - welders',
+        ],
+        [
+            'id' => 11,
+            'name' => 'Fabrication - skilled',
+        ],
+        [
+            'id' => 12,
+            'name' => 'Fabrication - helpers',
+        ],
+        [
+            'id' => 13,
+            'name' => 'Furniture - Carpenters',
+        ],
+        [
+            'id' => 14,
+            'name' => 'Plumbing - skilled',
+        ],
+        [
+            'id' => 15,
+            'name' => 'Plumbing - unskilled',
+        ],
+        [
+            'id' => 16,
+            'name' => 'Color - skilled',
+        ],
+        [
+            'id' => 17,
+            'name' => 'Security',
+        ],
+        [
+            'id' => 18,
+            'name' => 'Concrete pump labor',
+        ],
+        [
+            'id' => 19,
+            'name' => 'Electrician - skilled',
+        ],
+        [
+            'id' => 20,
+            'name' => 'Electrician - helper',
+        ],
     ];
-
     return render_select($name_type, $result, array('id', 'name'), '', $type);
 }
 
@@ -559,4 +619,300 @@ function get_client_listing()
     $CI = &get_instance();
     $CI->db->select('userid,company');
     return $CI->db->get(db_prefix().'clients')->result_array();
+}
+
+function get_items_listing_for_apc()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Are solvent, paint and fuel containers tightly capped and stored in safe places with only authorised access? ',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Are access roads properly paved with tarmac?',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Are locations where fuels, paints and solvents used or stored, well ventilated?',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Are mechanical plant and vehicles regularly maintained?',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Are wastes cement packaging disposed in proper waste receptacles?',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Is illegal open burning prohibited and restricted?',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Are sand heaps constantly wetted or covered to prevent and segregated from general waste?',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Are discarded solvent and paint cans properly lidded',
+        ],
+        [
+            'id' => 9,
+            'name' => 'Are combustible materials stored away from volatile substances?',
+        ],
+        [
+            'id' => 10,
+            'name' => 'Is the cooking area for canteens well ventilated to disperse cooking vapours and fumes to reduce local nuisance?',
+        ]
+    ];
+    return $result;
+}
+function get_items_listing_for_wpc()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Are solvent, paint and fuel containers tightly lidded and stored on raised platforms and accessed by authorised persons only?',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Is  the  access  road  into  the site having properly  designed vehicle washing devices?',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Are the locations for the use and storage of chemical containers bounded with sump facilities?',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Are the mechanical plants and vehicles maintained regularly to prevent oil leakage? ',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Are general wastes such as food wastes properly bagged and disposed in designated waste bins? ',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Are toilet facilities regularly maintained in working order and connected to treatment facility?',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Are sand heaps not located near drains and bounded to prevent sand from being washed away?',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Are waste containers not overfilled and disposed promptly?',
+        ],
+        [
+            'id' => 9,
+            'name' => 'Is toxic wastes segregated from general wastes for removal by licensed contractors?',
+        ],
+        [
+            'id' => 10,
+            'name' => 'Does the site canteen have washing facilities connected to proper treatment and disposal plants?',
+        ],
+        [
+            'id' => 11,
+            'name' => 'Are there oil / diesel / paint stains on the ground?',
+        ],
+        [
+            'id' => 12,
+            'name' => 'Any provision of secondary containment for oil / diesel / paint storage area & fuel filling points?',
+        ]
+    ];
+    return $result;
+}
+function get_items_listing_for_mfa()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Sterilized Bandage (small, Medium & Large)',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Sterilized Cotton Wool',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Roller Bandage (10cm & 5cm)',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Absorbent Gauze (Packet of 10 pieces)',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Antiseptic Cream',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Triangular Bandages',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Scissors',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Safety Pin',
+        ],
+        [
+            'id' => 9,
+            'name' => 'Disposable Gloves (Pairs)',
+        ],
+        [
+            'id' => 10,
+            'name' => 'Eye drop/ ear drop',
+        ],
+        [
+            'id' => 11,
+            'name' => 'Eye pad',
+        ],
+        [
+            'id' => 12,
+            'name' => 'burn dressings',
+        ],
+        [
+            'id' => 13,
+            'name' => 'Snake bit Lancet',
+        ],
+        [
+            'id' => 14,
+            'name' => 'Sterile water or saline in 100ml disposable container (only where tap water is not available)',
+        ],
+        [
+            'id' => 15,
+            'name' => 'Torchlight',
+        ]
+    ];
+    return $result;
+}
+function get_items_required_amount_mfa(){
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => '24/12/12',
+        ],
+        [
+            'id' => 2,
+            'name' => '15',
+        ],
+        [
+            'id' => 3,
+            'name' => '12/12',
+        ],
+        [
+            'id' => 4,
+            'name' => '15',
+        ],
+        [
+            'id' => 5,
+            'name' => '1',
+        ],
+        [
+            'id' => 6,
+            'name' => '10',
+        ],
+        [
+            'id' => 7,
+            'name' => '1',
+        ],
+        [
+            'id' => 8,
+            'name' => '3 Packets',
+        ],
+        [
+            'id' => 9,
+            'name' => '2 Packets',
+        ],
+        [
+            'id' => 10,
+            'name' => '1',
+        ],
+        [
+            'id' => 11,
+            'name' => '12',
+        ],
+        [
+            'id' => 12,
+            'name' => '12',
+        ],
+        [
+            'id' => 13,
+            'name' => '2',
+        ],
+        [
+            'id' => 14,
+            'name' => '1 bottle',
+        ],
+        [
+            'id' => 15,
+            'name' => '1',
+        ]
+    ];
+    return $result;
+}
+function get_items_listing_for_mlg()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Kinking/ Wear & Tear Condition ',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Hook',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Safety Latch',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Handle C/W Pin',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Colour Code',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Overall condition',
+        ],
+        
+    ];
+    return $result;
+}
+function get_item_status_listing()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => '1',
+            'name' => 'Yes',
+        ],
+        [
+            'id' => '2',
+            'name' => 'No',
+        ],
+        [
+            'id' => '3',
+            'name' => 'May Be',
+        ]
+    ];
+    return $result;
+}
+function get_staff_list($where = '')
+{
+    $CI = &get_instance();
+    $CI->db->select('staffid,concat(firstname," ",lastname) as name');
+    if ($where != '') {
+        $CI->db->where($where);
+    }
+    return $CI->db->get(db_prefix().'staff')->result_array();
 }

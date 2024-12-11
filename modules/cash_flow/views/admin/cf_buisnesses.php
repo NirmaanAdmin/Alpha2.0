@@ -67,7 +67,7 @@
                     <div class="panel_s">
                         <div class="panel-body">
                             <h4 class="no-margin">
-                                <i class="fa-solid fa-money-bill-transfer"></i> Total Business Expenses.
+                                <i class="fa-solid fa-money-bill-transfer"></i> Total Project Expenses.
                             </h4>
                             <hr class="hr-panel-heading" />
                             <div class="row">
