@@ -3117,6 +3117,7 @@ class Purchase_model extends App_Model
         foreach ($data_new as $key => $value) {
             $row = [];
             $this->db->select('rel_id');
+            $this->db->where('staffid', $value['id']);
             $this->db->where('rel_id', $data['rel_id']);
             $this->db->where('rel_type', $data['rel_type']);
             $rel_id_data = $this->db->get(db_prefix() . 'pur_approval_details')->result_array();
