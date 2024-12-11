@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Beheer van uitgaven';
+$lang['final_balance'] = 'Eindsaldo';
+$lang['revenue'] = 'Inkomsten';
+$lang['amount_spent'] = 'Uitgegeven bedrag';
+$lang['received'] = 'Ontvangen';
+$lang['disbursement'] = 'Uitbetaling';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Operatie opslaan';
+$lang['operation'] = 'Operatie';
+$lang['cf_new_expense'] = 'Uitgaven registreren via transactie';
+$lang['expense_name'] = 'Naam';
+$lang['new_buisiness'] = 'Bedrijven toevoegen';
+$lang['cf_submit'] = 'Operatie opslaan';
+$lang['operation_type'] = 'Type operatie';
+$lang['add_cf_expenses'] = 'Uitgave van';
+$lang['edit_cf_expenses'] = 'Bewerken van uitgave van';
+$lang['new_buisness_type'] = 'Nieuw bedrijf toevoegen';
+$lang['buisness_type_name'] = 'Bedrijfsnaam';
+$lang['buisness_type_edit'] = 'Bedrijfsnaam bewerken';
+$lang['buisness_types'] = 'Mijn bedrijven';
+$lang['cash_flow'] = 'Kasstroom';

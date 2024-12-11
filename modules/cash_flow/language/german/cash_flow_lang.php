@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Verwaltung der Ausgaben';
+$lang['final_balance'] = 'Endsaldo';
+$lang['revenue'] = 'Einnahmen';
+$lang['amount_spent'] = 'Ausgegebener Betrag';
+$lang['received'] = 'Erhalten';
+$lang['disbursement'] = 'Auszahlung';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Vorgang speichern';
+$lang['operation'] = 'Vorgang';
+$lang['cf_new_expense'] = 'Ausgabenaufzeichnung durch Transaktion';
+$lang['expense_name'] = 'Bezeichnung';
+$lang['new_buisiness'] = 'Geschäfte hinzufügen';
+$lang['cf_submit'] = 'Vorgang speichern';
+$lang['operation_type'] = 'Vorgangstyp';
+$lang['add_cf_expenses'] = 'Ausgabe von';
+$lang['edit_cf_expenses'] = 'Ausgabe bearbeiten von';
+$lang['new_buisness_type'] = 'Neues Geschäft hinzufügen';
+$lang['buisness_type_name'] = 'Geschäftsname';
+$lang['buisness_type_edit'] = 'Geschäftsname bearbeiten';
+$lang['buisness_types'] = 'Meine Geschäfte';
+$lang['cash_flow'] = 'Geldfluss';

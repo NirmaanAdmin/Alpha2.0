@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Nakit Yönetimi Giderleri';
+$lang['final_balance'] = 'Son Bakiyem';
+$lang['revenue'] = 'Gelir';
+$lang['amount_spent'] = 'Harcanan Tutar';
+$lang['received'] = 'Alındı';
+$lang['disbursement'] = 'Dağıtım';
+$lang['balance'] = 'Bakiye';
+$lang['cf_save_operation'] = 'İşlemi Kaydet';
+$lang['operation'] = 'İşlem';
+$lang['cf_new_expense'] = 'İşlemle Gider Kaydı';
+$lang['expense_name'] = 'Tanım';
+$lang['new_buisiness'] = 'Yeni İşletme Ekle';
+$lang['cf_submit'] = 'İşlemi Kaydet';
+$lang['operation_type'] = 'İşlem Türü';
+$lang['add_cf_expenses'] = 'Gideri Ekle';
+$lang['edit_cf_expenses'] = 'Gideri Düzenle';
+$lang['new_buisness_type'] = 'Yeni İş Türü Ekle';
+$lang['buisness_type_name'] = 'İşletme Adı';
+$lang['buisness_type_edit'] = 'İşletme Adını Düzenle';
+$lang['buisness_types'] = 'İşletmelerim';
+$lang['cash_flow'] = 'Nakit Akışı';

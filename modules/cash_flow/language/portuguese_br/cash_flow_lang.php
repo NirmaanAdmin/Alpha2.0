@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gerenciamento de Despesas';
+$lang['final_balance'] = 'Saldo Final';
+$lang['revenue'] = 'Receita';
+$lang['amount_spent'] = 'Valor Gasto';
+$lang['received'] = 'Recebido';
+$lang['disbursement'] = 'Desembolso';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Salvar Operação';
+$lang['operation'] = 'Operação';
+$lang['cf_new_expense'] = 'Registro de Despesas por Transação';
+$lang['expense_name'] = 'Nome';
+$lang['new_buisiness'] = 'Adicionar Empresas';
+$lang['cf_submit'] = 'Salvar Operação';
+$lang['operation_type'] = 'Tipo de Operação';
+$lang['add_cf_expenses'] = 'Despesa de';
+$lang['edit_cf_expenses'] = 'Editar Despesa de';
+$lang['new_buisness_type'] = 'Adicionar Novo Tipo de Negócio';
+$lang['buisness_type_name'] = 'Nome do Negócio';
+$lang['buisness_type_edit'] = 'Editar Nome do Negócio';
+$lang['buisness_types'] = 'Meus Negócios';
+$lang['cash_flow'] = 'Fluxo de Caixa';

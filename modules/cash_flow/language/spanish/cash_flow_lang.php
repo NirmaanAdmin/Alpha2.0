@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gestión de Gastos';
+$lang['final_balance'] = 'Saldo Final';
+$lang['revenue'] = 'Ingresos';
+$lang['amount_spent'] = 'Monto Gastado';
+$lang['received'] = 'Recibido';
+$lang['disbursement'] = 'Desembolso';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Guardar Operación';
+$lang['operation'] = 'Operación';
+$lang['cf_new_expense'] = 'Registro de Gastos por Transacción';
+$lang['expense_name'] = 'Nombre';
+$lang['new_buisiness'] = 'Agregar Empresas';
+$lang['cf_submit'] = 'Guardar Operación';
+$lang['operation_type'] = 'Tipo de Operación';
+$lang['add_cf_expenses'] = 'Gasto de';
+$lang['edit_cf_expenses'] = 'Editar Gasto de';
+$lang['new_buisness_type'] = 'Agregar Nuevo Tipo de Negocio';
+$lang['buisness_type_name'] = 'Nombre del Negocio';
+$lang['buisness_type_edit'] = 'Editar Nombre del Negocio';
+$lang['buisness_types'] = 'Mis Negocios';
+$lang['cash_flow'] = 'Flujo de Caja';

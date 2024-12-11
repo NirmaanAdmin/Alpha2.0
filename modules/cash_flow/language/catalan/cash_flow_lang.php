@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gestió de Despeses de Tresoreria';
+$lang['final_balance'] = 'Balanç Final';
+$lang['revenue'] = 'Ingressos';
+$lang['amount_spent'] = 'Quantitat Despesa';
+$lang['received'] = 'Rebut';
+$lang['disbursement'] = 'Desemborsament';
+$lang['balance'] = 'Balanç';
+$lang['cf_save_operation'] = 'Guardar Operació';
+$lang['operation'] = 'Operació';
+$lang['cf_new_expense'] = 'Registre de Despesa per Transacció';
+$lang['expense_name'] = 'Concepte';
+$lang['new_buisiness'] = 'Afegir Empreses';
+$lang['cf_submit'] = 'Guardar Operació';
+$lang['operation_type'] = 'Tipus d’Operació';
+$lang['add_cf_expenses'] = 'Despesa de';
+$lang['edit_cf_expenses'] = 'Edició de Despesa de';
+$lang['new_buisness_type'] = 'Afegir Nou Negoci';
+$lang['buisness_type_name'] = 'Nom del Negoci';
+$lang['buisness_type_edit'] = 'Editar Nom del Negoci';
+$lang['buisness_types'] = 'Els Meus Negocis';
+$lang['cash_flow'] = 'Flux de Caixa';

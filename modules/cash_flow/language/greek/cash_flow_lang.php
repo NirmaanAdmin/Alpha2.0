@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Διαχείριση Ταμειακών Εξόδων';
+$lang['final_balance'] = 'Τελικό Υπόλοιπο';
+$lang['revenue'] = 'Έσοδα';
+$lang['amount_spent'] = 'Δαπανηθέν Ποσό';
+$lang['received'] = 'Ελήφθη';
+$lang['disbursement'] = 'Δαπάνη';
+$lang['balance'] = 'Υπόλοιπο';
+$lang['cf_save_operation'] = 'Αποθήκευση Ενέργειας';
+$lang['operation'] = 'Ενέργεια';
+$lang['cf_new_expense'] = 'Καταγραφή Εξόδων μέσω Συναλλαγής';
+$lang['expense_name'] = 'Ονομασία';
+$lang['new_buisiness'] = 'Προσθήκη Επιχειρήσεων';
+$lang['cf_submit'] = 'Αποθήκευση Ενέργειας';
+$lang['operation_type'] = 'Τύπος Ενέργειας';
+$lang['add_cf_expenses'] = 'Έξοδα από';
+$lang['edit_cf_expenses'] = 'Επεξεργασία Εξόδων από';
+$lang['new_buisness_type'] = 'Προσθήκη Νέας Επιχείρησης';
+$lang['buisness_type_name'] = 'Όνομα Επιχείρησης';
+$lang['buisness_type_edit'] = 'Επεξεργασία Ονόματος Επιχείρησης';
+$lang['buisness_types'] = 'Οι Επιχειρήσεις Μου';
+$lang['cash_flow'] = 'Ταμειακή Ροή';

@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gestionarea Cheltuielilor';
+$lang['final_balance'] = 'Sold Final';
+$lang['revenue'] = 'Venituri';
+$lang['amount_spent'] = 'Sumă Cheltuită';
+$lang['received'] = 'Recepționat';
+$lang['disbursement'] = 'Decontare';
+$lang['balance'] = 'Sold';
+$lang['cf_save_operation'] = 'Salvează Operațiunea';
+$lang['operation'] = 'Operațiune';
+$lang['cf_new_expense'] = 'Înregistrarea Cheltuielilor prin Tranzacție';
+$lang['expense_name'] = 'Denumire';
+$lang['new_buisiness'] = 'Adaugă Afaceri';
+$lang['cf_submit'] = 'Salvează Operațiunea';
+$lang['operation_type'] = 'Tip de Operațiune';
+$lang['add_cf_expenses'] = 'Cheltuială de';
+$lang['edit_cf_expenses'] = 'Editează Cheltuială de';
+$lang['new_buisness_type'] = 'Adaugă Tip Nou de Afacere';
+$lang['buisness_type_name'] = 'Numele Afacerii';
+$lang['buisness_type_edit'] = 'Editează Numele Afacerii';
+$lang['buisness_types'] = 'Afacerea Mea';
+$lang['cash_flow'] = 'Flux de Numerar';

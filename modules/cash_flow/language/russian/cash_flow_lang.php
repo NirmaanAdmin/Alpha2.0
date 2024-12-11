@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Управление расходами';
+$lang['final_balance'] = 'Итоговый баланс';
+$lang['revenue'] = 'Выручка';
+$lang['amount_spent'] = 'Сумма потрачена';
+$lang['received'] = 'Получено';
+$lang['disbursement'] = 'Расход';
+$lang['balance'] = 'Баланс';
+$lang['cf_save_operation'] = 'Сохранить операцию';
+$lang['operation'] = 'Операция';
+$lang['cf_new_expense'] = 'Запись расходов по транзакции';
+$lang['expense_name'] = 'Название';
+$lang['new_buisiness'] = 'Добавить бизнес';
+$lang['cf_submit'] = 'Сохранить операцию';
+$lang['operation_type'] = 'Тип операции';
+$lang['add_cf_expenses'] = 'Расходы на';
+$lang['edit_cf_expenses'] = 'Редактировать расходы на';
+$lang['new_buisness_type'] = 'Добавить новый бизнес';
+$lang['buisness_type_name'] = 'Название бизнеса';
+$lang['buisness_type_edit'] = 'Редактировать название бизнеса';
+$lang['buisness_types'] = 'Мои бизнесы';
+$lang['cash_flow'] = 'Денежный поток';

@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gestion des dépenses de trésorerie';
+$lang['final_balance'] = 'Solde final';
+$lang['revenue'] = 'Revenu';
+$lang['amount_spent'] = 'Montant dépensé';
+$lang['received'] = 'Reçu';
+$lang['disbursement'] = 'Décaissement';
+$lang['balance'] = 'Solde';
+$lang['cf_save_operation'] = 'Enregistrer l’opération';
+$lang['operation'] = 'Opération';
+$lang['cf_new_expense'] = 'Enregistrement des dépenses par transaction';
+$lang['expense_name'] = 'Libellé';
+$lang['new_buisiness'] = 'Ajouter des entreprises';
+$lang['cf_submit'] = 'Enregistrer l’opération';
+$lang['operation_type'] = 'Type d’opération';
+$lang['add_cf_expenses'] = 'Dépense de';
+$lang['edit_cf_expenses'] = 'Modifier la dépense de';
+$lang['new_buisness_type'] = 'Ajouter une nouvelle entreprise';
+$lang['buisness_type_name'] = 'Nom de l’entreprise';
+$lang['buisness_type_edit'] = 'Modifier le nom de l’entreprise';
+$lang['buisness_types'] = 'Mes entreprises';
+$lang['cash_flow'] = 'Flux de trésorerie';

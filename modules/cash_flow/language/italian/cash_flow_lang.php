@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Gestione delle Spese';
+$lang['final_balance'] = 'Saldo Finale';
+$lang['revenue'] = 'Entrate';
+$lang['amount_spent'] = 'Importo Speso';
+$lang['received'] = 'Ricevuto';
+$lang['disbursement'] = 'Erogazione';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Salva Operazione';
+$lang['operation'] = 'Operazione';
+$lang['cf_new_expense'] = 'Registrazione delle Spese per Transazione';
+$lang['expense_name'] = 'Voce';
+$lang['new_buisiness'] = 'Aggiungi Attività';
+$lang['cf_submit'] = 'Salva Operazione';
+$lang['operation_type'] = 'Tipo di Operazione';
+$lang['add_cf_expenses'] = 'Spesa di';
+$lang['edit_cf_expenses'] = 'Modifica Spesa di';
+$lang['new_buisness_type'] = 'Aggiungi Nuova Attività';
+$lang['buisness_type_name'] = 'Nome dell\'Attività';
+$lang['buisness_type_edit'] = 'Modifica Nome dell\'Attività';
+$lang['buisness_types'] = 'Le Mie Attività';
+$lang['cash_flow'] = 'Flusso di Cassa';

@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'مدیریت هزینه‌های نقدی';
+$lang['final_balance'] = 'مانده نهایی';
+$lang['revenue'] = 'درآمد';
+$lang['amount_spent'] = 'مبلغ هزینه شده';
+$lang['received'] = 'دریافت شده';
+$lang['disbursement'] = 'پرداخت';
+$lang['balance'] = 'مانده';
+$lang['cf_save_operation'] = 'ذخیره عملیات';
+$lang['operation'] = 'عملیات';
+$lang['cf_new_expense'] = 'ثبت هزینه از طریق تراکنش';
+$lang['expense_name'] = 'عنوان';
+$lang['new_buisiness'] = 'اضافه کردن کسب و کار';
+$lang['cf_submit'] = 'ذخیره عملیات';
+$lang['operation_type'] = 'نوع عملیات';
+$lang['add_cf_expenses'] = 'هزینه‌های';
+$lang['edit_cf_expenses'] = 'ویرایش هزینه‌های';
+$lang['new_buisness_type'] = 'اضافه کردن کسب و کار جدید';
+$lang['buisness_type_name'] = 'نام کسب و کار';
+$lang['buisness_type_edit'] = 'ویرایش نام کسب و کار';
+$lang['buisness_types'] = 'کسب و کارهای من';
+$lang['cash_flow'] = 'جریان نقدی';

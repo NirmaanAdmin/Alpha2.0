@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Управление на парични разходи';
+$lang['final_balance'] = 'Краен баланс';
+$lang['revenue'] = 'Приходи';
+$lang['amount_spent'] = 'Изразходвана сума';
+$lang['received'] = 'Получено';
+$lang['disbursement'] = 'Разход';
+$lang['balance'] = 'Баланс';
+$lang['cf_save_operation'] = 'Запазване на операция';
+$lang['operation'] = 'Операция';
+$lang['cf_new_expense'] = 'Запис на разход чрез транзакция';
+$lang['expense_name'] = 'Наименование';
+$lang['new_buisiness'] = 'Добавяне на бизнеси';
+$lang['cf_submit'] = 'Запази операция';
+$lang['operation_type'] = 'Тип операция';
+$lang['add_cf_expenses'] = 'Разход на';
+$lang['edit_cf_expenses'] = 'Редактиране на разход на';
+$lang['new_buisness_type'] = 'Добавяне на нов бизнес';
+$lang['buisness_type_name'] = 'Име на бизнес';
+$lang['buisness_type_edit'] = 'Редактиране на име на бизнес';
+$lang['buisness_types'] = 'Моите бизнеси';
+$lang['cash_flow'] = 'Паричен поток';

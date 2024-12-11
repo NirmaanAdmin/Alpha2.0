@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Pengelolaan Pengeluaran Kas';
+$lang['final_balance'] = 'Saldo Akhir';
+$lang['revenue'] = 'Pendapatan';
+$lang['amount_spent'] = 'Jumlah Dibelanjakan';
+$lang['received'] = 'Diterima';
+$lang['disbursement'] = 'Pengeluaran';
+$lang['balance'] = 'Saldo';
+$lang['cf_save_operation'] = 'Simpan Operasi';
+$lang['operation'] = 'Operasi';
+$lang['cf_new_expense'] = 'Pencatatan Pengeluaran Melalui Transaksi';
+$lang['expense_name'] = 'Nama';
+$lang['new_buisiness'] = 'Tambahkan Bisnis';
+$lang['cf_submit'] = 'Simpan Operasi';
+$lang['operation_type'] = 'Jenis Operasi';
+$lang['add_cf_expenses'] = 'Pengeluaran dari';
+$lang['edit_cf_expenses'] = 'Edit Pengeluaran dari';
+$lang['new_buisness_type'] = 'Tambahkan Bisnis Baru';
+$lang['buisness_type_name'] = 'Nama Bisnis';
+$lang['buisness_type_edit'] = 'Edit Nama Bisnis';
+$lang['buisness_types'] = 'Bisnis Saya';
+$lang['cash_flow'] = 'Arus Kas';

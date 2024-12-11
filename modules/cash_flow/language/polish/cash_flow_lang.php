@@ -1,0 +1,22 @@
+<?php
+$lang['cash_flow_menu_name'] = 'Zarządzanie Wydatkami Gotówkowymi';
+$lang['final_balance'] = 'Ostateczny Bilans';
+$lang['revenue'] = 'Przychody';
+$lang['amount_spent'] = 'Wydana Kwota';
+$lang['received'] = 'Otrzymano';
+$lang['disbursement'] = 'Wydanie';
+$lang['balance'] = 'Bilans';
+$lang['cf_save_operation'] = 'Zapisz Operację';
+$lang['operation'] = 'Operacja';
+$lang['cf_new_expense'] = 'Rejestracja Wydatku przez Transakcję';
+$lang['expense_name'] = 'Nazwa';
+$lang['new_buisiness'] = 'Dodaj Firmy';
+$lang['cf_submit'] = 'Zapisz Operację';
+$lang['operation_type'] = 'Typ Operacji';
+$lang['add_cf_expenses'] = 'Wydatek z';
+$lang['edit_cf_expenses'] = 'Edytuj Wydatek z';
+$lang['new_buisness_type'] = 'Dodaj Nowy Typ Firmy';
+$lang['buisness_type_name'] = 'Nazwa Firmy';
+$lang['buisness_type_edit'] = 'Edytuj Nazwę Firmy';
+$lang['buisness_types'] = 'Moje Firmy';
+$lang['cash_flow'] = 'Przepływ Gotówki';
