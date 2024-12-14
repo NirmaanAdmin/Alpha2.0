@@ -599,8 +599,8 @@
           $('select[name="currency"]').val(response.currency).change();
           $('input[name="currency_rate"]').val(response.currency_rate).change();
 
-          // $('.invoice-item table.invoice-items-table.items tbody').html('');
-          // $('.invoice-item table.invoice-items-table.items tbody').append(response.list_item);
+          $('.invoice-item table.invoice-items-table.items tbody').html('');
+          $('.invoice-item table.invoice-items-table.items tbody').append(response.list_item);
 
           setTimeout(function () {
             pur_calculate_total();
