@@ -240,7 +240,7 @@ class Spreadsheet_online extends AdminController
     			}
     		}
 
-    		if(count($data['clients_share'] > 0)){
+    		if(count($data['clients_share']) > 0){
     			if($data['clients_share'][0] != ''){
     				foreach ($data['clients_share'] as $key => $value) {
     					$this->db->where('id', $data['id']);
