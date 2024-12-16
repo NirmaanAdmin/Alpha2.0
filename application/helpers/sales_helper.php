@@ -884,6 +884,8 @@ function get_base_currency()
 
 function amount_format($num, $type = 1)
 {
+    $isNegative = $num < 0;
+    $num = $isNegative ? abs($num) : $num;
     $num_full = number_format((float)$num,2,'.','');
     if (strpos($num, '.') !== false) {
     $num = substr($num_full, 0, strpos($num_full, "."));
@@ -908,6 +910,8 @@ function amount_format($num, $type = 1)
         } else {
             $thecash = $num.substr($num_full, -3);
         }
+        $sign = $isNegative ? "-" : "";
+        $thecash = $sign.$thecash;
         return $thecash; // writes the final format where $currency is the currency symbol.
     }
 }
