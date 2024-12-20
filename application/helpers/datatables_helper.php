@@ -13,7 +13,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param  string $sGroupBy group results
  * @return array
  */
-function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where = [], $additionalSelect = [], $sGroupBy = '', $searchAs = [], $having = '')
+function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where = [], $additionalSelect = [], $sGroupBy = '', $searchAs = [], $having = '', $module ='')
 {
     $CI          = &get_instance();
     $data      = $CI->input->post();
@@ -53,68 +53,74 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     $nullColumnsAsLast = get_null_columns_that_should_be_sorted_as_last();
 
     $sOrder = '';
-    if ($CI->input->post('order')) {
-        $sOrder = 'ORDER BY ';
-        foreach ($CI->input->post('order') as $key => $val) {
-            $columnName = $aColumns[intval($data['order'][$key]['column'])];
-            $dir        = strtoupper($data['order'][$key]['dir']);
-            $type       = $data['order'][$key]['type'] ?? null;
+if ($CI->input->post('order')) {
+    $sOrder = 'ORDER BY ';
+    foreach ($CI->input->post('order') as $key => $val) {
+        $columnName = $aColumns[intval($data['order'][$key]['column'])];
+        $dir        = strtoupper($data['order'][$key]['dir']);
+        $type       = $data['order'][$key]['type'] ?? null;
 
-            // Security
-            if (!in_array($dir, ['ASC', 'DESC'])) {
-                $dir = 'ASC';
-            }
+        // Security
+        if (!in_array($dir, ['ASC', 'DESC'])) {
+            $dir = 'ASC';
+        }
 
-            if (strpos($columnName, ' as ') !== false) {
-                $columnName = strbefore($columnName, ' as');
-            }
+        if (strpos($columnName, ' as ') !== false) {
+            $columnName = strbefore($columnName, ' as');
+        }
 
-            // first checking is for eq tablename.column name
-            // second checking there is already prefixed table name in the column name
-            // this will work on the first table sorting - checked by the draw parameters
-            // in future sorting user must sort like he want and the duedates won't be always last
-            if ((in_array($sTable . '.' . $columnName, $nullColumnsAsLast)
-                || in_array($columnName, $nullColumnsAsLast))) {
-                $sOrder .= $columnName . ' IS NULL ' . $dir . ', ' . $columnName;
+        if ((in_array($sTable . '.' . $columnName, $nullColumnsAsLast)
+            || in_array($columnName, $nullColumnsAsLast))) {
+            $sOrder .= $columnName . ' IS NULL ' . $dir . ', ' . $columnName;
+        } else {
+            if ($type === 'number') {
+                $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as SIGNED)', $sTable);
+            } elseif ($type === 'date_picker') {
+                $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as DATE)', $sTable);
+            } elseif ($type === 'date_picker_time') {
+                $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as DATETIME)', $sTable);
             } else {
-                // Custom fields sorting support for number type custom fields
-                if ($type === 'number') {
-                    $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as SIGNED)', $sTable);
-                } elseif ($type === 'date_picker') {
-                    $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as DATE)', $sTable);
-                } elseif ($type === 'date_picker_time') {
-                    $sOrder .= hooks()->apply_filters('datatables_query_order_column', 'CAST(' . $columnName . ' as DATETIME)', $sTable);
-                } else {
-                    $sOrder .= hooks()->apply_filters('datatables_query_order_column', $columnName, $sTable);
-                }
+                $sOrder .= hooks()->apply_filters('datatables_query_order_column', $columnName, $sTable);
             }
-
-            $sOrder .= ' ' . $dir . ', ';
         }
 
-        if (trim($sOrder) == 'ORDER BY') {
-            $sOrder = '';
-        }
-
-        $sOrder = rtrim($sOrder, ', ');
-
-        if (
-            get_option('save_last_order_for_tables') == '1'
-            && $CI->input->post('last_order_identifier')
-            && $CI->input->post('order')
-        ) {
-            // https://stackoverflow.com/questions/11195692/json-encode-sparse-php-array-as-json-array-not-json-object
-
-            $indexedOnly = [];
-            foreach ($CI->input->post('order') as $row) {
-                $indexedOnly[] = array_values($row);
-            }
-
-            $meta_name = $CI->input->post('last_order_identifier') . '-table-last-order';
-
-            update_staff_meta(get_staff_user_id(), $meta_name, json_encode($indexedOnly, JSON_NUMERIC_CHECK));
-        }
+        $sOrder .= ' ' . $dir . ', ';
     }
+
+    if (trim($sOrder) == 'ORDER BY') {
+        $sOrder = '';
+    }
+
+    $sOrder = rtrim($sOrder, ', ');
+
+    // If the $module parameter is set, add custom ordering
+    if (!empty($module)) {
+        $additionalOrder = '';
+
+        // Add specific ordering logic based on the module value
+        if ($module === 'purchase_request') {
+            $additionalOrder = '(status = 1) DESC, ';
+        } 
+
+        // Prepend additional order conditions
+        $sOrder = 'ORDER BY ' . $additionalOrder . ltrim($sOrder, 'ORDER BY ');
+    }
+
+    if (
+        get_option('save_last_order_for_tables') == '1'
+        && $CI->input->post('last_order_identifier')
+        && $CI->input->post('order')
+    ) {
+        $indexedOnly = [];
+        foreach ($CI->input->post('order') as $row) {
+            $indexedOnly[] = array_values($row);
+        }
+
+        $meta_name = $CI->input->post('last_order_identifier') . '-table-last-order';
+        update_staff_meta(get_staff_user_id(), $meta_name, json_encode($indexedOnly, JSON_NUMERIC_CHECK));
+    }
+}
+
     /*
      * Filtering
      * NOTE this does not match the built-in DataTables filtering which does it

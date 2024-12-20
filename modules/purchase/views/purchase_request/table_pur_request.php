@@ -3,7 +3,6 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
-     
     'pur_rq_code',
     'pur_rq_name',
     'requester',
@@ -18,7 +17,7 @@ $sIndexColumn = 'id';
 $sTable       = db_prefix().'pur_request';
 $join         = [ 'LEFT JOIN '.db_prefix().'departments ON '.db_prefix().'departments.departmentid = '.db_prefix().'pur_request.department' ];
 $where = [];
-
+$module = 'purchase_request';
 $having = '';
 if(!is_admin()) {
     $having = "FIND_IN_SET('".get_staff_user_id()."', member_list) != 0";
@@ -58,7 +57,7 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     'name',
     'pur_rq_code',
     '(SELECT GROUP_CONCAT(' . db_prefix() . 'project_members.staff_id SEPARATOR ",") FROM ' . db_prefix() . 'project_members WHERE ' . db_prefix() . 'project_members.project_id=' . db_prefix() . 'pur_request.project) as member_list',
-], '', [], $having);
+], '', [], $having , $module);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
