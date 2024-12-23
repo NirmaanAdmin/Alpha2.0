@@ -137,6 +137,7 @@
                                  <tr>
                                     <th align="center">#</th>
                                     <th  colspan="1"><?php echo _l('commodity_code') ?></th>
+                                    <th  colspan="1"><?php echo _l('description') ?></th>
                                      <th colspan="1"><?php echo _l('warehouse_name') ?></th>
                                      <th  colspan="1"><?php echo _l('unit_name') ?></th>
                                      <th  colspan="2" class="text-center"><?php echo _l('quantity') ?></th>
@@ -144,7 +145,7 @@
                                      <th align="right" colspan="1"><?php echo _l('total_money') ?></th>
                                      <th align="right" colspan="1"><?php echo _l('tax_money') ?></th>
                                      <th align="right" colspan="1"><?php echo _l('lot_number') ?></th>
-                                     <th align="right" colspan="1"><?php echo _l('expiry_date') ?></th>
+                                     <!-- <th align="right" colspan="1"><?php echo _l('expiry_date') ?></th> -->
                                  </tr>
                               </thead>
                               <tbody class="ui-sortable">
@@ -172,6 +173,7 @@
                               $expiry_date =(isset($receipt_value) ? $receipt_value['expiry_date'] : '');
                               $lot_number =(isset($receipt_value) ? $receipt_value['lot_number'] : '');
                               $commodity_name = $receipt_value['commodity_name'];
+                              $description = $receipt_value['description'];
                               if(strlen($commodity_name) == 0){
                                 $commodity_name = wh_get_item_variatiom($receipt_value['commodity_code']);
                               }
@@ -188,6 +190,7 @@
                               <tr data-toggle="tooltip" data-original-title="<?php echo html_entity_decode($name_serial_number_tooltip); ?>">
                               <td ><?php echo html_entity_decode($receipt_key) ?></td>
                                   <td ><?php echo html_entity_decode($commodity_name) ?></td>
+                                  <td ><?php echo html_entity_decode($description) ?></td>
                                   <td ><?php echo html_entity_decode($warehouse_code) ?></td>
                                   <td ><?php echo html_entity_decode($unit_name) ?></td>
                                   <td ></td>
@@ -196,7 +199,7 @@
                                   <td class="text-right"><?php echo app_format_money((float)$goods_money,'') ?></td>
                                   <td class="text-right"><?php echo app_format_money((float)$tax_money,'') ?></td>
                                   <td class="text-right"><?php echo html_entity_decode($lot_number) ?></td>
-                                  <td class="text-right"><?php echo _d($expiry_date) ?></td>
+                                  <!-- <td class="text-right"><?php echo _d($expiry_date) ?></td> -->
                                 </tr>
                              <?php  } ?>
                               </tbody>

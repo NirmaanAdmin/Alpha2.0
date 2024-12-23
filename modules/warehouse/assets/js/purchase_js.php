@@ -146,6 +146,7 @@ function wh_add_item_to_preview(id) {
 
 		$('.main input[name="commodity_code"]').val(response.itemid);
 		$('.main textarea[name="commodity_name"]').val(response.code_description);
+		$('.main textarea[name="description"]').val(response.description);
 		$('.main input[name="unit_price"]').val(response.purchase_price);
 		$('.main input[name="unit_name"]').val(response.unit_name);
 		$('.main input[name="unit_id"]').val(response.unit_id);
@@ -207,7 +208,7 @@ function wh_add_item_to_table(data, itemid) {
 	var item_key = lastAddedItemKey ? lastAddedItemKey += 1 : $("body").find('.invoice-items-table tbody .item').length + 1;
 	lastAddedItemKey = item_key;
 	$("body").append('<div class="dt-loader"></div>');
-	wh_get_item_row_template('newitems[' + item_key + ']',data.commodity_name,data.warehouse_id,data.quantities, data.unit_name,data.unit_price, data.taxname, data.lot_number,data.date_manufacture,data.expiry_date, data.commodity_code, data.unit_id, data.tax_rate, data.tax_money, data.goods_money, data.note, itemid).done(function(output){
+	wh_get_item_row_template('newitems[' + item_key + ']',data.commodity_name,data.warehouse_id,data.quantities, data.unit_name,data.unit_price, data.taxname, data.lot_number,data.date_manufacture,data.expiry_date, data.commodity_code, data.unit_id, data.tax_rate, data.tax_money, data.goods_money, data.note, itemid,data.description).done(function(output){
 		table_row += output;
 
 		$('.invoice-item table.invoice-items-table.items tbody').append(table_row);
@@ -225,7 +226,7 @@ function wh_add_item_to_table(data, itemid) {
 
         <?php if(get_option('wh_products_by_serial')){ ?>
 	        // open serial modal
-	        fill_multiple_serial_number_modal(data.quantities, 'newitems[' + item_key + ']');
+	        // fill_multiple_serial_number_modal(data.quantities, 'newitems[' + item_key + ']');
 	    <?php } ?>
 
 		return true;
@@ -238,6 +239,7 @@ function wh_get_item_preview_values() {
 
 	var response = {};
 	response.commodity_name = $('.invoice-item .main textarea[name="commodity_name"]').val();
+	response.description = $('.invoice-item .main textarea[name="description"]').val();
 	response.warehouse_id = $('.invoice-item .main select[name="warehouse_id"]').val();
 	response.quantities = $('.invoice-item .main input[name="quantities"]').val();
 	response.unit_name = $('.invoice-item .main input[name="unit_name"]').val();
@@ -265,7 +267,7 @@ function wh_clear_item_preview_values(parent) {
 	previewArea.find('select').val('').selectpicker('refresh');
 }
 
-function wh_get_item_row_template(name, commodity_name, warehouse_id, quantities, unit_name, unit_price, taxname, lot_number, date_manufacture, expiry_date, commodity_code, unit_id, tax_rate, tax_money, goods_money, note, item_key)  {
+function wh_get_item_row_template(name, commodity_name, warehouse_id, quantities, unit_name, unit_price, taxname, lot_number, date_manufacture, expiry_date, commodity_code, unit_id, tax_rate, tax_money, goods_money, note, item_key,description)  {
 	"use strict";
 
 	jQuery.ajaxSetup({
@@ -275,6 +277,7 @@ function wh_get_item_row_template(name, commodity_name, warehouse_id, quantities
 	var d = $.post(admin_url + 'warehouse/get_good_receipt_row_template', {
 		name: name,
 		commodity_name : commodity_name,
+		description : description,
 		warehouse_id : warehouse_id,
 		quantities : quantities,
 		unit_name : unit_name,

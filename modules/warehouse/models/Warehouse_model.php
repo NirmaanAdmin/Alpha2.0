@@ -1424,7 +1424,7 @@ class Warehouse_model extends App_Model {
 				$quantities = (float)$value['quantities'] - (float)$value['wh_quantity_received'];
 				$sub_total = 0;
 
-				$list_item .= $this->create_goods_receipt_row_template($warehouse_data, 'newitems[' . $index . ']', $commodity_name, '', $quantities, $unit_name, $unit_price, $taxname, $lot_number, $date_manufacture, $expiry_date, $value['commodity_code'], $value['unit_id'] , $value['tax_rate'], $value['tax_value'], $value['goods_money'], $note, $value['id'], $sub_total, '', $value['tax'], true);
+				$list_item .= $this->create_goods_receipt_row_template($warehouse_data, 'newitems[' . $index . ']', $commodity_name, '', $quantities, $unit_name, $unit_price, $taxname, $lot_number, $date_manufacture, $expiry_date, $value['commodity_code'], $value['unit_id'] , $value['tax_rate'], $value['tax_value'], $value['goods_money'], $note, $value['id'], $sub_total, '', $value['tax'], true,'','');
 
 				$total_goods_money_temp = ((float)$value['quantities'] - (float)$value['wh_quantity_received'])*(float)$unit_price;
 				$total_goods_money += $total_goods_money_temp;
@@ -3050,6 +3050,7 @@ class Warehouse_model extends App_Model {
 		<tr>
 		<th class="thead-dark-ip">'. _l('_order').'</th>
 		<th class="thead-dark-ip">' . _l('commodity_code') . '</th>
+		<th class="thead-dark-ip">' . _l('description') . '</th>
 		<th class="thead-dark-ip">' . _l('warehouse_name') . '</th>
 		<th class="thead-dark-ip">' . _l('unit_name') . '</th>
 		<th class="thead-dark-ip">' . _l('quantity') . '</th>
@@ -3057,9 +3058,10 @@ class Warehouse_model extends App_Model {
 		<th class="thead-dark-ip">' . _l('total_money') . '</th>
 		<th class="thead-dark-ip">' . _l('tax_money') . '</th>
 		<th class="thead-dark-ip">' . _l('lot_number') . '</th>
-		<th class="thead-dark-ip">' . _l('expiry_date') . '</th>
+		
 
 		</tr>';
+		// <th class="thead-dark-ip">' . _l('expiry_date') . '</th>
 		foreach ($goods_receipt_detail as $receipt_key => $receipt_value) {
 
 			$commodity_name = (isset($receipt_value) ? $receipt_value['commodity_name'] : '');
@@ -3079,6 +3081,7 @@ class Warehouse_model extends App_Model {
 			$expiry_date =(isset($receipt_value['expiry_date']) ? $receipt_value['expiry_date'] : '');
 			$lot_number =(isset($receipt_value['lot_number']) ? $receipt_value['lot_number'] : '');
 			$commodity_name = $receipt_value['commodity_name'];
+			$description = $receipt_value['description'];
 			if(strlen($commodity_name) == 0){
 				$commodity_name = wh_get_item_variatiom($receipt_value['commodity_code']);
 			}
@@ -3088,6 +3091,7 @@ class Warehouse_model extends App_Model {
 			$html .= '<tr>';
 			$html .= '<td class="td_style_r_ep_c"><b>' . $key . '</b></td>
 			<td class="td_style_r_ep_c"><b>' . $commodity_name.'</b></td>
+			<td class="td_style_r_ep_c">' . $description.'</td>
 			<td class="td_style_r_ep_c">' . $warehouse_code . '</td>
 			<td class="td_style_r_ep_c">' . $unit_name . '</td>
 			<td class="td_style_r_ep_c">' . $quantities . '</td>
@@ -3095,8 +3099,9 @@ class Warehouse_model extends App_Model {
 			<td class="td_style_r_ep_c">' . app_format_money((float) $goods_money, '') . '</td>
 			<td class="td_style_r_ep_c">' . app_format_money((float) $tax_money, '') . '</td>
 			<td class="td_style_r_ep_c">' . $lot_number . '</td>
-			<td class="td_style_r_ep_c">' . _d($expiry_date) . '</td>
+			
 			</tr>';
+			// <td class="td_style_r_ep_c">' . _d($expiry_date) . '</td>
 
 			if(strlen($receipt_value['serial_number']) > 0){
 				$arr_serial_numbers = explode(',', $receipt_value['serial_number']);
@@ -14930,7 +14935,7 @@ class Warehouse_model extends App_Model {
         $this->db->select($rateCurrencyColumns . '' . db_prefix() . 'items.id as itemid,rate,
             t1.taxrate as taxrate,t1.id as taxid,t1.name as taxname,
             t2.taxrate as taxrate_2,t2.id as taxid_2,t2.name as taxname_2,
-            CONCAT(commodity_code,"_",description) as code_description,long_description,group_id,' . db_prefix() . 'items_groups.name as group_name,unit,'.db_prefix().'ware_unit_type.unit_name as unit_name, purchase_price, unit_id, guarantee, without_checking_warehouse');
+            CONCAT(commodity_code,"_",description) as code_description,long_description,description,group_id,' . db_prefix() . 'items_groups.name as group_name,unit,'.db_prefix().'ware_unit_type.unit_name as unit_name, purchase_price, unit_id, guarantee, without_checking_warehouse');
         $this->db->from(db_prefix() . 'items');
         $this->db->join('' . db_prefix() . 'taxes t1', 't1.id = ' . db_prefix() . 'items.tax', 'left');
         $this->db->join('' . db_prefix() . 'taxes t2', 't2.id = ' . db_prefix() . 'items.tax2', 'left');
@@ -14972,7 +14977,7 @@ class Warehouse_model extends App_Model {
      * @param  boolean $is_edit          
      * @return [type]                    
      */
-    public function create_goods_receipt_row_template($warehouse_data = [], $name = '', $commodity_name = '', $warehouse_id = '', $quantities = '', $unit_name = '', $unit_price = '', $taxname = '', $lot_number = '', $date_manufacture = '', $expiry_date = '', $commodity_code = '', $unit_id = '', $tax_rate = '', $tax_money = '', $goods_money = '', $note = '', $item_key = '', $sub_total = '', $tax_name = '', $tax_id = '', $is_edit = false, $serial_number = '') {
+    public function create_goods_receipt_row_template($warehouse_data = [], $name = '', $commodity_name = '', $warehouse_id = '', $quantities = '', $unit_name = '', $unit_price = '', $taxname = '', $lot_number = '', $date_manufacture = '', $expiry_date = '', $commodity_code = '', $unit_id = '', $tax_rate = '', $tax_money = '', $goods_money = '', $note = '', $item_key = '', $sub_total = '', $tax_name = '', $tax_id = '', $is_edit = false, $serial_number = '',$description = '') {
 		
 		$this->load->model('invoice_items_model');
 		$row = '';
@@ -14998,7 +15003,7 @@ class Warehouse_model extends App_Model {
 		$array_attr_payment = ['data-payment' => 'invoice'];
 		$name_sub_total = 'sub_total';
 		$name_serial_number = 'serial_number';
-
+		$name_description = 'description';
 		$array_qty_attr = [ 'min' => '0.0', 'step' => 'any'];
 		$array_rate_attr = [ 'min' => '0.0', 'step' => 'any'];
 		$str_rate_attr = 'min="0.0" step="any"';
@@ -15040,7 +15045,7 @@ class Warehouse_model extends App_Model {
 			$name_tax_name = $name .'[tax_name]';
 			$name_sub_total = $name .'[sub_total]';
 			$name_serial_number = $name .'[serial_number]';
-
+			$name_description = $name .'[description]';
 			$array_rate_attr = ['onblur' => 'wh_calculate_total();', 'onchange' => 'wh_calculate_total();', 'min' => '0.0' , 'step' => 'any', 'data-amount' => 'invoice', 'placeholder' => _l('unit_price')];
 
 			$array_qty_attr = ['onblur' => 'wh_calculate_total();', 'onchange' => 'wh_calculate_total();', 'min' => '0.0' , 'step' => 'any',  'data-quantity' => (float)$quantities];
@@ -15081,6 +15086,7 @@ class Warehouse_model extends App_Model {
 		$clients_attr = ["onchange" => "get_vehicle('" . $name_commodity_code . "','" . $name_unit_id . "','" . $name_warehouse_id . "');", "data-none-selected-text" => _l('customer_name'), 'data-customer_id' => 'invoice'];
 
 		$row .= '<td class="">' . render_textarea($name_commodity_name, '', $commodity_name, ['rows' => 2, 'placeholder' => _l('item_description_placeholder'), 'readonly' => true] ) . '</td>';
+		$row .= '<td class="">' . render_textarea($name_description, '', $description, ['rows' => 2, 'placeholder' => _l('item_description_placeholder')] ) . '</td>';
 		$row .= '<td class="warehouse_select">' .
 		// render_select_with_input_group($name_warehouse_id, $warehouse_data,array('warehouse_id','warehouse_name'),'',$warehouse_id,'<a href="javascript:void(0)" onclick="new_vehicle_reg(this,\''.$name_commodity_code.'\', \''.$name_warehouse_id.'\');return false;"><i class="fa fa-plus"></i></a>', ["data-none-selected-text" => _l('warehouse_name')]).
 		render_select($name_warehouse_id, $warehouse_data,array('warehouse_id','warehouse_name'),'',$warehouse_id,[], ["data-none-selected-text" => _l('warehouse_name')], 'no-margin').
@@ -15095,7 +15101,7 @@ class Warehouse_model extends App_Model {
 		$row .= '<td class="taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
 		$row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
 		$row .= '<td>' . render_date_input($name_date_manufacture, '', $date_manufacture, ['placeholder' => _l('date_manufacture')]) . '</td>';
-		$row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
+		// $row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
 		$row .= '<td class="amount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
@@ -15113,9 +15119,9 @@ class Warehouse_model extends App_Model {
 		} else {
 			$row .= '<td><a href="#" class="btn btn-danger pull-right" onclick="wh_delete_item(this,' . $item_key . ',\'.invoice-item\'); return false;" data-toggle="tooltip" data-original-title="'._l('delete').'"><i class="fa fa-trash"></i></a></td>';
 
-			if(get_option('wh_products_by_serial')){
-				$row .= '<td><a href="javascript:void(0)" class="btn btn-success pull-right" onclick="wh_view_serial_number( \''. $name_quantities . '\', \''. $name_serial_number . '\',\''. $name . '\'); return false;" data-toggle="tooltip" data-original-title="'.$name_serial_number_tooltip.'"><i class="fa fa-eye"></i></a></td>';
-			}
+			// if(get_option('wh_products_by_serial')){
+			// 	$row .= '<td><a href="javascript:void(0)" class="btn btn-success pull-right" onclick="wh_view_serial_number( \''. $name_quantities . '\', \''. $name_serial_number . '\',\''. $name . '\'); return false;" data-toggle="tooltip" data-original-title="'.$name_serial_number_tooltip.'"><i class="fa fa-eye"></i></a></td>';
+			// }
 
 		}
 		$row .= '</tr>';
