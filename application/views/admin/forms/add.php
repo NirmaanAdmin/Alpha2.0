@@ -45,6 +45,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group select-placeholder">
+                                        <label for="form" class="control-label">Forms</label>
                                             <select name="form_type" class="selectpicker no-margin" data-width="100%"  id="form_type" data-none-selected-text="None selected" data-live-search="true">
                                                 <option value=""></option>
                                                 <?php

@@ -75,13 +75,13 @@
                     <th colspan="13" class="daily_report_activity">ACTIVITY WITH LOCATION & OUTPUT</th>
                 </tr>
                 <tr>
-                    <th rowspan="2" class="daily_report_head daily_center">
+                    <th rowspan="2" class="daily_report_head daily_center" style="width: 200px;">
                         <span class="daily_report_label">Location</span>
                     </th>
-                    <th rowspan="2" class="daily_report_head daily_center">
+                    <th rowspan="2" class="daily_report_head daily_center" style="width: 200px;">
                         <span class="daily_report_label">Agency</span>
                     </th>
-                    <th rowspan="2" class="daily_report_head daily_center">
+                    <th rowspan="2" class="daily_report_head daily_center" style="width: 200px;">
                         <span class="daily_report_label">Type</span>
                     </th>
                     <th colspan="2" class="daily_report_head daily_center">

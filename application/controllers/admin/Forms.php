@@ -66,7 +66,7 @@ class Forms extends AdminController
     public function add($userid = false)
     {
         if ($this->input->post()) {
-            $data            = $this->input->post();
+            $data = $this->input->post();
             $data['message'] = html_purify($this->input->post('message', false));
             $id              = $this->forms_model->add($data, get_staff_user_id());
             if ($id) {
@@ -332,7 +332,8 @@ class Forms extends AdminController
                     die();
                 }
             }
-
+            // $data = $this->input->post();
+            // dd($data);
             $success = $this->forms_model->update_single_form_settings($this->input->post());
             if ($success) {
                 $this->session->set_flashdata('active_tab', true);
@@ -790,26 +791,27 @@ class Forms extends AdminController
         }
     }
 
-    public function find_project_contact() 
+    public function find_project_contact()
     {
         $response = array();
         if ($this->input->post()) {
             $data = $this->input->post();
-            if(!empty($data['project_id'])) {
+            if (!empty($data['project_id'])) {
                 $response = $this->forms_model->find_project_contact($data['project_id']);
             }
         }
         echo json_encode($response);
     }
 
-    public function find_form_design($form_type, $form_id = 0) {
+    public function find_form_design($form_type, $form_id = 0)
+    {
         $data = array();
-        if($form_type == "dpr") {
+        if ($form_type == "dpr") {
             $dpr_row_template = $this->forms_model->create_dpr_row_template();
-            if($form_id != 0) {
+            if ($form_id != 0) {
                 $dpr_form = $this->forms_model->get_dpr_form($form_id);
                 $dpr_form_detail = $this->forms_model->get_dpr_form_detail($form_id);
-                if(!empty($dpr_form_detail)) {
+                if (!empty($dpr_form_detail)) {
                     $index_order = 0;
                     foreach ($dpr_form_detail as $value) {
                         $index_order++;
@@ -820,13 +822,75 @@ class Forms extends AdminController
             }
             $data['dpr_row_template'] = $dpr_row_template;
             $this->load->view('admin/forms/form_design/dpr', $data);
+        } elseif ($form_type == "apc") {
+
+            if ($form_id != 0) {
+                $apc_form = $this->forms_model->get_apc_form($form_id);
+                $apc_form_detail = $this->forms_model->get_apc_form_detail($form_id);
+                $data['apc_attachments'] = $this->forms_model->get_apc_form_attachments($form_id);
+                $data['apc_form'] = $apc_form;
+                $data['apc_form_detail'] = $apc_form_detail;
+                $data['form_id'] = $form_id;
+            }
+         
+            $this->load->view('admin/forms/form_design/apc', $data);
+        } elseif ($form_type == "wpc") {
+            if ($form_id != 0) {
+                $wpc_form = $this->forms_model->get_wpc_form($form_id);
+                $wpc_form_detail = $this->forms_model->get_wpc_form_detail($form_id);                 
+                $data['wpc_form'] = $wpc_form;
+                $data['wpc_form_detail'] = $wpc_form_detail;
+                $data['wpc_attachments'] = $this->forms_model->get_wpc_form_attachments($form_id);
+                $data['form_id'] = $form_id;
+            }
+            $this->load->view('admin/forms/form_design/wpc', $data);
+        }elseif ($form_type == "mfa") {
+            if ($form_id != 0) {
+                $mfa_form = $this->forms_model->get_mfa_form($form_id);
+                $mfa_form_detail = $this->forms_model->get_mfa_form_detail($form_id);
+                $data['mfa_form'] = $mfa_form;
+                $data['mfa_form_detail'] = $mfa_form_detail;
+                $data['form_id'] = $form_id;
+            }
+            $this->load->view('admin/forms/form_design/mfa', $data);
+        }elseif ($form_type == "mlg") {
+            if ($form_id != 0) {
+                $mlg_form = $this->forms_model->get_mlg_form($form_id);
+                $mlg_form_detail = $this->forms_model->get_mlg_form_detail($form_id);
+                $data['mlg_attachments'] = $this->forms_model->get_mlg_form_attachments($form_id);
+                $data['mlg_form'] = $mlg_form;
+                $data['mlg_form_detail'] = $mlg_form_detail;
+                $data['form_id'] = $form_id;               
+            }            
+            $this->load->view('admin/forms/form_design/mlg', $data);
+        }elseif ($form_type == "msh") {
+            if ($form_id != 0) {
+                $msh_form = $this->forms_model->get_msh_form($form_id);
+                $msh_form_detail = $this->forms_model->get_msh_form_detail($form_id);
+                $data['msh_attachments'] = $this->forms_model->get_msh_form_attachments($form_id);
+                $data['msh_form'] = $msh_form;
+                $data['msh_form_detail'] = $msh_form_detail;
+                $data['form_id'] = $form_id;
+            }            
+            $this->load->view('admin/forms/form_design/msh', $data);
+        }elseif ($form_type == "sca") {
+            if ($form_id != 0) {
+                $msh_form = $this->forms_model->get_msh_form($form_id);
+                $msh_form_detail = $this->forms_model->get_msh_form_detail($form_id);
+                $data['msh_attachments'] = $this->forms_model->get_msh_form_attachments($form_id);
+                $data['msh_form'] = $msh_form;
+                $data['msh_form_detail'] = $msh_form_detail;
+                $data['form_id'] = $form_id;
+            }            
+            $this->load->view('admin/forms/form_design/sca', $data);
         }
     }
 
     /**
      * Gets the Daily Progress Report row template.
      */
-    public function get_dpr_row_template(){
+    public function get_dpr_row_template()
+    {
         $name = $this->input->post('name');
         $location = $this->input->post('location');
         $agency = $this->input->post('agency');
@@ -841,7 +905,24 @@ class Forms extends AdminController
         $male = $this->input->post('male');
         $female = $this->input->post('female');
         $item_key = $this->input->post('item_key');
-        
+
         echo $this->forms_model->create_dpr_row_template($name, $location, $agency, $type, $work_execute, $material_consumption, $machinery, $skilled, $unskilled, $depart, $total, $male, $female, false, $item_key);
+    }
+
+    public function delete_apc_attachment($id){
+        $this->forms_model->delete_apc_attachment($id);
+        
+    }
+    public function delete_msh_attachment($id){
+        $this->forms_model->delete_msh_attachment($id);
+        
+    }
+    public function delete_mlg_attachment($id){
+        $this->forms_model->delete_mlg_attachment($id);
+        
+    }
+    public function delete_wpc_attachment($id){
+        $this->forms_model->delete_wpc_attachment($id);
+        
     }
 }

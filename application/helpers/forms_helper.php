@@ -428,6 +428,14 @@ function get_form_listing()
                     'id' => 'mlg',
                     'name' => 'Monthly Lifting Gear and Appliance Inspection',
                 ],
+                [
+                    'id' => 'msh',
+                    'name' => 'Monthly Safety Harness Inspection',
+                ],
+                [
+                    'id' => 'sca',
+                    'name' => 'Scaffolds Dismantling Checklist',
+                ],
                 
             ]
         ]
@@ -883,6 +891,110 @@ function get_items_listing_for_mlg()
         [
             'id' => 6,
             'name' => 'Overall condition',
+        ],
+        
+    ];
+    return $result;
+}
+function get_items_listing_for_msh()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Lanyard',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Eye Loop',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Snap Hook',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Karabiner',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Shock Absorber',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Dorsal Anchorage',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Strap',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Buckler',
+        ],  
+        [
+            'id' => 9,
+            'name' => 'Colour Code',
+        ],
+        
+    ];
+    return $result;
+}
+function get_items_listing_for_sca()
+{
+    $result = array();
+    $result = [
+        [
+            'id' => 1,
+            'name' => 'Have warning notices stating “CAUTION, DO NOT USE THE SCAFFOLD” been fixed in prominent positions before dismantling the scaffold?',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Is the scaffold safe to dismantle?',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Have all the scaffolders been warned that if they deliberately or negligently drop any materials, they are liable to instant dismissal and/or followed by legal action?',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Have scaffolders been warned not to release any tie-ins in advance of scaffold dismantling  or to do anything that will make the scaffold unstable during dismantling?',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Have barricades been erected to restrict casual access to the scaffold?',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Are  all  personnel,  not  involved  in  the  actual  dismantling, removed from the site of the scaffold? ',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Are the scaffolders wearing safety helmets which will not slip?',
+        ],
+        [
+            'id' => 8,
+            'name' => 'Are the scaffolders supplied with personal safety protection devices like safety harness, life line, etc., and do hey use these devices?',
+        ],  
+        [
+            'id' => 9,
+            'name' => 'Are all local hazards such as lighting poles, telephone wires, etc., being recognised and allowed for? ',
+        ],
+        [
+            'id' => 10,
+            'name' => 'Is   there a qualified   scaffold   supervisor to supervise dismantling operation?',
+        ],
+        [
+            'id' => 11,
+            'name' => 'Have  ropes  been  provided  for  lowering  down  tubes  and boards, and baskets or buckets for fittings?',
+        ],
+        [
+            'id' => 12,
+            'name' => 'Have any adjacent temporary structures which may be affected by the removal of the scaffold been checked for safety? A Professional Engineer should always be asked to advise?',
+        ],
+        [
+            'id' => 13,
+            'name' => 'Have you inspected the site of the dismantled scaffold and taken note of the effects which may affect the other scaffolds in the vicinity? ',
         ],
         
     ];

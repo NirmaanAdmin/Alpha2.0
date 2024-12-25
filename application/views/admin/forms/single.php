@@ -48,13 +48,13 @@
                                 <div class="scroller arrow-right"><i class="fa fa-angle-right"></i></div>
                                 <div class="horizontal-tabs">
                                     <ul class="nav nav-tabs nav-tabs-horizontal" role="tablist">
-                                        <li role="presentation" class="<?php if (!$this->session->flashdata('active_tab')) {
+                                        <!-- <li role="presentation" class="<?php if (!$this->session->flashdata('active_tab')) {
                                 echo 'active';
                             } ?>">
                                             <a href="#addreply" aria-controls="addreply" role="tab" data-toggle="tab">
                                                 <?php echo _l('form_single_add_reply'); ?>
                                             </a>
-                                        </li>
+                                        </li> -->
                                         <li role="presentation">
                                             <a href="#note" aria-controls="note" role="tab" data-toggle="tab">
                                                 <?php echo _l('form_single_add_note'); ?>
@@ -81,12 +81,12 @@
                                 ?>
                                             </a>
                                         </li>
-                                        <li role="presentation">
+                                        <!-- <li role="presentation">
                                             <a href="#otherforms" onclick="init_table_forms(true);"
                                                 aria-controls="otherforms" role="tab" data-toggle="tab">
                                                 <?php echo _l('form_single_other_user_forms'); ?>
                                             </a>
-                                        </li>
+                                        </li> -->
                                         <li role="presentation">
                                             <a href="#tasks"
                                                 onclick="init_rel_tasks_table(<?php echo e($form->formid); ?>,'form'); return false;"
@@ -899,6 +899,7 @@ if(form_type != '') {
 function find_form_design(form_type) {
     var form_id = $('input[name="formid"]').val();
     $.post(admin_url + 'forms/find_form_design/'+form_type+'/'+form_id).done(function(response){
+        console.log(response);
         $('.view_form_design').html('');
         $('.view_form_design').html(response);
         $('.view_project_name').html('');
