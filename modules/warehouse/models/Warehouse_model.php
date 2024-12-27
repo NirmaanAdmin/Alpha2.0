@@ -1424,7 +1424,7 @@ class Warehouse_model extends App_Model {
 				$quantities = (float)$value['quantities'] - (float)$value['wh_quantity_received'];
 				$sub_total = 0;
 
-				$list_item .= $this->create_goods_receipt_row_template($warehouse_data, 'newitems[' . $index . ']', $commodity_name, '', $quantities, $unit_name, $unit_price, $taxname, $lot_number, $date_manufacture, $expiry_date, $value['commodity_code'], $value['unit_id'] , $value['tax_rate'], $value['tax_value'], $value['goods_money'], $note, $value['id'], $sub_total, '', $value['tax'], true,'','');
+				$list_item .= $this->create_goods_receipt_row_template($warehouse_data, 'newitems[' . $index . ']', $commodity_name, '', $quantities, $unit_name, $unit_price, $taxname, $lot_number, $date_manufacture, $expiry_date, $value['commodity_code'], $value['unit_id'] , $value['tax_rate'], $value['tax_value'], $value['goods_money'], $note, $value['id'], $sub_total, '', $value['tax'], true,'',$value['description']);
 
 				$total_goods_money_temp = ((float)$value['quantities'] - (float)$value['wh_quantity_received'])*(float)$unit_price;
 				$total_goods_money += $total_goods_money_temp;

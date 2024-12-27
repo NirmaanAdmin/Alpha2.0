@@ -500,7 +500,7 @@ if (!function_exists('format_organization_info')) {
     {
         $format = get_option('company_info_format');
         $vat    = get_option('company_vat');
-
+        $vat    = '';
         $format = _info_format_replace('company_name', '<b style="color:black" class="company-name-formatted">' . get_option('invoice_company_name') . '</b>', $format);
         $format = _info_format_replace('address', get_option('invoice_company_address'), $format);
         $format = _info_format_replace('city', get_option('invoice_company_city'), $format);
