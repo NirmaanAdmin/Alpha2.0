@@ -78,8 +78,9 @@
       data.staff = $('select[name="staff_timesheets[]"]').val();
       data.department = $('#department_timesheets').val();
       data.job_position = $('#job_position_timesheets').val();
-
+      $('#loader-container').removeClass('hide');
       $.post(admin_url + 'timesheets/reload_timesheets_byfilter', data).done(function(response) {
+        $('#loader-container').addClass('hide');
         response = JSON.parse(response);
         dataObject = response.arr;
         dataCol = response.set_col_tk;

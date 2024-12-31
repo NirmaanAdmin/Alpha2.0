@@ -156,46 +156,55 @@
 		</div>
 
 		<div class="col-md-12">
-			<table class="table border table-striped ">
-				<thead>
-					<th class="th-color"><?php echo _l('hr_hr_contract_rel_type'); ?></th>
-					<th class="text-center th-color"><?php echo _l('hr_hr_contract_rel_value'); ?></th>
-					<th class="th-color"><?php echo _l('hr_start_month'); ?></th>
-					<th class="th-color"><?php echo _l('note'); ?></th>
-				</thead>
-				<tbody>
-					<?php foreach($contract_details as $contract_detail){ ?>
-						<?php 
-						$type_name ='';
-						if(preg_match('/^st_/', $contract_detail['rel_type'])){
-							$rel_value = new_str_replace('st_', '', $contract_detail['rel_type']);
-							$salary_type = $this->hr_profile_model->get_salary_form($rel_value);
+		<table class="table border table-striped ">
+    <thead>
+        <th class="th-color"><?php echo _l('hr_hr_contract_rel_type'); ?></th>
+        <th class="text-center th-color"><?php echo _l('hr_hr_contract_rel_value'); ?></th>
+        <th class="th-color"><?php echo _l('hr_start_month'); ?></th>
+        <th class="th-color"><?php echo _l('note'); ?></th>
+    </thead>
+    <tbody>
+        <?php 
+        $total_value = 0; // Initialize the total value
+        foreach($contract_details as $contract_detail) { 
+            $type_name = '';
+            if(preg_match('/^st_/', $contract_detail['rel_type'])) {
+                $rel_value = new_str_replace('st_', '', $contract_detail['rel_type']);
+                $salary_type = $this->hr_profile_model->get_salary_form($rel_value);
 
-							$type = 'salary';
-							if($salary_type){
-								$type_name = $salary_type->form_name;
-							}
+                $type = 'salary';
+                if($salary_type) {
+                    $type_name = $salary_type->form_name;
+                }
 
-						}elseif(preg_match('/^al_/', $contract_detail['rel_type'])){
-							$rel_value = new_str_replace('al_', '', $contract_detail['rel_type']);
-							$allowance_type = $this->hr_profile_model->get_allowance_type($rel_value);
+            } elseif(preg_match('/^al_/', $contract_detail['rel_type'])) {
+                $rel_value = new_str_replace('al_', '', $contract_detail['rel_type']);
+                $allowance_type = $this->hr_profile_model->get_allowance_type($rel_value);
 
-							$type = 'allowance';
-							if($allowance_type){
-								$type_name = $allowance_type->type_name;
-							}
-						}
-						?>
-						<tr>
-							<td><?php echo new_html_entity_decode($type_name); ?></td>
-							<td class="text-right"><?php echo app_format_money((float)$contract_detail['rel_value'],''); ?></td>
-							<td><?php echo _d($contract_detail['since_date']); ?></td>
-							<td><?php echo new_html_entity_decode($contract_detail['contract_note']); ?></td>
+                $type = 'allowance';
+                if($allowance_type) {
+                    $type_name = $allowance_type->type_name;
+                }
+            }
 
-						</tr>
-					<?php } ?>
-				</tbody>
-			</table>  
+            $total_value += (float)$contract_detail['rel_value']; // Accumulate the total
+        ?>
+            <tr>
+                <td><?php echo new_html_entity_decode($type_name); ?></td>
+                <td class="text-right"><?php echo app_format_money((float)$contract_detail['rel_value'], ''); ?></td>
+                <td><?php echo _d($contract_detail['since_date']); ?></td>
+                <td><?php echo new_html_entity_decode($contract_detail['contract_note']); ?></td>
+            </tr>
+        <?php } ?>
+        <tr>
+            <td colspan="1" class=""><strong><?php echo _l('total'); ?></strong></td>
+            <td class="text-right"><strong><?php echo app_format_money($total_value, ''); ?></strong></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
 		</div>
 
 		<div class="col-md-12">

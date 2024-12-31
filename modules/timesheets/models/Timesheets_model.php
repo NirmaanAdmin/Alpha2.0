@@ -109,6 +109,9 @@ class timesheets_model extends app_model
 	{
 		$affectedrows = 0;
 		foreach (json_decode($data['leave_of_the_year_data']) as $key => $value) {
+			 // Remove the second value (index 1) from the array
+			 unset($value[1]);
+			 $value = array_values($value); // Re-index the array after unset
 			if ($value[0] != null) {
 				$this->db->where('staffid', $value[0]);
 				$this->db->where('year', $data['start_year_for_annual_leave_cycle']);
@@ -2872,6 +2875,8 @@ class timesheets_model extends app_model
 
 		$result = 0;
 		$data_shift_list = $this->get_shift_work_staff_by_date($staff_id, $date);
+		
+	
 		foreach ($data_shift_list as $ss) {
 			$data_shift_type = $this->get_shift_type($ss);
 			if ($data_shift_type) {
@@ -2880,7 +2885,8 @@ class timesheets_model extends app_model
 				$result += abs($hour - $lunch_hour);
 			}
 		}
-
+		
+	
 		return $result;
 	}
 	/**

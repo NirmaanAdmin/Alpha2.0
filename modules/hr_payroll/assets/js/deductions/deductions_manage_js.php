@@ -65,8 +65,9 @@
 		data.staff  = $('select[name="staff_deductions[]"]').val();
 		data.department = $('#department_deductions').val();
 		data.role_attendance = $('select[name="role_deductions[]"]').val();
-
+		$('#loader-container').removeClass('hide');
 		$.post(admin_url + 'hr_payroll/deductions_filter', data).done(function(response) {
+			$('#loader-container').addClass('hide');
 			response = JSON.parse(response);
 			dataObject = response.data_object;
 			purchase.updateSettings({

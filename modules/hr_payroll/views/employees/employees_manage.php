@@ -1,9 +1,30 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style type="text/css">
+  .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+  }
 
+  .loader-gif {
+    width: 100px;
+    /* Adjust the size as needed */
+    height: 100px;
+  }
+</style>
 <div id="wrapper">
 	<div class="content">
-		
+	<div class="loader-container hide" id="loader-container">
+      <img src="<?php echo site_url('modules/hr_payroll/uploads/lodder/lodder.gif') ?>" alt="Loading..." class="loader-gif">
+    </div>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel_s">

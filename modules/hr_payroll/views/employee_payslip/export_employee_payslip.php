@@ -12,10 +12,9 @@
 </table>
 
 <div class="text_align_center">
-	<b><h3><?php echo _l('hrp_payslip_for').' '. date('M-Y', strtotime($payslip_detail['month'])); ?> </h3></b>
+	<b><h3 style="margin-bottom: 0% !important;"><?php echo _l('hrp_payslip_for').' '. date('M-Y', strtotime($payslip_detail['month'])); ?> </h3></b>
+	<br><p style="margin-top: 0% !important;font-size: 12px">Form IV B [ Rule 26(2) (b) ]</p>
 </div>
-
-
 
 <table border="1" class="width-100-height-55" >
 	<tbody>
@@ -77,6 +76,16 @@
 				</tr>
 
 				<?php echo isset($hrp_payslip_salary_allowance['formal_contract_list']) ? $hrp_payslip_salary_allowance['formal_contract_list'] : '' ?>
+			</tbody>
+		</table>
+		<table class="table">
+			<tbody>
+				<tr>
+					<th  class=" thead-dark">Deductions</th>
+					<th  class=" thead-dark"></th>
+				</tr>
+
+				<?php echo isset($hrp_payslip_salary_allowance['formal_deduction_list']) ? $hrp_payslip_salary_allowance['formal_deduction_list'] : '' ?>
 			</tbody>
 		</table>
 		<?php } ?>

@@ -2415,8 +2415,10 @@ class timesheets extends AdminController {
 									}
 								}
 							}
+							
 							$index++;
 						}
+						
 						$row[] = $total_shift;
 						$row[] = ($total > 0) ? (float) number_format($total, 2) : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
@@ -4271,11 +4273,13 @@ public function check_in_ts() {
 	public function set_leave() {
 		if ($this->input->post()) {
 			$data = $this->input->post();
+			
 			$not_show_notify = 0;
 			if(isset($data['not_show_notify']) && $data['not_show_notify'] == '1'){
 				$not_show_notify = 1;
 				unset($data['not_show_notify']);
 			}
+			
 			$success = $this->timesheets_model->set_leave($data);
 			if ($success > 0) {
 				$message = _l('ts_updated_successfully', _l('setting'));
@@ -6879,7 +6883,7 @@ public function check_in_ts() {
 				$remain_day = $data_leave->remain;
 			}
 		}
-		return array('staffid' => $data_staff['staffid'], 'staff' => $data_staff['firstname'] . ' ' . $data_staff['lastname'], 'department' => $department_name, 'role' => $role_name, 'maximum_leave_of_the_year' => $day, 'number_of_leave_days_remaining' => $remain_day);
+		return array('staffid' => $data_staff['staffid'],'staffcode' => $data_staff['staff_identifi'] ,'staff' => $data_staff['firstname'] . ' ' . $data_staff['lastname'], 'department' => $department_name, 'role' => $role_name, 'maximum_leave_of_the_year' => $day, 'number_of_leave_days_remaining' => $remain_day);
 	}
 
 	/**

@@ -65,8 +65,9 @@
     data.staff  = $('select[name="staff_employees[]"]').val();
     data.department = $('#department_employees').val();
     data.role_attendance = $('select[name="role_employees[]"]').val();
-
+    $('#loader-container').removeClass('hide');
     $.post(admin_url + 'hr_payroll/employees_filter', data).done(function(response) {
+      $('#loader-container').addClass('hide');
       response = JSON.parse(response);
       dataObject = response.data_object;
       purchase.updateSettings({

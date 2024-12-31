@@ -110,6 +110,11 @@
       {
         data: 'staffid',
         type: 'text',
+        readOnly: true,
+      },
+      {
+        data: 'staffcode',
+        type: 'text',
         readOnly: true
       },
       {
@@ -177,6 +182,7 @@
       colWidths: [80,200,200,200,200,200],
       colHeaders: [
       "<?php echo _l('staffid'); ?>",
+      "Employee Code",
       "<?php echo _l('staff'); ?>",
       "<?php echo _l('department'); ?>",
       "<?php echo _l('role'); ?>",

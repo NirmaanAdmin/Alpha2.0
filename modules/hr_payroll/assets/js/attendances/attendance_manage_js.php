@@ -63,8 +63,9 @@
 		data.staff = $('select[name="staff_attendance[]"]').val();
 		data.department = $('#department_attendance').val();
 		data.role_attendance = $('select[name="role_attendance[]"]').val();
-
+		$('#loader-container').removeClass('hide');
 		$.post(admin_url + 'hr_payroll/attendance_filter', data).done(function(response) {
+			$('#loader-container').addClass('hide');
 			response = JSON.parse(response);
 			dataObject = response.data_object;
 			commodity_fill.updateSettings({
