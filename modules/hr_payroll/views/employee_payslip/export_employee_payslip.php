@@ -28,21 +28,22 @@
 		<tr class="height-27">
 			<td class="width-20-height-27 align_left" ><strong><?php echo _l('job_title') ; ?></strong></td>
 			<td class="width-30-height-27" ><?php echo new_html_entity_decode(isset($employee['job_title']) ? $employee['job_title'] : '') ?></td>
-			<td class="width-20-height-27" ><strong><?php echo _l('hrp_worked_day') ; ?></strong></td>
-			<td class="width-30-height-27" ><?php echo app_format_money((float)$payslip_detail['actual_workday']+(float)$payslip_detail['actual_workday_probation'], '') ?></td>
+			<td class="width-20-height-27" ><strong><?php echo _l('hrp_worked_day_new') ; ?></strong></td>
+			<td class="width-30-height-27" ><?php echo app_format_money((float)$get_data_for_month[3], '') ?></td>
+			
 		</tr>
 
 		<tr class="height-27">
 			<td class="width-20-height-27 align_left" ><strong><?php echo _l('staff_departments') ; ?></strong></td>
 			<td class="width-30-height-27"><?php echo new_html_entity_decode($list_department) ?></td>
-			<td class="width-20-height-27" ><strong><?php echo _l('paid_leave') ; ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['paid_leave']); ?></td>
+			<td class="width-20-height-27" ><strong><?php echo _l('paid_days') ; ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($get_data_for_month[4]); ?></td>
 		</tr>
 		<tr class="height-27">
 			<td class="width-20-height-27 align_left" ><strong><?php echo _l('ps_pay_slip_number') ; ?></strong></td>
 			<td class="width-30-height-27" ><?php echo new_html_entity_decode($payslip_detail['pay_slip_number']); ?></td>
-			<td class="width-20-height-27" ><strong><?php echo _l('unpaid_leave') ; ?></strong></td>
-			<td class="width-30-height-27" ><?php echo new_html_entity_decode($payslip_detail['unpaid_leave']); ?></td>
+			<td class="width-20-height-27" ><strong><?php echo _l('unpaid_days') ; ?></strong></td>
+			<td class="width-30-height-27" ><?php echo app_format_money((float)$get_data_for_month[3]-(float)$get_data_for_month[4], ''); ?></td>
 		</tr>
 		
 	</tbody>

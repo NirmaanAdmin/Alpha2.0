@@ -302,3 +302,6 @@ $lang['hrp_updated_at']	 								 = 'Updated At';
 $lang['hrp_get_online_currency_rates']	 								 = 'Get Online Currency Rates';
 $lang['hrp_edit_currency_rate']	 								 = 'Edit Currency Rate';
 $lang['hrp_to']	 								 = 'To';
+$lang['hrp_worked_day_new']             										= 'Actual working days';
+$lang['paid_days']              										= 'Paid days';
+$lang['unpaid_days']              										= 'Unpaid days';

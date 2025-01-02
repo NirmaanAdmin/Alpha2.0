@@ -5164,6 +5164,9 @@ order by staff_id, header_oder
 
 		//get salary deduction
 		$deductions_data = $this->get_deductions_data($payslip_month, $str_sql);
+		// echo '<pre>';
+		// print_r($deductions_data);
+		// die;
 		foreach ($deductions_data as $deduction_key => $deduction_value) {
 			$deductions_value[$deduction_value['staff_id']] = $deduction_value;
 
@@ -5173,7 +5176,7 @@ order by staff_id, header_oder
 				$staffs_id[$deduction_value['staff_id']] = $deduction_value;
 			}
 		}
-
+		
 		//get commission
 		$commissions_data = $this->get_commissions_data($payslip_month, $str_sql);
 		foreach ($commissions_data as $commission_key => $commission_value) {
@@ -5213,12 +5216,14 @@ order by staff_id, header_oder
 
 		//get salary deduction from setting
 		$get_salary_deductions_list_setting = $this->get_salary_deductions_list();
-
+		
 		$salary_deductions_list_setting = [];
 		foreach ($get_salary_deductions_list_setting as $sl_key =>  $sl_value) {
 			$salary_deductions_list_setting['deduction_' . $sl_value['id']] = $sl_value['basis'];
 		}
-
+		// echo '<pre>';
+		// print_r($staffs_id);
+		// die;
 		//get insurance data from setting
 		$get_insurance_list_setting = $this->get_insurance_list();
 
@@ -5327,6 +5332,7 @@ order by staff_id, header_oder
 										//6 is formular is row 6
 										$payroll_formular = "=" . $number_to_anphabe[$gross_pay_index] . "6*" . $value . "/100";
 									}
+									
 								} elseif (preg_match('/^st_/', $salary_deductions_list_setting[$payroll_key]) || preg_match('/^al_/', $salary_deductions_list_setting[$payroll_key]) || preg_match('/^earning_/', $salary_deductions_list_setting[$payroll_key])) {
 
 									$salary_deductions_list_setting[$payroll_key];
@@ -5364,6 +5370,8 @@ order by staff_id, header_oder
 									}
 								}
 							}
+
+							
 						} elseif (preg_match('/^st_insurance_/', $payroll_key)) {
 							$value = isset($staff_value[$payroll_key]) ? $staff_value[$payroll_key] : 0;
 
@@ -5442,6 +5450,7 @@ order by staff_id, header_oder
 
 				$staff_row++;
 			}
+			
 		} else {
 			$payslip_cell_data[] = $this->general_cell_data(5, 4, _l('no_eligible_employee_was_found_for_this_payslip_template'), $t = 'g', $f = '', false, false, true);
 		}
@@ -7546,4 +7555,313 @@ order by staff_id, header_oder
 	}
 
 	//End file
+	/**
+	 * get hour shift staff
+	 * @param  integer $staff_id
+	 * @param  integer $date
+	 * @return integer
+	 */
+	public function get_hour_shift_staff($staff_id, $date)
+	{
+
+		$result = 0;
+		$data_shift_list = $this->get_shift_work_staff_by_date($staff_id, $date);
+		
+	
+		foreach ($data_shift_list as $ss) {
+			$data_shift_type = $this->get_shift_type($ss);
+			if ($data_shift_type) {
+				$hour = $this->get_hour($data_shift_type->time_start_work, $data_shift_type->time_end_work);
+				$lunch_hour = $this->get_hour($data_shift_type->start_lunch_break_time, $data_shift_type->end_lunch_break_time);
+				$result += abs($hour - $lunch_hour);
+			}
+		}
+		
+	
+		return $result;
+	}
+	/**
+	 * get hour
+	 * @param date $date1
+	 * @param date $date2
+	 * @return decimal
+	 */
+	public function get_hour($date1, $date2)
+	{
+		$result = 0;
+		if ($date1 != '' && $date2 != '') {
+			$timestamp1 = strtotime($date1);
+			$timestamp2 = strtotime($date2);
+			$result = number_format(abs($timestamp2 - $timestamp1) / (60 * 60), 2);
+		}
+		return $result;
+	}
+	/**
+	 * get data edit shift by staff
+	 * @param  integer $staff
+	 * @param  date $date
+	 * @return array
+	 */
+	public function get_shift_work_staff_by_date($staff, $date = '')
+	{
+		$nv = $this->staff_model->get($staff);
+		$dpm = $this->departments_model->get_staff_departments($staff, true);
+		$sql_dpm = '';
+		if ($dpm) {
+			foreach ($dpm as $key => $value) {
+				if ($sql_dpm == '') {
+					$sql_dpm .= 'find_in_set(' . $value . ', department)';
+				} else {
+					$sql_dpm .= ' or find_in_set(' . $value . ', department)';
+				}
+			}
+		}
+
+		if ($date == '') {
+			$date = date('Y-m-d');
+		}
+		$sql_where = 'find_in_set(' . $staff . ', staff)';
+		$this->db->where($sql_where);
+		$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+		$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+
+		if (!$shift) {
+			if ($sql_dpm != '' && ($nv) && ($nv->role != 0 && $nv->role != '')) {
+				$this->db->where('find_in_set(' . $nv->role . ', position)');
+				$this->db->where('(' . $sql_dpm . ')');
+				$this->db->where('(staff = "" or staff is null)');
+				$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+				$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+				if (!$shift) {
+					$this->db->where('(position = "" or position is null)');
+					$this->db->where('(' . $sql_dpm . ')');
+					$this->db->where('(staff = "" or staff is null)');
+					$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+					$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+
+					if (!$shift) {
+						$this->db->where('find_in_set(' . $nv->role . ', position)');
+						$this->db->where('(department = "" or department is null)');
+						$this->db->where('(staff = "" or staff is null)');
+						$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+						$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+
+						if (!$shift) {
+							$this->db->where('(position = "" or position is null)');
+							$this->db->where('(department = "" or department is null)');
+							$this->db->where('(staff = "" or staff is null)');
+							$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+							$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+						}
+					}
+				}
+			} elseif ($sql_dpm == '' && ($nv) && ($nv->role != 0 && $nv->role != '')) {
+
+				$this->db->where('find_in_set(' . $nv->role . ', position)');
+				$this->db->where('(department = "" or department is null)');
+				$this->db->where('(staff = "" or staff is null)');
+				$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+				$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+
+				if (!$shift) {
+					$this->db->where('(position = "" or position is null)');
+					$this->db->where('(department = "" or department is null)');
+					$this->db->where('(staff = "" or staff is null)');
+					$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+					$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+				}
+			} elseif ($sql_dpm != '' && ($nv) && ($nv->role == 0 || $nv->role == '')) {
+
+				$this->db->where('(position = "" or position is null)');
+				$this->db->where('(' . $sql_dpm . ')');
+				$this->db->where('(staff = "" or staff is null)');
+				$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+				$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+				if (!$shift) {
+					$this->db->where('(position = "" or position is null)');
+					$this->db->where('(department = "" or department is null)');
+					$this->db->where('(staff = "" or staff is null)');
+					$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+					$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+				}
+			} elseif ($sql_dpm == '' && ($nv) && ($nv->role == 0 || $nv->role == '')) {
+				$this->db->where('(position = "" or position is null)');
+				$this->db->where('(department = "" or department is null)');
+				$this->db->where('(staff = "" or staff is null)');
+				$this->db->where('("' . $date . '" >=  from_date and "' . $date . '" <= to_date)');
+				$shift = $this->db->get(db_prefix() . 'work_shift')->result_array();
+			}
+		}
+		$list_shift_id = [];
+		$day_number = (int) date('d', strtotime($date));
+		$Day = (int) date('N', strtotime($date));
+		if ($shift) {
+			foreach ($shift as $key => $value) {
+				if ($value['type_shiftwork'] == 'by_absolute_time') {
+					$this->db->where('(staff_id = ' . $staff . ' or staff_id = 0)');
+					$this->db->where('date', $date);
+					$this->db->where('work_shift_id', $value['id']);
+					$shift_detail = $this->db->get(db_prefix() . 'work_shift_detail')->row();
+					if ($shift_detail) {
+						if (!in_array($shift_detail->shift_id, $list_shift_id)) {
+							$list_shift_id[] = $shift_detail->shift_id;
+						}
+					}
+				} else {
+					$this->db->where('(staff_id = ' . $staff . ' or staff_id = 0)');
+					$this->db->where('number', $Day);
+					$this->db->where('work_shift_id', $value['id']);
+					$shift_detail = $this->db->get(db_prefix() . 'work_shift_detail_number_day')->row();
+					if ($shift_detail) {
+						if (!in_array($shift_detail->shift_id, $list_shift_id)) {
+							$list_shift_id[] = $shift_detail->shift_id;
+						}
+					}
+				}
+			}
+		}
+		return $list_shift_id;
+	}
+	/**
+	 * get shift type
+	 * @param  integer
+	 * @return bool
+	 */
+	public function get_shift_type($id = '')
+	{
+		if ($id != '') {
+			$this->db->where('id', $id);
+			return $this->db->get(db_prefix() . 'shift_type')->row();
+		} else {
+			return $this->db->get(db_prefix() . 'shift_type')->result_array();
+		}
+	}
+	/**
+	 * get attendance manual
+	 * @param  [type] $staffs_list
+	 * @param  string $month
+	 * @param  string $year
+	 * @param  string $from_date
+	 * @param  string $to_date
+	 * @return [type]
+	 */
+	public function get_attendance_manual($staffs_list, $month = '', $year = '', $from_date = '', $to_date = '')
+	{
+		$type_valid = ['AL', 'W', 'U', 'HO', 'E', 'L', 'B', 'SI', 'M', 'ME', 'NS', 'P'];
+		$data_type_of_leave = $this->get_type_of_leave();
+		foreach ($data_type_of_leave as $key => $value) {
+			$type_valid[] = $value['symbol'];
+		}
+		$data['cell_background'] = [];
+		$data['staff_row_tk'] = [];
+		$data['staff_row_tk_detailt'] = [];
+		if ($month != '' && $year != '') {
+			$from_date = $year . '-' . $month . '-01';
+			$to_date = $year . '-' . $month . '-' . date('t', strtotime($from_date));
+			$data_ts = $this->get_timesheets_ts_by_month($month, $year);
+		} elseif ($from_date != '' && $to_date != '') {
+			$data_ts = $this->get_timesheets_between_date($from_date, $to_date);
+		}
+		$list_date = $this->get_list_date($from_date, $to_date);
+		foreach ($data_ts as $ts) {
+			$staff_info = array();
+			$staff_info['date'] = date('D d', strtotime($ts['date_work']));
+			$ts_type = $this->get_ts_by_date_and_staff($ts['date_work'], $ts['staff_id']);
+			if (count($ts_type) <= 1) {
+				$staff_info['ts'] = $ts['type'] . (($ts['value'] != '' && $ts['value'] > 0) ? ':' . round($ts['value'], 2) : '');
+			} else {
+				$str = '';
+				foreach ($ts_type as $tp) {
+					if ($tp['type'] == 'HO' || $tp['type'] == 'M') {
+						if ($str == '') {
+							$str .= $tp['type'];
+						} else {
+							$str .= "; " . $tp['type'];
+						}
+					} else {
+						if ($str == '') {
+							$str .= $tp['type'] . (($tp['value'] != '' && $tp['value'] > 0) ? ':' . round($tp['value'], 2) : '');
+						} else {
+							$str .= "; " . $tp['type'] . (($tp['value'] != '' && $tp['value'] > 0) ? ':' . round($tp['value'], 2) : '');
+						}
+					}
+				}
+				$staff_info['ts'] = $str;
+			}
+
+			if (!isset($data_map[$ts['staff_id']])) {
+				$data_map[$ts['staff_id']] = array();
+			}
+			$data_map[$ts['staff_id']][$staff_info['date']] = $staff_info;
+		}
+		foreach ($staffs_list as $s) {
+			$list_hour_shift = $this->get_list_hour_shift_staff($s['staffid'], $list_date);
+			$list_holiday = $this->get_list_holiday($s['staffid'], $from_date, $to_date);
+			$list_color = $this->list_cell_color_checkin_out($s['staffid'], $list_date, $from_date, $to_date);
+			$ts_date = '';
+			$ts_ts = '';
+			$result_tb = [];
+			if (isset($data_map[$s['staffid']])) {
+				foreach ($data_map[$s['staffid']] as $key => $value) {
+					$ts_date = $data_map[$s['staffid']][$key]['date'];
+					$ts_ts = $data_map[$s['staffid']][$key]['ts'];
+					$result_tb[] = [$ts_date => $ts_ts];
+				}
+			}
+
+			$dt_ts = [];
+			$dt_ts_detail = [];
+			$dt_cell_bg = [];
+			$dt_ts = [_l('staff_id') => $s['staffid'], _l('staff') => $s['firstname'] . ' ' . $s['lastname']];
+			$note = [];
+			$list_dtts = [];
+			foreach ($result_tb as $key => $rs) {
+				foreach ($rs as $day => $val) {
+					if ($val == "NS" || $val == "HO") {
+						continue;
+					}
+					$list_dtts[$day] = $val;
+				}
+			}
+			foreach ($list_date as $key => $value) {
+				$date_s = date('D d', strtotime($value));
+				$max_hour = isset($list_hour_shift[$value]) ? $list_hour_shift[$value] : 0;
+				$check_holiday = isset($list_date[date('m-d', strtotime($value))]) ? $list_date[date('m-d', strtotime($value))] : false;
+				$result_lack = '';
+				if ($max_hour > 0) {
+					if (!$check_holiday) {
+						$ts_lack = '';
+						if (isset($list_dtts[$date_s])) {
+							$ts_lack = $list_dtts[$date_s] . '; ';
+						}
+						$total_lack = $ts_lack;
+						if ($total_lack) {
+							$total_lack = rtrim($total_lack, '; ');
+						}
+						$result_lack = $this->merge_ts($total_lack, $max_hour, $type_valid);
+					} else {
+						if ($check_holiday == 'holiday') {
+							$result_lack = "HO";
+						}
+						if ($check_holiday == 'event_break') {
+							$result_lack = "EB";
+						}
+						if ($check_holiday == 'unexpected_break') {
+							$result_lack = "UB";
+						}
+					}
+				} else {
+					$result_lack = 'NS';
+				}
+				$dt_ts[$date_s] = $result_lack;
+				$dt_ts_detail[$value] = $result_lack;
+
+				$dt_cell_bg[$date_s] = $list_color[$value];
+			}
+			$data['staff_row_tk'][] = $dt_ts;
+			$data['staff_row_tk_detailt'][] = $dt_ts_detail;
+			$data['cell_background'][] = $dt_cell_bg;
+		}
+		return $data;
+	}
 }

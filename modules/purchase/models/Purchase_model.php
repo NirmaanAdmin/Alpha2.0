@@ -4422,6 +4422,9 @@ class Purchase_model extends App_Model
         if(!empty($ship_to)) {
             $ship_to_detail = '<span style="text-align: right;">'.$ship_to.'</span><br /><br />';
         }
+        if (!empty(($pur_order->order_date))) {
+            $order_date = '<span><b>' . _l('order_date') . ':</b> ' . date('d M Y', strtotime($pur_order->order_date)) . '<br /></span><br />';
+        }
         
     $html = '<table class="table">
         <tbody>
@@ -4433,6 +4436,7 @@ class Purchase_model extends App_Model
             <td style="position: absolute; float: right;">
                 <span style="text-align: right; font-size: 25px"><b>'.mb_strtoupper(_l('purchase_order')).'</b></span><br />
                 <span style="text-align: right;">'.$pur_order->pur_order_number.' - '.$pur_order->pur_order_name.'</span><br /><br />
+                ' . $order_date . '
                 <span style="text-align: right;">'.format_pdf_vendor_info($pur_order->vendor).'</span><br />
             </td>
           </tr>

@@ -5,25 +5,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /**
  * hr payroll controler
  */
-class hr_payroll extends AdminController {
+class hr_payroll extends AdminController
+{
 
-	public function __construct() {
+	public function __construct()
+	{
 		parent::__construct();
 		$this->load->model('hr_payroll_model');
-		hooks()->do_action('hr_payroll_init'); 
+		hooks()->do_action('hr_payroll_init');
 	}
 
 	/**
 	 * setting
 	 * @return view
 	 */
-	public function setting() {
+	public function setting()
+	{
 		if (!has_permission('hrp_setting', '', 'view') && !has_permission('hrp_setting', '', 'edit') && !is_admin() && !has_permission('hrp_setting', '', 'create')) {
 			access_denied('hrp_settting');
 		}
 
 		$data['group'] = $this->input->get('group');
-        $data['unit_tab'] = $this->input->get('tab');
+		$data['unit_tab'] = $this->input->get('tab');
 
 		$data['title'] = _l('setting');
 
@@ -39,7 +42,7 @@ class hr_payroll extends AdminController {
 		$data['tab'][] = 'payroll_columns';
 		$data['tab'][] = 'pdf_payslip_template';
 		$data['tab'][] = 'data_integration';
-        $data['tab'][] = 'currency_rates';
+		$data['tab'][] = 'currency_rates';
 
 		if (is_admin()) {
 			$data['tab'][] = 'permissions';
@@ -53,7 +56,6 @@ class hr_payroll extends AdminController {
 		} elseif ($data['group'] == 'payroll_columns') {
 			$data['payroll_column_value'] = $this->hr_payroll_model->get_hrp_payroll_columns();
 			$data['order_display_in_paylip'] = $this->hr_payroll_model->count_payroll_column();
-
 		} elseif ($data['group'] == 'income_tax_rates') {
 			$data['title'] = _l('income_tax_rates');
 			$data['income_tax_rates'] = json_encode($this->hr_payroll_model->get_income_tax_rate());
@@ -102,35 +104,32 @@ class hr_payroll extends AdminController {
 				foreach ($earnings_list as $value) {
 					switch ($value['rel_type']) {
 						case 'salary':
-						
-						$basis_value[] = [
-							'id' => 'st_'.$value['rel_id'],
-							'label' => $value['description'],
-						];
-						break;
+
+							$basis_value[] = [
+								'id' => 'st_' . $value['rel_id'],
+								'label' => $value['description'],
+							];
+							break;
 
 						case 'allowance':
-						$basis_value[] = [
-							'id' => 'al_'.$value['rel_id'],
-							'label' => $value['description'],
-						];
-						
-						break;
+							$basis_value[] = [
+								'id' => 'al_' . $value['rel_id'],
+								'label' => $value['description'],
+							];
+
+							break;
 
 						default:
-						# code...
-						break;
+							# code...
+							break;
 					}
-
 				}
-
-
 			} else {
 				$earnings_list = $this->hr_payroll_model->get_earnings_list();
 
 				foreach ($earnings_list as $value) {
 					$basis_value[] = [
-						'id' => 'earning_'.$value['id'],
+						'id' => 'earning_' . $value['id'],
 						'label' => $value['description'],
 					];
 				}
@@ -140,7 +139,6 @@ class hr_payroll extends AdminController {
 			$data['basis_value'] = $basis_value;
 			$data['earn_inclusion'] = $earn_inclusion_value;
 			$data['salary_deductions_list'] = json_encode($this->hr_payroll_model->get_salary_deductions_list());
-
 		} elseif ($data['group'] == 'insurance_list') {
 			$basis_value = [];
 			$basis_value[] = [
@@ -155,7 +153,6 @@ class hr_payroll extends AdminController {
 			$data['title'] = _l('insurance_list');
 			$data['basis_value'] = $basis_value;
 			$data['insurance_list'] = json_encode($this->hr_payroll_model->get_insurance_list());
-
 		} elseif ($data['group'] == 'company_contributions_list') {
 			$earn_inclusion_value = [];
 			$earn_inclusion_value[] = [
@@ -211,7 +208,6 @@ class hr_payroll extends AdminController {
 			$data['paid_leave_type'] = $get_attendance_type['paid_leave'];
 			$data['unpaid_leave_type'] = $get_attendance_type['unpaid_leave'];
 			$data['get_customize_payslip_columns'] = $this->hr_payroll_model->get_customize_payslip_columns();
-
 		} elseif ($data['group'] == 'hr_records_earnings_list') {
 			$earnings_value = [];
 			$earnings_value[] = [
@@ -226,18 +222,17 @@ class hr_payroll extends AdminController {
 			$data['title'] = _l('earnings_list');
 			$data['basis_value'] = $earnings_value;
 			$data['earnings_list_hr_records'] = json_encode($this->hr_payroll_model->hr_records_get_earnings_list());
-		} elseif($data['group'] == 'pdf_payslip_template'){
+		} elseif ($data['group'] == 'pdf_payslip_template') {
 			$data['pdf_payslip_templates'] = $this->hr_payroll_model->get_pdf_payslip_template();
+		} elseif ($data['group'] == 'currency_rates') {
+			$this->load->model('currencies_model');
+			$this->hr_payroll_model->check_auto_create_currency_rate();
 
-		} elseif($data['group'] == 'currency_rates'){
-            $this->load->model('currencies_model');
-            $this->hr_payroll_model->check_auto_create_currency_rate();
-
-            $data['currencies'] = $this->currencies_model->get();
-            if($data['unit_tab'] == ''){
-                $data['unit_tab'] = 'general';
-            }
-        }
+			$data['currencies'] = $this->currencies_model->get();
+			if ($data['unit_tab'] == '') {
+				$data['unit_tab'] = 'general';
+			}
+		}
 
 		$data['tabs']['view'] = 'includes/' . $data['group'];
 
@@ -248,7 +243,8 @@ class hr_payroll extends AdminController {
 	 * setting incometax rates
 	 * @return [type]
 	 */
-	public function setting_incometax_rates() {
+	public function setting_incometax_rates()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -257,15 +253,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_income_tax_rates($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=income_tax_rates'));
-
 			}
-
 		}
 	}
 
@@ -273,7 +266,8 @@ class hr_payroll extends AdminController {
 	 * setting incometax rebates
 	 * @return [type]
 	 */
-	public function setting_incometax_rebates() {
+	public function setting_incometax_rebates()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -282,15 +276,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_income_tax_rebates($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=income_tax_rebates'));
-
 			}
-
 		}
 	}
 
@@ -298,7 +289,8 @@ class hr_payroll extends AdminController {
 	 * setting earnings list
 	 * @return [type]
 	 */
-	public function setting_earnings_list() {
+	public function setting_earnings_list()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -307,15 +299,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_earnings_list($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=earnings_list'));
-
 			}
-
 		}
 	}
 
@@ -323,7 +312,8 @@ class hr_payroll extends AdminController {
 	 * setting salary deductions list
 	 * @return [type]
 	 */
-	public function setting_salary_deductions_list() {
+	public function setting_salary_deductions_list()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -332,15 +322,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_salary_deductions_list($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=salary_deductions_list'));
-
 			}
-
 		}
 	}
 
@@ -348,7 +335,8 @@ class hr_payroll extends AdminController {
 	 * setting insurance list
 	 * @return [type]
 	 */
-	public function setting_insurance_list() {
+	public function setting_insurance_list()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -357,15 +345,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_insurance_list($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=insurance_list'));
-
 			}
-
 		}
 	}
 
@@ -373,7 +358,8 @@ class hr_payroll extends AdminController {
 	 * setting company contributions list
 	 * @return [type]
 	 */
-	public function setting_company_contributions_list() {
+	public function setting_company_contributions_list()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -382,15 +368,12 @@ class hr_payroll extends AdminController {
 				$mess = $this->hr_payroll_model->update_company_contributions_list($data);
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('warning', _l('hrp_updated_failed'));
 				}
 
 				redirect(admin_url('hr_payroll/setting?group=company_contributions_list'));
-
 			}
-
 		}
 	}
 
@@ -398,7 +381,8 @@ class hr_payroll extends AdminController {
 	 * data integration
 	 * @return [type]
 	 */
-	public function data_integration() {
+	public function data_integration()
+	{
 		if (!is_admin()) {
 			access_denied('hr_payroll');
 		}
@@ -408,20 +392,19 @@ class hr_payroll extends AdminController {
 		$mess = $this->hr_payroll_model->update_data_integration($data);
 		if ($mess) {
 			set_alert('success', _l('hrp_updated_successfully'));
-
 		} else {
 			set_alert('warning', _l('hrp_updated_failed'));
 		}
 
 		redirect(admin_url('hr_payroll/setting?group=data_integration'));
-
 	}
 
 	/**
 	 * timesheet integration type change
 	 * @return [type]
 	 */
-	public function timesheet_integration_type_change() {
+	public function timesheet_integration_type_change()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 
@@ -440,7 +423,8 @@ class hr_payroll extends AdminController {
 	 * setting earnings list hr records
 	 * @return [type]
 	 */
-	public function setting_earnings_list_hr_records() {
+	public function setting_earnings_list_hr_records()
+	{
 		if ($this->input->post()) {
 
 			$data = $this->input->post();
@@ -450,7 +434,6 @@ class hr_payroll extends AdminController {
 				set_alert('success', _l('hrp_successful_data_synchronization'));
 				if ($mess) {
 					set_alert('success', _l('hrp_updated_successfully'));
-
 				} else {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
@@ -464,7 +447,8 @@ class hr_payroll extends AdminController {
 	 * hr payroll permission table
 	 * @return [type]
 	 */
-	public function hr_payroll_permission_table() {
+	public function hr_payroll_permission_table()
+	{
 		if ($this->input->is_ajax_request()) {
 
 			$select = [
@@ -533,7 +517,8 @@ class hr_payroll extends AdminController {
 	 * permission modal
 	 * @return [type]
 	 */
-	public function permission_modal() {
+	public function permission_modal()
+	{
 		if (!$this->input->is_ajax_request()) {
 			show_404();
 		}
@@ -570,7 +555,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function hr_payroll_update_permissions($id = '') {
+	public function hr_payroll_update_permissions($id = '')
+	{
 		if (!is_admin()) {
 			access_denied('hr_payroll');
 		}
@@ -632,7 +618,6 @@ class hr_payroll extends AdminController {
 			set_alert('success', _l('updated_successfully', _l('staff_member')));
 		}
 		redirect(admin_url('hr_payroll/setting?group=permissions'));
-
 	}
 
 	/**
@@ -640,7 +625,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $staff_id
 	 * @return [type]
 	 */
-	public function staff_id_changed($staff_id) {
+	public function staff_id_changed($staff_id)
+	{
 		$role_id = '';
 		$status = 'false';
 		$r_permission = [];
@@ -656,7 +642,6 @@ class hr_payroll extends AdminController {
 
 			$role_id = $staff->role;
 			$status = 'true';
-
 		}
 
 		if (count($r_permission) > 0) {
@@ -674,7 +659,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]
 	 */
-	public function delete_hr_payroll_permission($id) {
+	public function delete_hr_payroll_permission($id)
+	{
 		if (!is_admin()) {
 			access_denied('hr_profile');
 		}
@@ -689,14 +675,14 @@ class hr_payroll extends AdminController {
 			set_alert('warning', _l('problem_deleting', _l('department_lowercase')));
 		}
 		redirect(admin_url('hr_payroll/setting?group=permissions'));
-
 	}
 
 	/**
 	 * manage employees
 	 * @return [type]
 	 */
-	public function manage_employees() {
+	public function manage_employees()
+	{
 		if (!has_permission('hrp_employee', '', 'view') && !has_permission('hrp_employee', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -763,7 +749,6 @@ class hr_payroll extends AdminController {
 				}
 
 				$data_object_kpi[$staff_key]['department_name'] = $list_department;
-
 			} else {
 				$data_object_kpi[$staff_key]['employee_number'] = '';
 				$data_object_kpi[$staff_key]['employee_name'] = '';
@@ -787,7 +772,6 @@ class hr_payroll extends AdminController {
 					$data_object_kpi[$staff_key]['account_number'] = $employees_value[$staff_value['staffid'] . '_' . $current_month]['account_number'];
 					$data_object_kpi[$staff_key]['epf_no'] = $employees_value[$staff_value['staffid'] . '_' . $current_month]['epf_no'];
 					$data_object_kpi[$staff_key]['social_security_no'] = $employees_value[$staff_value['staffid'] . '_' . $current_month]['social_security_no'];
-
 				} else {
 					$data_object_kpi[$staff_key]['job_title'] = '';
 					$data_object_kpi[$staff_key]['income_tax_number'] = '';
@@ -818,8 +802,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi[$staff_key]['primary_expiration'] = $employees_value[$staff_value['staffid'] . '_' . $current_month]['primary_expiration'];
 
 				$data_object_kpi[$staff_key]['id'] = $employees_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
-
 			} else {
 				$data_object_kpi[$staff_key]['income_rebate_code'] = 'A';
 				$data_object_kpi[$staff_key]['income_tax_rate'] = 'A';
@@ -833,7 +815,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi[$staff_key]['primary_expiration'] = '';
 
 				$data_object_kpi[$staff_key]['id'] = 0;
-
 			}
 
 			$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
@@ -860,7 +841,8 @@ class hr_payroll extends AdminController {
 	 * employees filter
 	 * @return [type]
 	 */
-	public function employees_filter() {
+	public function employees_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -940,7 +922,6 @@ class hr_payroll extends AdminController {
 					}
 
 					$data_object_kpi[$staff_key]['department_name'] = $list_department;
-
 				} else {
 					$data_object_kpi[$staff_key]['employee_number'] = '';
 					$data_object_kpi[$staff_key]['employee_name'] = '';
@@ -964,7 +945,6 @@ class hr_payroll extends AdminController {
 						$data_object_kpi[$staff_key]['account_number'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['account_number'];
 						$data_object_kpi[$staff_key]['epf_no'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['epf_no'];
 						$data_object_kpi[$staff_key]['social_security_no'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['social_security_no'];
-
 					} else {
 						$data_object_kpi[$staff_key]['job_title'] = '';
 						$data_object_kpi[$staff_key]['income_tax_number'] = '';
@@ -995,8 +975,6 @@ class hr_payroll extends AdminController {
 					}
 
 					$data_object_kpi[$staff_key]['id'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
-
-
 				} else {
 					$data_object_kpi[$staff_key]['income_rebate_code'] = 'A';
 					$data_object_kpi[$staff_key]['income_tax_rate'] = 'A';
@@ -1005,12 +983,10 @@ class hr_payroll extends AdminController {
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $format_employees_value['probationary'], $format_employees_value['formal']);
 
 					$data_object_kpi[$staff_key]['id'] = 0;
-
 				}
 
 				$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 			}
-
 		}
 
 		//check is add new or update data
@@ -1030,7 +1006,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add manage employees
 	 */
-	public function add_manage_employees() {
+	public function add_manage_employees()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -1055,7 +1032,6 @@ class hr_payroll extends AdminController {
 
 			redirect(admin_url('hr_payroll/manage_employees'));
 		}
-
 	}
 
 	/**
@@ -1066,7 +1042,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $data_role_attendance
 	 * @return [type]
 	 */
-	public function render_filter_query($data_month, $data_staff, $data_department, $data_role_attendance) {
+	public function render_filter_query($data_month, $data_staff, $data_department, $data_role_attendance)
+	{
 
 		$months_filter = $data_month;
 		$querystring = ' active=1';
@@ -1135,7 +1112,8 @@ class hr_payroll extends AdminController {
 	 * manage attendance
 	 * @return [type]
 	 */
-	public function manage_attendance() {
+	public function manage_attendance()
+	{
 		if (!has_permission('hrp_attendance', '', 'view') && !has_permission('hrp_attendance', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_attendance');
 		}
@@ -1198,17 +1176,14 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object_kpi[$staff_key]['staff_departments'] = $list_department;
-
 			} else {
 				$data_object_kpi[$staff_key]['hr_code'] = '';
 				$data_object_kpi[$staff_key]['staff_name'] = '';
 				$data_object_kpi[$staff_key]['staff_departments'] = '';
-
 			}
 
 			if (isset($attendances_value[$staff_value['staffid'] . '_' . $current_month])) {
@@ -1221,7 +1196,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi[$staff_key]['id'] = $attendances_value[$staff_value['staffid'] . '_' . $current_month]['id'];
 
 				$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $attendances_value[$staff_value['staffid'] . '_' . $current_month]);
-
 			} else {
 				$data_object_kpi[$staff_key]['standard_workday'] = get_hr_payroll_option('standard_working_time');
 				$data_object_kpi[$staff_key]['actual_workday_probation'] = 0;
@@ -1230,12 +1204,10 @@ class hr_payroll extends AdminController {
 				$data_object_kpi[$staff_key]['unpaid_leave'] = 0;
 				$data_object_kpi[$staff_key]['id'] = 0;
 				$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $days_header_in_month['days_header']);
-
 			}
 			$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 			$data_object_kpi[$staff_key]['month'] = $current_month;
 			$data_object_kpi[$staff_key]['staff_id'] = $staff_value['staffid'];
-
 		}
 
 		//check is add new or update data
@@ -1260,7 +1232,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add attendance
 	 */
-	public function add_attendance() {
+	public function add_attendance()
+	{
 		if (!has_permission('hrp_attendance', '', 'create') && !has_permission('hrp_attendance', '', 'edit') && !is_admin()) {
 			access_denied('hrp_attendance');
 		}
@@ -1284,7 +1257,6 @@ class hr_payroll extends AdminController {
 				}
 				redirect(admin_url('hr_payroll/manage_attendance'));
 			}
-
 		}
 	}
 
@@ -1292,7 +1264,8 @@ class hr_payroll extends AdminController {
 	 * import xlsx employees
 	 * @return [type]
 	 */
-	public function import_xlsx_employees() {
+	public function import_xlsx_employees()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -1306,7 +1279,6 @@ class hr_payroll extends AdminController {
 			} else {
 				$data['active_language'] = get_option('active_language');
 			}
-
 		} else {
 			$data['active_language'] = get_option('active_language');
 		}
@@ -1318,7 +1290,8 @@ class hr_payroll extends AdminController {
 	 * create employees sample file
 	 * @return [type]
 	 */
-	public function create_employees_sample_file() {
+	public function create_employees_sample_file()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -1373,8 +1346,13 @@ class hr_payroll extends AdminController {
 		$col_style1 = [0, 1, 2, 3, 4, 5, 7];
 		$style1 = ['widths' => $widths, 'fill' => '#ff9800', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13];
 
-		$writer->writeSheetHeader_v2('Sheet1', $writer_header, $col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
-			$col_style1, $style1);
+		$writer->writeSheetHeader_v2(
+			'Sheet1',
+			$writer_header,
+			$col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
+			$col_style1,
+			$style1
+		);
 
 		//load deparment by manager
 		if (!is_admin() && !has_permission('hrp_employee', '', 'view')) {
@@ -1428,7 +1406,6 @@ class hr_payroll extends AdminController {
 					$data_object_kpi['job_title'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['job_title'];
 					$data_object_kpi['income_tax_number'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['income_tax_number'];
 					$data_object_kpi['residential_address'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['residential_address'];
-
 				} else {
 					$data_object_kpi['job_title'] = '';
 					$data_object_kpi['income_tax_number'] = '';
@@ -1454,7 +1431,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi['primary_expiration'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['primary_expiration'];
 
 				$data_object_kpi['id'] = $employees_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
-
 			} else {
 				$data_object_kpi['income_rebate_code'] = 'A';
 				$data_object_kpi['income_tax_rate'] = 'A';
@@ -1470,7 +1446,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi['primary_expiration'] = '';
 
 				$data_object_kpi['id'] = 0;
-
 			}
 
 			$data_object_kpi['rel_type'] = $rel_type;
@@ -1486,7 +1461,6 @@ class hr_payroll extends AdminController {
 				$writer->writeSheetRow('Sheet1', array_merge([0 => 'month'], $header_key));
 			}
 			$writer->writeSheetRow('Sheet1', $temp);
-
 		}
 
 		$filename = 'employees_sample_file' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
@@ -1498,14 +1472,14 @@ class hr_payroll extends AdminController {
 			'staff_id' => get_staff_user_id(),
 			'filename' => HR_PAYROLL_CREATE_EMPLOYEES_SAMPLE . $filename,
 		]);
-
 	}
 
 	/**
 	 * import employees excel
 	 * @return [type]
 	 */
-	public function import_employees_excel() {
+	public function import_employees_excel()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -1597,9 +1571,7 @@ class hr_payroll extends AdminController {
 
 							if (($flag == 1) || $flag2 == 1) {
 								//write error file
-								$writer->writeSheetRow('Sheet1', [
-
-								]);
+								$writer->writeSheetRow('Sheet1', []);
 
 								$total_row_false++;
 							}
@@ -1612,9 +1584,7 @@ class hr_payroll extends AdminController {
 								unset($rd['department_name']);
 
 								array_push($arr_insert, $rd);
-
 							}
-
 						}
 
 						//insert batch
@@ -1631,7 +1601,6 @@ class hr_payroll extends AdminController {
 							$filename = 'Import_attendance_error_' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
 							$writer->writeToFile(new_str_replace($filename, HR_PAYROLL_ERROR . $filename, $filename));
 						}
-
 					}
 				}
 			}
@@ -1656,7 +1625,8 @@ class hr_payroll extends AdminController {
 	 * attendance filter
 	 * @return [type]
 	 */
-	public function attendance_filter() {
+	public function attendance_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -1778,17 +1748,14 @@ class hr_payroll extends AdminController {
 									$list_department .= $department_value->name;
 								}
 							}
-
 						}
 					}
 
 					$data_object_kpi[$staff_key]['staff_departments'] = $list_department;
-
 				} else {
 					$data_object_kpi[$staff_key]['hr_code'] = '';
 					$data_object_kpi[$staff_key]['staff_name'] = '';
 					$data_object_kpi[$staff_key]['staff_departments'] = '';
-
 				}
 
 				if (isset($attendances_value[$staff_value['staffid'] . '_' . $month_filter])) {
@@ -1800,7 +1767,6 @@ class hr_payroll extends AdminController {
 					$data_object_kpi[$staff_key]['unpaid_leave'] = $attendances_value[$staff_value['staffid'] . '_' . $month_filter]['unpaid_leave'];
 					$data_object_kpi[$staff_key]['id'] = $attendances_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $attendances_value[$staff_value['staffid'] . '_' . $month_filter]);
-
 				} else {
 					$data_object_kpi[$staff_key]['standard_workday'] = get_hr_payroll_option('standard_working_time');
 					$data_object_kpi[$staff_key]['actual_workday_probation'] = 0;
@@ -1809,14 +1775,11 @@ class hr_payroll extends AdminController {
 					$data_object_kpi[$staff_key]['unpaid_leave'] = 0;
 					$data_object_kpi[$staff_key]['id'] = 0;
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $days_header_in_month['days_header']);
-
 				}
 
 				$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 				$data_object_kpi[$staff_key]['month'] = $month_filter;
-
 			}
-
 		}
 
 		//check is add new or update data
@@ -1839,7 +1802,8 @@ class hr_payroll extends AdminController {
 	 * import xlsx attendance
 	 * @return [type]
 	 */
-	public function import_xlsx_attendance() {
+	public function import_xlsx_attendance()
+	{
 		$this->load->model('staff_model');
 		$data_staff = $this->staff_model->get(get_staff_user_id());
 		/*get language active*/
@@ -1849,7 +1813,6 @@ class hr_payroll extends AdminController {
 			} else {
 				$data['active_language'] = get_option('active_language');
 			}
-
 		} else {
 			$data['active_language'] = get_option('active_language');
 		}
@@ -1861,7 +1824,8 @@ class hr_payroll extends AdminController {
 	 * create attendance sample file
 	 * @return [type]
 	 */
-	public function create_attendance_sample_file() {
+	public function create_attendance_sample_file()
+	{
 		$this->load->model('staff_model');
 		$this->load->model('departments_model');
 
@@ -1909,8 +1873,13 @@ class hr_payroll extends AdminController {
 		$col_style1 = [0, 1, 2, 3, 4, 5, 6];
 		$style1 = ['widths' => $widths, 'fill' => '#ff9800', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13];
 
-		$writer->writeSheetHeader_v2('Sheet1', $writer_header, $col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
-			$col_style1, $style1);
+		$writer->writeSheetHeader_v2(
+			'Sheet1',
+			$writer_header,
+			$col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
+			$col_style1,
+			$style1
+		);
 
 		$data_object_kpi = [];
 		foreach ($staffs as $staff_key => $staff_value) {
@@ -1956,17 +1925,14 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object_kpi['staff_departments'] = $list_department;
-
 			} else {
 				$data_object_kpi['hr_code'] = '';
 				$data_object_kpi['staff_name'] = '';
 				$data_object_kpi['staff_departments'] = '';
-
 			}
 
 			if (isset($attendances_value[$staff_value['staffid'] . '_' . $current_month])) {
@@ -1979,7 +1945,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi['id'] = $attendances_value[$staff_value['staffid'] . '_' . $current_month]['id'];
 
 				$data_object_kpi = array_merge($data_object_kpi, $attendances_value[$staff_value['staffid'] . '_' . $current_month]);
-
 			} else {
 				$data_object_kpi['standard_workday'] = get_hr_payroll_option('standard_working_time');
 				$data_object_kpi['actual_workday_probation'] = 0;
@@ -1988,7 +1953,6 @@ class hr_payroll extends AdminController {
 				$data_object_kpi['unpaid_leave'] = 0;
 				$data_object_kpi['id'] = 0;
 				$data_object_kpi = array_merge($data_object_kpi, $days_header_in_month['days_header']);
-
 			}
 			$data_object_kpi['rel_type'] = $rel_type;
 			$data_object_kpi['month'] = $current_month;
@@ -2000,7 +1964,6 @@ class hr_payroll extends AdminController {
 
 			$get_values_for_keys = $this->get_values_for_keys($data_object_kpi, $header_key);
 			$writer->writeSheetRow('Sheet1', $get_values_for_keys);
-
 		}
 
 		$filename = 'attendance_sample_file' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
@@ -2012,7 +1975,6 @@ class hr_payroll extends AdminController {
 			'staff_id' => get_staff_user_id(),
 			'filename' => HR_PAYROLL_CREATE_ATTENDANCE_SAMPLE . $filename,
 		]);
-
 	}
 
 	/**
@@ -2021,7 +1983,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $keys
 	 * @return [type]
 	 */
-	function get_values_for_keys($mapping, $keys) {
+	function get_values_for_keys($mapping, $keys)
+	{
 		foreach ($keys as $key) {
 			$output_arr[] = $mapping[$key];
 		}
@@ -2032,7 +1995,8 @@ class hr_payroll extends AdminController {
 	 * import attendance excel
 	 * @return [type]
 	 */
-	public function import_attendance_excel() {
+	public function import_attendance_excel()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -2154,9 +2118,7 @@ class hr_payroll extends AdminController {
 
 								$rows[] = $rd;
 								array_push($arr_insert, $rd);
-
 							}
-
 						}
 
 						//insert batch
@@ -2173,7 +2135,6 @@ class hr_payroll extends AdminController {
 							$filename = 'Import_attendance_error_' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
 							$writer->writeToFile(new_str_replace($filename, HR_PAYROLL_ERROR . $filename, $filename));
 						}
-
 					}
 				}
 			}
@@ -2198,7 +2159,8 @@ class hr_payroll extends AdminController {
 	 * attendance calculation
 	 * @return [type]
 	 */
-	public function attendance_calculation() {
+	public function attendance_calculation()
+	{
 		if (!has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -2215,7 +2177,8 @@ class hr_payroll extends AdminController {
 	 * manage deductions
 	 * @return [type]
 	 */
-	public function manage_deductions() {
+	public function manage_deductions()
+	{
 		if (!has_permission('hrp_deduction', '', 'view') && !has_permission('hrp_deduction', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_deduction');
 		}
@@ -2291,17 +2254,14 @@ class hr_payroll extends AdminController {
 				}
 
 				$data_object_kpi[$staff_key]['id'] = $deductions_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 			} else {
 
 				// array merge: staff information + earning list (probationary contract) + earning list (formal)
 				$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $format_deduction_value['array_deduction']);
 
 				$data_object_kpi[$staff_key]['id'] = 0;
-
 			}
 			$data_object_kpi[$staff_key]['month'] = $current_month;
-
 		}
 
 		//check is add new or update data
@@ -2325,7 +2285,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add manage deductions
 	 */
-	public function add_manage_deductions() {
+	public function add_manage_deductions()
+	{
 		if (!has_permission('hrp_deduction', '', 'create') && !has_permission('hrp_deduction', '', 'edit') && !is_admin()) {
 			access_denied('hrp_deduction');
 		}
@@ -2348,14 +2309,14 @@ class hr_payroll extends AdminController {
 
 			redirect(admin_url('hr_payroll/manage_deductions'));
 		}
-
 	}
 
 	/**
 	 * deductions filter
 	 * @return [type]
 	 */
-	public function deductions_filter() {
+	public function deductions_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -2443,18 +2404,15 @@ class hr_payroll extends AdminController {
 					}
 
 					$data_object_kpi[$staff_key]['id'] = $deductions_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
-
 				} else {
 
 					// array merge: staff information + earning list (probationary contract) + earning list (formal)
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $format_deduction_value['array_deduction']);
 
 					$data_object_kpi[$staff_key]['id'] = 0;
-
 				}
 				$data_object_kpi[$staff_key]['month'] = $month_filter;
 			}
-
 		}
 
 		//check is add new or update data
@@ -2475,7 +2433,8 @@ class hr_payroll extends AdminController {
 	 * manage commissions
 	 * @return [type]
 	 */
-	public function manage_commissions() {
+	public function manage_commissions()
+	{
 		if (!has_permission('hrp_commission', '', 'view') && !has_permission('hrp_commission', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_commission');
 		}
@@ -2545,16 +2504,13 @@ class hr_payroll extends AdminController {
 
 				$data_object_kpi[$staff_key]['commission_amount'] = $commissions_value[$staff_value['staffid'] . '_' . $current_month]['commission_amount'];
 				$data_object_kpi[$staff_key]['id'] = $commissions_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 			} else {
 
 				$data_object_kpi[$staff_key]['commission_amount'] = 0;
 				$data_object_kpi[$staff_key]['id'] = 0;
-
 			}
 			$data_object_kpi[$staff_key]['month'] = $current_month;
 			$data_object_kpi[$staff_key]['rel_type'] = $commission_type;
-
 		}
 
 		//check is add new or update data
@@ -2578,7 +2534,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add manage commissions
 	 */
-	public function add_manage_commissions() {
+	public function add_manage_commissions()
+	{
 		if (!has_permission('hrp_commission', '', 'create') && !has_permission('hrp_commission', '', 'edit') && !is_admin()) {
 			access_denied('hrp_commission');
 		}
@@ -2592,7 +2549,6 @@ class hr_payroll extends AdminController {
 			} elseif ($data['hrp_commissions_rel_type'] == 'synchronization') {
 				//synchronization
 				$success = $this->hr_payroll_model->commissions_synchronization($data);
-
 			} else {
 				$success = false;
 			}
@@ -2605,14 +2561,14 @@ class hr_payroll extends AdminController {
 
 			redirect(admin_url('hr_payroll/manage_commissions'));
 		}
-
 	}
 
 	/**
 	 * commissions filter
 	 * @return [type]
 	 */
-	public function commissions_filter() {
+	public function commissions_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -2694,17 +2650,14 @@ class hr_payroll extends AdminController {
 
 					$data_object_kpi[$staff_key]['commission_amount'] = $commissions_value[$staff_value['staffid'] . '_' . $month_filter]['commission_amount'];
 					$data_object_kpi[$staff_key]['id'] = $commissions_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
-
 				} else {
 
 					$data_object_kpi[$staff_key]['commission_amount'] = 0;
 					$data_object_kpi[$staff_key]['id'] = 0;
-
 				}
 				$data_object_kpi[$staff_key]['month'] = $month_filter;
 				$data_object_kpi[$staff_key]['rel_type'] = $commission_type;
 			}
-
 		}
 
 		//check is add new or update data
@@ -2725,7 +2678,8 @@ class hr_payroll extends AdminController {
 	 * [import_xlsx_commissions
 	 * @return [type]
 	 */
-	public function import_xlsx_commissions() {
+	public function import_xlsx_commissions()
+	{
 		$this->load->model('staff_model');
 		$data_staff = $this->staff_model->get(get_staff_user_id());
 		/*get language active*/
@@ -2735,7 +2689,6 @@ class hr_payroll extends AdminController {
 			} else {
 				$data['active_language'] = get_option('active_language');
 			}
-
 		} else {
 			$data['active_language'] = get_option('active_language');
 		}
@@ -2747,10 +2700,10 @@ class hr_payroll extends AdminController {
 	 * create commissions sample file
 	 * @return [type]
 	 */
-	public function create_commissions_sample_file() {
+	public function create_commissions_sample_file()
+	{
 		if (!has_permission('hrp_commission', '', 'create') && !has_permission('hrp_commission', '', 'edit') && !is_admin()) {
 			access_denied('hrp_commission');
-
 		}
 		$this->load->model('staff_model');
 		$this->load->model('departments_model');
@@ -2799,8 +2752,13 @@ class hr_payroll extends AdminController {
 		$col_style1 = [0, 1, 2, 3, 4, 5, 6];
 		$style1 = ['widths' => $widths, 'fill' => '#ff9800', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13];
 
-		$writer->writeSheetHeader_v2('Sheet1', $writer_header, $col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
-			$col_style1, $style1);
+		$writer->writeSheetHeader_v2(
+			'Sheet1',
+			$writer_header,
+			$col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
+			$col_style1,
+			$style1
+		);
 
 		$data_object_kpi = [];
 		foreach ($staffs as $staff_key => $staff_value) {
@@ -2840,28 +2798,23 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object_kpi['department_name'] = $list_department;
-
 			} else {
 				$data_object_kpi['employee_number'] = '';
 				$data_object_kpi['employee_name'] = '';
 				$data_object_kpi['department_name'] = '';
-
 			}
 
 			if (isset($commissions_value[$staff_value['staffid'] . '_' . $current_month])) {
 
 				$data_object_kpi['commission_amount'] = $commissions_value[$staff_value['staffid'] . '_' . $current_month]['commission_amount'];
 				$data_object_kpi['id'] = $commissions_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 			} else {
 				$data_object_kpi['commission_amount'] = 0;
 				$data_object_kpi['id'] = 0;
-
 			}
 			$data_object_kpi['rel_type'] = $rel_type;
 			$data_object_kpi['month'] = $current_month;
@@ -2873,7 +2826,6 @@ class hr_payroll extends AdminController {
 			$get_values_for_keys = $this->get_values_for_keys($data_object_kpi, $header_key);
 
 			$writer->writeSheetRow('Sheet1', $get_values_for_keys);
-
 		}
 
 		$filename = 'commission_sample_file' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
@@ -2885,14 +2837,14 @@ class hr_payroll extends AdminController {
 			'staff_id' => get_staff_user_id(),
 			'filename' => HR_PAYROLL_CREATE_COMMISSIONS_SAMPLE . $filename,
 		]);
-
 	}
 
 	/**
 	 * import commissions excel
 	 * @return [type]
 	 */
-	public function import_commissions_excel() {
+	public function import_commissions_excel()
+	{
 		if (!has_permission('hrp_commission', '', 'create') && !has_permission('hrp_commission', '', 'edit') && !is_admin()) {
 			access_denied('hrp_commission');
 		}
@@ -3014,9 +2966,7 @@ class hr_payroll extends AdminController {
 
 								$rows[] = $rd;
 								array_push($arr_insert, $rd);
-
 							}
-
 						}
 
 						//insert batch
@@ -3033,7 +2983,6 @@ class hr_payroll extends AdminController {
 							$filename = 'Import_commissions_error_' . get_staff_user_id() . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
 							$writer->writeToFile(new_str_replace($filename, HR_PAYROLL_ERROR . $filename, $filename));
 						}
-
 					}
 				}
 			}
@@ -3058,7 +3007,8 @@ class hr_payroll extends AdminController {
 	 * manage income taxs
 	 * @return [type]
 	 */
-	public function income_taxs_manage() {
+	public function income_taxs_manage()
+	{
 		if (!has_permission('hrp_income_tax', '', 'view') && !has_permission('hrp_income_tax', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_income_tax');
 		}
@@ -3133,12 +3083,10 @@ class hr_payroll extends AdminController {
 
 				$data_object_kpi[$staff_key]['income_tax'] = $income_taxs_value[$staff_value['staffid'] . '_' . $current_month]['income_tax'];
 				$data_object_kpi[$staff_key]['id'] = $income_taxs_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 			} else {
 
 				$data_object_kpi[$staff_key]['income_tax'] = 0;
 				$data_object_kpi[$staff_key]['id'] = 0;
-
 			}
 			$data_object_kpi[$staff_key]['month'] = $current_month;
 
@@ -3164,7 +3112,8 @@ class hr_payroll extends AdminController {
 	 * income taxs filter
 	 * @return [type]
 	 */
-	public function income_taxs_filter() {
+	public function income_taxs_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -3253,12 +3202,10 @@ class hr_payroll extends AdminController {
 
 					$data_object_kpi[$staff_key]['income_tax'] = $income_taxs_value[$staff_value['staffid'] . '_' . $current_month]['income_tax'];
 					$data_object_kpi[$staff_key]['id'] = $income_taxs_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 				} else {
 
 					$data_object_kpi[$staff_key]['income_tax'] = 0;
 					$data_object_kpi[$staff_key]['id'] = 0;
-
 				}
 				$data_object_kpi[$staff_key]['month'] = $current_month;
 				if (isset($tax_in_year[$staff_value['staffid']])) {
@@ -3267,7 +3214,6 @@ class hr_payroll extends AdminController {
 					$data_object_kpi[$staff_key]['tax_for_year'] = 0;
 				}
 			}
-
 		}
 
 		echo json_encode([
@@ -3280,7 +3226,8 @@ class hr_payroll extends AdminController {
 	 * manage insurances
 	 * @return [type]
 	 */
-	public function manage_insurances() {
+	public function manage_insurances()
+	{
 		if (!has_permission('hrp_insurrance', '', 'view') && !has_permission('hrp_insurrance', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_insurrance');
 		}
@@ -3355,17 +3302,14 @@ class hr_payroll extends AdminController {
 				}
 
 				$data_object_kpi[$staff_key]['id'] = $insurances_value[$staff_value['staffid'] . '_' . $current_month]['id'];
-
 			} else {
 
 				// array merge: staff information + earning list (probationary contract) + earning list (formal)
 				$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $format_insurance_value['array_insurance']);
 
 				$data_object_kpi[$staff_key]['id'] = 0;
-
 			}
 			$data_object_kpi[$staff_key]['month'] = $current_month;
-
 		}
 
 		//check is add new or update data
@@ -3389,7 +3333,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add manage insurances
 	 */
-	public function add_manage_insurances() {
+	public function add_manage_insurances()
+	{
 		if (!has_permission('hrp_insurrance', '', 'create') && !has_permission('hrp_insurrance', '', 'edit') && !is_admin()) {
 			access_denied('hrp_insurrance');
 		}
@@ -3412,14 +3357,14 @@ class hr_payroll extends AdminController {
 
 			redirect(admin_url('hr_payroll/manage_insurances'));
 		}
-
 	}
 
 	/**
 	 * insurances filter
 	 * @return [type]
 	 */
-	public function insurances_filter() {
+	public function insurances_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -3507,18 +3452,15 @@ class hr_payroll extends AdminController {
 					}
 
 					$data_object_kpi[$staff_key]['id'] = $insurances_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
-
 				} else {
 
 					// array merge: staff information + earning list (probationary contract) + earning list (formal)
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $format_insurance_value['array_insurance']);
 
 					$data_object_kpi[$staff_key]['id'] = 0;
-
 				}
 				$data_object_kpi[$staff_key]['month'] = $month_filter;
 			}
-
 		}
 
 		//check is add new or update data
@@ -3539,7 +3481,8 @@ class hr_payroll extends AdminController {
 	 * delete_error file day before
 	 * @return [type]
 	 */
-	public function delete_error_file_day_before($before_day = '', $folder_name = '') {
+	public function delete_error_file_day_before($before_day = '', $folder_name = '')
+	{
 		if ($before_day != '') {
 			$day = $before_day;
 		} else {
@@ -3583,20 +3526,21 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function payslip_manage($id = '') {
+	public function payslip_manage($id = '')
+	{
 		if (!has_permission('hrp_payslip', '', 'view') && !has_permission('hrp_payslip', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_payslip');
 		}
 		$data['internal_id'] = $id;
 		$data['title'] = _l('hr_pay_slips');
 		$data['staffs'] = $this->staff_model->get();
-        $base_currency = get_base_currency();
-        $base_currency_id = 0;
-        if ($base_currency) {
-        	$base_currency_id = $base_currency->id;
-        }
-        $data['base_currency_id'] = $base_currency_id;
-        $data['currencies'] = $this->currencies_model->get();
+		$base_currency = get_base_currency();
+		$base_currency_id = 0;
+		if ($base_currency) {
+			$base_currency_id = $base_currency->id;
+		}
+		$data['base_currency_id'] = $base_currency_id;
+		$data['currencies'] = $this->currencies_model->get();
 
 		$this->load->view('payslips/payslip_manage', $data);
 	}
@@ -3605,7 +3549,8 @@ class hr_payroll extends AdminController {
 	 * payslip table
 	 * @return table
 	 */
-	public function payslip_table() {
+	public function payslip_table()
+	{
 		$this->app->get_table_data(module_views_path('hr_payroll', 'payslips/payslip_table'));
 	}
 
@@ -3614,7 +3559,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]
 	 */
-	public function delete_payslip($id) {
+	public function delete_payslip($id)
+	{
 		if (!is_admin() && !has_permission('hrp_payslip', '', 'delete')) {
 			access_denied('hrp_payslip');
 		}
@@ -3638,7 +3584,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function payslip_templates_manage($id = '') {
+	public function payslip_templates_manage($id = '')
+	{
 		if (!has_permission('hrp_payslip_template', '', 'view') && !has_permission('hrp_payslip_template', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_payslip_template');
 		}
@@ -3660,7 +3607,8 @@ class hr_payroll extends AdminController {
 	 * payslip table
 	 * @return table
 	 */
-	public function payslip_template_table() {
+	public function payslip_template_table()
+	{
 		$this->app->get_table_data(module_views_path('hr_payroll', 'payslip_templates/payslip_template_table'));
 	}
 
@@ -3668,7 +3616,8 @@ class hr_payroll extends AdminController {
 	 * get column key html add
 	 * @return [type]
 	 */
-	public function get_payroll_column_method_html_add() {
+	public function get_payroll_column_method_html_add()
+	{
 		$method_option = $this->hr_payroll_model->get_list_payroll_column_method(['id' => '']);
 		$order_display = $this->hr_payroll_model->count_payroll_column();
 
@@ -3683,7 +3632,8 @@ class hr_payroll extends AdminController {
 	 * get payroll column function name html
 	 * @return [type]
 	 */
-	public function get_payroll_column_function_name_html() {
+	public function get_payroll_column_function_name_html()
+	{
 		$method_option = $this->hr_payroll_model->get_list_payroll_column_function_name(['function_name' => '']);
 
 		echo json_encode([
@@ -3696,7 +3646,8 @@ class hr_payroll extends AdminController {
 	 * payroll column
 	 * @return [type]
 	 */
-	public function payroll_column() {
+	public function payroll_column()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (!$this->input->post('id')) {
@@ -3726,7 +3677,6 @@ class hr_payroll extends AdminController {
 				}
 				redirect(admin_url('hr_payroll/setting?group=payroll_columns'));
 			}
-
 		}
 	}
 
@@ -3735,7 +3685,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]
 	 */
-	public function get_payroll_column($id) {
+	public function get_payroll_column($id)
+	{
 		//get data
 		$payroll_column = $this->hr_payroll_model->get_hrp_payroll_columns($id);
 		//get taking method html
@@ -3757,7 +3708,6 @@ class hr_payroll extends AdminController {
 			'function_name' => $function_name,
 		]);
 		die;
-
 	}
 
 	/**
@@ -3765,7 +3715,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function delete_payroll_column_setting($id = '') {
+	public function delete_payroll_column_setting($id = '')
+	{
 		if (!is_admin() && !has_permission('hrp_setting', '', 'delete')) {
 			access_denied('hr_payroll');
 		}
@@ -3789,7 +3740,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function get_payslip_template($id = '') {
+	public function get_payslip_template($id = '')
+	{
 		$payslip_template_data = '';
 		if (isset($id) && $id != '') {
 			$payslip_template = $this->hr_payroll_model->get_hrp_payslip_templates($id);
@@ -3797,7 +3749,6 @@ class hr_payroll extends AdminController {
 			$payslip_template_selected = $this->hr_payroll_model->get_payslip_template_selected_html($payslip_template->payslip_id_copy);
 			$payslip_column_selected = $this->hr_payroll_model->get_payslip_column_html($payslip_template->payslip_columns);
 			$payslip_template_data = $payslip_template;
-
 		} else {
 			// create
 			$payslip_template_selected = $this->hr_payroll_model->get_payslip_template_selected_html('');
@@ -3810,14 +3761,14 @@ class hr_payroll extends AdminController {
 			'payslip_template_data' => $payslip_template_data,
 		]);
 		die;
-
 	}
 
 	/**
 	 * payslip template
 	 * @return [type]
 	 */
-	public function payslip_template() {
+	public function payslip_template()
+	{
 		if (!has_permission('hrp_payslip_template', '', 'create') && !has_permission('hrp_payslip_template', '', 'edit') && !is_admin()) {
 			access_denied('hrp_payslip_template');
 		}
@@ -3868,7 +3819,6 @@ class hr_payroll extends AdminController {
 				}
 				redirect(admin_url('hr_payroll/view_payslip_templates_detail/' . $id));
 			}
-
 		}
 	}
 
@@ -3877,7 +3827,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]
 	 */
-	public function delete_payslip_template($id) {
+	public function delete_payslip_template($id)
+	{
 		if (!is_admin() && !has_permission('hrp_payslip_template', '', 'delete')) {
 			access_denied('hr_payroll');
 		}
@@ -3901,15 +3852,16 @@ class hr_payroll extends AdminController {
 	 * @param [type] $parent_id
 	 * @param string $id
 	 */
-	public function view_payslip_templates_detail($id = "") {
+	public function view_payslip_templates_detail($id = "")
+	{
 
 		$data_form = $this->input->post();
 		if ($this->input->post()) {
 			$data = $this->input->post();
-			if(isset($data['csrf_token_name'])){
+			if (isset($data['csrf_token_name'])) {
 				unset($data['csrf_token_name']);
 			}
-			
+
 			if (!is_admin() && !has_permission('hrp_payslip_template', '', 'edit') && !has_permission('hrp_payslip_template', '', 'create')) {
 				$message = _l('access_denied');
 				echo json_encode(['danger' => false, 'message' => $message]);
@@ -3930,14 +3882,12 @@ class hr_payroll extends AdminController {
 				echo json_encode(['success' => true, 'message' => $message]);
 				die;
 			}
-
 		}
 
 		if ($id != '') {
 			$data['id'] = $id;
 			$data['file_excel'] = $this->hr_payroll_model->get_hrp_payslip_templates($data['id']);
 			$data['data_form'] = $data['file_excel']->payslip_template_data;
-
 		}
 		if (has_permission('hrp_payslip_template', '', 'create') || has_permission('hrp_payslip_template', '', 'edit')) {
 
@@ -3951,7 +3901,6 @@ class hr_payroll extends AdminController {
 		$data['title'] = _l('view_payslip_templates_detail');
 
 		$this->load->view('payslip_templates/add_payslip_template', $data);
-
 	}
 
 	/**
@@ -3959,7 +3908,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function view_payslip_detail($id = "") {
+	public function view_payslip_detail($id = "")
+	{
 
 		if (!is_admin() && !has_permission('hrp_payslip', '', 'view')) {
 			access_denied('view_payslip');
@@ -3987,7 +3937,6 @@ class hr_payroll extends AdminController {
 				echo json_encode(['success' => false, 'message' => $message]);
 				die;
 			}
-
 		}
 
 		if ($id != '') {
@@ -3997,7 +3946,7 @@ class hr_payroll extends AdminController {
 			$data['payslip'] = $payslip;
 
 			$path = HR_PAYROLL_PAYSLIP_FILE . $payslip->file_name;
-			if(!file_exists($path)){
+			if (!file_exists($path)) {
 				set_alert('warning', _l('hrp_The_physical_file_has_been_deleted'));
 				redirect(admin_url('hr_payroll/payslip_manage'));
 			}
@@ -4005,7 +3954,6 @@ class hr_payroll extends AdminController {
 
 			//$data['data_form'] = replace_spreadsheet_value($mystring);
 			$data['data_form'] = $mystring;
-
 		}
 
 		if (has_permission('hrp_payslip', '', 'create') || has_permission('hrp_payslip', '', 'edit')) {
@@ -4018,7 +3966,6 @@ class hr_payroll extends AdminController {
 		$data['title'] = _l('payslip_detail');
 
 		$this->load->view('payslips/payslip', $data);
-
 	}
 
 	/**
@@ -4026,7 +3973,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id
 	 * @return [type]
 	 */
-	public function view_payslip_detail_v2($id = "") {
+	public function view_payslip_detail_v2($id = "")
+	{
 		if (!is_admin() && !has_permission('hrp_payslip', '', 'view_own')) {
 			access_denied('view_payslip');
 		}
@@ -4053,7 +4001,6 @@ class hr_payroll extends AdminController {
 				echo json_encode(['success' => false, 'message' => $message]);
 				die;
 			}
-
 		}
 
 		if ($id != '') {
@@ -4064,7 +4011,7 @@ class hr_payroll extends AdminController {
 			$data['payslip'] = $payslip;
 
 			$path = HR_PAYROLL_PAYSLIP_FILE . $payslip->file_name;
-			if(!file_exists($path)){
+			if (!file_exists($path)) {
 				set_alert('warning', _l('hrp_The_physical_file_has_been_deleted'));
 				redirect(admin_url('hr_payroll/payslip_manage'));
 			}
@@ -4075,7 +4022,6 @@ class hr_payroll extends AdminController {
 
 			//$data['data_form'] = replace_spreadsheet_value($mystring);
 			$data['data_form'] = $mystring;
-
 		}
 
 		$permission_actions = '<a href="#" class="btn mright5 btn-success pull-right payslip_download hide" >Download</a><button  class="btn mright5 btn-info pull-right luckysheet_info_detail_exports ">Create file</button><a href="' . admin_url() . 'hr_payroll/payslip_manage' . '" class="btn mright5 btn-default pull-right" >Back</a>';
@@ -4084,14 +4030,14 @@ class hr_payroll extends AdminController {
 		$data['title'] = _l('view_payslip');
 
 		$this->load->view('payslips/payslip_view_own', $data);
-
 	}
 
 	/**
 	 * manage bonus
 	 * @return [type]
 	 */
-	public function manage_bonus() {
+	public function manage_bonus()
+	{
 		if (!has_permission('hrp_bonus_kpi', '', 'view') && !has_permission('hrp_bonus_kpi', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_bonus_kpi');
 		}
@@ -4152,18 +4098,15 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object_kpi[$staff_key]['staff_departments'] = $list_department;
-
 			} else {
 				$data_object_kpi[$staff_key]['hr_code'] = '';
 				$data_object_kpi[$staff_key]['staff_name'] = '';
 				$data_object_kpi[$staff_key]['job_position'] = $staff_value['staffid'];
 				$data_object_kpi[$staff_key]['staff_departments'] = '';
-
 			}
 
 			//get_data from hrm_allowance_commodity_fill
@@ -4171,12 +4114,10 @@ class hr_payroll extends AdminController {
 			if ($bonus_kpi) {
 
 				$data_object_kpi[$staff_key]['bonus_kpi'] = $bonus_kpi->bonus_kpi;
-
 			} else {
 				$data_object_kpi[$staff_key]['bonus_kpi'] = 0;
 				$bonus_status = false;
 			}
-
 		}
 
 		/*bonus Kpi*/
@@ -4200,7 +4141,8 @@ class hr_payroll extends AdminController {
 	 * add bonus kpi
 	 * @return redirect
 	 */
-	public function add_bonus_kpi() {
+	public function add_bonus_kpi()
+	{
 		if (!has_permission('hrp_bonus_kpi', '', 'view') && !has_permission('hrp_bonus_kpi', '', 'edit') && !is_admin()) {
 			access_denied('hrp_bonus_kpi');
 		}
@@ -4218,7 +4160,6 @@ class hr_payroll extends AdminController {
 				}
 				redirect(admin_url('hr_payroll/manage_bonus'));
 			}
-
 		}
 	}
 
@@ -4226,7 +4167,8 @@ class hr_payroll extends AdminController {
 	 * bonus kpi filter
 	 * @return array
 	 */
-	public function bonus_kpi_filter() {
+	public function bonus_kpi_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -4257,7 +4199,6 @@ class hr_payroll extends AdminController {
 			}
 			$month = $month_new;
 			$month_year = (int) $year;
-
 		}
 
 		if ($department != '') {
@@ -4326,7 +4267,6 @@ class hr_payroll extends AdminController {
 					$data_object[$index_data_object]['job_position'] = '';
 
 					$data_object[$index_data_object]['bonus_kpi'] = $bonus_value->bonus_kpi;
-
 				} else {
 					$data_object[$index_data_object]['staffid'] = $staff_value['staffid'];
 
@@ -4338,7 +4278,6 @@ class hr_payroll extends AdminController {
 					$data_object[$index_data_object]['bonus_kpi'] = 0;
 
 					$bonus_status = false;
-
 				}
 
 				$arr_department = $this->hr_payroll_model->get_staff_departments($staff_value['staffid'], true);
@@ -4356,16 +4295,13 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object[$index_data_object]['staff_departments'] = $list_department;
 
 				$index_data_object++;
-
 			}
-
 		}
 
 		//check is add new or update data
@@ -4387,7 +4323,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $value
 	 * @return [type]
 	 */
-	public function payslip($value = '') {
+	public function payslip($value = '')
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 
@@ -4403,9 +4340,7 @@ class hr_payroll extends AdminController {
 					set_alert('success', $message);
 				}
 				redirect(admin_url('hr_payroll/payslip_manage'));
-
 			}
-
 		}
 	}
 
@@ -4413,7 +4348,8 @@ class hr_payroll extends AdminController {
 	 * payslip closing
 	 * @return [type]
 	 */
-	public function payslip_closing() {
+	public function payslip_closing()
+	{
 		if (!has_permission('hrp_payslip', '', 'edit') && !is_admin()) {
 			$message = _l('access_denied');
 			echo json_encode(['danger' => false, 'message' => $message]);
@@ -4421,7 +4357,7 @@ class hr_payroll extends AdminController {
 		}
 		if ($this->input->post()) {
 			$data = $this->input->post();
-			if(isset($data['csrf_token_name'])){
+			if (isset($data['csrf_token_name'])) {
 				unset($data['csrf_token_name']);
 			}
 			$hrp_payslip = $this->hr_payroll_model->get_hrp_payslip($data['id']);
@@ -4430,14 +4366,14 @@ class hr_payroll extends AdminController {
 				$payslip_checked = $this->hr_payroll_model->payslip_checked($hrp_payslip->payslip_month, $hrp_payslip->payslip_template_id, true);
 				// if ($payslip_checked) {
 
-					$result = $this->hr_payroll_model->payslip_close($data);
-					if ($result == true) {
-						$message = _l('hrp_updated_successfully');
-						$status = true;
-					} else {
-						$message = _l('hrp_updated_failed');
-						$status = false;
-					}
+				$result = $this->hr_payroll_model->payslip_close($data);
+				if ($result == true) {
+					$message = _l('hrp_updated_successfully');
+					$status = true;
+				} else {
+					$message = _l('hrp_updated_failed');
+					$status = false;
+				}
 				// } else {
 				// 	$status = false;
 				// 	$message = _l('payslip_for_the_month_of');
@@ -4460,7 +4396,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]
 	 */
-	public function payslip_update_status($id) {
+	public function payslip_update_status($id)
+	{
 		if (!is_admin() && !has_permission('hrp_payslip', '', 'udpate')) {
 			access_denied('hrp_payslip');
 		}
@@ -4478,7 +4415,8 @@ class hr_payroll extends AdminController {
 	 * table staff payslip
 	 * @return [type]
 	 */
-	public function table_staff_payslip() {
+	public function table_staff_payslip()
+	{
 		$this->app->get_table_data(module_views_path('hr_payroll', 'employee_payslip/table_staff_payslip'));
 	}
 
@@ -4486,7 +4424,8 @@ class hr_payroll extends AdminController {
 	 * view staff payslip modal
 	 * @return [type]
 	 */
-	public function view_staff_payslip_modal() {
+	public function view_staff_payslip_modal()
+	{
 		if (!$this->input->is_ajax_request()) {
 			show_404();
 		}
@@ -4518,7 +4457,7 @@ class hr_payroll extends AdminController {
 			$employee = $this->hr_payroll_model->get_employees_data($data['payslip_detail']->month, '', ' staff_id = ' . $data['payslip_detail']->staff_id);
 
 			$data['payslip'] = $this->hr_payroll_model->get_hrp_payslip($data['payslip_detail']->payslip_id);
-			if($data['payslip'] && is_null($data['payslip']->to_currency_name)){
+			if ($data['payslip'] && is_null($data['payslip']->to_currency_name)) {
 				$base_currency = get_base_currency();
 				$base_currency_id = 0;
 				if ($base_currency) {
@@ -4537,7 +4476,8 @@ class hr_payroll extends AdminController {
 	 * reports
 	 * @return [type]
 	 */
-	public function reports() {
+	public function reports()
+	{
 		if (!has_permission('hrp_report', '', 'view') && !is_admin()) {
 			access_denied('reports');
 		}
@@ -4559,7 +4499,8 @@ class hr_payroll extends AdminController {
 	 * payslip report
 	 * @return [type]
 	 */
-	public function payslip_report() {
+	public function payslip_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 
@@ -4594,13 +4535,11 @@ class hr_payroll extends AdminController {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == '12') {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -4668,7 +4607,7 @@ class hr_payroll extends AdminController {
 				$rResult = $result['rResult'];
 				foreach ($rResult as $aRow) {
 					$payslip = $this->hr_payroll_model->get_hrp_payslip($aRow['payslip_id']);
-					if($payslip && is_null($payslip->to_currency_name)){
+					if ($payslip && is_null($payslip->to_currency_name)) {
 						$base_currency = get_base_currency();
 						$base_currency_id = 0;
 						if ($base_currency) {
@@ -4706,7 +4645,8 @@ class hr_payroll extends AdminController {
 	 * income summary report
 	 * @return [type]
 	 */
-	public function income_summary_report() {
+	public function income_summary_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$this->load->model('departments_model');
@@ -4742,13 +4682,11 @@ class hr_payroll extends AdminController {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == '12') {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -4794,7 +4732,6 @@ class hr_payroll extends AdminController {
 
 				if (($staff_query) && ($staff_query != '')) {
 					$staff_query_trim = rtrim($staff_query, ' and');
-
 				}
 				$where = [$total_query];
 
@@ -4961,7 +4898,6 @@ class hr_payroll extends AdminController {
 
 				echo json_encode($output);
 				die();
-
 			}
 		}
 	}
@@ -4970,7 +4906,8 @@ class hr_payroll extends AdminController {
 	 * insurance cost summary report
 	 * @return [type]
 	 */
-	public function insurance_cost_summary_report() {
+	public function insurance_cost_summary_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$this->load->model('departments_model');
@@ -5006,13 +4943,11 @@ class hr_payroll extends AdminController {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == '12') {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -5035,7 +4970,7 @@ class hr_payroll extends AdminController {
 
 				if (isset($staff_filter)) {
 					$staffid_list = implode(',', $staff_filter);
-					if(1==2){
+					if (1 == 2) {
 						$query .= db_prefix() . 'staff.staffid in (' . $staffid_list . ') and ';
 					}
 
@@ -5058,7 +4993,6 @@ class hr_payroll extends AdminController {
 
 				if (($staff_query) && ($staff_query != '')) {
 					$staff_query_trim = rtrim($staff_query, ' and');
-
 				}
 
 				$where = [$total_query];
@@ -5104,7 +5038,6 @@ class hr_payroll extends AdminController {
 
 				echo json_encode($output);
 				die();
-
 			}
 		}
 	}
@@ -5113,7 +5046,8 @@ class hr_payroll extends AdminController {
 	 * payslip chart
 	 * @return [type]
 	 */
-	public function payslip_chart() {
+	public function payslip_chart()
+	{
 		if ($this->input->is_ajax_request()) {
 
 			$months_report = $this->input->post('months_filter');
@@ -5130,7 +5064,8 @@ class hr_payroll extends AdminController {
 	 * department payslip chart
 	 * @return [type]
 	 */
-	public function department_payslip_chart() {
+	public function department_payslip_chart()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$months_report = $this->input->post('months_filter');
@@ -5146,7 +5081,6 @@ class hr_payroll extends AdminController {
 				if ($months_report == '1') {
 					$from_date = date('Y-m-01', strtotime('first day of last month'));
 					$to_date = date('Y-m-t', strtotime('last day of last month'));
-
 				}
 				if ($months_report == 'this_year') {
 					$from_date = date('Y-m-d', strtotime(date('Y-01-01')));
@@ -5161,19 +5095,16 @@ class hr_payroll extends AdminController {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == '6') {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == '12') {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -5217,7 +5148,8 @@ class hr_payroll extends AdminController {
 	 * payslip template checked
 	 * @return [type]
 	 */
-	public function payslip_template_checked() {
+	public function payslip_template_checked()
+	{
 		$data = $this->input->post();
 		if ($this->input->is_ajax_request()) {
 			$payslip_template_checked = $this->hr_payroll_model->payslip_template_checked($data);
@@ -5239,7 +5171,8 @@ class hr_payroll extends AdminController {
 	 * payslip checked
 	 * @return [type]
 	 */
-	public function payslip_checked() {
+	public function payslip_checked()
+	{
 		$data = $this->input->post();
 		if ($this->input->is_ajax_request()) {
 			$payslip_checked = $this->hr_payroll_model->payslip_checked($data['payslip_month'], $data['payslip_template_id']);
@@ -5264,7 +5197,8 @@ class hr_payroll extends AdminController {
 	 * create payslip file
 	 * @return [type]
 	 */
-	public function create_payslip_file() {
+	public function create_payslip_file()
+	{
 
 		$data = $this->input->post();
 		$get_data = $this->hr_payroll_model->payslip_download($data);
@@ -5291,7 +5225,6 @@ class hr_payroll extends AdminController {
 					$writer_header[$value] = '#,##0.00';
 				} else {
 					$writer_header[$value] = 'string';
-
 				}
 				$widths[] = 30;
 				$col_style1[] = $key;
@@ -5301,8 +5234,13 @@ class hr_payroll extends AdminController {
 
 			$style1 = ['widths' => $widths, 'fill' => '#ff9800', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13];
 
-			$writer->writeSheetHeader_v2('Sheet1', $writer_header, $col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
-				$col_style1, $style1);
+			$writer->writeSheetHeader_v2(
+				'Sheet1',
+				$writer_header,
+				$col_options = ['widths' => $widths, 'fill' => '#03a9f46b', 'font-style' => 'bold', 'color' => '#0a0a0a', 'border' => 'left,right,top,bottom', 'border-color' => '#0a0a0a', 'font-size' => 13],
+				$col_style1,
+				$style1
+			);
 
 			$data_object_kpi = [];
 			$writer->writeSheetRow('Sheet1', $get_data['payroll_header']);
@@ -5310,7 +5248,6 @@ class hr_payroll extends AdminController {
 			foreach ($get_data['payslip_detail'] as $data_key => $payslip_detail) {
 
 				$writer->writeSheetRow('Sheet1', array_values($payslip_detail));
-
 			}
 
 			$filename = 'Payslip_' . date('Y-m', strtotime($get_data['month'])) . '_' . strtotime(date('Y-m-d H:i:s')) . '.xlsx';
@@ -5334,14 +5271,14 @@ class hr_payroll extends AdminController {
 			'filename' => HR_PAYROLL_CREATE_PAYSLIP_EXCEL,
 		]);
 		die;
-
 	}
 
 	/**
 	 *employees copy
 	 * @return [type]
 	 */
-	public function employees_copy() {
+	public function employees_copy()
+	{
 		if (!has_permission('hrp_employee', '', 'create') && !has_permission('hrp_employee', '', 'edit') && !is_admin()) {
 			access_denied('hrp_employee');
 		}
@@ -5361,14 +5298,14 @@ class hr_payroll extends AdminController {
 				'status' => $results['status'],
 			]);
 		}
-
 	}
 
 	/**
 	 * reset data
 	 * @return [type]
 	 */
-	public function reset_data() {
+	public function reset_data()
+	{
 
 		if (!is_admin()) {
 			access_denied('hr_payroll');
@@ -5408,7 +5345,6 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/attendance_sample_file/' . $filename);
 				}
 			}
-
 		}
 
 		foreach (glob('modules/hr_payroll/uploads/commissions_sample_file/' . '*') as $file) {
@@ -5421,7 +5357,6 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/commissions_sample_file/' . $filename);
 				}
 			}
-
 		}
 
 		foreach (glob('modules/hr_payroll/uploads/employees_sample_file/' . '*') as $file) {
@@ -5434,7 +5369,6 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/employees_sample_file/' . $filename);
 				}
 			}
-
 		}
 
 		foreach (glob('modules/hr_payroll/uploads/file_error_response/' . '*') as $file) {
@@ -5447,7 +5381,6 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/file_error_response/' . $filename);
 				}
 			}
-
 		}
 
 		foreach (glob('modules/hr_payroll/uploads/payslip/' . '*') as $file) {
@@ -5460,7 +5393,6 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/payslip/' . $filename);
 				}
 			}
-
 		}
 
 		foreach (glob('modules/hr_payroll/uploads/payslip_excel_file/' . '*') as $file) {
@@ -5473,12 +5405,10 @@ class hr_payroll extends AdminController {
 					unlink('modules/hr_payroll/uploads/payslip_excel_file/' . $filename);
 				}
 			}
-
 		}
 
 		set_alert('success', _l('reset_data_successful'));
 		redirect(admin_url('hr_payroll/setting?group=reset_data'));
-
 	}
 
 	/**
@@ -5486,7 +5416,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id 
 	 * @return [type]     
 	 */
-	public function employee_export_pdf($id) {
+	public function employee_export_pdf($id)
+	{
 		if (!$id) {
 			show_404();
 		}
@@ -5520,21 +5451,21 @@ class hr_payroll extends AdminController {
 		$data['employee'] = count($employee) > 0 ? $employee[0] : [];
 		$data['list_department'] = $list_department;
 		$data['payslip'] = $this->hr_payroll_model->get_hrp_payslip($data['payslip_detail']['payslip_id']);
-		if($data['payslip'] && is_null($data['payslip']->to_currency_name)){
+		if ($data['payslip'] && is_null($data['payslip']->to_currency_name)) {
 			$base_currency = get_base_currency();
 			$base_currency_id = 0;
 			if ($base_currency) {
 				$data['payslip']->to_currency_name = $base_currency->name;
 			}
 		}
-
+		$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'],$data['payslip_detail']['staff_id']);
+	
 		$html = $this->load->view('hr_payroll/employee_payslip/export_employee_payslip', $data, true);
 		$html .= '<link href="' . module_dir_url(HR_PAYROLL_MODULE_NAME, 'assets/css/export_employee_pdf.css') . '"  rel="stylesheet" type="text/css" />';
 
 
 		try {
 			$pdf = $this->hr_payroll_model->employee_export_pdf($html);
-
 		} catch (Exception $e) {
 			echo new_html_entity_decode($e->getMessage());
 			die;
@@ -5550,7 +5481,7 @@ class hr_payroll extends AdminController {
 			$type = 'I';
 		}
 
-		$pdf->Output($data['payslip_detail']['employee_number'].'_'.date('m-Y', strtotime($data['payslip_detail']['month'])).'_'.strtotime(date('Y-m-d H:i:s')).'.pdf', $type);
+		$pdf->Output($data['payslip_detail']['employee_number'] . '_' . date('m-Y', strtotime($data['payslip_detail']['month'])) . '_' . strtotime(date('Y-m-d H:i:s')) . '.pdf', $type);
 	}
 
 	/**
@@ -5567,13 +5498,13 @@ class hr_payroll extends AdminController {
 		$data = $this->input->post();
 
 		//delete sub folder STOCK_EXPORT
-		foreach(glob(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . '*') as $file) { 
-			$file_arr = new_explode("/",$file);
+		foreach (glob(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . '*') as $file) {
+			$file_arr = new_explode("/", $file);
 			$filename = array_pop($file_arr);
 
-			if(file_exists($file)) {
+			if (file_exists($file)) {
 				if ($filename != 'index.html') {
-					unlink(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP.$filename);
+					unlink(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . $filename);
 				}
 			}
 		}
@@ -5585,11 +5516,11 @@ class hr_payroll extends AdminController {
 
 		foreach ($payslip_details as $payslip_detail) {
 			$check_payslip_has_pdf_template = check_payslip_has_pdf_template($payslip_detail['payslip_id']);
-			if(is_numeric($check_payslip_has_pdf_template) && is_numeric($check_payslip_has_pdf_template) && $check_payslip_has_pdf_template != 0 ){
+			if (is_numeric($check_payslip_has_pdf_template) && is_numeric($check_payslip_has_pdf_template) && $check_payslip_has_pdf_template != 0) {
 				$has_pdf_template = true;
 			}
 
-			if($has_pdf_template){
+			if ($has_pdf_template) {
 				$payslip = $this->hr_payroll_model->hr_payroll_get_payslip_pdf_only_for_pdf($payslip_detail['id']);
 
 				try {
@@ -5598,7 +5529,7 @@ class hr_payroll extends AdminController {
 					echo $e->getMessage();
 					die;
 				}
-			}else{
+			} else {
 				$data = [];
 				$data['payslip_detail'] = $payslip_detail;
 
@@ -5626,47 +5557,48 @@ class hr_payroll extends AdminController {
 				$data['list_department'] = $list_department;
 
 				$data['payslip'] = $this->hr_payroll_model->get_hrp_payslip($data['payslip_detail']['payslip_id']);
-				if($data['payslip'] && is_null($data['payslip']->to_currency_name)){
+				if ($data['payslip'] && is_null($data['payslip']->to_currency_name)) {
 					$base_currency = get_base_currency();
 					$base_currency_id = 0;
 					if ($base_currency) {
 						$data['payslip']->to_currency_name = $base_currency->name;
 					}
 				}
-		
+				// echo '<pre>';
+				// print_r($data);
+				// die;
 				$html = $this->load->view('hr_payroll/employee_payslip/export_employee_payslip', $data, true);
 				$html .= '<link href="' . module_dir_url(HR_PAYROLL_MODULE_NAME, 'assets/css/export_employee_pdf.css') . '"  rel="stylesheet" type="text/css" />';
 
 
 				try {
 					$pdf = $this->hr_payroll_model->employee_export_pdf($html);
-
 				} catch (Exception $e) {
 					echo new_html_entity_decode($e->getMessage());
 					die;
 				}
 			}
 
-			if(!is_null($payslip_detail['employee_number']) && $payslip_detail['employee_number'] != ''  && $payslip_detail['employee_number'] != 0 ){
+			if (!is_null($payslip_detail['employee_number']) && $payslip_detail['employee_number'] != ''  && $payslip_detail['employee_number'] != 0) {
 				$employee_name = $payslip_detail['employee_number'];
-			}else{
+			} else {
 				$employee_name = slug_it($payslip_detail['employee_name'] ?? '', ['separator' => '_']);
 			}
 
-			$this->re_save_to_dir($pdf, $employee_name .'_'.date('m-Y', strtotime($payslip_detail['month'])) . '.pdf');
+			$this->re_save_to_dir($pdf, $employee_name . '_' . date('m-Y', strtotime($payslip_detail['month'])) . '.pdf');
 		}
 
 		$this->load->library('zip');
 
-        //get list file
-		foreach(glob(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . '*') as $file) { 
-			$file_arr = new_explode("/",$file);
+		//get list file
+		foreach (glob(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . '*') as $file) {
+			$file_arr = new_explode("/", $file);
 			$filename = array_pop($file_arr);
 
-			$this->zip->read_file(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP. $filename);
+			$this->zip->read_file(HR_PAYROLL_EXPORT_EMPLOYEE_PAYSLIP . $filename);
 		}
 
-		$this->zip->download($payslip->payslip_name .'_'. date('m-Y', strtotime($payslip->payslip_month)). '.zip');
+		$this->zip->download($payslip->payslip_name . '_' . date('m-Y', strtotime($payslip->payslip_month)) . '.zip');
 		$this->zip->clear_data();
 	}
 
@@ -5689,7 +5621,8 @@ class hr_payroll extends AdminController {
 	 * manage attendance timesheet leaves
 	 * @return [type] 
 	 */
-	public function manage_attendance_timesheet_leaves($month = '') {
+	public function manage_attendance_timesheet_leaves($month = '')
+	{
 		if (!has_permission('hrp_attendance', '', 'view') && !has_permission('hrp_attendance', '', 'view_own') && !is_admin()) {
 			access_denied('hrp_attendance');
 		}
@@ -5700,10 +5633,10 @@ class hr_payroll extends AdminController {
 		$rel_type = hrp_get_timesheets_status();
 
 		//get current month
-		if(strlen($month) > 0){
+		if (strlen($month) > 0) {
 			$current_month = date('Y-m-d', strtotime($month . '-01'));
 			$data['current_month'] = date('Y-m-d', strtotime($month . '-01'));
-		}else{
+		} else {
 			$current_month = date('Y-m-d', strtotime(date('Y-m') . '-01'));
 			$data['current_month'] = date('Y-m-d', strtotime(date('Y-m') . '-01'));
 		}
@@ -5721,27 +5654,25 @@ class hr_payroll extends AdminController {
 			$dt_cell_bg = [];
 			foreach ($value as $hearder_key => $cell_value) {
 
-				if($hearder_key != 'id' && $hearder_key != 'staff_id' && $hearder_key != 'month' && $hearder_key != 'paid_leave' && $hearder_key != 'unpaid_leave' && $hearder_key != 'rel_type'){
-					if(strlen($cell_value) > 0){
-						if(preg_match('/^PL:/', $cell_value) && strlen($cell_value) < 7){
+				if ($hearder_key != 'id' && $hearder_key != 'staff_id' && $hearder_key != 'month' && $hearder_key != 'paid_leave' && $hearder_key != 'unpaid_leave' && $hearder_key != 'rel_type') {
+					if (strlen($cell_value) > 0) {
+						if (preg_match('/^PL:/', $cell_value) && strlen($cell_value) < 7) {
 							$dt_cell_bg[$hearder_key] = '#0c0';
-
-						}elseif(preg_match('/^UPL:/', $cell_value) && strlen($cell_value) < 7){
+						} elseif (preg_match('/^UPL:/', $cell_value) && strlen($cell_value) < 7) {
 							$dt_cell_bg[$hearder_key] = '#c00';
-
-						}elseif(preg_match('/PL:/', $cell_value) && preg_match('/UPL:/', $cell_value)){
+						} elseif (preg_match('/PL:/', $cell_value) && preg_match('/UPL:/', $cell_value)) {
 							$dt_cell_bg[$hearder_key] = '#FF9800';
-						}else{
+						} else {
 							$dt_cell_bg[$hearder_key] = '#fff';
 						}
-					}else{
+					} else {
 						$dt_cell_bg[$hearder_key] = '#fff';
 					}
-				}elseif($hearder_key == 'paid_leave' && (float)$cell_value > 0){
+				} elseif ($hearder_key == 'paid_leave' && (float)$cell_value > 0) {
 					$dt_cell_bg[$hearder_key] = '#0c0';
-				}elseif($hearder_key == 'unpaid_leave' && (float)$cell_value > 0){
+				} elseif ($hearder_key == 'unpaid_leave' && (float)$cell_value > 0) {
 					$dt_cell_bg[$hearder_key] = '#c00';
-				}else{
+				} else {
 					$dt_cell_bg[$hearder_key] = '#fff';
 				}
 			}
@@ -5789,17 +5720,14 @@ class hr_payroll extends AdminController {
 								$list_department .= $department_value->name;
 							}
 						}
-
 					}
 				}
 
 				$data_object_kpi[$staff_key]['staff_departments'] = $list_department;
-
 			} else {
 				$data_object_kpi[$staff_key]['hr_code'] = '';
 				$data_object_kpi[$staff_key]['staff_name'] = '';
 				$data_object_kpi[$staff_key]['staff_departments'] = '';
-
 			}
 
 			if (isset($attendances_value[$staff_value['staffid'] . '_' . $current_month])) {
@@ -5812,18 +5740,16 @@ class hr_payroll extends AdminController {
 
 				$cell_background_data[] = $cell_background[$staff_value['staffid'] . '_' . $current_month];
 			} else {
-			
+
 				$data_object_kpi[$staff_key]['paid_leave'] = 0;
 				$data_object_kpi[$staff_key]['unpaid_leave'] = 0;
 				$data_object_kpi[$staff_key]['id'] = 0;
 				$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $days_header_in_month['days_header']);
 				$cell_background_data[] = $hrp_timesheet_leave_data_sample;
-
 			}
 			$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 			$data_object_kpi[$staff_key]['month'] = $current_month;
 			$data_object_kpi[$staff_key]['staff_id'] = $staff_value['staffid'];
-
 		}
 
 		//check is add new or update data
@@ -5849,7 +5775,8 @@ class hr_payroll extends AdminController {
 	/**
 	 * add timesheets leave
 	 */
-	public function add_timesheets_leave() {
+	public function add_timesheets_leave()
+	{
 		if (!has_permission('hrp_attendance', '', 'create') && !has_permission('hrp_attendance', '', 'edit') && !is_admin()) {
 			access_denied('hrp_attendance');
 		}
@@ -5869,13 +5796,12 @@ class hr_payroll extends AdminController {
 				if ($success) {
 					set_alert('success', _l('hrp_updated_successfully'));
 				}
-				if(isset($data['attendance_fill_month'])){
-					redirect(admin_url('hr_payroll/manage_attendance_timesheet_leaves/'.$data['attendance_fill_month']));
-				}else{
+				if (isset($data['attendance_fill_month'])) {
+					redirect(admin_url('hr_payroll/manage_attendance_timesheet_leaves/' . $data['attendance_fill_month']));
+				} else {
 					redirect(admin_url('hr_payroll/manage_attendance_timesheet_leaves'));
 				}
 			}
-
 		}
 	}
 
@@ -5883,7 +5809,8 @@ class hr_payroll extends AdminController {
 	 * timesheets leave filter
 	 * @return [type] 
 	 */
-	public function timesheets_leave_filter() {
+	public function timesheets_leave_filter()
+	{
 		$this->load->model('departments_model');
 		$data = $this->input->post();
 
@@ -5964,26 +5891,23 @@ class hr_payroll extends AdminController {
 			$dt_cell_bg = [];
 			foreach ($value as $hearder_key => $cell_value) {
 
-				if($hearder_key != 'id' && $hearder_key != 'staff_id' && $hearder_key != 'month' && $hearder_key != 'paid_leave' && $hearder_key != 'unpaid_leave' && $hearder_key != 'rel_type'){
-					if(strlen($cell_value) > 0){
-						if(preg_match('/^PL:/', $cell_value) && strlen($cell_value) < 7){
+				if ($hearder_key != 'id' && $hearder_key != 'staff_id' && $hearder_key != 'month' && $hearder_key != 'paid_leave' && $hearder_key != 'unpaid_leave' && $hearder_key != 'rel_type') {
+					if (strlen($cell_value) > 0) {
+						if (preg_match('/^PL:/', $cell_value) && strlen($cell_value) < 7) {
 							$dt_cell_bg[$hearder_key] = '#0c0';
-
-						}elseif(preg_match('/^UPL:/', $cell_value) && strlen($cell_value) < 7){
+						} elseif (preg_match('/^UPL:/', $cell_value) && strlen($cell_value) < 7) {
 							$dt_cell_bg[$hearder_key] = '#c00';
-
-						}elseif(preg_match('/PL:/', $cell_value) && preg_match('/UPL:/', $cell_value)){
+						} elseif (preg_match('/PL:/', $cell_value) && preg_match('/UPL:/', $cell_value)) {
 							$dt_cell_bg[$hearder_key] = '#FF9800';
-						}else{
+						} else {
 							$dt_cell_bg[$hearder_key] = '#fff';
 						}
-					}else{
+					} else {
 						$dt_cell_bg[$hearder_key] = '#fff';
 					}
-				}else{
+				} else {
 					$dt_cell_bg[$hearder_key] = '#fff';
 				}
-
 			}
 			$cell_background[$value['staff_id'] . '_' . $value['month']] = $dt_cell_bg;
 			$attendances_value[$value['staff_id'] . '_' . $value['month']] = $value;
@@ -6034,44 +5958,36 @@ class hr_payroll extends AdminController {
 									$list_department .= $department_value->name;
 								}
 							}
-
 						}
 					}
 
 					$data_object_kpi[$staff_key]['staff_departments'] = $list_department;
-
 				} else {
 					$data_object_kpi[$staff_key]['hr_code'] = '';
 					$data_object_kpi[$staff_key]['staff_name'] = '';
 					$data_object_kpi[$staff_key]['staff_departments'] = '';
-
 				}
 
 				if (isset($attendances_value[$staff_value['staffid'] . '_' . $month_filter])) {
 
-					
+
 					$data_object_kpi[$staff_key]['paid_leave'] = $attendances_value[$staff_value['staffid'] . '_' . $month_filter]['paid_leave'];
 					$data_object_kpi[$staff_key]['unpaid_leave'] = $attendances_value[$staff_value['staffid'] . '_' . $month_filter]['unpaid_leave'];
 					$data_object_kpi[$staff_key]['id'] = $attendances_value[$staff_value['staffid'] . '_' . $month_filter]['id'];
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $attendances_value[$staff_value['staffid'] . '_' . $month_filter]);
 					$cell_background_data[] = $cell_background[$staff_value['staffid'] . '_' . $month_filter];
-
-
 				} else {
-					
+
 					$data_object_kpi[$staff_key]['paid_leave'] = 0;
 					$data_object_kpi[$staff_key]['unpaid_leave'] = 0;
 					$data_object_kpi[$staff_key]['id'] = 0;
 					$data_object_kpi[$staff_key] = array_merge($data_object_kpi[$staff_key], $days_header_in_month['days_header']);
 					$cell_background_data[] = $hrp_timesheet_leave_data_sample;
-
 				}
 
 				$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 				$data_object_kpi[$staff_key]['month'] = $month_filter;
-
 			}
-
 		}
 
 		//check is add new or update data
@@ -6115,7 +6031,8 @@ class hr_payroll extends AdminController {
 	 * @param  string $id 
 	 * @return [type]     
 	 */
-	public function payslip_pdf_template($id = '') {
+	public function payslip_pdf_template($id = '')
+	{
 
 		if ($this->input->post()) {
 			$message = '';
@@ -6125,7 +6042,6 @@ class hr_payroll extends AdminController {
 
 			if (isset($data['mce_0'])) {
 				unset($data['mce_0']);
-
 			}
 
 			if ($id == '') {
@@ -6139,7 +6055,7 @@ class hr_payroll extends AdminController {
 					set_alert('warning', $message);
 				}
 
-				redirect(admin_url('hr_payroll/payslip_pdf_template/'.$id));
+				redirect(admin_url('hr_payroll/payslip_pdf_template/' . $id));
 			} else {
 
 				$success = $this->hr_payroll_model->update_pdf_payslip_template($data, $id);
@@ -6147,12 +6063,10 @@ class hr_payroll extends AdminController {
 				if ($success) {
 					$message = _l('updated_successfully', _l('pdf_payslip_template'));
 					set_alert('success', $message);
-
 				}
 
-				redirect(admin_url('hr_payroll/payslip_pdf_template/'.$id));
+				redirect(admin_url('hr_payroll/payslip_pdf_template/' . $id));
 			}
-
 		}
 		$data = [];
 
@@ -6160,7 +6074,6 @@ class hr_payroll extends AdminController {
 			//add
 			$title = _l('add_pdf_payslip_template');
 			$data['title'] = $title;
-
 		} else {
 			//update
 			$title = _l('update_pdf_payslip_template');
@@ -6172,7 +6085,6 @@ class hr_payroll extends AdminController {
 		$data['pdf_payslip_merge_fields'] = $this->app_merge_fields->get_flat('hr_payslip', ['other'], '{email_signature}');
 
 		$this->load->view('includes/pdf_payslip_template_detail', $data);
-
 	}
 
 	/**
@@ -6180,7 +6092,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id
 	 * @return [type]    
 	 */
-	public function delete_payslip_pdf_template_($id) {
+	public function delete_payslip_pdf_template_($id)
+	{
 		if (!$id) {
 			redirect(admin_url('hr_payroll/setting?group=pdf_payslip_template'));
 		}
@@ -6232,8 +6145,9 @@ class hr_payroll extends AdminController {
 	 * @param  string $pdf_payslip_template_id 
 	 * @return [type]                          
 	 */
-	public function get_pdf_payslip_template($id = '', $payslip_template_id = '') {
-		
+	public function get_pdf_payslip_template($id = '', $payslip_template_id = '')
+	{
+
 		$base_currency_id = 0;
 		$payslip_template_data = '';
 		$payslip_name = '';
@@ -6245,17 +6159,17 @@ class hr_payroll extends AdminController {
 		$to_currency_rate = '';
 
 		$base_currency = get_base_currency();
-        $base_currency_id = 0;
-        if ($base_currency) {
-        	$base_currency_id = $base_currency->id;
-        }
+		$base_currency_id = 0;
+		if ($base_currency) {
+			$base_currency_id = $base_currency->id;
+		}
 
 		if (isset($id) && $id != '' && $id != 0) {
 
 			// update
 			$get_hrp_payslip = $this->hr_payroll_model->get_hrp_payslip($id);
 			$pdf_payslip_template_id = '';
-			if($get_hrp_payslip){
+			if ($get_hrp_payslip) {
 				$pdf_payslip_template_id = $get_hrp_payslip->pdf_template_id;
 				$payslip_name = $get_hrp_payslip->payslip_name;
 				$from_currency_id = $get_hrp_payslip->from_currency_id;
@@ -6264,11 +6178,9 @@ class hr_payroll extends AdminController {
 				$to_currency_id = $get_hrp_payslip->to_currency_id;
 				$to_currency_name = $get_hrp_payslip->to_currency_name;
 				$to_currency_rate = $get_hrp_payslip->to_currency_rate;
-
 			}
 
 			$pdf_payslip_template_selected = $this->hr_payroll_model->get_pdf_payslip_template_selected_html($payslip_template_id, $pdf_payslip_template_id);
-
 		} else {
 			// create
 			$pdf_payslip_template_selected = $this->hr_payroll_model->get_pdf_payslip_template_selected_html($payslip_template_id, '');
@@ -6292,7 +6204,8 @@ class hr_payroll extends AdminController {
 	 * edit payslip
 	 * @return [type] 
 	 */
-	public function edit_payslip() {
+	public function edit_payslip()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (isset($data['id'])) {
@@ -6304,7 +6217,7 @@ class hr_payroll extends AdminController {
 
 				$payslip = $this->hr_payroll_model->get_hrp_payslip($data['id']);
 				$old_currency_id = $payslip->to_currency_id;
-				if($old_currency_id != $data['to_currency_id']){
+				if ($old_currency_id != $data['to_currency_id']) {
 					$get_currency_rate = $this->hr_payroll_model->get_currency_rate_infor($data['to_currency_id']);
 					$update_data['from_currency_name'] = $get_currency_rate['base_currency_name'];
 					$update_data['from_currency_rate'] = $get_currency_rate['base_currency_rate'];
@@ -6318,13 +6231,12 @@ class hr_payroll extends AdminController {
 				$update_data['pdf_template_id'] = $data['pdf_template_id'];
 
 				$this->db->where('id', $data['id']);
-				$this->db->update(db_prefix().'hrp_payslips', $update_data);
-				if($this->db->affected_rows() > 0){
+				$this->db->update(db_prefix() . 'hrp_payslips', $update_data);
+				if ($this->db->affected_rows() > 0) {
 					$message = _l('added_successfully', _l('hrp_payslip'));
 					set_alert('success', $message);
 				}
 				redirect(admin_url('hr_payroll/payslip_manage'));
-
 			}
 		}
 	}
@@ -6334,7 +6246,8 @@ class hr_payroll extends AdminController {
 	 * @param  [type] $id 
 	 * @return [type]     
 	 */
-	public function new_employee_export_pdf($id) {
+	public function new_employee_export_pdf($id)
+	{
 
 		if (!$id) {
 			show_404();
@@ -6361,140 +6274,320 @@ class hr_payroll extends AdminController {
 	}
 
 	/**
-     * currency rate table
-     * @return [type] 
-     */
-    public function currency_rate_table(){
-        $this->app->get_table_data(module_views_path('hr_payroll', 'includes/currencies/currency_rate_table'));
-    }
+	 * currency rate table
+	 * @return [type] 
+	 */
+	public function currency_rate_table()
+	{
+		$this->app->get_table_data(module_views_path('hr_payroll', 'includes/currencies/currency_rate_table'));
+	}
 
-    /**
-     * update automatic conversion
-     */
-    public function update_setting_currency_rate(){
-        $data = $this->input->post();
-        $success = $this->hr_payroll_model->update_setting_currency_rate($data);
-        if($success == true){
-            $message = _l('updated_successfully', _l('setting'));
-            set_alert('success', $message);
-        }
-        redirect(admin_url('hr_payroll/setting?group=currency_rates'));
-    }
+	/**
+	 * update automatic conversion
+	 */
+	public function update_setting_currency_rate()
+	{
+		$data = $this->input->post();
+		$success = $this->hr_payroll_model->update_setting_currency_rate($data);
+		if ($success == true) {
+			$message = _l('updated_successfully', _l('setting'));
+			set_alert('success', $message);
+		}
+		redirect(admin_url('hr_payroll/setting?group=currency_rates'));
+	}
 
-    /**
-     * Gets all currency rate online.
-     */
-    public function get_all_currency_rate_online()
-    {
-        $result = $this->hr_payroll_model->get_all_currency_rate_online();
-        if($result){
-            set_alert('success', _l('updated_successfully', _l('hrp_currency_rates')));
-        }
-        else{
-            set_alert('warning', _l('no_data_changes', _l('hrp_currency_rates')));                  
-        }
+	/**
+	 * Gets all currency rate online.
+	 */
+	public function get_all_currency_rate_online()
+	{
+		$result = $this->hr_payroll_model->get_all_currency_rate_online();
+		if ($result) {
+			set_alert('success', _l('updated_successfully', _l('hrp_currency_rates')));
+		} else {
+			set_alert('warning', _l('no_data_changes', _l('hrp_currency_rates')));
+		}
 
-        redirect(admin_url('hr_payroll/setting?group=currency_rates'));
-    }
+		redirect(admin_url('hr_payroll/setting?group=currency_rates'));
+	}
 
-    /**
-     * update currency rate
-     * @return [type] 
-     */
-    public function update_currency_rate($id)
-    {
-        if($this->input->post()){
-            $data = $this->input->post();
+	/**
+	 * update currency rate
+	 * @return [type] 
+	 */
+	public function update_currency_rate($id)
+	{
+		if ($this->input->post()) {
+			$data = $this->input->post();
 
-            $result =  $this->hr_payroll_model->update_currency_rate($data, $id);
-            if($result){
-                set_alert('success', _l('updated_successfully', _l('hrp_currency_rates')));
-            }
-            else{
-                set_alert('warning', _l('no_data_changes', _l('hrp_currency_rates')));                  
-            }
-        }
+			$result =  $this->hr_payroll_model->update_currency_rate($data, $id);
+			if ($result) {
+				set_alert('success', _l('updated_successfully', _l('hrp_currency_rates')));
+			} else {
+				set_alert('warning', _l('no_data_changes', _l('hrp_currency_rates')));
+			}
+		}
 
-        redirect(admin_url('hr_payroll/setting?group=currency_rates'));
-    }
+		redirect(admin_url('hr_payroll/setting?group=currency_rates'));
+	}
 
-    /**
-     * Gets the currency rate online.
-     *
-     * @param        $id     The identifier
-     */
-    public function get_currency_rate_online($id)
-    {
-            $result =  $this->hr_payroll_model->get_currency_rate_online($id);
-            echo json_encode(['value' => $result]);
-            die;
-    }
-
-
-    /**
-     * delete currency
-     * @param  [type] $id 
-     * @return [type]     
-     */
-    public function delete_currency_rate($id){
-        if($id != ''){
-            $result =  $this->hr_payroll_model->delete_currency_rate($id);
-            if($result){
-                set_alert('success', _l('deleted_successfully', _l('hrp_currency_rates')));
-            }
-            else{
-                set_alert('danger', _l('deleted_failure', _l('hrp_currency_rates')));                   
-            }
-        }
-        redirect(admin_url('hr_payroll/setting?group=currency_rates'));
-    }
-
-    /**
-     * currency rate modal
-     * @return [type] 
-     */
-    public function currency_rate_modal()
-    {
-        if (!$this->input->is_ajax_request()) {
-            show_404();
-        }
-
-        $id=$this->input->post('id');
-
-        $data=[];
-        $data['currency_rate'] = $this->hr_payroll_model->get_currency_rate($id);
-
-        $this->load->view('includes/currencies/currency_rate_modal', $data);
-    }
-
-    /**
-     * currency rate table
-     * @return [type] 
-     */
-    public function currency_rate_logs_table(){
-        $this->app->get_table_data(module_views_path('hr_payroll', 'includes/currencies/currency_rate_logs_table'));
-    }
-
-    /**
-     * get currency rate
-     * @param  [type] $currency_id 
-     * @return [type]              
-     */
-	public function get_currency_rate($currency_id){
-        $get_currency_rate = $this->hr_payroll_model->get_currency_rate_infor($currency_id);
-
-        $currency_rate = $get_currency_rate['currency_rate'];
-        $convert_str = $get_currency_rate['convert_str'];
-        $currency_name = $get_currency_rate['currency_name'];
-
-        echo json_encode([
-            'currency_rate' => hrp_app_format_number($currency_rate),
-            'convert_str' => $convert_str,
-            'currency_name' => $currency_name,
-        ]);
-
-    }
+	/**
+	 * Gets the currency rate online.
+	 *
+	 * @param        $id     The identifier
+	 */
+	public function get_currency_rate_online($id)
+	{
+		$result =  $this->hr_payroll_model->get_currency_rate_online($id);
+		echo json_encode(['value' => $result]);
+		die;
+	}
 
 
-//End file
+	/**
+	 * delete currency
+	 * @param  [type] $id 
+	 * @return [type]     
+	 */
+	public function delete_currency_rate($id)
+	{
+		if ($id != '') {
+			$result =  $this->hr_payroll_model->delete_currency_rate($id);
+			if ($result) {
+				set_alert('success', _l('deleted_successfully', _l('hrp_currency_rates')));
+			} else {
+				set_alert('danger', _l('deleted_failure', _l('hrp_currency_rates')));
+			}
+		}
+		redirect(admin_url('hr_payroll/setting?group=currency_rates'));
+	}
+
+	/**
+	 * currency rate modal
+	 * @return [type] 
+	 */
+	public function currency_rate_modal()
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+		}
+
+		$id = $this->input->post('id');
+
+		$data = [];
+		$data['currency_rate'] = $this->hr_payroll_model->get_currency_rate($id);
+
+		$this->load->view('includes/currencies/currency_rate_modal', $data);
+	}
+
+	/**
+	 * currency rate table
+	 * @return [type] 
+	 */
+	public function currency_rate_logs_table()
+	{
+		$this->app->get_table_data(module_views_path('hr_payroll', 'includes/currencies/currency_rate_logs_table'));
+	}
+
+	/**
+	 * get currency rate
+	 * @param  [type] $currency_id 
+	 * @return [type]              
+	 */
+	public function get_currency_rate($currency_id)
+	{
+		$get_currency_rate = $this->hr_payroll_model->get_currency_rate_infor($currency_id);
+
+		$currency_rate = $get_currency_rate['currency_rate'];
+		$convert_str = $get_currency_rate['convert_str'];
+		$currency_name = $get_currency_rate['currency_name'];
+
+		echo json_encode([
+			'currency_rate' => hrp_app_format_number($currency_rate),
+			'convert_str' => $convert_str,
+			'currency_name' => $currency_name,
+		]);
+	}
+
+	/**
+	 * general public report
+	 * @return json
+	 */
+	public function general_public_report($month,$staff_id)
+	{	
+		
+
+		if ($month != '') 
+		{
+			$from_date = date('Y-m-01', strtotime($month));
+			$to_date = date('Y-m-t', strtotime($month));
+			// $from_date = $this->timesheets_model->format_date($this->input->post('report_from'));
+			// $to_date = $this->timesheets_model->format_date($this->input->post('report_to'));
+		}
+		
+		$select = [
+			'staffid',
+			'firstname',
+			'lastname',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+			'staffid',
+		];
+		$query = '';
+
+		if (isset($staff_id)) {
+			$staffid_list =  $staff_id;
+			$query .= ' staffid in (' . $staffid_list . ') and';
+		}
+
+		
+		$query .= ' active = 1 and';
+		$total_query = '';
+		if (($query) && ($query != '')) {
+			$total_query = rtrim($query, ' and');
+			$total_query = ' where ' . $total_query;
+		}
+		$where = [$total_query];
+		$aColumns = $select;
+		$sIndexColumn = 'staffid';
+		$sTable = db_prefix() . 'staff';
+		$join = [];
+		$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
+			'staffid',
+			'firstname',
+			'lastname',
+			'email',
+		]);
+
+		// $output = $result['output'];
+		$rResult = $result['rResult'];
+		$data_timesheet = [];
+		
+		$this->load->model('timesheets/timesheets_model');
+		
+		$data_timesheet = $this->timesheets_model->get_attendance_manual($rResult, '', '', $from_date, $to_date);
+		
+		$index_hr_code = _l('staff_id');
+		
+		if ($data_timesheet) {
+			foreach ($rResult as $aRow) {
+				$row = [];
+				$row[] = $aRow['staffid'];
+				$row[] = $aRow['firstname'];
+				$row[] = $aRow['lastname'];
+				$total = 0;
+				$total2 = 0;
+				$total3 = 0;
+				$total7 = 0;
+				$total8 = 0;
+				$total9 = 0;
+				$total10 = 0;
+				$total11 = 0;
+				$total12 = 0;
+				$total13 = 0;
+				$total14 = 0;
+				$data_row_attendance = [];
+				$data_working_hour = [];
+				$index = 0;
+				$total_shift = 0;
+				foreach ($data_timesheet['staff_row_tk'] as $attendance_row) {
+					if ($attendance_row[$index_hr_code] == $aRow['staffid']) {
+
+						foreach ($data_timesheet['staff_row_tk_detailt'][$index] as $date => $list_attendance) {
+							$shift_hour = $this->timesheets_model->get_hour_shift_staff($aRow['staffid'], $date);
+							if ($shift_hour > 0) {
+								$total_shift++;
+							}
+							if (($list_attendance != '') && ($shift_hour > 0)) {
+								$list_tks = explode(';', $list_attendance);
+								foreach ($list_tks as $key_tk => $tk) {
+									$split_val = explode(':', trim($tk));
+									if (strtolower($split_val[0]) == 'w') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total += $cal;
+											$data_working_hour[] = $this->timesheets_model->calculate_working_hour($split_val[1]);
+										}
+									}
+									if (strtolower($split_val[0]) == 'al') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total2 += $cal;
+										}
+									}
+
+									if (strtolower($split_val[0]) == 'p') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total3 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'b') {
+										$total7 += 1;
+									}
+									if (strtolower($split_val[0]) == 'si') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total8 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'm') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total9 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'u') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total10 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'ho') {
+										$total11 += 1;
+									}
+									if (strtolower($split_val[0]) == 'e') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total12 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'l') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total13 += $cal;
+										}
+									}
+									if (strtolower($split_val[0]) == 'me') {
+										if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+											$cal = $split_val[1] / $shift_hour;
+											$total14 += $cal;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					$index++;
+				}
+
+				$row[] = $total_shift;
+				$row[] = ($total > 0) ? (float) number_format($total, 2) : 0;
+				
+				$output[] = $row;
+			}
+		}
+		return $row;
+		die();
+	}
+	//End file
 }
