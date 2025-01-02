@@ -139,7 +139,8 @@ class fixed_equipment extends AdminController
 				}
 
 				$has_delete_pemit = false;
-				if (is_admin() || 
+				if (
+					is_admin() ||
 					has_permission('fixed_equipment_setting_depreciation', '', 'delete') ||
 					has_permission('fixed_equipment_assets', '', 'delete') ||
 					has_permission('fixed_equipment_licenses', '', 'delete') ||
@@ -500,14 +501,15 @@ class fixed_equipment extends AdminController
 					$has_edit_pemit = true;
 				}
 				$has_delete_pemit = false;
-				if (is_admin() ||
-				 has_permission('fixed_equipment_setting_supplier', '', 'delete') ||
-				 has_permission('fixed_equipment_setting_supplier', '', 'delete') ||
-				 has_permission('fixed_equipment_assets', '', 'delete') ||
-				 has_permission('fixed_equipment_licenses', '', 'delete') ||
-				 has_permission('fixed_equipment_accessories', '', 'delete') ||
-				 has_permission('fixed_equipment_consumables', '', 'delete')
-				 ) {
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_supplier', '', 'delete') ||
+					has_permission('fixed_equipment_setting_supplier', '', 'delete') ||
+					has_permission('fixed_equipment_assets', '', 'delete') ||
+					has_permission('fixed_equipment_licenses', '', 'delete') ||
+					has_permission('fixed_equipment_accessories', '', 'delete') ||
+					has_permission('fixed_equipment_consumables', '', 'delete')
+				) {
 					$has_delete_pemit = true;
 				}
 
@@ -692,13 +694,14 @@ class fixed_equipment extends AdminController
 					$has_edit_pemit = true;
 				}
 				$has_delete_pemit = false;
-				if (is_admin() ||
-				 has_permission('fixed_equipment_setting_manufacturer', '', 'delete') ||
-				 has_permission('fixed_equipment_assets', '', 'delete') ||
-				 has_permission('fixed_equipment_licenses', '', 'delete') ||
-				 has_permission('fixed_equipment_accessories', '', 'delete') ||
-				 has_permission('fixed_equipment_consumables', '', 'delete')
-				 ) {
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_manufacturer', '', 'delete') ||
+					has_permission('fixed_equipment_assets', '', 'delete') ||
+					has_permission('fixed_equipment_licenses', '', 'delete') ||
+					has_permission('fixed_equipment_accessories', '', 'delete') ||
+					has_permission('fixed_equipment_consumables', '', 'delete')
+				) {
 					$has_delete_pemit = true;
 				}
 
@@ -851,12 +854,13 @@ class fixed_equipment extends AdminController
 				}
 
 				$has_delete_pemit = false;
-				if (is_admin() || 
-				has_permission('fixed_equipment_setting_category', '', 'delete') ||
-				has_permission('fixed_equipment_assets', '', 'delete') ||
-				has_permission('fixed_equipment_licenses', '', 'delete') ||
-				has_permission('fixed_equipment_accessories', '', 'delete') ||
-				has_permission('fixed_equipment_consumables', '', 'delete')
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_category', '', 'delete') ||
+					has_permission('fixed_equipment_assets', '', 'delete') ||
+					has_permission('fixed_equipment_licenses', '', 'delete') ||
+					has_permission('fixed_equipment_accessories', '', 'delete') ||
+					has_permission('fixed_equipment_consumables', '', 'delete')
 				) {
 					$has_delete_pemit = true;
 				}
@@ -1024,22 +1028,26 @@ class fixed_equipment extends AdminController
 				}
 
 				$has_edit_permission = false;
-				if (is_admin() ||
-				has_permission('fixed_equipment_setting_model', '', 'edit') ||
-				has_permission('fixed_equipment_assets', '', 'edit') ||
-				has_permission('fixed_equipment_licenses', '', 'edit') ||
-				has_permission('fixed_equipment_accessories', '', 'edit') ||
-				has_permission('fixed_equipment_consumables', '', 'edit')) {
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_model', '', 'edit') ||
+					has_permission('fixed_equipment_assets', '', 'edit') ||
+					has_permission('fixed_equipment_licenses', '', 'edit') ||
+					has_permission('fixed_equipment_accessories', '', 'edit') ||
+					has_permission('fixed_equipment_consumables', '', 'edit')
+				) {
 					$has_edit_permission = true;
 				}
 
 				$has_delete_permission = false;
-				if (is_admin() ||
-				has_permission('fixed_equipment_setting_model', '', 'delete') ||
-				has_permission('fixed_equipment_assets', '', 'delete') ||
-				has_permission('fixed_equipment_licenses', '', 'delete') ||
-				has_permission('fixed_equipment_accessories', '', 'delete') ||
-				has_permission('fixed_equipment_consumables', '', 'delete')) {
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_model', '', 'delete') ||
+					has_permission('fixed_equipment_assets', '', 'delete') ||
+					has_permission('fixed_equipment_licenses', '', 'delete') ||
+					has_permission('fixed_equipment_accessories', '', 'delete') ||
+					has_permission('fixed_equipment_consumables', '', 'delete')
+				) {
 					$has_delete_permission = true;
 				}
 
@@ -1144,7 +1152,9 @@ class fixed_equipment extends AdminController
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if ($data['id'] == '') {
+				$assets_check = $data['assets'];
 				unset($data['id']);
+				unset($data['assets']);
 				$insert_id =  $this->fixed_equipment_model->add_models($data);
 				if (is_numeric($insert_id)) {
 					fe_handle_item_file($insert_id, 'models');
@@ -1162,7 +1172,12 @@ class fixed_equipment extends AdminController
 				fe_handle_item_file($data['id'], 'models');
 			}
 		}
-		redirect(admin_url('fixed_equipment/settings?tab=models'));
+		if($assets_check == 1){
+			redirect(admin_url('fixed_equipment/assets'));
+		}else{
+			redirect(admin_url('fixed_equipment/settings?tab=models'));
+		}
+		
 	}
 	/**
 	 * delete models
@@ -1255,12 +1270,13 @@ class fixed_equipment extends AdminController
 				}
 
 				$has_delete_pemit = false;
-				if (is_admin() || 
-				has_permission('fixed_equipment_setting_status_label', '', 'delete') ||
-				has_permission('fixed_equipment_assets', '', 'delete') ||
-				has_permission('fixed_equipment_licenses', '', 'delete') ||
-				has_permission('fixed_equipment_accessories', '', 'delete') ||
-				has_permission('fixed_equipment_consumables', '', 'delete')
+				if (
+					is_admin() ||
+					has_permission('fixed_equipment_setting_status_label', '', 'delete') ||
+					has_permission('fixed_equipment_assets', '', 'delete') ||
+					has_permission('fixed_equipment_licenses', '', 'delete') ||
+					has_permission('fixed_equipment_accessories', '', 'delete') ||
+					has_permission('fixed_equipment_consumables', '', 'delete')
 				) {
 					$has_delete_pemit = true;
 				}
@@ -1650,7 +1666,7 @@ class fixed_equipment extends AdminController
 			$data['currency_name'] = $base_currency->name;
 		}
 
-        $data['projects'] = $this->fixed_equipment_model->get_projects();
+		$data['projects'] = $this->fixed_equipment_model->get_projects();
 		$data['models'] = $this->fixed_equipment_model->get_models();
 		$data['suppliers'] = $this->fixed_equipment_model->get_suppliers();
 		$data['status_labels'] = $this->fixed_equipment_model->get_status_labels();
@@ -1659,6 +1675,14 @@ class fixed_equipment extends AdminController
 		$data['assets'] = $this->fixed_equipment_model->get_assets('', 'asset');
 		$data['staffs'] = $this->staff_model->get();
 		$data['customers'] = $this->clients_model->get();
+
+		$data['manufacturers'] = $this->fixed_equipment_model->get_asset_manufacturers();
+		$data['categories'] = $this->fixed_equipment_model->get_categories('', 'asset');
+		$data['depreciations'] = $this->fixed_equipment_model->get_depreciations();
+		$data['custom_field_lists'] = get_custom_fields('fixed_equipment');
+		$data['field_sets'] = $this->fixed_equipment_model->get_field_set();
+		// $data['models'] = $this->fixed_equipment_model->get_models('');
+		
 		$this->load->view('asset_management', $data);
 	}
 
@@ -1902,8 +1926,7 @@ class fixed_equipment extends AdminController
 							$icon_checkout_to = '<i class="fa fa-barcode"></i>';
 							$checkout_to = '<a href="' . admin_url('fixed_equipment/detail_asset/' . $data_location_info->to_id . '?tab=details') . '" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_asset') . ': ' . $data_location_info->checkout_to . '</a>';
 							$current_location = '';
-						}
-						elseif ($data_location_info->checkout_type == 'project') {							
+						} elseif ($data_location_info->checkout_type == 'project') {
 							$icon_checkout_to = '<i class="fa-solid fa-chart-gantt"></i>';
 							$checkout_to = '<a href="' . admin_url('projects/view/' . $data_location_info->to_id) . '" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_project') . ': ' . $data_location_info->checkout_to . '</a>';
 							$current_location = '';
@@ -2406,9 +2429,9 @@ class fixed_equipment extends AdminController
 					$row[] = $avail;
 
 					$inventory_data = $this->fixed_equipment_model->get_warehouse_info_item($aRow['id']);
-					if(count($inventory_data['warehouse']) > 0 ){
+					if (count($inventory_data['warehouse']) > 0) {
 						foreach ($inventory_data['warehouse'] as $value) {
-						    $inventory_qty += (float)$value['quantity'];
+							$inventory_qty += (float)$value['quantity'];
 						}
 					}
 					$row[] = $inventory_qty;
@@ -3361,7 +3384,7 @@ class fixed_equipment extends AdminController
 					'date_buy',
 					'unit_price'
 				];
-		
+
 				$where        = [];
 				$aColumns     = $select;
 				$sIndexColumn = 'id';
@@ -3552,7 +3575,7 @@ class fixed_equipment extends AdminController
 		}
 		$this->load->model('staff_model');
 		$data['title']  = _l('fe_predefined_kits_management');
-        $data['projects'] = $this->fixed_equipment_model->get_projects();
+		$data['projects'] = $this->fixed_equipment_model->get_projects();
 		$data['staffs'] = $this->staff_model->get();
 		$data['assets'] = $this->fixed_equipment_model->get_assets();
 		$data['categories'] = $this->fixed_equipment_model->get_categories('', 'component');
@@ -5704,7 +5727,8 @@ class fixed_equipment extends AdminController
 					$has_edit_pemit = true;
 				}
 				$has_delete_pemit = false;
-				if (is_admin() || 
+				if (
+					is_admin() ||
 					has_permission('fixed_equipment_setting_custom_field', '', 'delete') ||
 					has_permission('fixed_equipment_assets', '', 'delete') ||
 					has_permission('fixed_equipment_licenses', '', 'delete') ||
@@ -6194,7 +6218,7 @@ class fixed_equipment extends AdminController
 				if ($check_proccess) {
 					if ($check_proccess->choose_when_approving == 0) {
 						$this->fixed_equipment_model->send_request_approve($insert_id, $rel_type, $staff_id);
-						$process = 'not_choose';						
+						$process = 'not_choose';
 						set_alert('success', _l('fe_successful_submission_of_approval_request'));
 					} else {
 						$process = 'choose';
@@ -7557,7 +7581,7 @@ class fixed_equipment extends AdminController
 				}
 				if ($id != '') {
 					$child_location_data = $this->fixed_equipment_model->get_child_location_id($id);
-					$child_location_id = ((count($child_location_data) > 0) ? implode(',',$child_location_data) : 0);
+					$child_location_id = ((count($child_location_data) > 0) ? implode(',', $child_location_data) : 0);
 					array_push($where, 'AND ((' . db_prefix() . 'fe_assets.asset_location = ' . $id . ' AND ' . db_prefix() . 'fe_assets.checkin_out = 1) OR (' . db_prefix() . 'fe_assets.location_id = ' . $id . ' AND ' . db_prefix() . 'fe_assets.checkin_out = 2) OR (' . db_prefix() . 'fe_assets.location_id IN (' . $child_location_id . ')))');
 					// array_push($where, 'AND ((' . db_prefix() . 'fe_assets.asset_location = ' . $id . ' AND ' . db_prefix() . 'fe_assets.checkin_out = 1) OR (' . db_prefix() . 'fe_assets.location_id = ' . $id . ' AND ' . db_prefix() . 'fe_assets.checkin_out = 2))');
 				}
@@ -8953,10 +8977,11 @@ class fixed_equipment extends AdminController
 				$sIndexColumn = 'id';
 				$sTable       = db_prefix() . 'fe_checkin_assets';
 				$join         = [
-				'LEFT JOIN ' . db_prefix() . 'fe_assets ON ' . db_prefix() . 'fe_assets.id = ' . db_prefix() . 'fe_checkin_assets.item_id', 
-				'left join ' . db_prefix() . 'staff on ' . db_prefix() . 'staff.staffid = ' . db_prefix() . 'fe_checkin_assets.staff_id', 
-				'left join ' . db_prefix() . 'fe_locations on ' . db_prefix() . 'fe_locations.id = ' . db_prefix() . 'fe_checkin_assets.location_id', 
-				'LEFT JOIN ' . db_prefix() . 'fe_sign_documents ON FIND_IN_SET(' . db_prefix() . 'fe_checkin_assets.id, ' . db_prefix() . 'fe_sign_documents.checkin_out_id)'];
+					'LEFT JOIN ' . db_prefix() . 'fe_assets ON ' . db_prefix() . 'fe_assets.id = ' . db_prefix() . 'fe_checkin_assets.item_id',
+					'left join ' . db_prefix() . 'staff on ' . db_prefix() . 'staff.staffid = ' . db_prefix() . 'fe_checkin_assets.staff_id',
+					'left join ' . db_prefix() . 'fe_locations on ' . db_prefix() . 'fe_locations.id = ' . db_prefix() . 'fe_checkin_assets.location_id',
+					'LEFT JOIN ' . db_prefix() . 'fe_sign_documents ON FIND_IN_SET(' . db_prefix() . 'fe_checkin_assets.id, ' . db_prefix() . 'fe_sign_documents.checkin_out_id)'
+				];
 
 				$location_id = $this->input->post('location_id');
 				if ($location_id != '') {
@@ -9644,10 +9669,10 @@ class fixed_equipment extends AdminController
 					$unit_name = '';
 					$tax_name_array = [];
 					$tax_rate_array = [];
-					if($receipt_detail['tax_name'] != '' && $receipt_detail['tax_name'] != null){
+					if ($receipt_detail['tax_name'] != '' && $receipt_detail['tax_name'] != null) {
 						$tax_name_array = explode('|', $receipt_detail['tax_name']);
 					}
-					if($receipt_detail['tax_rate'] != '' && $receipt_detail['tax_rate'] != null){
+					if ($receipt_detail['tax_rate'] != '' && $receipt_detail['tax_rate'] != null) {
 						$tax_rate_array = explode('|', $receipt_detail['tax_rate']);
 					}
 					$tax_array = [];
@@ -9711,7 +9736,7 @@ class fixed_equipment extends AdminController
 			$data['send_notify'] = $send_notify;
 			$this->session->unset_userdata("send_notify");
 		}
-		
+
 		$data['title']                 = _l('fe_fixed_equipment');
 		$data['tab'] = $this->input->get('tab');
 		$id = $this->input->get('id');
@@ -9878,13 +9903,13 @@ class fixed_equipment extends AdminController
 		$item_key = $this->input->post('item_key');
 		$arr_serial_number = explode(',', $serial_number);
 		$goods_receipt_row_template = '';
-		
-		if(!is_null($serial_number) && $serial_number != ''){
+
+		if (!is_null($serial_number) && $serial_number != '') {
 			foreach ($arr_serial_number as $key => $serial_number) {
 				$quantities = 1;
 				$goods_receipt_row_template .= $this->fixed_equipment_model->create_goods_receipt_row_template(
 					[],
-					'newitems['.$item_key.']',
+					'newitems[' . $item_key . ']',
 					$commodity_name,
 					$warehouse_id,
 					$quantities,
@@ -9899,7 +9924,7 @@ class fixed_equipment extends AdminController
 				);
 				$item_key++;
 			}
-		}else{
+		} else {
 			$goods_receipt_row_template .= $this->fixed_equipment_model->create_goods_receipt_row_template(
 				[],
 				$name,
@@ -9917,7 +9942,6 @@ class fixed_equipment extends AdminController
 			);
 		}
 		echo $goods_receipt_row_template;
-
 	}
 
 
@@ -10805,8 +10829,8 @@ class fixed_equipment extends AdminController
 				$data['suppliers'] = $this->fixed_equipment_model->get_suppliers();
 				$data['assets'] = $this->fixed_equipment_model->get_assets('', 'asset', false, false, '', true);
 				$data['goods_delivery_exist'] = $goods_delivery_exist;
-				$data['issue_open'] = $this->fixed_equipment_model->get_issue(false, 'cart_id = '.$id.' AND status != "closed"');
-				$data['order_issues_closed'] = $this->fixed_equipment_model->get_issue(false, 'cart_id = '.$id);
+				$data['issue_open'] = $this->fixed_equipment_model->get_issue(false, 'cart_id = ' . $id . ' AND status != "closed"');
+				$data['order_issues_closed'] = $this->fixed_equipment_model->get_issue(false, 'cart_id = ' . $id);
 				$this->load->view('orders/cart_detailt', $data);
 			} else {
 				access_denied('order');
@@ -10927,7 +10951,7 @@ class fixed_equipment extends AdminController
 					$message = _l('added_fail');
 					set_alert('danger', $message);
 				}
-				redirect(admin_url('fixed_equipment/view_order_detailt/'.$res));
+				redirect(admin_url('fixed_equipment/view_order_detailt/' . $res));
 			} else {
 
 				if (!has_permission('fixed_equipment_order_list', '', 'edit') && !is_admin()) {
@@ -10942,7 +10966,7 @@ class fixed_equipment extends AdminController
 					$message = _l('update_fail');
 					set_alert('danger', $message);
 				}
-				redirect(admin_url('fixed_equipment/view_order_detailt/'.$order_id));
+				redirect(admin_url('fixed_equipment/view_order_detailt/' . $order_id));
 			}
 		}
 		$data['payment_modes'] = $this->payment_modes_model->get('', [
@@ -11903,7 +11927,8 @@ class fixed_equipment extends AdminController
 	/**	
 	 * send notify
 	 */
-	public function send_notify(){
+	public function send_notify()
+	{
 		$data = $this->input->post();
 		$this->fixed_equipment_model->send_notify_new_object($data);
 		echo true;
@@ -11975,15 +12000,15 @@ class fixed_equipment extends AdminController
 						$_data .= '<a href="' . admin_url('fixed_equipment/delete_assign_predefined_kits/' . $parent_id . '/' . $aRow['id'] . '') . '" class="text-danger _delete">' . _l('fe_delete') . '</a>';
 					}
 					$_data .= '</div>';
-					
+
 					$row[] = $aRow['name'] . $_data;
 
 					$assign_data = '';
-					if($aRow['assign_data'] != ''){
+					if ($aRow['assign_data'] != '') {
 						$assign_json = json_decode($aRow['assign_data']);
-						if(is_object($assign_json) && $assign_json = (array)$assign_json){
-							foreach($assign_json as $assign){
-								foreach($assign as $asset_id){
+						if (is_object($assign_json) && $assign_json = (array)$assign_json) {
+							foreach ($assign_json as $assign) {
+								foreach ($assign as $asset_id) {
 									$assign_data .= '<a class="mleft10 label label-primary" target="_blank" href="' . admin_url('fixed_equipment/detail_asset/' . $asset_id . '?tab=details') . '">' . fe_item_name($asset_id, true) . '</a>';
 								}
 							}
@@ -12001,21 +12026,21 @@ class fixed_equipment extends AdminController
 		}
 	}
 
-	public function assign_asset_predefined_kits(){
+	public function assign_asset_predefined_kits()
+	{
 		if (!has_permission('estimates', '', 'create')) {
 			access_denied('estimates');
 		}
-		if($this->input->post()){
+		if ($this->input->post()) {
 			$data = $this->input->post();
-			if($data['id'] == ''){
+			if ($data['id'] == '') {
 				$insert_id = $this->fixed_equipment_model->add_assign_asset_predefined_kits($data);
 				if (is_numeric($insert_id)) {
 					set_alert('success', _l('added_successfully'));
 				} else {
 					set_alert('success', _l('added_failed'));
 				}
-			}
-			else{
+			} else {
 				$result = $this->fixed_equipment_model->update_assign_asset_predefined_kits($data);
 				if ($result) {
 					set_alert('success', _l('fe_updated_successfully'));
@@ -12048,11 +12073,12 @@ class fixed_equipment extends AdminController
 	/**	
 	 * get modal content assign asset
 	 */
-	public function get_modal_content_assign_asset($parent_id, $id = ''){
+	public function get_modal_content_assign_asset($parent_id, $id = '')
+	{
 		$assign_data = '';
-		if(is_numeric($id) && $id > 0){
+		if (is_numeric($id) && $id > 0) {
 			$data_assign = $this->fixed_equipment_model->get_assign_asset_predefined_kits($id);
-			if($data_assign){
+			if ($data_assign) {
 				$assign_data = $data_assign->assign_data;
 			}
 		}
@@ -12066,8 +12092,9 @@ class fixed_equipment extends AdminController
 	/**	
 	 * get available kit
 	 */
-	public function get_available_kit($id){
-		$data_available_kit = $this->fixed_equipment_model->get_assign_asset_predefined_kits('', 'parent_id = '.$id);
+	public function get_available_kit($id)
+	{
+		$data_available_kit = $this->fixed_equipment_model->get_assign_asset_predefined_kits('', 'parent_id = ' . $id);
 
 		$html = render_select('available_kit', $data_available_kit, array('id', 'name'), 'fe_please_select_a_kit', '', ['onchange' => 'get_warning_available_kit(this)']);
 
@@ -12080,34 +12107,36 @@ class fixed_equipment extends AdminController
 	/**	
 	 * get warning available kit
 	 */
-	public function get_warning_available_kit($id, $kit_id = ''){
+	public function get_warning_available_kit($id, $kit_id = '')
+	{
 		$error = false;
 		$html = '';
 		$_model_lists = $this->fixed_equipment_model->get_model_predefined_kits($id);
-		if ($_model_lists) { 
+		if ($_model_lists) {
 			foreach ($_model_lists as $model) {
 				$model_id = $model['id'];
 				$quantity = $model['quantity'];
-				$asset_list = $this->fixed_equipment_model->list_asset_checkout_predefined_kit_by_model($model_id, $quantity); 
-				if ($asset_list->msg != '') { 
+				$asset_list = $this->fixed_equipment_model->list_asset_checkout_predefined_kit_by_model($model_id, $quantity);
+				if ($asset_list->msg != '') {
 					$error = true;
-					$html .= '<div class="alert alert-danger">'.$asset_list->msg.'</div>';
-				} 
-			} 
-		} 
+					$html .= '<div class="alert alert-danger">' . $asset_list->msg . '</div>';
+				}
+			}
+		}
 		echo json_encode([
 			'error' => $error,
 			'data' => $html
 		]);
 		die;
 	}
-	
+
 	/**
 	 * generate serial number
 	 * @param  integer $serial_number_quantity 
 	 * @return [type]                          
 	 */
-	public function generate_serial_number($serial_number_quantity = 1) {
+	public function generate_serial_number($serial_number_quantity = 1)
+	{
 		if ($this->input->is_ajax_request()) {
 			$serial_numbers = $this->fixed_equipment_model->create_serial_numbers($serial_number_quantity, true);
 			echo json_encode([
@@ -12129,24 +12158,23 @@ class fixed_equipment extends AdminController
 		$data['title'] = _l('fe_enter_the_serial_number');
 		$slug = $this->input->post('slug');
 
-		if($slug == 'add'){
+		if ($slug == 'add') {
 			$quantity = $this->input->post('quantity');
 			$prefix_name = $this->input->post('prefix_name');
-
-		}else{
+		} else {
 			$actual_serial_number = 0;
 			$quantity = $this->input->post('quantity');
 			$serial_data = [];
 			$serial_input_value = $this->input->post('serial_input_value');
 			$serial_input_value = new_explode(',', $serial_input_value);
 
-			if(count($serial_input_value) > 0){
+			if (count($serial_input_value) > 0) {
 				foreach ($serial_input_value as $value) {
-					if($actual_serial_number < $quantity){
+					if ($actual_serial_number < $quantity) {
 
-						if($value != 'null'){
+						if ($value != 'null') {
 							$serial_data[] = ['serial_number' => $value];
-						}else{
+						} else {
 							$serial_data[] = ['serial_number' => ''];
 						}
 					}
@@ -12171,63 +12199,61 @@ class fixed_equipment extends AdminController
 	 * @return [type] 
 	 */
 	public function get_asset_data()
-    {
-    	$data = $this->input->post();
-    	$assets = $this->fixed_equipment_model->list_asset_by_model($data['model_id']);
-    	echo json_encode([
-    		'assets' => $assets
-    	]);
-    }
+	{
+		$data = $this->input->post();
+		$assets = $this->fixed_equipment_model->list_asset_by_model($data['model_id']);
+		echo json_encode([
+			'assets' => $assets
+		]);
+	}
 
-    /**
-     * model update batch rate
-     * @return [type] 
-     */
-    public function model_update_batch_rate()
+	/**
+	 * model update batch rate
+	 * @return [type] 
+	 */
+	public function model_update_batch_rate()
 	{
 		$total_updated = 0;
 		$data = $this->input->post();
-		if($data){
+		if ($data) {
 			$data_update = [];
-			if(isset($data['requestable']) && $data['requestable'] == 1){
+			if (isset($data['requestable']) && $data['requestable'] == 1) {
 				$data_update['requestable'] = 1;
-			}else{
+			} else {
 				$data_update['requestable'] = 0;
 			}
 
-			if(isset($data['for_sell']) && $data['for_sell'] == 1){
+			if (isset($data['for_sell']) && $data['for_sell'] == 1) {
 				$data_update['for_sell'] = 1;
 				$data_update['selling_price'] = (float)$data['selling_price'];
-
-			}else{
+			} else {
 				$data_update['for_sell'] = 0;
 			}
 
-			if(isset($data['for_rent']) && $data['for_rent'] == 1){
+			if (isset($data['for_rent']) && $data['for_rent'] == 1) {
 				$data_update['for_rent'] = 1;
 				$data_update['rental_price'] = (float)$data['rental_price'];
 				$data_update['renting_period'] = $data['renting_period'];
 				$data_update['renting_unit'] = $data['renting_unit'];
-			}else{
+			} else {
 				$data_update['for_rent'] = 0;
 			}
 
-			if($data['select_item'] == 0){
+			if ($data['select_item'] == 0) {
 				// update by model_id
 				$this->db->where('model_id', $data['model']);
-				$this->db->update(db_prefix().'fe_assets', $data_update);
+				$this->db->update(db_prefix() . 'fe_assets', $data_update);
 				$total_updated = $this->db->affected_rows();
-				
-			}else{
+			} else {
 				// update by asset_id
 				$this->db->where('model_id', $data['model']);
-				if(isset($data['asset_id']) && is_array($data['asset_id'])){
-					$this->db->where('id IN ('.implode(',', $data['asset_id']).')');
+				if (isset($data['asset_id']) && is_array($data['asset_id'])) {
+					$this->db->where('id IN (' . implode(',', $data['asset_id']) . ')');
 				}
-				$this->db->update(db_prefix().'fe_assets', $data_update);
+				$this->db->update(db_prefix() . 'fe_assets', $data_update);
 				$total_updated = $this->db->affected_rows();
 			}
-			set_alert('success', _l('fe_updated_successfully').': '.$total_updated.' '. _l('fe_assets'));
+			set_alert('success', _l('fe_updated_successfully') . ': ' . $total_updated . ' ' . _l('fe_assets'));
 			redirect(admin_url('fixed_equipment/settings?tab=models'));
 		}
 		redirect(admin_url('fixed_equipment/settings?tab=models'));
@@ -12240,99 +12266,96 @@ class fixed_equipment extends AdminController
 	 * @return [type]                  
 	 */
 	public function client_change_data($customer_id, $current_invoice = '')
-    {
-        if ($this->input->is_ajax_request()) {
-            $data                     = [];
-            $data['billing_shipping'] = $this->clients_model->get_customer_billing_and_shipping_details($customer_id);
+	{
+		if ($this->input->is_ajax_request()) {
+			$data                     = [];
+			$data['billing_shipping'] = $this->clients_model->get_customer_billing_and_shipping_details($customer_id);
 
-            echo json_encode($data);
-        }
-    }
+			echo json_encode($data);
+		}
+	}
 
-    /**
-     * get model by id
-     * @param  [type] $id 
-     * @return [type]     
-     */
-    public function get_model_by_id($id)
-    {
-    	if ($this->input->is_ajax_request()) {
-    		$item = [];
-    		if (is_numeric($id)) {
-    			$total_available_qty = 0;
-    			$rate = 0;
-    			$asset = $this->fixed_equipment_model->get_assets($id);
-    			switch ($asset->type) {
-    				case 'accessory':
-    				$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
-    				$data_asset = $this->fixed_equipment_model->data_query($query);
-    				if ($data_asset) {
-    					$total_available_qty = $data_asset->quantity;
-    					$rate = (float)$data_asset->selling_price;
-    				}
-    				break;
-    				case 'consumable':
-    				$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
-    				$data_asset = $this->fixed_equipment_model->data_query($query);
-    				if ($data_asset) {
-    					$total_available_qty = $data_asset->quantity;
-    					$rate = (float)$data_asset->selling_price;
+	/**
+	 * get model by id
+	 * @param  [type] $id 
+	 * @return [type]     
+	 */
+	public function get_model_by_id($id)
+	{
+		if ($this->input->is_ajax_request()) {
+			$item = [];
+			if (is_numeric($id)) {
+				$total_available_qty = 0;
+				$rate = 0;
+				$asset = $this->fixed_equipment_model->get_assets($id);
+				switch ($asset->type) {
+					case 'accessory':
+						$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
+						$data_asset = $this->fixed_equipment_model->data_query($query);
+						if ($data_asset) {
+							$total_available_qty = $data_asset->quantity;
+							$rate = (float)$data_asset->selling_price;
+						}
+						break;
+					case 'consumable':
+						$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
+						$data_asset = $this->fixed_equipment_model->data_query($query);
+						if ($data_asset) {
+							$total_available_qty = $data_asset->quantity;
+							$rate = (float)$data_asset->selling_price;
+						}
+						break;
+					case 'component':
+						$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
+						$data_asset = $this->fixed_equipment_model->data_query($query);
+						if ($data_asset) {
+							$total_available_qty = $data_asset->quantity;
+							$rate = (float)$data_asset->selling_price;
+						}
+						break;
+					case 'license':
+						$query = 'select selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
+						$data_license = $this->fixed_equipment_model->data_query($query);
+						if ($data_license) {
+							$rate = (float)$data_license->selling_price;
+						}
+						$query = 'select count(id) as total_seat from ' . db_prefix() . 'fe_seats where license_id = ' . $id . ' AND to_id = 0';
+						$data_asset = $this->fixed_equipment_model->data_query($query);
+						if ($data_asset) {
+							$total_available_qty = $data_asset->total_seat;
+						}
+						break;
+					default:
+						$total_available_qty = 1;
+						break;
+				}
 
-    				}
-    				break;
-    				case 'component':
-    				$query = 'select quantity, selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
-    				$data_asset = $this->fixed_equipment_model->data_query($query);
-    				if ($data_asset) {
-    					$total_available_qty = $data_asset->quantity;
-    					$rate = (float)$data_asset->selling_price;
+				$item['model_id'] = $id;
+				$item['name'] = $asset->assets_name;
+				$item['rate'] = $rate;
+				$item['total_available_qty'] = $total_available_qty;
+			} else {
+				$model_id = str_replace('model-', '', $id);
+				$total_available_qty = 0;
+				$data_model = $this->fixed_equipment_model->get_models($model_id);
+				$total_available_qty = count($this->fixed_equipment_model->get_assets('', '', false, false, 'deployable', false, $model_id));
 
-    				}
-    				break;
-    				case 'license':
-    				$query = 'select selling_price from ' . db_prefix() . 'fe_assets where id = ' . $id;
-    				$data_license = $this->fixed_equipment_model->data_query($query);
-    				if ($data_license) {
-    					$rate = (float)$data_license->selling_price;
-    				}
-    				$query = 'select count(id) as total_seat from ' . db_prefix() . 'fe_seats where license_id = ' . $id .' AND to_id = 0';
-    				$data_asset = $this->fixed_equipment_model->data_query($query);
-    				if ($data_asset) {
-    					$total_available_qty = $data_asset->total_seat;
-    				}
-    				break;
-    				default:
-    				$total_available_qty = 1;
-    				break;
-    			}
+				if ($data_model) {
+					$item['model_id'] = $id;
+					$item['name'] = $data_model->model_no . ' ' . $data_model->model_name;
+					$item['rate'] = '';
+					$item['total_available_qty'] = $total_available_qty;
+				}
+			}
+			echo json_encode($item);
+		}
+	}
 
-    			$item['model_id'] = $id;
-    			$item['name'] = $asset->assets_name;
-    			$item['rate'] = $rate;
-    			$item['total_available_qty'] = $total_available_qty;
-
-    		}else{
-    			$model_id = str_replace('model-', '', $id);
-    			$total_available_qty = 0;
-    			$data_model = $this->fixed_equipment_model->get_models($model_id);
-    			$total_available_qty = count($this->fixed_equipment_model->get_assets('', '', false, false, 'deployable', false, $model_id));
-
-    			if ($data_model) {
-    				$item['model_id'] = $id;
-    				$item['name'] = $data_model->model_no . ' ' . $data_model->model_name;
-    				$item['rate'] = '';
-    				$item['total_available_qty'] = $total_available_qty;
-    			}
-    		}
-    		echo json_encode($item);
-    	}
-    }
-
-    /**
-     * get serial number
-     * @return [type] 
-     */
-    public function get_serial_number()
+	/**
+	 * get serial number
+	 * @return [type] 
+	 */
+	public function get_serial_number()
 	{
 
 		if ($this->input->is_ajax_request()) {
@@ -12351,11 +12374,11 @@ class fixed_equipment extends AdminController
 			$list_temporaty_serial_numbers = $this->fixed_equipment_model->get_assets('', '', false, false, 'deployable', false, $model_id, $quantity);
 
 			foreach ($list_temporaty_serial_numbers as $list_temporaty_serial_number) {
-			    $arr_list_temporaty_serial_number[$list_temporaty_serial_number['series']] = $list_temporaty_serial_number['series'];
+				$arr_list_temporaty_serial_number[$list_temporaty_serial_number['series']] = $list_temporaty_serial_number['series'];
 			}
 
 			foreach ($list_serial_numbers as $list_serial_number) {
-				if(!isset($arr_list_temporaty_serial_number[$list_serial_number['series']])){
+				if (!isset($arr_list_temporaty_serial_number[$list_serial_number['series']])) {
 					$arr_serial_numbers[$list_serial_number['series']] = [
 						'name' => $list_serial_number['series'],
 					];
@@ -12364,14 +12387,14 @@ class fixed_equipment extends AdminController
 
 			foreach ($list_temporaty_serial_numbers as $index => $serial_number) {
 
-				$arr_serial_numbers = array_merge(array($serial_number['series'] => array('name' => $serial_number['series']) ), $arr_serial_numbers);
+				$arr_serial_numbers = array_merge(array($serial_number['series'] => array('name' => $serial_number['series'])), $arr_serial_numbers);
 
 				$table_serial_number .= '<tr class="sortable serial_number_item"><div class="row">';
-				$table_serial_number .= '<div class="col-md-6"><td class="">' . $serial_number['series'].' '.$serial_number['assets_name'] . '</td></div>';
-				$table_serial_number .= '<div class="col-md-6"><td class="serial_number">' . render_select('serial_number['.$index.']', $arr_serial_numbers,array('name','name'),'',$serial_number['series'],[], ["data-none-selected-text" => _l('fe_serial_number')], 'no-margin', '', false) . '</td><input name="product_id['.$index.']" type="hidden" value="'.$serial_number['id'].'"></input><input name="product_name['.$index.']" type="hidden" value="'.$serial_number['assets_name'].'"></input><input name="product_rate['.$index.']" type="hidden" value="'.$serial_number['selling_price'].'"></input></div>';
+				$table_serial_number .= '<div class="col-md-6"><td class="">' . $serial_number['series'] . ' ' . $serial_number['assets_name'] . '</td></div>';
+				$table_serial_number .= '<div class="col-md-6"><td class="serial_number">' . render_select('serial_number[' . $index . ']', $arr_serial_numbers, array('name', 'name'), '', $serial_number['series'], [], ["data-none-selected-text" => _l('fe_serial_number')], 'no-margin', '', false) . '</td><input name="product_id[' . $index . ']" type="hidden" value="' . $serial_number['id'] . '"></input><input name="product_name[' . $index . ']" type="hidden" value="' . $serial_number['assets_name'] . '"></input><input name="product_rate[' . $index . ']" type="hidden" value="' . $serial_number['selling_price'] . '"></input></div>';
 				$table_serial_number .= '</div></tr>';
 
-				if(isset($arr_serial_numbers[$serial_number['series']])){
+				if (isset($arr_serial_numbers[$serial_number['series']])) {
 					unset($arr_serial_numbers[$serial_number['series']]);
 				}
 			}
@@ -12408,49 +12431,49 @@ class fixed_equipment extends AdminController
 		$list_temporaty_product_name = [];
 		$list_temporaty_product_rate = [];
 
-		if(is_array($formdata) && count($formdata) > 1){
+		if (is_array($formdata) && count($formdata) > 1) {
 
-			foreach ( $formdata as $key => $form_value) {
-				if($form_value['name'] != 'csrf_token_name'){
-					if(preg_match('/^serial_number/', $form_value['name'])){
+			foreach ($formdata as $key => $form_value) {
+				if ($form_value['name'] != 'csrf_token_name') {
+					if (preg_match('/^serial_number/', $form_value['name'])) {
 
 						$list_temporaty_serial_numbers[] = [
 							'serial_number' => $form_value['value'],
 						];
-					}elseif(preg_match('/^product_id/', $form_value['name'])){
+					} elseif (preg_match('/^product_id/', $form_value['name'])) {
 						$list_temporaty_product_ids[] = [
 							'product_id' => $form_value['value'],
 						];
-					}elseif(preg_match('/^product_name/', $form_value['name'])){
+					} elseif (preg_match('/^product_name/', $form_value['name'])) {
 						$list_temporaty_product_name[] = [
 							'product_name' => $form_value['value'],
 						];
-					}elseif(preg_match('/^product_rate/', $form_value['name'])){
+					} elseif (preg_match('/^product_rate/', $form_value['name'])) {
 						$list_temporaty_product_rate[] = [
 							'product_rate' => $form_value['value'],
 						];
 					}
 				}
 			}
-		}else{
+		} else {
 			// $list_temporaty_serial_numbers = $this->warehouse_model->get_list_temporaty_serial_numbers($commodity_code, $warehouse_id, $quantities);
 		}
 
 		foreach ($list_temporaty_serial_numbers as $key => $value) {
 			$description = $value['serial_number'];
-			$description .= isset($list_temporaty_product_name[$key]) ? ' '.$list_temporaty_product_name[$key]['product_name'] : '';
+			$description .= isset($list_temporaty_product_name[$key]) ? ' ' . $list_temporaty_product_name[$key]['product_name'] : '';
 			$rate = isset($list_temporaty_product_rate[$key]) ? (float)$list_temporaty_product_rate[$key]['product_rate'] : 0;
 			$product_id = isset($list_temporaty_product_ids[$key]) ? (float)$list_temporaty_product_ids[$key]['product_id'] : 0;
 			$sku = '';
 
 			// check change serial Number manual
 			$asset = $this->fixed_equipment_model->get_assets($product_id);
-			if($asset->series != $value['serial_number']){
+			if ($asset->series != $value['serial_number']) {
 
 				$this->db->where('series', $value['serial_number']);
 				$this->db->where('model_id', $asset->model_id);
-				$new_asset = $this->db->get(db_prefix().'fe_assets')->row();
-				if($new_asset){
+				$new_asset = $this->db->get(db_prefix() . 'fe_assets')->row();
+				if ($new_asset) {
 					$description = $value['serial_number'];
 					$description .= $new_asset->assets_name;
 					$rate = $new_asset->selling_price;
@@ -12459,31 +12482,31 @@ class fixed_equipment extends AdminController
 			}
 
 			$quantities = 1;
-			$name = 'newitems['.$item_index.']';
+			$name = 'newitems[' . $item_index . ']';
 
 			$manual_order_row_template .= $this->fixed_equipment_model->create_order_manual_row_template($name, $description, $temporaty_available_quantity, $quantities, $rate, $sku, $product_id, $item_key, false);
 
 			$temporaty_quantity--;
 			$temporaty_available_quantity--;
-			$item_index ++;
+			$item_index++;
 		}
 
-		if($temporaty_quantity > 0){
+		if ($temporaty_quantity > 0) {
 			$rate = 0;
 			if (is_numeric($product_id)) {
 				$total_available_qty = 0;
 				$asset = $this->fixed_equipment_model->get_assets($product_id);
-				if($asset){
+				if ($asset) {
 					$rate = (float)$asset->selling_price;
 				}
 			}
 
 			$quantities = $temporaty_quantity;
 			$available_quantity = $temporaty_available_quantity;
-			$name = 'newitems['.$item_index.']';
+			$name = 'newitems[' . $item_index . ']';
 
 			$manual_order_row_template .= $this->fixed_equipment_model->create_order_manual_row_template($name, $description, $available_quantity, $quantities, $rate, $sku, $product_id, $item_key, false);
-			$item_index ++;
+			$item_index++;
 		}
 
 
@@ -12511,16 +12534,16 @@ class fixed_equipment extends AdminController
 	 * add edit issue
 	 * @param string $id 
 	 */
-	public function add_edit_issue($id='', $orderid = '')
+	public function add_edit_issue($id = '', $orderid = '')
 	{
 		if (!has_permission('fixed_equipment_order_list', '', 'view')  && !is_admin()) {
 			access_denied('fixed_equipment_order_list');
 		}
-		
+
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$data = issue_data_processing($data);
-			if(isset($data['csrf_token_name'])){
+			if (isset($data['csrf_token_name'])) {
 				unset($data['csrf_token_name']);
 			}
 			if ($id == '' || $id == 0) {
@@ -12531,7 +12554,7 @@ class fixed_equipment extends AdminController
 				$id = $this->fixed_equipment_model->add_issue($data);
 				if ($id) {
 
-					$url = admin_url('fixed_equipment/issue_detail/'.$id);
+					$url = admin_url('fixed_equipment/issue_detail/' . $id);
 					if ($id) {
 						set_alert('success', _l('fe_added_successfully'));
 						/*upload multifile*/
@@ -12544,17 +12567,16 @@ class fixed_equipment extends AdminController
 					}
 					set_alert('success', _l('fe_added_successfully'));
 				}
-
 			} else {
 				if (!has_permission('fixed_equipment_order_list', '', 'edit') && !is_admin()) {
 					access_denied('fixed_equipment_order_list');
 				}
-				if(isset($data['id'])){
+				if (isset($data['id'])) {
 					unset($data['id']);
 				}
 				$response = $this->fixed_equipment_model->update_issue($data, $id);
 
-				$url = admin_url('fixed_equipment/issue_detail/'.$id);
+				$url = admin_url('fixed_equipment/issue_detail/' . $id);
 				if ($response) {
 					set_alert('success', _l('updated_successfully'));
 				}
@@ -12568,15 +12590,13 @@ class fixed_equipment extends AdminController
 			}
 		}
 
-		if(is_numeric($id) && $id != 0){
+		if (is_numeric($id) && $id != 0) {
 			$data['is_edit'] = false;
 			$data['title'] = _l('fe_edit_issue');
 			$data['ticket'] = $this->fixed_equipment_model->get_issue($id);
 			$orderid = $data['ticket']->cart_id;
 			$data['issue_attachments'] = $this->fixed_equipment_model->fe_get_attachments_file($id, 'fixe_issue');
-
-
-		}else{
+		} else {
 			$data['is_edit'] = true;
 			$data['title'] = _l('fe_new_issue');
 		}
@@ -12601,7 +12621,7 @@ class fixed_equipment extends AdminController
 		issue_handle_movement_attachments($id);
 
 		// $url = admin_url('fixed_equipment/order_list/'.$id);
-		$url = admin_url('fixed_equipment/issue_detail/'.$id);
+		$url = admin_url('fixed_equipment/issue_detail/' . $id);
 		echo json_encode([
 			'url' => $url,
 			'id' => $id,
@@ -12657,7 +12677,7 @@ class fixed_equipment extends AdminController
 		if (!$ticket) {
 			blank_page(_l('issue_not_found'));
 		}
-		
+
 		$data = [];
 
 		$data['ticket'] = $ticket;
@@ -12689,7 +12709,7 @@ class fixed_equipment extends AdminController
 				if ($id) {
 					set_alert('success', _l('fe_added_successfully'));
 				}
-				redirect(admin_url('fixed_equipment/issue_detail/'.$data['ticket_id']));
+				redirect(admin_url('fixed_equipment/issue_detail/' . $data['ticket_id']));
 			}
 		}
 	}
@@ -12707,9 +12727,9 @@ class fixed_equipment extends AdminController
 		}
 
 		$delete = $this->fixed_equipment_model->delete_issue_history($id, $type);
-		if($delete){
+		if ($delete) {
 			$status = true;
-		}else{
+		} else {
 			$status = false;
 		}
 
@@ -12756,7 +12776,6 @@ class fixed_equipment extends AdminController
 		} else {
 			set_alert('warning', _l('problem_deleting'));
 		}
-		redirect(admin_url('fixed_equipment/view_order_detailt/'.$issue->cart_id));
+		redirect(admin_url('fixed_equipment/view_order_detailt/' . $issue->cart_id));
 	}
-
 }
