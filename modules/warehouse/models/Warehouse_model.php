@@ -12741,6 +12741,10 @@ class Warehouse_model extends App_Model {
 
 	    //invoice_data_date
 		$invoice_date = '<br /><b>' . _l('invoice_data_date') . ' ' . _d($internal_delivery->date_add) . '</b><br />';
+		$project_detail = '';
+		if(!empty($internal_delivery->project)) {
+			$project_detail = '<b>' . _l('project') . ': ' . get_project_name_by_id($internal_delivery->project) . '</b><br />';
+		}
 
 		$html .= '<table class="table">
 		<tbody>
@@ -12759,7 +12763,7 @@ class Warehouse_model extends App_Model {
 		<tbody>
 		<tr>
 		<td rowspan="2" width="50%" class="text-left"></td>
-		<td rowspan="2" width="50%" class="text_right">'.$invoice_date.'</td>
+		<td rowspan="2" width="50%" class="text_right">'.$invoice_date.$project_detail.'</td>
 		</tr>
 		</tbody>
 		</table>
