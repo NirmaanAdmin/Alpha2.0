@@ -75,13 +75,16 @@ if(get_status_modules_pur('hr_profile') == true){
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-12">
-						<?php echo render_select('project_id', $projects, array('id','name'), 'project'); ?>
+						<?php 
+						$related = [ 
+							0 => ['id' => '1', 'name' => _l('stock_import')],
+							1 => ['id' => '2', 'name' => _l('stock_export')],
+							2 => ['id' => '3', 'name' => _l('loss_adjustment')],
+							3 => ['id' => '4', 'name' => _l('internal_delivery_note')],
+						];
+						echo render_select('related',$related,array('id','name'),'task_single_related'); ?>
 						<?php echo render_input('name','subject','','text'); ?>
-						<?php $related = [ 
-								0 => ['id' => '1', 'name' => _l('stock_import')],
-								1 => ['id' => '2', 'name' => _l('stock_export')],
-							]; ?>
-						<?php echo render_select('related',$related,array('id','name'),'task_single_related'); ?>
+						<?php echo render_select('project_id', $projects, array('id','name'), 'project'); ?>
 						<div class="select-placeholder form-group">
 							<label for="approver" class="control-label"><?php echo _l('approver'); ?></label>
 							<select name="approver[]" id="approver" class="selectpicker" data-width="100%" data-live-search="true" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" multiple="true" data-actions-box="true">

@@ -32,6 +32,20 @@
                     echo render_input('internal_delivery_name','internal_delivery_name',$internal_delivery_name); ?>
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                      <label for="project"><?php echo _l('project'); ?></label>
+                      <select name="project" id="project" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+                        <option value=""></option>
+                        <?php if(isset($projects)){ ?>
+                          <?php foreach($projects as $s) { ?>
+                            <option value="<?php echo html_entity_decode($s['id']); ?>" <?php if(isset($internal_delivery) && $s['id'] == $internal_delivery->project){ echo 'selected'; } ?>><?php echo html_entity_decode($s['name']); ?></option>
+                          <?php } ?>
+                        <?php } ?>
+                      </select>
+                  </div>
+                </div>
                 
                 <div class="row">
                   <div class="col-md-12">

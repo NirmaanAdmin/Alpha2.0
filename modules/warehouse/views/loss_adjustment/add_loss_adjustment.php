@@ -45,7 +45,6 @@
                         <option value="loss" <?php if($type == 'loss'){ echo 'selected'; } ?>><?php echo _l('loss'); ?></option>
                         <option value="adjustment" <?php if($type == 'adjustment'){ echo 'selected'; } ?>><?php echo _l('adjustment'); ?></option>
                   </select>
-                 <br><br>
                </div>
 
                <div class="col-md-4 form-group">
@@ -56,10 +55,24 @@
                           <option value="<?php echo html_entity_decode($wh['id']); ?>" <?php if(isset($loss_adjustment) && $loss_adjustment->warehouses == $wh['id']){ echo 'selected';} ?> ><?php echo html_entity_decode($wh['label']); ?></option>
                         <?php } ?>
                   </select>
-                 <br><br>
                </div>                  
                             
          </div>
+
+         <div class="row">
+          <div class="col-md-4">
+              <label for="project"><?php echo _l('project'); ?></label>
+              <select name="project" id="project" class="selectpicker" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
+                <option value=""></option>
+                <?php if(isset($projects)){ ?>
+                  <?php foreach($projects as $s) { ?>
+                    <option value="<?php echo html_entity_decode($s['id']); ?>" <?php if(isset($loss_adjustment) && $s['id'] == $loss_adjustment->project){ echo 'selected'; } ?>><?php echo html_entity_decode($s['name']); ?></option>
+                  <?php } ?>
+                <?php } ?>
+              </select>
+          </div>
+         </div>
+
        </div>
 
        <div class="panel-body mtop10 invoice-item">

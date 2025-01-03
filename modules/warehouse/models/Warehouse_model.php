@@ -2308,6 +2308,14 @@ class Warehouse_model extends App_Model {
             $module = $this->get_goods_delivery($data['rel_id']);
             $project = $module->project;
         }
+        if ($data['rel_type'] == '4') {
+            $module = $this->get_internal_delivery($data['rel_id']);
+            $project = $module->project;
+        }
+        if ($data['rel_type'] == '3') {
+            $module = $this->get_loss_adjustment($data['rel_id']);
+            $project = $module->project;
+        }
         $data_new = $this->check_approval_setting($project, $data['rel_type'], 1);
 
         foreach ($data_new as $key => $value) {
@@ -6290,13 +6298,15 @@ class Warehouse_model extends App_Model {
 		unset($data['unit_id']);
 		unset($data['serial_number']);
 
-		$check_appr = $this->get_approve_setting('3');
-		$data_add['status'] = 0;
-		if ($check_appr && $check_appr != false) {
-			$data_add['status'] = 0;
-		} else {
-			$data_add['status'] = 1;
-		}	
+		$check_appr = $this->check_approval_setting($data['project'], '3', 0);
+        $data_add['status'] = ($check_appr == true) ? 1 : 0;
+		// $check_appr = $this->get_approve_setting('3');
+		// $data_add['status'] = 0;
+		// if ($check_appr && $check_appr != false) {
+		// 	$data_add['status'] = 0;
+		// } else {
+		// 	$data_add['status'] = 1;
+		// }	
 
 		if(!$this->check_format_date($data['time'])){
     		$data_add['time'] = to_sql_date($data['time'], true);
@@ -6309,6 +6319,7 @@ class Warehouse_model extends App_Model {
 		$data_add['addfrom'] = $data['addfrom'];
 		$data_add['date_create'] = $data['date_create'];
 		$data_add['warehouses'] = $data['warehouses'];
+		$data_add['project'] = $data['project'];
 
 		$this->db->insert(db_prefix() . 'wh_loss_adjustment', $data_add);
 		$insert_id = $this->db->insert_id();
@@ -6393,6 +6404,7 @@ class Warehouse_model extends App_Model {
 		$data_add['addfrom'] = $data['addfrom'];
 		$data_add['date_create'] = $data['date_create'];
 		$data_add['warehouses'] = $data['warehouses'];
+		$data_add['project'] = $data['project'];
 		$this->db->where('id', $data['id']);
 		$this->db->update(db_prefix() . 'wh_loss_adjustment', $data_add);
 
@@ -10942,13 +10954,15 @@ class Warehouse_model extends App_Model {
 		unset($data['into_money']);
 		unset($data['serial_number']);
 
-    	$check_appr = $this->get_approve_setting('4');
-    	$data['approval'] = 0;
-    	if ($check_appr && $check_appr != false) {
-    		$data['approval'] = 0;
-    	} else {
-    		$data['approval'] = 1;
-    	}
+		$check_appr = $this->check_approval_setting($data['project'], '4', 0);
+		$data['approval'] = ($check_appr == true) ? 1 : 0;
+    	// $check_appr = $this->get_approve_setting('4');
+    	// $data['approval'] = 0;
+    	// if ($check_appr && $check_appr != false) {
+    	// 	$data['approval'] = 0;
+    	// } else {
+    	// 	$data['approval'] = 1;
+    	// }
 
     	if(isset($data['edit_approval'])){
     		unset($data['edit_approval']);

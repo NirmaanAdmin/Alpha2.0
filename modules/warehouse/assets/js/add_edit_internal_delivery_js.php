@@ -9,7 +9,7 @@
   appValidateForm($('#add_update_internal_delivery'), {
      internal_delivery_name: 'required',
      date_add: 'required',
-    
+     project: 'required',
    }); 
   // Maybe items ajax search
   init_ajax_search('items','#item_select.ajax-search',undefined,admin_url+'warehouse/wh_commodity_code_search');

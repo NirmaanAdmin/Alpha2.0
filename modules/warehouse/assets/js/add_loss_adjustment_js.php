@@ -2,6 +2,11 @@
   var lastAddedItemKey = null;
 (function($) {
 "use strict";
+  appValidateForm($('#pur_order-form'), {
+    type: 'required',
+    warehouses: 'required',
+    project: 'required',
+  }); 
   // Maybe items ajax search
   init_ajax_search('items','#item_select.ajax-search',undefined,admin_url+'warehouse/wh_commodity_code_search');
   wh_calculate_total();
