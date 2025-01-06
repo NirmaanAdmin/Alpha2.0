@@ -1660,6 +1660,7 @@ class warehouse extends AdminController {
 		}else{
 			$data['base_currency_id'] = 0;
 		}
+		$data['goods_receipt'] = $this->warehouse_model->get_all_approved_goods_receipt();
 
 		$this->load->view('manage_goods_delivery/delivery', $data);
 
@@ -9216,4 +9217,19 @@ if(strlen($data['inventory_filter']) > 0){
         echo json_encode($response);
     }
 
+    /**
+     * coppy manage receipt
+     * @param  integer $invoice_id 
+     * @return json              
+     */
+    public function copy_manage_receipt($goods_receipt_id = '') 
+    {
+		$manage_receipt_detail = $this->warehouse_model->copy_manage_receipt($goods_receipt_id);
+
+		echo json_encode([
+			'result' => $manage_receipt_detail['result'] ? $manage_receipt_detail['result'] : '',
+			'additional_discount' => 0,
+			'goods_receipt' => $manage_receipt_detail['goods_receipt'] ? $manage_receipt_detail['goods_receipt'] : '',
+		]);
+    }
 }

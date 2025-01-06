@@ -574,6 +574,46 @@ function invoice_change(){
 
 }
 
+function stock_import_change(){
+  "use strict";
+  var goods_receipt_id = $('select[name="goods_receipt_id"]').val();
+  $.post(admin_url + 'warehouse/copy_manage_receipt/'+goods_receipt_id).done(function(response){
+    response = JSON.parse(response);
+
+    $('input[name="additional_discount"]').val((response.additional_discount));
+    $('.invoice-item table.invoice-items-table.items tbody').html('');
+    $('.invoice-item table.invoice-items-table.items tbody').append(response.result);
+
+    setTimeout(function () {
+      wh_calculate_total();
+    }, 15);
+
+    init_selectpicker();
+    init_datepicker();
+    wh_reorder_items('.invoice-item');
+    wh_clear_item_preview_values('.invoice-item');
+    $('body').find('#items-warning').remove();
+    $("body").find('.dt-loader').remove();
+    $('#item_select').selectpicker('val', '');
+
+    if(goods_receipt_id != ''){
+     $('select[name="buyer_id"]').val(response.goods_receipt.buyer).change();
+     $('select[name="project"]').val(response.goods_receipt.project).change();
+     $('select[name="type"]').val(response.goods_receipt.type).change();
+     $('select[name="department"]').val(response.goods_receipt.department).change();
+     $('select[name="requester"]').val(response.goods_receipt.requester).change();
+    }else{
+      $('select[name="buyer_id"]').val('').change();
+      $('select[name="project"]').val('').change();
+      $('select[name="type"]').val('').change();
+      $('select[name="department"]').val('').change();
+      $('select[name="requester"]').val('').change();
+    }
+    $('.selectpicker').selectpicker('refresh');
+
+  });
+}
+
   function pr_order_change(){
      "use strict";
 
