@@ -15900,8 +15900,8 @@ class Warehouse_model extends App_Model {
 		$row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
 		// $row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
 		$row .= '<td class="amount" align="right">' . $amount . '</td>';
-		// $row .= '<td class="discount">' . render_input($name_discount, '', $discount, 'number', $array_discount_attr) . '</td>';
-		// $row .= '<td class="label_discount_money" align="right">' . $amount . '</td>';
+		$row .= '<td class="hide discount">' . render_input($name_discount, '', $discount, 'number', $array_discount_attr) . '</td>';
+		$row .= '<td class="hide label_discount_money" align="right">' . $amount . '</td>';
 		$row .= '<td class="label_total_after_discount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
