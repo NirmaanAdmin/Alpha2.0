@@ -234,9 +234,10 @@
                               <th width="10%" align="right" class="qty"><?php echo _l('quantity'); ?></th>
                               <th width="10%" align="right"><?php echo _l('rate'); ?></th>
                               <th width="12%" align="right"><?php echo _l('invoice_table_tax_heading'); ?></th>
+                              <th width="10%" align="right"><?php echo _l('lot_number'); ?></th>
                               <th width="10%" align="right"><?php echo _l('subtotal'); ?></th>
-                              <th width="7%" align="right"><?php echo _l('discount'); ?></th>
-                              <th width="10%" align="right"><?php echo _l('discount(money)'); ?></th>
+                              <?php /* <th width="7%" align="right"><?php echo _l('discount'); ?></th>
+                              <th width="10%" align="right"><?php echo _l('discount(money)'); ?></th> */ ?>
                               <th width="10%" align="right"><?php echo _l('total_money'); ?></th>
 
                               <th align="center"></th>

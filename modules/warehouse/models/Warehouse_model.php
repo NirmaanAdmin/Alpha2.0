@@ -3455,6 +3455,7 @@ class Warehouse_model extends App_Model {
 		unset($data['total_after_discount']);
 		unset($data['serial_number']);
 		unset($data['without_checking_warehouse']);
+		unset($data['lot_number']);
 		if(isset($data['onoffswitch'])){
 			if($data['onoffswitch'] == 'on'){
 				$switch_barcode_scanners = true;
@@ -3504,7 +3505,7 @@ class Warehouse_model extends App_Model {
 			foreach ($goods_deliveries as $goods_delivery) {
 				$goods_delivery['goods_delivery_id'] = $insert_id;
 				$goods_delivery['expiry_date'] = null;
-				$goods_delivery['lot_number'] = null;
+				// $goods_delivery['lot_number'] = null;
 				$tax_money = 0;
 				$tax_rate_value = 0;
 				$tax_rate = null;
@@ -7435,6 +7436,7 @@ class Warehouse_model extends App_Model {
 		unset($data['total_after_discount']);
 		unset($data['serial_number']);
 		unset($data['without_checking_warehouse']);
+		unset($data['lot_number']);
 
     	$check_appr = $this->get_approve_setting('2');
     	$data['approval'] = 0;
@@ -7545,7 +7547,7 @@ class Warehouse_model extends App_Model {
 		foreach ($goods_deliveries as $goods_delivery) {
 			$goods_delivery['goods_delivery_id'] = $goods_delivery_id;
 			$goods_delivery['expiry_date'] = null;
-			$goods_delivery['lot_number'] = null;
+			// $goods_delivery['lot_number'] = null;
 
 			$tax_money = 0;
 			$tax_rate_value = 0;
@@ -15895,11 +15897,11 @@ class Warehouse_model extends App_Model {
 
 		$row .= '<td class="rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
 		$row .= '<td class="taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
-		// $row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
+		$row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
 		// $row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
 		$row .= '<td class="amount" align="right">' . $amount . '</td>';
-		$row .= '<td class="discount">' . render_input($name_discount, '', $discount, 'number', $array_discount_attr) . '</td>';
-		$row .= '<td class="label_discount_money" align="right">' . $amount . '</td>';
+		// $row .= '<td class="discount">' . render_input($name_discount, '', $discount, 'number', $array_discount_attr) . '</td>';
+		// $row .= '<td class="label_discount_money" align="right">' . $amount . '</td>';
 		$row .= '<td class="label_total_after_discount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
@@ -20103,7 +20105,7 @@ class Warehouse_model extends App_Model {
     	$goods_delivery_row_template = '';
     	$goods_delivery_row_template = $this->warehouse_model->create_goods_delivery_row_template();
 
-    	$this->db->select(db_prefix().'goods_receipt_detail.commodity_code, '.db_prefix().'items.description, ' .db_prefix().'items.unit_id , unit_price as rate, quantities, '.db_prefix().'goods_receipt_detail.tax as tax_id, '.db_prefix().'goods_receipt_detail.goods_money as total_money, '.db_prefix().'goods_receipt_detail.goods_money as total, '.db_prefix().'goods_receipt_detail.discount, '.db_prefix().'goods_receipt_detail.discount_money, '.db_prefix().'goods_receipt_detail.goods_money as total_after_discount, '.db_prefix().'items.guarantee, '.db_prefix().'goods_receipt_detail.tax_rate, '.db_prefix().'goods_receipt_detail.warehouse_id');
+    	$this->db->select(db_prefix().'goods_receipt_detail.commodity_code, '.db_prefix().'items.description, ' .db_prefix().'items.unit_id , unit_price as rate, quantities, '.db_prefix().'goods_receipt_detail.tax as tax_id, '.db_prefix().'goods_receipt_detail.goods_money as total_money, '.db_prefix().'goods_receipt_detail.goods_money as total, '.db_prefix().'goods_receipt_detail.discount, '.db_prefix().'goods_receipt_detail.discount_money, '.db_prefix().'goods_receipt_detail.goods_money as total_after_discount, '.db_prefix().'items.guarantee, '.db_prefix().'goods_receipt_detail.tax_rate, '.db_prefix().'goods_receipt_detail.warehouse_id, '.db_prefix().'goods_receipt_detail.lot_number');
     	$this->db->join(db_prefix() . 'items', '' . db_prefix() . 'goods_receipt_detail.commodity_code = ' . db_prefix() . 'items.id', 'left');
     	$this->db->where(db_prefix().'goods_receipt_detail.goods_receipt_id = '. $goods_receipt_id);
     	$arr_results = $this->db->get(db_prefix() . 'goods_receipt_detail')->result_array();
@@ -20174,7 +20176,7 @@ class Warehouse_model extends App_Model {
     			$unit_id = $value['unit_id'];
     			$taxname = '';
     			$expiry_date = null;
-    			$lot_number = null;
+    			$lot_number = $value['lot_number'];
     			$note = null;
     			$commodity_name = wh_get_item_variatiom($value['commodity_code']);
     			$total_money = 0;
