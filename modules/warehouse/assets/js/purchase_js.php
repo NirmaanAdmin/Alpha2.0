@@ -482,6 +482,7 @@ function submit_form(save_and_send_request) {
 		$(this).find('.add_goods_receipt_send').prop('disabled', true);
 		$(this).find('.add_goods_receipt').prop('disabled', true);
 		$('#add_goods_receipt').submit();
+		$('#loader-container').removeClass('hide');
 	}else{
 		alert_float('warning', '<?php echo _l('please_select_a_warehouse') ?>');
 	}
