@@ -5452,6 +5452,7 @@ class hr_payroll extends AdminController
 		$employee = $this->hr_payroll_model->get_employees_data($data['payslip_detail']['month'], '', ' staff_id = ' . $data['payslip_detail']['staff_id']);
 		$emp_data = $this->hr_payroll_model->get_staff_info($data['payslip_detail']['staff_id']);
 		$data['emp_code'] = $emp_data->staff_identifi;
+		$data['esi_no'] = $emp_data->esi;
 		$data['employee'] = count($employee) > 0 ? $employee[0] : [];
 		$data['list_department'] = $list_department;
 		$data['payslip'] = $this->hr_payroll_model->get_hrp_payslip($data['payslip_detail']['payslip_id']);

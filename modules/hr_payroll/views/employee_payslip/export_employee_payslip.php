@@ -52,7 +52,7 @@
 			<td class="width-20-height-27 align_left"><strong><?php echo _l('epf_no'); ?></strong></td>
 			<td class="width-30-height-27"><?php echo new_html_entity_decode($employee['epf_no']); ?></td>
 			<td class="width-20-height-27"><strong><?php echo _l('esi_no'); ?></strong></td>
-			<td class="width-30-height-27"><?php ?></td>
+			<td class="width-30-height-27"><?php echo $esi_no ?></td>
 		</tr>
 		<tr class="height-27">
 			<td class="width-20-height-27 align_left"><strong><?php echo _l('doj'); ?></strong></td>
