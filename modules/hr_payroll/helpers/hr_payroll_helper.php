@@ -699,17 +699,17 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 
 				$_name = '';
 				if (isset($earnings_list_data[$key])) {
-					$_name .= $earnings_list_data[$key]['description'];
+				$integration_hr = true;
+				$_name .= $earnings_list_data[$key]['description'];
 				}
 
 				$formal_salary_list .= '<tr class="project-overview">
 					<td  width="50%" >' . $_name . '</td>
-					<td class="text-left">' . currency_converter_value($value, $payslip->to_currency_rate ?? 1, $payslip->to_currency_name ?? '', true) . '</td>
+					<td >' . currency_converter_value($value, $payslip->to_currency_rate ?? 1, $payslip->to_currency_name ?? '', true) . '</td>
 					</tr>';
 			} elseif (preg_match('/^al2_/', $key)) {
 				$formal_allowance += (float)$value;
-				$integration_hr = true;
-
+	
 				$_name = '';
 				if (isset($earnings_list_data[$key])) {
 					$_name .= $earnings_list_data[$key]['description'];
@@ -773,7 +773,7 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 
 
 		$formal_contract_list .= '<tr class="project-overview">
-												<td  width="50%" ><b>' . _l('hrp_salary') . '</b></td>
+												<td  width="50%" ><b></b></td>
 												<td  width="50%" ></td>
 											</tr>' . $formal_salary_list;
 
