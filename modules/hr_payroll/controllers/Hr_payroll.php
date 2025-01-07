@@ -718,7 +718,7 @@ class hr_payroll extends AdminController
 		foreach ($staffs as $staff_key => $staff_value) {
 			/*check value from database*/
 			$data_object_kpi[$staff_key]['staff_id'] = $staff_value['staffid'];
-
+			
 			$staff_i = $this->hr_payroll_model->get_staff_info($staff_value['staffid']);
 			if ($staff_i) {
 
@@ -819,6 +819,7 @@ class hr_payroll extends AdminController
 
 			$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 		}
+		
 		//check is add new or update data
 		if (count($employees_value) > 0) {
 			$data['button_name'] = _l('hrp_update');
@@ -831,9 +832,10 @@ class hr_payroll extends AdminController
 		$data['staffs'] = $staffs;
 
 		$data['body_value'] = json_encode($data_object_kpi);
+		
 		$data['columns'] = json_encode($format_employees_value['column_format']);
 		$data['col_header'] = json_encode($format_employees_value['header']);
-
+		
 		$this->load->view('employees/employees_manage', $data);
 	}
 
@@ -5448,6 +5450,8 @@ class hr_payroll extends AdminController
 		}
 
 		$employee = $this->hr_payroll_model->get_employees_data($data['payslip_detail']['month'], '', ' staff_id = ' . $data['payslip_detail']['staff_id']);
+		$emp_data = $this->hr_payroll_model->get_staff_info($data['payslip_detail']['staff_id']);
+		$data['emp_code'] = $emp_data->staff_identifi;
 		$data['employee'] = count($employee) > 0 ? $employee[0] : [];
 		$data['list_department'] = $list_department;
 		$data['payslip'] = $this->hr_payroll_model->get_hrp_payslip($data['payslip_detail']['payslip_id']);
