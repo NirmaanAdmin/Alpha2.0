@@ -157,10 +157,10 @@ $total_formal_contract = $total_formal_salary + $total_formal_allowance;
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['total_insurance'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 				</tr>
 
-				<tr class="project-overview">
+				<!-- <tr class="project-overview">
 					<td><?php echo _l('hrp_deduction_manage'); ?></td>
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
-				</tr>
+				</tr> -->
 				<tr class="project-overview">
 					<td class="bold"><?php echo _l('total'); ?></td>
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
