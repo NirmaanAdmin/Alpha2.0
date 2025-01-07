@@ -778,12 +778,11 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 											</tr>' . $formal_salary_list;
 
 		$formal_contract_list .= '<tr class="project-overview">
-												<td  width="50%" ><b>' . _l('hrp_allowance') . '</b></td>
+												
 												<td  width="50%" ></td>
 											</tr>' . $formal_allowance_list;
 		$formal_deduction_list .= '<tr class="project-overview">
-												<td  width="50%" ><b>' . _l('hrp_deduction_manage') . '</b></td>
-												<td  width="50%" ></td>
+												
 											</tr>' . $deduction_list;
 	} else {
 
