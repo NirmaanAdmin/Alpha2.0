@@ -66,13 +66,13 @@ return App_table::find('projects')
 
         $output  = $result['output'];
         $rResult = $result['rResult'];
-
+        $sr = 1;
         foreach ($rResult as $aRow) {
             $row = [];
 
             $link = admin_url('projects/view/' . $aRow['id']);
 
-            $row[] = '<a href="' . $link . '">' . $aRow['id'] . '</a>';
+            $row[] = '<a href="' . $link . '">' . $sr . '</a>';
 
             $name = '<a href="' . $link . '">' . e($aRow['name']) . '</a>';
 
@@ -157,6 +157,7 @@ return App_table::find('projects')
             $row = hooks()->apply_filters('projects_table_row_data', $row, $aRow);
 
             $output['aaData'][] = $row;
+            $sr++;
         }
         return $output;
     })->setRules([
