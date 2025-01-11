@@ -5569,6 +5569,7 @@ class hr_payroll extends AdminController
 						$data['payslip']->to_currency_name = $base_currency->name;
 					}
 				}
+				$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'],$data['payslip_detail']['staff_id']);
 				
 				$html = $this->load->view('hr_payroll/employee_payslip/export_employee_payslip', $data, true);
 				$html .= '<link href="' . module_dir_url(HR_PAYROLL_MODULE_NAME, 'assets/css/export_employee_pdf.css') . '"  rel="stylesheet" type="text/css" />';
