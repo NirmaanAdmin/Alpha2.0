@@ -95,15 +95,18 @@ libxml_clear_errors();
 // Initialize result array
 $result = [];
 
+// Create a DOMXPath object
+$xpath = new DOMXPath($dom);
+
 // Find all <tr> elements
-$rows = $dom->getElementsByTagName('tr');
+$rows = $xpath->query('//tr');
 
 foreach ($rows as $row) {
 	// Get all <td> elements within the row
-	$cells = $row->getElementsByTagName('td');
-	if ($cells->length === 2) { // Ensure there are exactly 2 <td> elements
-		$label = trim($cells->item(0)->nodeValue); // Get text from the first <td>
-		$value = trim($cells->item(1)->nodeValue); // Get text from the second <td>
+	$cells = $xpath->query('.//td', $row);
+	if (count($cells) === 2) { // Ensure there are exactly 2 <td> elements
+		$label = trim($cells[0]->nodeValue); // Get text from the first <td>
+		$value = trim($cells[1]->nodeValue); // Get text from the second <td>
 		if (!empty($label) || !empty($value)) {
 			$result[] = [
 				'label' => $label,
@@ -141,7 +144,7 @@ $earnings_data = array_merge(
 		<?php if ((float)($payslip_detail['actual_workday']) > 0) { ?>
 			<table class="table">
 				<tbody>
-					<!-- Table Header -->
+
 					<tr style="background-color:rgb(28, 26, 26);color: #ffffff;">
 						<th style=" padding: 5px;"><strong><?php echo _l('Actual salary'); ?></strong></th>
 						<th style=" padding: 5px; "><strong><?php echo _l('Amount'); ?></strong></th>
@@ -153,50 +156,53 @@ $earnings_data = array_merge(
 					<?php
 
 
-					$max_rows = max(count($result), count($earnings_data)); // Use $result instead of $formal_rows after parsing
+					$max_rows = max(count($result), count($earnings_data));
 
 					for ($i = 0; $i < $max_rows; $i++) {
-						// Add space before "Gross pay"
+
 						if (isset($earnings_data[$i]['label']) && $earnings_data[$i]['label'] === 'Gross pay') {
 							echo '<tr>';
-							echo '<td colspan="2"></td>'; // Maintain left column structure
-							echo '<td colspan="2" style="height: 10px;">&nbsp;</td>'; // Add space to the right side only
+							echo '<td colspan="2"></td>';
+							echo '<td colspan="2" style="height: 10px;">&nbsp;</td>';
 							echo '</tr>';
 						}
-					
+
 						echo '<tr>';
-					
-						// Left Side (Formal Salary Rows)
-						if (isset($result[$i])) { // Use $result for parsed formal rows
+
+
+						if (isset($result[$i])) {
 							echo '<td>' . htmlspecialchars($result[$i]['label']) . '</td>';
-							echo '<td>₹' . number_format($result[$i]['value'],2) . '</td>';
+							echo '<td>₹' . number_format($result[$i]['value'], 2) . '</td>';
 						} else {
-							echo '<td></td><td></td>'; // Empty cells if no formal row exists
+							echo '<td></td><td></td>';
 						}
-					
-						// Right Side (Earnings)
+
+
 						if (isset($earnings_data[$i])) {
 							$label = $earnings_data[$i]['label'];
-							$value = (float)str_replace(',', '', $earnings_data[$i]['value']); // Clean and cast value
-							
+							$value = str_replace(',', '', $earnings_data[$i]['value']);
+
 							if (in_array($label, ['Basic', 'HRA'])) {
-								// Calculate per-day value for "Basic" and "HRA"
-								$per_day_value = ($value / (float)$get_data_for_month[3]) * (float)$get_data_for_month[4];
+
+								if (!empty($get_data_for_month[3]) && $get_data_for_month[3] > 0 && !empty($get_data_for_month[4])) {
+									$per_day_value = ($value / (float)$get_data_for_month[3]) * (float)$get_data_for_month[4];
+								} else {
+									$per_day_value = 0; // Fallback value
+								}
+
 								echo '<td>' . htmlspecialchars($label) . '</td>';
 								echo '<td>₹' . number_format($per_day_value, 2) . '</td>';
 							} else {
-								// Show other labels as-is
+
 								echo '<td>' . htmlspecialchars($label) . '</td>';
-								echo '<td>₹' . number_format($earnings_data[$i]['value'],2) . '</td>';
+								echo '<td>₹' . number_format($earnings_data[$i]['value'], 2) . '</td>';
 							}
 						} else {
-							echo '<td></td><td></td>'; // Empty cells if no earnings row exists
+							echo '<td></td><td></td>';
 						}
-					
+
 						echo '</tr>';
 					}
-					
-					
 
 					?>
 				</tbody>
@@ -275,6 +281,6 @@ $earnings_data = array_merge(
 
 	</div>
 
-	
+
 
 </div>
