@@ -235,17 +235,14 @@ $earnings_data = array_merge(
 
 	</div>
 </div>
-
-
-
 <div class="row">
 	<div class="col-md-6">
 
 		<table class="table">
 			<tbody>
 				<tr>
-					<th class=" thead-dark">Deductions</th>
-					<th class=" thead-dark"></th>
+					<th class="thead-dark">Deductions</th>
+					<th class="thead-dark"></th>
 				</tr>
 
 				<?php echo isset($hrp_payslip_salary_allowance['formal_deduction_list']) ? $hrp_payslip_salary_allowance['formal_deduction_list'] : '' ?>
@@ -268,23 +265,16 @@ $earnings_data = array_merge(
 					<td class="bold"><?php echo _l('total'); ?></td>
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 				</tr>
-			</tbody>
-		</table>
-
-
-	</div>
-
-	<div class="col-md-6">
-		<table class="table">
-			<tbody>
 				<tr class="project-overview">
 					<td><?php echo _l('ps_net_pay'); ?></td>
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['net_pay'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 				</tr>
-
 			</tbody>
 		</table>
 
+
 	</div>
+
+	
 
 </div>
