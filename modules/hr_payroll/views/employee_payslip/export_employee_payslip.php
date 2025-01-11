@@ -71,7 +71,58 @@ $hrp_payslip_salary_allowance = hrp_payslip_json_data_decode($payslip_detail['js
 $total_formal_salary = $hrp_payslip_salary_allowance['formal_salary'] ?? 0;
 $total_formal_allowance = $hrp_payslip_salary_allowance['formal_allowance'] ?? 0;
 $total_formal_contract = $total_formal_salary + $total_formal_allowance;
+
+
+$formal_contract = isset($hrp_payslip_salary_allowance['formal_contract_list']) ? $hrp_payslip_salary_allowance['formal_contract_list'] : '';
+$formal_rows = explode('</tr>', $formal_contract);
+
+$earnings_data = [
+	['label' => _l('Gross pay'), 'value' => isset($payslip_detail) ? $payslip_detail['gross_pay'] : '0'],
+	['label' => _l('Commission amount'), 'value' => isset($payslip_detail) ? $payslip_detail['commission_amount'] : '0'],
+	['label' => _l('Bonus kpi'), 'value' => isset($payslip_detail) ? $payslip_detail['bonus_kpi'] : '0'],
+	['label' => _l('Total'), 'value' => isset($payslip_detail) ? $payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'] : '0'],
+];
+
+// Fix malformed HTML by wrapping it in a parent element
+$html = '<table>' . $formal_contract . '</table>';
+
+// Load HTML using DOMDocument
+$dom = new DOMDocument();
+libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
+$dom->loadHTML($html);
+libxml_clear_errors();
+
+// Initialize result array
+$result = [];
+
+// Find all <tr> elements
+$rows = $dom->getElementsByTagName('tr');
+
+foreach ($rows as $row) {
+	// Get all <td> elements within the row
+	$cells = $row->getElementsByTagName('td');
+	if ($cells->length === 2) { // Ensure there are exactly 2 <td> elements
+		$label = trim($cells->item(0)->nodeValue); // Get text from the first <td>
+		$value = trim($cells->item(1)->nodeValue); // Get text from the second <td>
+		if (!empty($label) || !empty($value)) {
+			$result[] = [
+				'label' => $label,
+				'value' => $value,
+			];
+		}
+	}
+}
+
+// Dynamically insert $result before "Gross Pay" in $earnings_data
+$gross_pay_index = array_search('Gross pay', array_column($earnings_data, 'label'));
+$earnings_data = array_merge(
+	array_slice($earnings_data, 0, $gross_pay_index), // Before "Gross Pay"
+	$result, // Insert $formal_rows (already formatted)
+	array_slice($earnings_data, $gross_pay_index) // After "Gross Pay"
+);
+
 ?>
+
 <div class="row">
 	<div class="col-md-6">
 		<!-- <?php if ((float)($payslip_detail['actual_workday_probation']) > 0) { ?>
@@ -88,10 +139,10 @@ $total_formal_contract = $total_formal_salary + $total_formal_allowance;
 		<?php } ?> -->
 
 		<?php if ((float)($payslip_detail['actual_workday']) > 0) { ?>
-			<table class="table" >
+			<table class="table">
 				<tbody>
 					<!-- Table Header -->
-					<tr style="background-color:rgb(28, 26, 26);">
+					<tr style="background-color:rgb(28, 26, 26);color: #ffffff;">
 						<th style=" padding: 5px;"><strong><?php echo _l('Actual salary'); ?></strong></th>
 						<th style=" padding: 5px; "><strong><?php echo _l('Amount'); ?></strong></th>
 						<th style=" padding: 5px;"><strong><?php echo _l('Earnings'); ?></strong></th>
@@ -100,38 +151,53 @@ $total_formal_contract = $total_formal_salary + $total_formal_allowance;
 
 					<!-- Table Body -->
 					<?php
-					$formal_contract = isset($hrp_payslip_salary_allowance['formal_contract_list']) ? $hrp_payslip_salary_allowance['formal_contract_list'] : '';
-					$formal_rows = explode('</tr>', $formal_contract); // Split rows for manual alignment
-					$earnings_data = [
-						['label' => '', 'value' => ''],
-						['label' => _l('Gross pay'), 'value' => isset($payslip_detail) ? currency_converter_value($payslip_detail['gross_pay'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : '0.00'],
-						['label' => _l('Commission amount'), 'value' => isset($payslip_detail) ? currency_converter_value($payslip_detail['commission_amount'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : '0.00'],
-						['label' => _l('Bonus kpi'), 'value' => isset($payslip_detail) ? currency_converter_value($payslip_detail['bonus_kpi'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : '0.00'],
-						['label' => _l('Total'), 'value' => isset($payslip_detail) ? currency_converter_value($payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : '0.00'],
-					];
 
-					$max_rows = max(count($formal_rows), count($earnings_data));
+
+					$max_rows = max(count($result), count($earnings_data)); // Use $result instead of $formal_rows after parsing
 
 					for ($i = 0; $i < $max_rows; $i++) {
-						echo '<tr style="">';
-
-						// Left Side (Actual Salary)
-						if (isset($formal_rows[$i]) && trim($formal_rows[$i]) !== '') {
-							echo $formal_rows[$i]; // Include the row as is
-						} else {
-							echo '<td style=""></td><td style=""></td>';
+						// Add space before "Gross pay"
+						if (isset($earnings_data[$i]['label']) && $earnings_data[$i]['label'] === 'Gross pay') {
+							echo '<tr>';
+							echo '<td colspan="2"></td>'; // Maintain left column structure
+							echo '<td colspan="2" style="height: 10px;">&nbsp;</td>'; // Add space to the right side only
+							echo '</tr>';
 						}
-
+					
+						echo '<tr>';
+					
+						// Left Side (Formal Salary Rows)
+						if (isset($result[$i])) { // Use $result for parsed formal rows
+							echo '<td>' . htmlspecialchars($result[$i]['label']) . '</td>';
+							echo '<td>₹' . number_format($result[$i]['value'],2) . '</td>';
+						} else {
+							echo '<td></td><td></td>'; // Empty cells if no formal row exists
+						}
+					
 						// Right Side (Earnings)
 						if (isset($earnings_data[$i])) {
-							echo '<td style="">' . $earnings_data[$i]['label'] . '</td>';
-							echo '<td style="">' . $earnings_data[$i]['value'] . '</td>';
+							$label = $earnings_data[$i]['label'];
+							$value = (float)str_replace(',', '', $earnings_data[$i]['value']); // Clean and cast value
+							
+							if (in_array($label, ['Basic', 'HRA'])) {
+								// Calculate per-day value for "Basic" and "HRA"
+								$per_day_value = ($value / (float)$get_data_for_month[3]) * (float)$get_data_for_month[4];
+								echo '<td>' . htmlspecialchars($label) . '</td>';
+								echo '<td>₹' . number_format($per_day_value, 2) . '</td>';
+							} else {
+								// Show other labels as-is
+								echo '<td>' . htmlspecialchars($label) . '</td>';
+								echo '<td>₹' . number_format($earnings_data[$i]['value'],2) . '</td>';
+							}
 						} else {
-							echo '<td style=""></td><td style=""></td>';
+							echo '<td></td><td></td>'; // Empty cells if no earnings row exists
 						}
-
+					
 						echo '</tr>';
 					}
+					
+					
+
 					?>
 				</tbody>
 			</table>

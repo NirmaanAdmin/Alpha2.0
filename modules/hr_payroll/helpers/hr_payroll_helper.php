@@ -705,7 +705,7 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 
 				$formal_salary_list .= '<tr class="project-overview">
 					<td  width="50%" >' . $_name . '</td>
-					<td >' . currency_converter_value($value, $payslip->to_currency_rate ?? 1, $payslip->to_currency_name ?? '', true) . '</td>
+					<td >' . $value . '</td>
 					</tr>';
 			} elseif (preg_match('/^al2_/', $key)) {
 				$formal_allowance += (float)$value;
