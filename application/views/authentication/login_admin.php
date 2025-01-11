@@ -58,9 +58,9 @@
                     <?php echo _l('admin_auth_login_fp'); ?>
                 </a>
                 <br />
-                <a href="<?php echo base_url('authentication/login'); ?>" style="font-weight: 500;">
+                <!-- <a href="<?php echo base_url('authentication/login'); ?>" style="font-weight: 500;">
                     Client? Login Here >>
-                </a>
+                </a> -->
             </div>
 
             <?php hooks()->do_action('before_admin_login_form_close'); ?>
