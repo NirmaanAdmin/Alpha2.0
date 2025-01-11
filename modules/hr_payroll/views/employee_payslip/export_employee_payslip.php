@@ -267,7 +267,7 @@ $earnings_data = array_merge(
 				</tr>
 				<tr class="project-overview">
 					<td><?php echo _l('ps_net_pay'); ?></td>
-					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['net_pay'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
+					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['net_pay'] - ($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions']), $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 				</tr>
 			</tbody>
 		</table>
