@@ -4724,7 +4724,7 @@ order by staff_id, header_oder
 	public function get_staff_info($staffid)
 	{
 		$this->db->where('staffid', $staffid);
-		$this->db->where('avtive', 1);
+		$this->db->where('active', 1);
 		$results = $this->db->get(db_prefix() . 'staff')->row();
 		return $results;
 	}
