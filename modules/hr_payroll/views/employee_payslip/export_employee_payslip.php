@@ -26,7 +26,7 @@ $earnings_data = [
 $leave_data = [
 	['label' => _l('sick_leaves'), 'value' => isset($hrp_sl_leaves) ? $hrp_sl_leaves : '0'],
 	['label' => _l('casual_leave'), 'value' => isset($hrp_cl_leaves) ? $hrp_cl_leaves : '0'],
-	['label' => _l('lwp'), 'value' => isset($hrp_lwp_leaves) ? $hrp_lwp_leaves : '0'],
+	['label' => _l('lwp'), 'value' => isset($hrp_lwp_leaves) ? $hrp_lwp_leaves + ((float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves) : '0'],
 	['label' => _l('religiuos_leave'), 'value' => isset($hrp_rl_leaves) ? $hrp_rl_leaves : '0'],
 ];
 
