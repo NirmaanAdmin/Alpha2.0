@@ -6,4 +6,5 @@ $html = <<<EOF
 $export_employee
 </div>
 EOF;
+$pdf->SetAutoPageBreak(false, 0);
 $pdf->writeHTML($html, true, false, true, false, '');
