@@ -4724,6 +4724,7 @@ order by staff_id, header_oder
 	public function get_staff_info($staffid)
 	{
 		$this->db->where('staffid', $staffid);
+		$this->db->where('avtive', 1);
 		$results = $this->db->get(db_prefix() . 'staff')->row();
 		return $results;
 	}
@@ -5118,7 +5119,7 @@ order by staff_id, header_oder
 		// if (isset($attendance_calculation_v2)) {
 		// 	$hrp_attendance = $attendance_calculation_v2;
 		// }
-
+		
 		foreach ($hrp_attendance as $attendance_key => $attendance_value) {
 
 			$attendances[$attendance_value['staff_id']] = $attendance_value;
@@ -6972,11 +6973,13 @@ order by staff_id, header_oder
 		if ($where != '') {
 			$this->db->where($where);
 		}
+		
 		$this->db->where('rel_type', $rel_type);
 		$this->db->where("date_format(month, '%Y-%m-%d') = '" . $month . "'");
 		$this->db->order_by('staff_id', 'asc');
 		$employees_timesheets = $this->db->get(db_prefix() . 'hrp_employees_timesheets')->result_array();
-
+		
+		
 		// get employees_timesheet leaves
 		$this->db->select($str_select_temp . ', id, staff_id, month');
 		if ($where != '') {
@@ -7065,6 +7068,7 @@ order by staff_id, header_oder
 
 			$attendance_data[$timesheet['staff_id']] = $employees_timesheets[$em_key];
 		}
+		
 		return $employees_timesheets;
 	}
 
