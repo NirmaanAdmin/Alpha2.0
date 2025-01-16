@@ -66,7 +66,13 @@
 </table>
 
 <?php
+
 $hrp_payslip_salary_allowance = hrp_payslip_json_data_decode($payslip_detail['json_data'], $payslip);
+$hrp_cl_leaves = get_staff_leaves($employee['staff_id'],'casual-leave-cl',$payslip_detail['month']);
+$hrp_sl_leaves = get_staff_leaves($employee['staff_id'],1,$payslip_detail['month']);
+$hrp_rl_leaves = get_staff_leaves($employee['staff_id'],'religiuos-leave-l',$payslip_detail['month']);
+$hrp_lwp_leaves = get_staff_leaves($employee['staff_id'],'private_work_without_pay',$payslip_detail['month']);
+
 // Extract total salary and allowance
 $total_formal_salary = $hrp_payslip_salary_allowance['formal_salary'] ?? 0;
 $total_formal_allowance = $hrp_payslip_salary_allowance['formal_allowance'] ?? 0;
@@ -81,6 +87,13 @@ $earnings_data = [
 	['label' => _l('Commission amount'), 'value' => isset($payslip_detail) ? $payslip_detail['commission_amount'] : '0'],
 	['label' => _l('Bonus kpi'), 'value' => isset($payslip_detail) ? $payslip_detail['bonus_kpi'] : '0'],
 	['label' => _l('Total'), 'value' => isset($payslip_detail) ? $payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'] : '0'],
+];
+
+$leave_data = [
+	['label' => _l('sick_leaves'), 'value' => isset($hrp_sl_leaves) ? $hrp_sl_leaves : '0'],
+	['label' => _l('casual_leave'), 'value' => isset($hrp_cl_leaves) ? $hrp_cl_leaves : '0'],
+	['label' => _l('lwp'), 'value' => isset($hrp_lwp_leaves) ? $hrp_lwp_leaves : '0'],
+	['label' => _l('religiuos_leave'), 'value' => isset($hrp_rl_leaves) ? $hrp_rl_leaves : '0'],
 ];
 
 // Fix malformed HTML by wrapping it in a parent element
@@ -146,17 +159,18 @@ $earnings_data = array_merge(
 				<tbody>
 
 					<tr style="background-color:rgb(28, 26, 26);color: #ffffff;">
+						<th style=" padding: 5px;"><strong><?php echo _l('Leave Details'); ?></strong></th>
+						<th style=" padding: 5px; "><strong><?php echo _l('Amount'); ?></strong></th>
 						<th style=" padding: 5px;"><strong><?php echo _l('Actual salary'); ?></strong></th>
 						<th style=" padding: 5px; "><strong><?php echo _l('Amount'); ?></strong></th>
 						<th style=" padding: 5px;"><strong><?php echo _l('Earnings'); ?></strong></th>
 						<th style=" padding: 5px; "><strong><?php echo _l('Amount'); ?></strong></th>
+
 					</tr>
 
 					<!-- Table Body -->
 					<?php
-
-
-					$max_rows = max(count($result), count($earnings_data));
+					$max_rows = max(count($result), count($earnings_data), count($leave_data));
 
 					for ($i = 0; $i < $max_rows; $i++) {
 
@@ -169,6 +183,12 @@ $earnings_data = array_merge(
 
 						echo '<tr>';
 
+						if (isset($leave_data[$i])) {
+							echo '<td>' . htmlspecialchars($leave_data[$i]['label']) . '</td>';
+							echo '<td>' . $leave_data[$i]['value'] . '</td>';
+						} else {
+							echo '<td></td><td></td>';
+						}
 
 						if (isset($result[$i])) {
 							echo '<td>' . htmlspecialchars($result[$i]['label']) . '</td>';
@@ -207,80 +227,43 @@ $earnings_data = array_merge(
 					?>
 				</tbody>
 			</table>
-
-
-			<!-- <table class="table" style="width: 48%;">
+			<table class="table">
 				<tbody>
 					<tr>
-						<th class=" thead-dark"><?php echo _l('Earnings'); ?></th>
-						<th class=" thead-dark" style="text-align: right;"><?php echo _l('hrp_amount'); ?></th>
+						<th class="thead-dark">Deductions</th>
+						<th class="thead-dark">Amount</th>
 					</tr>
-					<tr class="project-overview">
-						<td width="30%"><?php echo _l('ps_gross_pay'); ?></td>
-						<td style="text-align: right;"><?php echo new_html_entity_decode(isset($payslip_detail) ?  currency_converter_value($payslip_detail['gross_pay'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0); ?></td>
-					</tr>
-					<tr class="project-overview">
-						<td><?php echo _l('commission_amount'); ?></td>
-						<td style="text-align: right;"><?php echo (isset($payslip_detail) ? currency_converter_value($payslip_detail['commission_amount'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0); ?></td>
-					</tr>
+
+					<?php echo isset($hrp_payslip_salary_allowance['formal_deduction_list']) ? $hrp_payslip_salary_allowance['formal_deduction_list'] : '' ?>
+
 
 					<tr class="project-overview">
-						<td><?php echo _l('ps_bonus_kpi'); ?></td>
-						<td style="text-align: right;"><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['bonus_kpi'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
+						<td width="30%"><?php echo _l('income_tax'); ?></td>
+						<td class="text-left"><?php echo new_html_entity_decode(isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : ''); ?></td>
 					</tr>
 					<tr class="project-overview">
-						<td class="bold"><?php echo _l('total'); ?></td>
-						<td style="text-align: right;"><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
+						<td><?php echo _l('hrp_insurrance'); ?></td>
+						<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['total_insurance'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 					</tr>
 
-				</tbody>
-			</table> -->
-
-		<?php } ?>
-
-
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-6">
-
-		<table class="table">
-			<tbody>
-				<tr>
-					<th class="thead-dark">Deductions</th>
-					<th class="thead-dark"></th>
-				</tr>
-
-				<?php echo isset($hrp_payslip_salary_allowance['formal_deduction_list']) ? $hrp_payslip_salary_allowance['formal_deduction_list'] : '' ?>
-
-
-				<tr class="project-overview">
-					<td width="30%"><?php echo _l('income_tax'); ?></td>
-					<td class="text-left"><?php echo new_html_entity_decode(isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : ''); ?></td>
-				</tr>
-				<tr class="project-overview">
-					<td><?php echo _l('hrp_insurrance'); ?></td>
-					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['total_insurance'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
-				</tr>
-
-				<!-- <tr class="project-overview">
+					<!-- <tr class="project-overview">
 					<td><?php echo _l('hrp_deduction_manage'); ?></td>
 					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
 				</tr> -->
-				<tr class="project-overview">
-					<td class="bold"><?php echo _l('total'); ?></td>
-					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
-				</tr>
-				<tr class="project-overview">
-					<td><?php echo _l('ps_net_pay'); ?></td>
-					<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['net_pay'] - ($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions']), $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
-				</tr>
-			</tbody>
-		</table>
+					<tr class="project-overview">
+						<td class="bold"><?php echo _l('total'); ?></td>
+						<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions'], $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
+					</tr>
+					<tr class="project-overview">
+						<td><?php echo _l('ps_net_pay'); ?></td>
+						<td><?php echo isset($payslip_detail) ? currency_converter_value($payslip_detail['net_pay'] - ($payslip_detail['income_tax_paye'] + $payslip_detail['total_insurance'] + $payslip_detail['total_deductions']), $payslip->to_currency_rate, $payslip->to_currency_name ?? '', true) : 0; ?></td>
+					</tr>
+				</tbody>
+			</table>
 
-
+		<?php } ?>
+		<div class="col-md-12" style="text-align: center;">
+			<h5>This is computer generated statement hence and does not require signature</h5>
+		</div>
 	</div>
-
-
-
 </div>

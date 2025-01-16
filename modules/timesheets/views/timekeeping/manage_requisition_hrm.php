@@ -248,7 +248,7 @@ render_datatable($table_data,'table_registration_leave',
                      <!-- <option value="8"><?php echo _l('annual_leave') ?></option> -->
                      <!-- <option value="2"><?php echo _l('maternity_leave') ?></option>                   -->
                      <option value="4">Leave Without Pay(LWP)</option>
-                     <option value="1"><?php echo _l('sick_leave') ?></option>    
+                     <option value="1"><?php echo _l('sick_leave') ?>(SL)</option>    
                      <?php 
                      foreach ($type_of_leave as $value) { ?>
                       <option value="<?php echo html_entity_decode($value['slug']); ?>"><?php echo html_entity_decode($value['type_name']); ?></option>    

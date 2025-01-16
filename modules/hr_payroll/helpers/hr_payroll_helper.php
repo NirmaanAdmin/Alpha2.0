@@ -629,7 +629,7 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 					$probationary_code = 'al1_' . $value['rel_id'];
 					$formal_code  = 'al2_' . $value['rel_id'];
 					break;
-				
+
 
 				default:
 					# code...
@@ -699,8 +699,8 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 
 				$_name = '';
 				if (isset($earnings_list_data[$key])) {
-				$integration_hr = true;
-				$_name .= $earnings_list_data[$key]['description'];
+					$integration_hr = true;
+					$_name .= $earnings_list_data[$key]['description'];
 				}
 
 				$formal_salary_list .= '<tr class="project-overview">
@@ -709,7 +709,7 @@ function hrp_payslip_json_data_decode($json_data = '', $payslip = '')
 					</tr>';
 			} elseif (preg_match('/^al2_/', $key)) {
 				$formal_allowance += (float)$value;
-	
+
 				$_name = '';
 				if (isset($earnings_list_data[$key])) {
 					$_name .= $earnings_list_data[$key]['description'];
@@ -1230,4 +1230,28 @@ function currency_converter_value($value, $rate, $currency, $symbol = false)
 	}
 
 	return $value;
+}
+
+function get_staff_leaves($id, $type, $date)
+{
+    $CI = &get_instance();
+
+    // Parse the given date to extract the year and month
+    $parsed_date = new DateTime($date);
+    $year = $parsed_date->format('Y');
+    $month = $parsed_date->format('m');
+
+    // Build the query
+    $CI->db->select_sum('number_of_leaving_day');
+    $CI->db->where('type_of_leave_text', $type);
+    $CI->db->where('staff_id', $id);
+    $CI->db->where("YEAR(start_time) =", $year);
+    $CI->db->where("MONTH(start_time) =", $month);
+    $CI->db->where("YEAR(end_time) =", $year);
+    $CI->db->where("MONTH(end_time) =", $month);
+
+    $result = $CI->db->get(db_prefix() . 'timesheets_requisition_leave')->row();
+
+    // Return the sum
+    return $result->number_of_leaving_day ?? 0;
 }

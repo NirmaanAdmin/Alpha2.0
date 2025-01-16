@@ -310,3 +310,7 @@ $lang['doj']             										= 'Date of joining';
 $lang['staff_code']           										= 'Staff code';
 $lang['hrp_actual_salary']          										= 'Actual salary';
 $lang['hrp_total']        										= 'Total';
+$lang['lwp'] = 'LWP';
+$lang['casual_leave'] = 'CL';
+$lang['religiuos_leave'] = 'RL';
+$lang['sick_leaves'] = 'SL';
