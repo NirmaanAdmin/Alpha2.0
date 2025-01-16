@@ -44,7 +44,7 @@
           ?>
           <label for="type_of_leave" class="control-label"><?php echo _l('type_of_leave'); ?></label>
           <select name="type_of_leave" class="selectpicker" id="rel_type" data-width="100%" data-none-selected-text="<?php echo _l('none_type'); ?>" onchange="filter_hanson()">
-            <option value="8" <?php echo ($type_of_leave_selected == 8 ? 'selected' : '') ?>><?php echo _l('annual_leave') ?></option>
+            <!-- <option value="8" <?php echo ($type_of_leave_selected == 8 ? 'selected' : '') ?>><?php echo _l('annual_leave') ?></option> -->
             <!-- <option value="2" <?php echo ($type_of_leave_selected == 2 ? 'selected' : '') ?>><?php echo _l('maternity_leave') ?></option> -->
             <!-- <option value="4" <?php echo ($type_of_leave_selected == 4 ? 'selected' : '') ?>><?php echo _l('private_work_without_pay') ?></option> -->
             <option value="1" <?php echo ($type_of_leave_selected == 1 ? 'selected' : '') ?>><?php echo _l('sick_leave') ?>(SL)</option>
