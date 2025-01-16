@@ -12,17 +12,27 @@ $notification_recipient_select = explode(',', $notification_recipient_select);  
     <?php echo render_input('name','subject',$value,'text'); ?>
   </div>
   <div class="col-md-6">
-    <?php $related = [ 
+    <?php 
+    // $related = [ 
+    //   ['id' => 'additional_timesheets', 'name' => _l('additional_timesheets')],
+    //   ['id' => 'Leave', 'name' => _l('annual_leave')],
+    //   ['id' => 'maternity_leave', 'name' => _l('maternity_leave')],
+    //   ['id' => 'private_work_without_pay', 'name' => _l('private_work_without_pay')],
+    //   ['id' => 'sick_leave', 'name' => _l('sick_leave')],
+    //   ['id' => 'late', 'name' => _l('late')],
+    //   ['id' => 'early', 'name' => _l('early')],
+    //   ['id' => 'Go_out', 'name' => _l('Go_out')],
+    //   ['id' => 'Go_on_bussiness', 'name' => _l('Go_on_bussiness')],
+    // ]; 
+    $related = [ 
       ['id' => 'additional_timesheets', 'name' => _l('additional_timesheets')],
-      ['id' => 'Leave', 'name' => _l('annual_leave')],
-      ['id' => 'maternity_leave', 'name' => _l('maternity_leave')],
       ['id' => 'private_work_without_pay', 'name' => _l('private_work_without_pay')],
       ['id' => 'sick_leave', 'name' => _l('sick_leave')],
       ['id' => 'late', 'name' => _l('late')],
       ['id' => 'early', 'name' => _l('early')],
       ['id' => 'Go_out', 'name' => _l('Go_out')],
       ['id' => 'Go_on_bussiness', 'name' => _l('Go_on_bussiness')],
-    ]; 
+    ];
 
     foreach ($type_of_leave as $value) {
       $related[] =  ['id' => $value['slug'], 'name' => $value['type_name']];
