@@ -3,7 +3,7 @@
 
 $hrp_payslip_salary_allowance = hrp_payslip_json_data_decode($payslip_detail['json_data'], $payslip);
 $hrp_cl_leaves = get_staff_leaves($employee['staff_id'],'casual-leave-cl',$payslip_detail['month']);
-$hrp_sl_leaves = get_staff_leaves($employee['staff_id'],1,$payslip_detail['month']);
+$hrp_sl_leaves = get_staff_leaves($employee['staff_id'],'sick_leave',$payslip_detail['month']);
 $hrp_rl_leaves = get_staff_leaves($employee['staff_id'],'religiuos-leave-l',$payslip_detail['month']);
 $hrp_lwp_leaves = get_staff_leaves($employee['staff_id'],'private_work_without_pay',$payslip_detail['month']);
 
