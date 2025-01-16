@@ -1,70 +1,4 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-
-<table class="table">
-	<tbody>
-		<tr>
-			<td width="15%" class="text_align_center candidate_name_widt_27">
-				<?php echo pdf_logo_url(); ?>
-			</td>
-			<td width="85%" class="text_align_center logo_with"><?php echo format_organization_info() ?></td>
-		</tr>
-	</tbody>
-</table>
-
-<div class="text_align_center">
-	<b>
-		<h3 style="margin-bottom: 0% !important;"><?php echo _l('hrp_payslip_for') . ' ' . date('M-Y', strtotime($payslip_detail['month'])); ?> </h3>
-	</b>
-	<br>
-	<p style="margin-top: 0% !important;font-size: 12px">Form IV B [ Rule 26(2) (b) ]</p>
-</div>
-
-<table border="1" class="width-100-height-55">
-	<tbody>
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('employee_name'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['employee_name']); ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('staff_code'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo $emp_code ?></td>
-		</tr>
-
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('job_title'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode(isset($employee['job_title']) ? $employee['job_title'] : '') ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('hrp_worked_day_new'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] ?></td>
-
-		</tr>
-
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('staff_departments'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($list_department) ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('paid_days'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($get_data_for_month[4]); ?></td>
-		</tr>
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('ps_pay_slip_number'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['pay_slip_number']); ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('unpaid_days'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] - (float)$get_data_for_month[4]; ?></td>
-		</tr>
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('epf_no'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode($employee['epf_no']); ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('esi_no'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo $esi_no ?></td>
-		</tr>
-		<tr class="height-27">
-			<td class="width-20-height-27 align_left"><strong><?php echo _l('doj'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo date('d M, Y', strtotime($employee['primary_effective'])); ?></td>
-			<td class="width-20-height-27"><strong><?php echo _l('income_tax_number'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo new_html_entity_decode(isset($employee['income_tax_number']) ? $employee['income_tax_number'] : '') ?></td>
-
-		</tr>
-
-	</tbody>
-</table>
-
 <?php
 
 $hrp_payslip_salary_allowance = hrp_payslip_json_data_decode($payslip_detail['json_data'], $payslip);
@@ -138,6 +72,72 @@ $earnings_data = array_merge(
 );
 
 ?>
+
+<table class="table">
+	<tbody>
+		<tr>
+			<td width="15%" class="text_align_center candidate_name_widt_27">
+				<?php echo pdf_logo_url(); ?>
+			</td>
+			<td width="85%" class="text_align_center logo_with"><?php echo format_organization_info() ?></td>
+		</tr>
+	</tbody>
+</table>
+
+<div class="text_align_center">
+	<b>
+		<h3 style="margin-bottom: 0% !important;"><?php echo _l('hrp_payslip_for') . ' ' . date('M-Y', strtotime($payslip_detail['month'])); ?> </h3>
+	</b>
+	<br>
+	<p style="margin-top: 0% !important;font-size: 12px">Form IV B [ Rule 26(2) (b) ]</p>
+</div>
+
+<table border="1" class="width-100-height-55">
+	<tbody>
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('employee_name'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['employee_name']); ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('staff_code'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo $emp_code ?></td>
+		</tr>
+
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('job_title'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode(isset($employee['job_title']) ? $employee['job_title'] : '') ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('hrp_worked_day_new'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] ?></td>
+
+		</tr>
+
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('staff_departments'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($list_department) ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('paid_days'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($get_data_for_month[4]); ?></td>
+		</tr>
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('ps_pay_slip_number'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['pay_slip_number']); ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('unpaid_days'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves; ?></td>
+		</tr>
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('epf_no'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode($employee['epf_no']); ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('esi_no'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo $esi_no ?></td>
+		</tr>
+		<tr class="height-27">
+			<td class="width-20-height-27 align_left"><strong><?php echo _l('doj'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo date('d M, Y', strtotime($employee['primary_effective'])); ?></td>
+			<td class="width-20-height-27"><strong><?php echo _l('income_tax_number'); ?></strong></td>
+			<td class="width-30-height-27"><?php echo new_html_entity_decode(isset($employee['income_tax_number']) ? $employee['income_tax_number'] : '') ?></td>
+
+		</tr>
+
+	</tbody>
+</table>
+
 
 <div class="row">
 	<div class="col-md-6">
