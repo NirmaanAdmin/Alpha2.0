@@ -6585,7 +6585,7 @@ public function check_in_ts() {
 		$max_row = 0;
 		$new_array_obj = [];
 		$this->load->model('staff_model');
-		$data_staff = $this->staff_model->get();
+		$data_staff = $this->staff_model->get('', 'active = 1');
 		foreach ($data_staff as $key => $value) {
 			$max_row++;
 			$result = $this->get_norms_of_leave_staff($value, $year, $type_of_leave);

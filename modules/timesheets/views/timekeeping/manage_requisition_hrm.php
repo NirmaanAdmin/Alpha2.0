@@ -246,8 +246,8 @@ render_datatable($table_data,'table_registration_leave',
                    <div class="<?php if(is_admin()){ echo 'input-group'; } ?>">
                     <select name="type_of_leave" class="selectpicker" id="type_of_leave" data-width="100%" data-none-selected-text="<?php echo _l('none_type'); ?>">
                      <option value="8"><?php echo _l('annual_leave') ?></option>
-                     <option value="2"><?php echo _l('maternity_leave') ?></option>                  
-                     <option value="4"><?php echo _l('private_work_without_pay') ?></option>
+                     <!-- <option value="2"><?php echo _l('maternity_leave') ?></option>                   -->
+                     <option value="4">Leave Without Pay(LWP)</option>
                      <option value="1"><?php echo _l('sick_leave') ?></option>    
                      <?php 
                      foreach ($type_of_leave as $value) { ?>
