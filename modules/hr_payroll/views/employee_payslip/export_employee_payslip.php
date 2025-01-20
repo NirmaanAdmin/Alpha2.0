@@ -230,13 +230,14 @@ $earnings_data = array_merge(
 
 						echo '</tr>';
 					}
+					$er_total = isset($payslip_detail) ? $payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'] : '0';
 					// Add Single Total Row for Both Actual Salary and Earnings
 					echo '<tr style="background-color: #f2f2f2; font-weight: bold;">';
 					echo '<td colspan="2"></td>'; // Empty cells for Leave Details
 					echo '<td>' . htmlspecialchars($total_row['label']) . '</td>';
 					echo '<td>₹' . number_format($total_row['value'], 2) . '</td>'; // Actual Salary Total
 					echo '<td>' . htmlspecialchars($total_earnings_row['label']) . '</td>';
-					echo '<td>₹' . number_format($payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'], 2) . '</td>'; // Earnings Total
+					echo '<td>₹' . number_format($er_total, 2) . '</td>'; // Earnings Total
 					echo '</tr>';
 					?>
 				</tbody>
