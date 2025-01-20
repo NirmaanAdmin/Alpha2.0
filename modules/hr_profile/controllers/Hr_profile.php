@@ -6154,7 +6154,7 @@ class Hr_profile extends AdminController {
 
 			$months_report = $months_report;
 			if ($months_report == '' || !isset($months_report)) {
-				$staff_list = $this->staff_model->get();
+				$staff_list = $this->staff_model->get('',['active' => 1]);
 			}
 			if ($months_report == 'this_month') {
 

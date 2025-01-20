@@ -11,7 +11,7 @@ class Hr_profile_model extends App_Model
 	 */
 	public function get_hr_profile_dashboard_data(){
 		$data_hrm = [];
-		$staff = $this->staff_model->get();
+		$staff = $this->staff_model->get('',['active' => 1]);
 		$total_staff = count($staff);
 		$new_staff_in_month = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE MONTH(datecreated) = '.date('m').' AND YEAR(datecreated) = '.date('Y'))->result_array();
 		$staff_working = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "working"')->result_array();
@@ -37,7 +37,7 @@ class Hr_profile_model extends App_Model
 	 */
 	public function staff_chart_by_age()
 	{
-		$staffs = $this->staff_model->get();
+		$staffs = $this->staff_model->get('',['active' => 1]);
 		$chart = [];
 		$status_1 = ['name' => _l('18_24_age'), 'color' => '#777', 'y' => 0, 'z' => 100];
 		$status_2 = ['name' => _l('25_29_age'), 'color' => '#fc2d42', 'y' => 0, 'z' => 100];
@@ -144,6 +144,8 @@ class Hr_profile_model extends App_Model
 
 		$this->db->select(db_prefix().'staff_departments.departmentid, count(staffdepartmentid) as total_staff,'.db_prefix().'departments.name as department_name');
 		$this->db->join(db_prefix() . 'departments', db_prefix() . 'departments.departmentid = ' . db_prefix() . 'staff_departments.departmentid', 'left');
+		$this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'staff_departments.staffid', 'left');
+		$this->db->where( db_prefix() . 'staff.active = 1');
 		$this->db->group_by('departmentid');
 		$staff_departments = $this->db->get(db_prefix().'staff_departments')->result_array();
 
@@ -185,6 +187,7 @@ class Hr_profile_model extends App_Model
 		$this->db->select(db_prefix().'hr_job_position.position_name, count(staffid) as total_staff, job_position');
 		$this->db->join(db_prefix() . 'hr_job_position', db_prefix() . 'hr_job_position.position_id = ' . db_prefix() . 'staff.job_position', 'left');
 		$this->db->group_by('job_position');
+		$this->db->where('active = 1');
 		$staff_departments = $this->db->get(db_prefix().'staff')->result_array();
 
 		$color_index=0;
@@ -251,7 +254,7 @@ class Hr_profile_model extends App_Model
 	public function new_staff_by_month($month)
 	{
 		$this->db->select('count(staffid) as total_staff');
-		$sql_where = "date_format(datecreated, '%Y-%m') = '".$month."'";
+		$sql_where = "active = 1 AND date_format(datecreated, '%Y-%m') = '".$month."'";
 		$this->db->where($sql_where);
 		$result = $this->db->get(db_prefix().'staff')->row();
 
@@ -271,7 +274,7 @@ class Hr_profile_model extends App_Model
 	public function staff_working_by_month($month)
 	{
 		$this->db->select('count(staffid) as total_staff');
-		$sql_where = "status_work = 'working' AND date_format(datecreated, '%Y-%m') < '".$month."'";
+		$sql_where = "active = 1 AND status_work = 'working' AND date_format(datecreated, '%Y-%m') < '".$month."'";
 		$this->db->where($sql_where);
 		$result = $this->db->get(db_prefix().'staff')->row();
 
@@ -291,7 +294,7 @@ class Hr_profile_model extends App_Model
 	public function staff_quit_work_by_month($month)
 	{	
 		$this->db->select('count(staffid) as total_staff');
-		$sql_where = 'staffid in (SELECT staffid FROM '.db_prefix().'hr_list_staff_quitting_work where date_format(dateoff, "%Y-%m") <= '.$month.') OR (status_work = "inactivity" AND date_format(date_update, "%Y-%m") = "'.$month.'")';
+		$sql_where = 'staffid in (SELECT staffid FROM '.db_prefix().'hr_list_staff_quitting_work where date_format(dateoff, "%Y-%m") <= '.$month.') OR (status_work = "inactivity" AND date_format(date_update, "%Y-%m") = "'.$month.'") AND active = 1';
 		$this->db->where($sql_where);
 		$result = $this->db->get(db_prefix().'staff')->row();
 
@@ -5995,7 +5998,7 @@ public function add_attachment_to_database($rel_id, $rel_type, $attachment, $ext
      */
     public function get_staff_by_month($from_month, $to_month)
     {
-        return $this->db->query('select * from '.db_prefix().'staff where datecreated between \''.$from_month.'\' and \''.$to_month.'\'')->result_array();
+        return $this->db->query('select * from '.db_prefix().'staff where active = 1 and datecreated between \''.$from_month.'\' and \''.$to_month.'\'')->result_array();
     }
 
 
