@@ -314,3 +314,4 @@ $lang['lwp'] = 'LWP';
 $lang['casual_leave'] = 'CL';
 $lang['religiuos_leave'] = 'RL';
 $lang['sick_leaves'] = 'SL';
+$lang['comp_off'] = 'CP';

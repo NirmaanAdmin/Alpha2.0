@@ -2,11 +2,11 @@
 <?php
 
 $hrp_payslip_salary_allowance = hrp_payslip_json_data_decode($payslip_detail['json_data'], $payslip);
-$hrp_cl_leaves = get_staff_leaves($employee['staff_id'],'casual-leave-cl',$payslip_detail['month']);
-$hrp_sl_leaves = get_staff_leaves($employee['staff_id'],'sick_leave',$payslip_detail['month']);
-$hrp_rl_leaves = get_staff_leaves($employee['staff_id'],'religiuos-leave-l',$payslip_detail['month']);
-$hrp_lwp_leaves = get_staff_leaves($employee['staff_id'],'private_work_without_pay',$payslip_detail['month']);
-
+$hrp_cl_leaves = get_staff_leaves($employee['staff_id'], 'casual-leave-cl', $payslip_detail['month']);
+$hrp_sl_leaves = get_staff_leaves($employee['staff_id'], 'sick_leave', $payslip_detail['month']);
+$hrp_rl_leaves = get_staff_leaves($employee['staff_id'], 'religiuos-leave-l', $payslip_detail['month']);
+$hrp_lwp_leaves = get_staff_leaves($employee['staff_id'], 'private_work_without_pay', $payslip_detail['month']);
+$hrp_coff_leaves = get_staff_leaves($employee['staff_id'], 'compensatory-leave-comp-off', $payslip_detail['month']);
 // Extract total salary and allowance
 $total_formal_salary = $hrp_payslip_salary_allowance['formal_salary'] ?? 0;
 $total_formal_allowance = $hrp_payslip_salary_allowance['formal_allowance'] ?? 0;
@@ -14,20 +14,22 @@ $total_formal_contract = $total_formal_salary + $total_formal_allowance;
 
 
 $formal_contract = isset($hrp_payslip_salary_allowance['formal_contract_list']) ? $hrp_payslip_salary_allowance['formal_contract_list'] : '';
+
 $formal_rows = explode('</tr>', $formal_contract);
 
 $earnings_data = [
 	['label' => _l('Gross pay'), 'value' => isset($payslip_detail) ? $payslip_detail['gross_pay'] : '0'],
 	['label' => _l('Commission amount'), 'value' => isset($payslip_detail) ? $payslip_detail['commission_amount'] : '0'],
 	['label' => _l('Bonus kpi'), 'value' => isset($payslip_detail) ? $payslip_detail['bonus_kpi'] : '0'],
-	['label' => _l('Total'), 'value' => isset($payslip_detail) ? $payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'] : '0'],
+	
 ];
 
 $leave_data = [
 	['label' => _l('sick_leaves'), 'value' => isset($hrp_sl_leaves) ? $hrp_sl_leaves : '0'],
 	['label' => _l('casual_leave'), 'value' => isset($hrp_cl_leaves) ? $hrp_cl_leaves : '0'],
-	['label' => _l('lwp'), 'value' => isset($hrp_lwp_leaves) ? $hrp_lwp_leaves + ((float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves) : '0'],
+	['label' => _l('lwp'), 'value' => isset($hrp_lwp_leaves) ? $hrp_lwp_leaves + ((float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves - (float)$hrp_coff_leaves) : '0'],
 	['label' => _l('religiuos_leave'), 'value' => isset($hrp_rl_leaves) ? $hrp_rl_leaves : '0'],
+	['label' => _l('comp_off'), 'value' => isset($hrp_coff_leaves) ? $hrp_coff_leaves : '0'],
 ];
 
 // Fix malformed HTML by wrapping it in a parent element
@@ -55,6 +57,8 @@ foreach ($rows as $row) {
 		$label = trim($cells[0]->nodeValue); // Get text from the first <td>
 		$value = trim($cells[1]->nodeValue); // Get text from the second <td>
 		if (!empty($label) || !empty($value)) {
+			$numeric_value = (float)str_replace(',', '', $value); // Convert value to a float
+			$total_actual_salary += $numeric_value; // Add to total
 			$result[] = [
 				'label' => $label,
 				'value' => $value,
@@ -62,7 +66,10 @@ foreach ($rows as $row) {
 		}
 	}
 }
-
+$total_row = [
+	'label' => _l('total'),
+	'value' => $total_actual_salary,
+];
 // Dynamically insert $result before "Gross Pay" in $earnings_data
 $gross_pay_index = array_search('Gross pay', array_column($earnings_data, 'label'));
 $earnings_data = array_merge(
@@ -119,7 +126,7 @@ $earnings_data = array_merge(
 			<td class="width-20-height-27 align_left"><strong><?php echo _l('ps_pay_slip_number'); ?></strong></td>
 			<td class="width-30-height-27"><?php echo new_html_entity_decode($payslip_detail['pay_slip_number']); ?></td>
 			<td class="width-20-height-27"><strong><?php echo _l('unpaid_days'); ?></strong></td>
-			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves; ?></td>
+			<td class="width-30-height-27"><?php echo (float)$get_data_for_month[3] - (float)$get_data_for_month[4] - (float)$hrp_cl_leaves - (float)$hrp_sl_leaves - (float)$hrp_coff_leaves; ?></td>
 		</tr>
 		<tr class="height-27">
 			<td class="width-20-height-27 align_left"><strong><?php echo _l('epf_no'); ?></strong></td>
@@ -223,7 +230,14 @@ $earnings_data = array_merge(
 
 						echo '</tr>';
 					}
-
+					// Add Single Total Row for Both Actual Salary and Earnings
+					echo '<tr style="background-color: #f2f2f2; font-weight: bold;">';
+					echo '<td colspan="2"></td>'; // Empty cells for Leave Details
+					echo '<td>' . htmlspecialchars($total_row['label']) . '</td>';
+					echo '<td>₹' . number_format($total_row['value'], 2) . '</td>'; // Actual Salary Total
+					echo '<td>' . htmlspecialchars($total_earnings_row['label']) . '</td>';
+					echo '<td>₹' . number_format($payslip_detail['gross_pay'] + $payslip_detail['commission_amount'] + $payslip_detail['bonus_kpi'], 2) . '</td>'; // Earnings Total
+					echo '</tr>';
 					?>
 				</tbody>
 			</table>
