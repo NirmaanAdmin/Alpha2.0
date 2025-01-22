@@ -3043,19 +3043,19 @@ class Warehouse_model extends App_Model
 		<tbody>
 
 		<tr>
-		<th class="thead-dark-ip">' . _l('_order') . '</th>
-		<th class="thead-dark-ip">' . _l('commodity_code') . '</th>
-		<th class="thead-dark-ip">' . _l('description') . '</th>
-		<th class="thead-dark-ip">' . _l('warehouse_name') . '</th>
-		<th class="thead-dark-ip">' . _l('unit_name') . '</th>
-		<th class="thead-dark-ip">' . _l('quantity') . '</th>
-		<th class="thead-dark-ip">' . _l('unit_price') . '</th>
-		<th class="thead-dark-ip">' . _l('total_money') . '</th>
-		<th class="thead-dark-ip">' . _l('tax_money') . '</th>
-		<th class="thead-dark-ip">' . _l('lot_number') . '</th>
+		<th class="thead-dark-ip" style="width: 6%">' . _l('_order') . '</th>
+		<th class="thead-dark-ip" style="width: 25%">' . _l('commodity_code') . '</th>
+		<th class="thead-dark-ip" style="width: 20%">' . _l('description') . '</th>
+		<th class="thead-dark-ip" style="width: 18%	">' . _l('warehouse_name') . '</th>
+		<th class="thead-dark-ip" style="width: 10%">' . _l('unit_name') . '</th>
+		<th class="thead-dark-ip" style="width: 10%">' . _l('quantity') . '</th>
+		<th class="thead-dark-ip" style="width: 10%">' . _l('lot_number') . '</th>
 		
 
 		</tr>';
+		// <th class="thead-dark-ip">' . _l('unit_price') . '</th>
+		// <th class="thead-dark-ip">' . _l('total_money') . '</th>
+		// <th class="thead-dark-ip">' . _l('tax_money') . '</th>
 		// <th class="thead-dark-ip">' . _l('expiry_date') . '</th>
 		foreach ($goods_receipt_detail as $receipt_key => $receipt_value) {
 
@@ -3084,18 +3084,18 @@ class Warehouse_model extends App_Model
 			$key = $receipt_key + 1;
 
 			$html .= '<tr>';
-			$html .= '<td class="td_style_r_ep_c"><b>' . $key . '</b></td>
-			<td class="td_style_r_ep_c"><b>' . $commodity_name . '</b></td>
-			<td class="td_style_r_ep_c">' . $description . '</td>
-			<td class="td_style_r_ep_c">' . $warehouse_code . '</td>
-			<td class="td_style_r_ep_c">' . $unit_name . '</td>
-			<td class="td_style_r_ep_c">' . $quantities . '</td>
-			<td class="td_style_r_ep_c">' . app_format_money((float) $unit_price, '') . '</td>
-			<td class="td_style_r_ep_c">' . app_format_money((float) $goods_money, '') . '</td>
-			<td class="td_style_r_ep_c">' . app_format_money((float) $tax_money, '') . '</td>
-			<td class="td_style_r_ep_c">' . $lot_number . '</td>
+			$html .= '<td class="" style="width: 6%"><b>' . $key . '</b></td>
+			<td class="" style="width: 25%"><b>' . $commodity_name . '</b></td>
+			<td class="" style="width: 20%">' . $description . '</td>
+			<td class="" style="width: 18%">' . $warehouse_code . '</td>
+			<td class="" style="width: 10%">' . $unit_name . '</td>
+			<td class="" style="width: 10%">' . $quantities . '</td>
+			<td class="" style="width: 10%">' . $lot_number . '</td>
 			
 			</tr>';
+			// <td class="td_style_r_ep_c">' . app_format_money((float) $unit_price, '') . '</td>
+			// <td class="td_style_r_ep_c">' . app_format_money((float) $goods_money, '') . '</td>
+			// <td class="td_style_r_ep_c">' . app_format_money((float) $tax_money, '') . '</td>
 			// <td class="td_style_r_ep_c">' . _d($expiry_date) . '</td>
 
 			if (strlen($receipt_value['serial_number']) > 0) {
@@ -3120,48 +3120,48 @@ class Warehouse_model extends App_Model
 		<p>' . $goods_receipt->description . '</p>';
 
 
-		$html .= '<table class="table">
-		<tbody>
-		<tr>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td class="text_left"><b>' . _l('total_goods_money') . '</b></td>
-		<td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_goods_money, '') . '</td>
-		</tr>
+		// $html .= '<table class="table">
+		// <tbody>
+		// <tr>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td class="text_left"><b>' . _l('total_goods_money') . '</b></td>
+		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_goods_money, '') . '</td>
+		// </tr>
 
-		<tr>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td class="text_left"><b>' . _l('value_of_inventory') . '</b></td>
-		<td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->value_of_inventory, '') . '</td>
-		</tr>';
+		// <tr>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td class="text_left"><b>' . _l('value_of_inventory') . '</b></td>
+		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->value_of_inventory, '') . '</td>
+		// </tr>';
 
-		$html .= $tax_data['pdf_html'];
+		// $html .= $tax_data['pdf_html'];
 
-		$html .= '<tr>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td class="text_left"><b>' . _l('total_tax_money') . '</b></td>
-		<td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_tax_money, '') . '</td>
-		</tr>';
+		// $html .= '<tr>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td class="text_left"><b>' . _l('total_tax_money') . '</b></td>
+		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_tax_money, '') . '</td>
+		// </tr>';
 
 
 
-		$html .= '<tr>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td class="text_left"><b>' . _l('total_money') . '</b></td>
-		<td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_money, '') . '</td>
-		</tr>
+		// $html .= '<tr>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td class="text_left"><b>' . _l('total_money') . '</b></td>
+		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_money, '') . '</td>
+		// </tr>
 		
-		</tbody>
-		</table>
-		<br><br><br>
-		';
+		// </tbody>
+		// </table>
+		// <br><br><br>
+		// ';
 
 		if ($warehouse_lotnumber_bottom_infor_option == 1) {
 			$html .= '<table class="table">
@@ -3865,25 +3865,25 @@ class Warehouse_model extends App_Model
 		<tbody>
 
 		<tr>
-		<th  class=" thead-dark"><b>#</b></th>
-		<th  class=" thead-dark">' . _l('commodity_name') . '</th>';
+		<th  class=" thead-dark" style="width:3%"><b>#</b></th>
+		<th  class=" thead-dark" style="width:30%">' . _l('commodity_name') . '</th>';
 		if ($warehouse_lotnumber_bottom_infor_option == 1) {
-			$html .= '<th  class=" thead-dark">' . _l('warehouse_name') . '</th>';
+			$html .= '<th  class=" thead-dark" style="width:11%">' . _l('warehouse_name') . '</th>';
 		}
-		$html .= '<th  class=" thead-dark">' . _l('quantity') . '</th>
-		<th  class=" thead-dark">' . _l('delivered') . '</th>';
+		$html .= '<th  class=" thead-dark" style="width:11%">' . _l('quantity') . '</th>
+		<th  class=" thead-dark" style="width:11%">' . _l('delivered') . '</th>';
 		if (get_warehouse_option('goods_delivery_pdf_display_outstanding') == 1) {
-			$html .= '<th  class=" thead-dark">' . _l('outstanding') . '</th>';
+			$html .= '<th  class=" thead-dark" style="width:11%">' . _l('outstanding') . '</th>';
 		}
-		$html .= '<th  class=" thead-dark">' . _l('unit_price') . '</th>';
+		// $html .= '<th  class=" thead-dark">' . _l('unit_price') . '</th>';
 		if ($warehouse_lotnumber_bottom_infor_option == 1) {
-			$html .= '<th  class=" thead-dark">' . _l('lot_number') . '</th>';
+			$html .= '<th  class=" thead-dark" style="width:11%">' . _l('lot_number') . '</th>';
 		}
-		$html .= '<th  class=" thead-dark">' . _l('subtotal') . '</th>
-		<th  class=" thead-dark">' . _l('subtotal_after_tax') . '</th>
-		<th  class=" thead-dark">' . _l('total_money') . '</th>
+		// $html .= '<th  class=" thead-dark">' . _l('subtotal') . '</th>
+		// <th  class=" thead-dark">' . _l('subtotal_after_tax') . '</th>
+		// <th  class=" thead-dark">' . _l('total_money') . '</th>
 
-		</tr>';
+		$html .= '</tr>';
 		$subtotal = 0;
 
 		foreach ($goods_delivery_detail as $delivery_key => $delivery_value) {
@@ -3966,29 +3966,29 @@ class Warehouse_model extends App_Model
 			}
 
 			$html .= '<tr>';
-			$html .= '<td class=""><b>' . (float)$item_order . '</b></td>
-			<td class="td_style_r_ep_c"><b>' . $get_commodity_name . '</b></td>';
+			$html .= '<td class="" style="width:3%"><b>' . (float)$item_order . '</b></td>
+			<td class="" style="width:30%"><b>' . $get_commodity_name . '</b></td>';
 			if ($warehouse_lotnumber_bottom_infor_option == 1) {
-				$html .= '<td class="td_style_r_ep_c"><b>' . $warehouse_name . '</b></td>';
+				$html .= '<td class="" style="width:11%" ><b>' . $warehouse_name . '</b></td>';
 			}
-			$html .= '<td class="td_style_r_ep_c"><b>' . $quantities . ' ' . $unit_name . '</b></td>
-			<td class="td_style_r_ep_c"><b>' . $quantities . ' ' . $unit_name . '</b></td>';
+			$html .= '<td class="" style="width:11%"><b>' . $quantities . ' ' . $unit_name . '</b></td>
+			<td class="" style="width:11%"><b>' . $quantities . ' ' . $unit_name . '</b></td>';
 			if (get_warehouse_option('goods_delivery_pdf_display_outstanding') == 1) {
-				$html .= '<td class="td_style_r_ep"><b>0.0</b></td>';
+				$html .= '<td class="" style="width:11%"><b>0.0</b></td>';
 			}
 
 			if (get_warehouse_option('goods_delivery_pdf_display') == 1) {
-				$html .= ' <td class="td_style_r_ep"><b>' . app_format_money((float) $unit_price, '') . '</b></td>';
+				// $html .= ' <td class="td_style_r_ep"><b>' . app_format_money((float) $unit_price, '') . '</b></td>';
 				if ($warehouse_lotnumber_bottom_infor_option == 1) {
-					$html .= '<td class="td_style_r_ep_c"><b>' . $lot_number . '</b></td>';
+					$html .= '<td class="" style="width:11%"><b>' . $lot_number . '</b></td>';
 				}
-				$html .= '<td class="td_style_r_ep"><b>' . app_format_money((float) $item_subtotal, '') . '</b></td>
-				<td class="td_style_r_ep"><b>' . app_format_money((float) $total_money, '') . '</b></td>
-				<td class="td_style_r_ep"><b>' . app_format_money((float) $total_after_discount, '') . '</b></td>';
+				// $html .= '<td class="td_style_r_ep"><b>' . app_format_money((float) $item_subtotal, '') . '</b></td>
+				// <td class="td_style_r_ep"><b>' . app_format_money((float) $total_money, '') . '</b></td>
+				// <td class="td_style_r_ep"><b>' . app_format_money((float) $total_after_discount, '') . '</b></td>';
 			} else {
 				$html .= '<td class="td_style_r_ep"><b></b></td>';
 				if ($warehouse_lotnumber_bottom_infor_option == 1) {
-					$html .= '<td class="td_style_r_ep_c"><b>' . $lot_number . '</b></td>';
+					$html .= '<td class="" style="width:11%"><b>' . $lot_number . '</b></td>';
 				}
 				$html .= '<td class="td_style_r_ep"><b></b></td>
 				<td class="td_style_r_ep"><b></b></td>
@@ -4014,77 +4014,77 @@ class Warehouse_model extends App_Model
 		}
 		if (get_warehouse_option('goods_delivery_pdf_display') == 1) {
 
-			$html .= '<table class="table">
-			<tbody>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('subtotal') . '</b></td>
-			<td class="text_right">' . $base_currency->symbol . app_format_money((float) $subtotal, '') . '</td>
-			</tr>';
+			// $html .= '<table class="table">
+			// <tbody>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('subtotal') . '</b></td>
+			// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $subtotal, '') . '</td>
+			// </tr>';
 
-			$html .= $tax_data['pdf_html'];
-			$html .= '<tr><td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('total_discount') . '</b></td>
-			<td class="text_right">' . $base_currency->symbol . app_format_money((float) $total_discount, '') . '</td>
-			</tr>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('wh_shipping_fee') . '</b></td>
-			<td class="text_right">' . $base_currency->symbol . app_format_money((float) $shipping_fee, '') . '</td>
-			</tr>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('total_money') . '</b></td>
-			<td class="text_right">' . $base_currency->symbol . app_format_money((float) $after_discount, '') . '</td>
-			</tr>
-			</tbody>
-			</table>
-			<br><br><br>
-			';
+			// $html .= $tax_data['pdf_html'];
+			// $html .= '<tr><td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('total_discount') . '</b></td>
+			// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $total_discount, '') . '</td>
+			// </tr>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('wh_shipping_fee') . '</b></td>
+			// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $shipping_fee, '') . '</td>
+			// </tr>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('total_money') . '</b></td>
+			// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $after_discount, '') . '</td>
+			// </tr>
+			// </tbody>
+			// </table>
+			// <br><br><br>
+			// ';
 		} else {
-			$html .= '<table class="table">
-			<tbody>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('subtotal') . '</b></td>
-			<td class="text_right">......................................</td>
-			</tr>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('total_discount') . '</b></td>
-			<td class="text_right">......................................</td>
-			</tr>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('wh_shipping_fee') . '</b></td>
-			<td class="text_right">......................................</td>
-			</tr>
-			<tr>
-			<td ></td>
-			<td ></td>
-			<td ></td>
-			<td class="text_left"><b>' . _l('total_money') . '</b></td>
-			<td class="text_right">......................................</td>
-			</tr>
+			// $html .= '<table class="table">
+			// <tbody>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('subtotal') . '</b></td>
+			// <td class="text_right">......................................</td>
+			// </tr>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('total_discount') . '</b></td>
+			// <td class="text_right">......................................</td>
+			// </tr>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('wh_shipping_fee') . '</b></td>
+			// <td class="text_right">......................................</td>
+			// </tr>
+			// <tr>
+			// <td ></td>
+			// <td ></td>
+			// <td ></td>
+			// <td class="text_left"><b>' . _l('total_money') . '</b></td>
+			// <td class="text_right">......................................</td>
+			// </tr>
 			
-			</tbody>
-			</table>
-			<br><br><br>
-			';
+			// </tbody>
+			// </table>
+			// <br><br><br>
+			// ';
 		}
 
 		if ($warehouse_lotnumber_bottom_infor_option == 1) {
@@ -12436,11 +12436,11 @@ class Warehouse_model extends App_Model
 		<th width="15%" class=" thead-dark-ip">' . _l('to_stock_name') . '</th>
 		<th width="10%" class=" thead-dark-ip">' . _l('available_quantity') . '</th>
 		<th width="10%" class=" thead-dark-ip">' . _l('quantity_export') . '</th>
-		<th width="10%" class=" thead-dark-ip">' . _l('unit_price') . '</th>
-		<th width="15%" class=" thead-dark-ip">' . _l('into_money') . '</th>
+		
 
 		</tr>';
-
+		// <th width="10%" class=" thead-dark-ip">' . _l('unit_price') . '</th>
+		// <th width="15%" class=" thead-dark-ip">' . _l('into_money') . '</th>
 		$warehouse_address 	= '';
 		$array_warehouse	= [];
 		$array_from_warehouse	= [];
@@ -12565,8 +12565,8 @@ class Warehouse_model extends App_Model
 			<td class="td_style_r_ep_c">' . $available_quantity . ' ' . $unit_name . '</td>
 			<td class="td_style_r_ep">' . $quantities . ' ' . $unit_name . '</td>';
 
-			$html .= ' <td class="td_style_r_ep">' . app_format_money((float) $unit_price, '') . '</td>
-			<td class="td_style_r_ep"><b>' . app_format_money((float) $into_money, '') . '</b></td>';
+			// $html .= ' <td class="td_style_r_ep">' . app_format_money((float) $unit_price, '') . '</td>
+			// <td class="td_style_r_ep"><b>' . app_format_money((float) $into_money, '') . '</b></td>';
 
 			$html .= '</tr>';
 		}
@@ -12578,20 +12578,20 @@ class Warehouse_model extends App_Model
 
 
 
-		$html .= '<table class="table">
-		<tbody>
-		<tr>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td ></td>
-		<td class="text_left"><b>' . _l('total_amount') . '</b></td>
-		<td class="text_right">' . $base_currency->symbol . app_format_money((float) $internal_delivery->total_amount, '') . '</td>
-		</tr>
-		</tbody>
-		</table>
-		<br>
-		';
+		// $html .= '<table class="table">
+		// <tbody>
+		// <tr>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td ></td>
+		// <td class="text_left"><b>' . _l('total_amount') . '</b></td>
+		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $internal_delivery->total_amount, '') . '</td>
+		// </tr>
+		// </tbody>
+		// </table>
+		// <br>
+		// ';
 
 
 		$html .=  '<h4 class="note-align">' . _l('warehouse_address') . ':</h4>
@@ -14697,12 +14697,12 @@ class Warehouse_model extends App_Model
 			render_input($name_unit_name, '', $unit_name, 'text', ['placeholder' => _l('unit'), 'readonly' => true], [], 'no-margin', 'input-transparent text-right wh_input_none') .
 			'</td>';
 
-		$row .= '<td class="rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
-		$row .= '<td class="taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
+		$row .= '<td class="hide rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
+		$row .= '<td class="hide taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
 		$row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
 		$row .= '<td>' . render_date_input($name_date_manufacture, '', $date_manufacture, ['placeholder' => _l('date_manufacture')]) . '</td>';
 		// $row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
-		$row .= '<td class="amount" align="right">' . $amount . '</td>';
+		$row .= '<td class="hide amount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
 		$row .= '<td class="hide unit_id">' . render_input($name_unit_id, '', $unit_id, 'text', ['placeholder' => _l('unit_id')]) . '</td>';
@@ -15164,8 +15164,8 @@ class Warehouse_model extends App_Model
 			render_input($name_quantities, '', $quantities, 'number', $array_qty_attr) .
 			'</td>';
 
-		$row .= '<td class="rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
-		$row .= '<td class="amount" align="right">' . $amount . '</td>';
+		$row .= '<td class="hide rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
+		$row .= '<td class="hide amount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
 		$row .= '<td class="hide unit_id">' . render_input($name_unit_id, '', $unit_id, 'text', ['placeholder' => _l('unit_id')]) . '</td>';
@@ -15472,14 +15472,14 @@ class Warehouse_model extends App_Model
 			render_input($name_guarantee_period, '', $guarantee_period, 'text', ['placeholder' => _l('guarantee_period'), 'readonly' => true], [], 'no-margin', 'input-transparent text-right wh_input_none') .
 			'</td>';
 
-		$row .= '<td class="rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
-		$row .= '<td class="taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
+		$row .= '<td class="hide rate">' . render_input($name_unit_price, '', $unit_price, 'number', $array_rate_attr) . '</td>';
+		$row .= '<td class="hide taxrate">' . $this->get_taxes_dropdown_template($name_tax_id_select, $invoice_item_taxes, 'invoice', $item_key, true, $manual) . '</td>';
 		$row .= '<td>' . render_input($name_lot_number, '', $lot_number, 'text', ['placeholder' => _l('lot_number')]) . '</td>';
 		// $row .= '<td>' . render_date_input($name_expiry_date, '', $expiry_date, ['placeholder' => _l('expiry_date')]) . '</td>';
-		$row .= '<td class="amount" align="right">' . $amount . '</td>';
+		$row .= '<td class="hide amount" align="right">' . $amount . '</td>';
 		$row .= '<td class="hide discount">' . render_input($name_discount, '', $discount, 'number', $array_discount_attr) . '</td>';
 		$row .= '<td class="hide label_discount_money" align="right">' . $amount . '</td>';
-		$row .= '<td class="label_total_after_discount" align="right">' . $amount . '</td>';
+		$row .= '<td class="hide label_total_after_discount" align="right">' . $amount . '</td>';
 
 		$row .= '<td class="hide commodity_code">' . render_input($name_commodity_code, '', $commodity_code, 'text', ['placeholder' => _l('commodity_code')]) . '</td>';
 		$row .= '<td class="hide unit_id">' . render_input($name_unit_id, '', $unit_id, 'text', ['placeholder' => _l('unit_id')]) . '</td>';
@@ -15489,13 +15489,13 @@ class Warehouse_model extends App_Model
 		$row .= '<td class="hide without_checking_warehouse">' . render_input($name_without_checking_warehouse, '', $without_checking_warehouse, 'text', []) . '</td>';
 
 		if ($name == '') {
-			$row .= '<td></td>';
+			$row .= '<td class="hide"></td>';
 			$row .= '<td><button type="button" onclick="wh_add_item_to_table(\'undefined\',\'undefined\'); return false;" class="btn pull-right btn-info"><i class="fa fa-check"></i></button></td>';
 		} else {
 			if (is_numeric($item_key) && strlen($serial_number) > 0 && is_admin() && get_option('wh_products_by_serial')) {
 				$row .= '<td><a href="#" class="btn btn-success pull-right" data-toggle="tooltip" data-original-title="' . _l('wh_change_serial_number') . '" onclick="wh_change_serial_number(\'' . $name_commodity_code . '\',\'' . $name_warehouse_id . '\',\'' . $name_serial_number . '\',\'' . $name_commodity_name . '\'); return false;"><i class="fa fa-refresh"></i></a></td>';
 			} else {
-				$row .= '<td></td>';
+				$row .= '<td class="hide"></td>';
 			}
 			if ($is_purchase_order) {
 				$row .= '<td></td>';

@@ -115,16 +115,16 @@
               <table class="table invoice-items-table items table-main-invoice-edit has-calculations no-mtop">
                 <thead>
                   <tr>
-                    <th></th>
+                    <th width="2%"></th>
                     <th width="20%" align="left"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-title="<?php echo _l('item_description_new_lines_notice'); ?>"></i> <?php echo _l('invoice_table_item_heading'); ?></th>
                     <th width="15%" align="left"><?php echo _l('from_stock_name'); ?></th>
                     <th width="15%" align="left"><?php echo _l('to_stock_name'); ?></th>
                     <th width="10%" align="right" class="qty"><?php echo _l('available_quantity'); ?></th>
                     <th width="10%" align="right" class="qty"><?php echo _l('quantity'); ?></th>
-                    <th width="10%" align="right"><?php echo _l('unit_price'); ?></th>
-                    <th width="10%" align="right"><?php echo _l('invoice_table_amount_heading'); ?></th>
+                    <!-- <th width="10%" align="right"><?php echo _l('unit_price'); ?></th>
+                    <th width="10%" align="right"><?php echo _l('invoice_table_amount_heading'); ?></th> -->
 
-                    <th align="center"><i class="fa fa-cog"></i></th>
+                    <th align="center" width="3%"><i class="fa fa-cog"></i></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -132,7 +132,7 @@
                 </tbody>
               </table>
             </div>
-            <div class="col-md-8 col-md-offset-4">
+            <!-- <div class="col-md-8 col-md-offset-4">
               <table class="table text-right">
                 <tbody>
                   <tr id="totalmoney">
@@ -143,7 +143,7 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </div> -->
             <div id="removed-items"></div>
           </div>
 

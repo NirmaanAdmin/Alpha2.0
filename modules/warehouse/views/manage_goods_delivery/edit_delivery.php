@@ -124,7 +124,7 @@
                   <td class="bold"><?php echo _l('print'); ?></td>
                   <td>
                     <div class="btn-group">
-                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf-o"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
+                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
                       <ul class="dropdown-menu dropdown-menu-right">
                        <li class="hidden-xs"><a href="<?php echo admin_url('warehouse/stock_export_pdf/'.$goods_delivery->id.'?output_type=I'); ?>"><?php echo _l('view_pdf'); ?></a></li>
                        <li class="hidden-xs"><a href="<?php echo admin_url('warehouse/stock_export_pdf/'.$goods_delivery->id.'?output_type=I'); ?>" target="_blank"><?php echo _l('view_pdf_in_new_window'); ?></a></li>
@@ -155,13 +155,13 @@
                  <th colspan="1"><?php echo _l('warehouse_name') ?></th>
                  <th  colspan="1"><?php echo _l('unit_name') ?></th>
                  <th  colspan="1" class="text-center"><?php echo _l('quantity') ?></th>
-                 <th align="right" colspan="1"><?php echo _l('rate') ?></th>
+                 <!-- <th align="right" colspan="1"><?php echo _l('rate') ?></th>
                  <th align="right" colspan="1"><?php echo _l('subtotal') ?></th>
                  <th align="right" colspan="1"><?php echo _l('subtotal_after_tax') ?></th>
                  <th align="right" colspan="1"><?php echo _l('discount(%)').'(%)' ?></th>
-                 <th align="right" colspan="1"><?php echo _l('discount(money)') ?></th>
+                 <th align="right" colspan="1"><?php echo _l('discount(money)') ?></th> -->
                  <th align="right" colspan="1"><?php echo _l('lot_number').'/'._l('quantity') ?></th>
-                 <th align="right" colspan="1"><?php echo _l('total_money') ?></th>
+                 <!-- <th align="right" colspan="1"><?php echo _l('total_money') ?></th> -->
                  <th align="right" colspan="1"><?php echo _l('guarantee_period') ?></th>
 
                </tr>
@@ -257,13 +257,13 @@
                  <td ><?php echo html_entity_decode($warehouse_name) ?></td>
                  <td ><?php echo html_entity_decode($unit_name) ?></td>
                  <td class="text-right"><?php echo html_entity_decode($quantities) ?></td>
-                 <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
+                 <!-- <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
                  <td class="text-right"><?php echo app_format_money((float)$item_subtotal,'') ?></td>
                  <td class="text-right"><?php echo app_format_money((float)$total_money,'') ?></td>
                  <td class="text-right"><?php echo app_format_money((float)$discount,'') ?></td>
-                 <td class="text-right"><?php echo app_format_money((float)$discount_money,'') ?></td>
+                 <td class="text-right"><?php echo app_format_money((float)$discount_money,'') ?></td> -->
                  <td class="text-right"><?php echo html_entity_decode($lot_number) ?></td>
-                 <td class="text-right"><?php echo app_format_money((float)$total_after_discount,'') ?></td>
+                 <!-- <td class="text-right"><?php echo app_format_money((float)$total_after_discount,'') ?></td> -->
                  <td class="text-right"><?php echo html_entity_decode($guarantee_period) ?></td>
 
                </tr>
@@ -275,7 +275,7 @@
 
        </div>
 
-       <div class="row pull-right mbot10">
+       <!-- <div class="row pull-right mbot10">
         <div class="col-md-12 ">
          <table class="table">
           <tbody>
@@ -322,7 +322,7 @@
 
           </tbody>
         </table>
-      </div>
+      </div> -->
 
     </div>
 

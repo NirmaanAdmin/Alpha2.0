@@ -106,7 +106,7 @@
                   <td class="bold"><?php echo _l('print'); ?></td>
                   <td>
                     <div class="btn-group">
-                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf-o"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
+                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
                       <ul class="dropdown-menu dropdown-menu-right">
                        <li class="hidden-xs"><a href="<?php echo admin_url('warehouse/stock_internal_delivery_pdf/'.$internal_delivery->id.'?output_type=I'); ?>"><?php echo _l('view_pdf'); ?></a></li>
                        <li class="hidden-xs"><a href="<?php echo admin_url('warehouse/stock_internal_delivery_pdf/'.$internal_delivery->id.'?output_type=I'); ?>" target="_blank"><?php echo _l('view_pdf_in_new_window'); ?></a></li>
@@ -139,8 +139,8 @@
                                      <th  colspan="1"><?php echo _l('unit_name') ?></th>
                                      <th  colspan="1" class="text-center"><?php echo _l('available_quantity') ?></th>
                                      <th  colspan="1" class="text-center"><?php echo _l('quantity_export') ?></th>
-                                     <th align="right" colspan="1"><?php echo _l('unit_price') ?></th>
-                                     <th align="right" colspan="1"><?php echo _l('into_money') ?></th>
+                                     <!-- <th align="right" colspan="1"><?php echo _l('unit_price') ?></th>
+                                     <th align="right" colspan="1"><?php echo _l('into_money') ?></th> -->
                                      
                                  </tr>
                               </thead>
@@ -186,8 +186,8 @@
                                   <td class="text-right" ><?php echo html_entity_decode($availale_quantity) ?></td>
                                   <td class="text-right" ><?php echo html_entity_decode($quantities) ?></td>
 
-                                  <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
-                                  <td class="text-right"><?php echo app_format_money((float)$into_money,'') ?></td>
+                                  <!-- <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
+                                  <td class="text-right"><?php echo app_format_money((float)$into_money,'') ?></td> -->
                                   
                                 </tr>
                              <?php  } ?>
@@ -196,7 +196,7 @@
                         </div>
                      </div>
 
-                     <div class="col-md-3 pull-right panel-padding">
+                     <!-- <div class="col-md-3 pull-right panel-padding">
                       <table class="table text-right table-margintop">
                         <tbody>
                           <tr class="project-overview">
@@ -206,7 +206,7 @@
                           </tr>
                         </tbody>
                       </table>
-                    </div>
+                    </div> -->
 
                         
 

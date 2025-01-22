@@ -45,10 +45,10 @@
                         _l('Buyer'),
                         _l('reference_purchase_order'),
                         _l('day_vouchers'),
-                        _l('total_tax_money'),
-                        _l('total_goods_money'),
-                        _l('value_of_inventory'),
-                        _l('total_money'),
+                        // _l('total_tax_money'),
+                        // _l('total_goods_money'),
+                        // _l('value_of_inventory'),
+                        // _l('total_money'),
                         _l('status_label'),
                         ),'table_manage_goods_receipt',['purchase_sm' => 'purchase_sm']); ?>
                         

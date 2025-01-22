@@ -9,10 +9,10 @@ $aColumns = [
     'buyer_id',
     'pr_order_id',
     'date_add',
-    'total_tax_money', 
-    'total_goods_money',
-    'value_of_inventory',
-    'total_money',
+    // 'total_tax_money', 
+    // 'total_goods_money',
+    // 'value_of_inventory',
+    // 'total_money',
     'approval',
 ];
 $sIndexColumn = 'id';
@@ -62,7 +62,7 @@ foreach ($rResult as $aRow) {
         }elseif($aColumns[$i] == 'date_add'){
             $_data = _d($aRow['date_add']);
         }elseif ($aColumns[$i] == 'total_tax_money') {
-            $_data = app_format_money((float)$aRow['total_tax_money'],'');
+            // $_data = app_format_money((float)$aRow['total_tax_money'],'');
         }elseif($aColumns[$i] == 'goods_receipt_code'){
             $name = '<a href="' . admin_url('warehouse/view_purchase/' . $aRow['id'] ).'" onclick="init_goods_receipt('.$aRow['id'].'); return false;">' . $aRow['goods_receipt_code'] . '</a>';
 
@@ -90,11 +90,11 @@ foreach ($rResult as $aRow) {
 
             $_data = $name;
         }elseif ($aColumns[$i] == 'total_goods_money') {
-            $_data = app_format_money((float)$aRow['total_goods_money'],'');
+            // $_data = app_format_money((float)$aRow['total_goods_money'],'');
         }elseif ($aColumns[$i] == 'total_money') {
-            $_data = app_format_money((float)$aRow['total_money'],'');
+            // $_data = app_format_money((float)$aRow['total_money'],'');
         }elseif($aColumns[$i] == 'value_of_inventory') {
-            $_data = app_format_money((float)$aRow['value_of_inventory'],'');
+            // $_data = app_format_money((float)$aRow['value_of_inventory'],'');
         }elseif($aColumns[$i] == 'approval') {
            
            if($aRow['approval'] == 1){
