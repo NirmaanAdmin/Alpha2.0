@@ -10626,8 +10626,13 @@ class Warehouse_model extends App_Model
 		unset($data['into_money']);
 		unset($data['serial_number']);
 
-		$check_appr = $this->check_approval_setting($data['project'], '4', 0);
-		$data['approval'] = ($check_appr == true) ? 1 : 0;
+		if(isset($data['save_as_draft'])) {
+			unset($data['save_as_draft']);
+			$data['approval'] = 0;
+		} else {
+			$check_appr = $this->check_approval_setting($data['project'], '4', 0);
+			$data['approval'] = ($check_appr == true) ? 1 : 0;
+		}
 		// $check_appr = $this->get_approve_setting('4');
 		// $data['approval'] = 0;
 		// if ($check_appr && $check_appr != false) {
@@ -10828,6 +10833,14 @@ class Warehouse_model extends App_Model
 		unset($data['unit_id']);
 		unset($data['into_money']);
 		unset($data['serial_number']);
+
+		if(isset($data['save_as_draft'])) {
+			unset($data['save_as_draft']);
+			$data['approval'] = 0;
+		} else {
+			$check_appr = $this->check_approval_setting($data['project'], '4', 0);
+			$data['approval'] = ($check_appr == true) ? 1 : 0;
+		}
 
 		if (isset($data['hot_internal_delivery'])) {
 			$hot_internal_delivery = $data['hot_internal_delivery'];

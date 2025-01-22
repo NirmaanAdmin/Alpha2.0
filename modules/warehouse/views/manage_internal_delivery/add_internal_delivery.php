@@ -158,10 +158,12 @@
                   <a href="<?php echo admin_url('warehouse/manage_internal_delivery'); ?>"class="btn btn-default text-right mright5"><?php echo _l('close'); ?></a>
                   <?php if (is_admin() || has_permission('warehouse', '', 'edit') || has_permission('warehouse', '', 'create')) { ?>
                     <?php if(isset($internal_delivery) && $internal_delivery->approval == 0){ ?>
+                      <input type="submit" name="save_as_draft" class="btn btn-info btn_add_internal_delivery" value="Save as Draft">
                       <button type="button" class="btn btn-info btn_add_internal_delivery ">
                         <?php echo _l('save'); ?>
                       </button>
                     <?php }elseif(!isset($internal_delivery)){ ?>
+                      <input type="submit" name="save_as_draft" class="btn btn-info btn_add_internal_delivery" value="Save as Draft">
                       <button type="button" class="btn btn-info btn_add_internal_delivery ">
                         <?php echo _l('save'); ?>
                       </button>
