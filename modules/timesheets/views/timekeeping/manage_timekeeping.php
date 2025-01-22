@@ -33,7 +33,7 @@
   }
 
   #scroll-thumb {
-    width: 30px;
+    width: 15px;
     height: 10px;
     background-color: #276493;
     border-radius: 5px;

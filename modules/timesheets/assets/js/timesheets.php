@@ -65,11 +65,6 @@
     };
     var hot = new Handsontable(hotElement, hotSettings);
 
-
-
-
-
-
     appValidateForm($('#import-timesheets-form'), {
       file_timesheets: 'required',
     })
