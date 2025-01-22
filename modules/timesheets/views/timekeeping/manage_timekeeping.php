@@ -25,7 +25,7 @@
     top: 64px;
     right: 10px;
     width: 200px;
-    height: 10px;
+    height: 2px;
     background-color: #ccc;
     border-radius: 5px;
     z-index: 10000;
@@ -34,10 +34,11 @@
 
   #scroll-thumb {
     width: 15px;
-    height: 10px;
+    height: 15px;
     background-color: #276493;
-    border-radius: 5px;
+    border-radius: 15px;
     position: relative;
+    top: -6px;
     /* transition: left 0.2s ease; */
   }
 </style>
