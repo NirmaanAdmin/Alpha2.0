@@ -60,6 +60,7 @@
           <thead>
             <tr>
               <th><input type="checkbox" id="mass_select_all" data-to-table="checkout_managements"></th>
+              <th><?php echo  _l('fe_checkin_checkout'); ?></th>
               <th>ID</th>
               <th><?php echo  _l('fe_asset_name'); ?></th>
               <th><?php echo  _l('fe_image'); ?></th>
@@ -91,7 +92,7 @@
               <?php
               if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
               ?>
-                <th><?php echo  _l('fe_checkin_checkout'); ?></th>
+                
               <?php } ?>
             </tr>
           </thead>

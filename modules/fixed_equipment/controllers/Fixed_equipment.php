@@ -1841,6 +1841,21 @@ class fixed_equipment extends AdminController
 				foreach ($rResult as $aRow) {
 					$row = [];
 					$row[] = '<input type="checkbox" class="individual" data-id="' . $aRow['id'] . '" onchange="checked_add(this); return false;"/>';
+					$button = '';
+					if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
+						if ($aRow['for_sell'] == 0 && $aRow['for_rent'] == 0) {
+							if ($aRow['checkin_out'] == 2) {
+								$button = '<a class="btn btn-primary" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_in(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkin') . '</a>';
+							} else {
+								if ($status == 'deployable') {
+									$button = '<a class="btn btn-danger" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_out(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkout') . '</a>';
+								}
+							}
+						} else {
+							$button = fe_get_html_option_button($aRow['for_sell'], $aRow['for_rent']);
+						}
+					}
+					$row[] = $button;
 					$row[] = $aRow['id'];
 
 					$_data = '';
@@ -1993,21 +2008,7 @@ class fixed_equipment extends AdminController
 					$row[] = '<span class="text-nowrap">' . $last_audit . '</span>';
 					$row[] = '<span class="text-nowrap">' . $next_audit . '</span>';
 
-					$button = '';
-					if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
-						if ($aRow['for_sell'] == 0 && $aRow['for_rent'] == 0) {
-							if ($aRow['checkin_out'] == 2) {
-								$button = '<a class="btn btn-primary" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_in(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkin') . '</a>';
-							} else {
-								if ($status == 'deployable') {
-									$button = '<a class="btn btn-danger" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_out(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkout') . '</a>';
-								}
-							}
-						} else {
-							$button = fe_get_html_option_button($aRow['for_sell'], $aRow['for_rent']);
-						}
-					}
-					$row[] = $button;
+					
 					$output['aaData'][] = $row;
 				}
 
