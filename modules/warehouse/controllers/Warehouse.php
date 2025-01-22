@@ -3505,6 +3505,14 @@ class warehouse extends AdminController {
 		die();
 	}
 
+	public function get_commodity_code() {
+		$commodity_code = $this->warehouse_model->get_new_commodity_code();
+
+		echo json_encode([
+			$commodity_code,
+		]);
+		die();
+	}
 	/**
 	 * table inventory stock
 	 * @return [type]

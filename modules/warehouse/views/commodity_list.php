@@ -488,7 +488,7 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <?php echo render_input('commodity_code', 'commodity_code'); ?>
+                                    <?php echo render_input('commodity_code', 'commodity_code','','',['readonly' => true]); ?>
                                 </div>
                                 <div class="col-md-6">
                                   <?php echo render_input('description', 'commodity_name'); ?>

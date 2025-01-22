@@ -26,7 +26,7 @@
     right: 10px;
     width: 200px;
     height: 2px;
-    background-color: #ccc;
+    background-color: #000000;
     border-radius: 5px;
     z-index: 10000;
     cursor: pointer;
@@ -35,7 +35,7 @@
   #scroll-thumb {
     width: 15px;
     height: 15px;
-    background-color: #276493;
+    background-color: #ad729f;
     border-radius: 15px;
     position: relative;
     top: -6px;

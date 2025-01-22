@@ -988,6 +988,10 @@ warehouse_type_value = warehouse_type;
       response = JSON.parse(response);
       $('#commodity_list-add-edit input[name="commodity_barcode"]').val(response);
     });
+    $.post(admin_url + 'warehouse/get_commodity_code').done(function(response) {
+      response = JSON.parse(response);
+      $('#commodity_list-add-edit input[name="commodity_code"]').val(response);
+    });
 
     $.post(admin_url + 'warehouse/get_variation_html_add').done(function(response) {
       response = JSON.parse(response);

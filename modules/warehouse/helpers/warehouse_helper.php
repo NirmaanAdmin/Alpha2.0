@@ -2074,3 +2074,27 @@ function handle_shipment_add_attachment($id)
     }
 
 }
+
+function get_item_option($name)
+{
+    $CI = & get_instance();
+    $options = [];
+    $val  = '';
+    $name = trim($name);
+    
+
+    
+        // is not auto loaded
+        $CI->db->select('option_val');
+        $CI->db->where('option_name', $name);
+        $row = $CI->db->get(db_prefix() . 'item_option')->row();
+        if ($row) {
+            $val = $row->option_val;
+        }
+  
+    return $val;
+}
+
+function item_html_entity_decode($str){
+    return html_entity_decode($str ?? '');
+}
