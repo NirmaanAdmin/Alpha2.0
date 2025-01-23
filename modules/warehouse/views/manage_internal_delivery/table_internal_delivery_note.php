@@ -8,7 +8,7 @@ $aColumns = [
     'staff_id',
     'addedfrom',
     'datecreated',
-    'total_amount',
+    // 'total_amount',
     'approval',
     ];
 $sIndexColumn = 'id';

@@ -35,7 +35,7 @@
                         _l('deliver_name'),
                         _l('addedfrom'),
                         _l('datecreated'),
-                        _l('total_amount'),
+                        // _l('total_amount'),
                         _l('status_label')
                         ),'table_internal_delivery',['internal_delivery_sm' => 'internal_delivery_sm']); ?>
 						
