@@ -224,12 +224,12 @@
                 <label for="checkout_to_user"><?php echo _l('fe_staffs'); ?></label>
               </div>
             </div>
-            <div class="pull-left">
+            <!-- <div class="pull-left">
               <div class="checkbox">
                 <input type="radio" name="checkout_to" id="checkout_to_customer" value="customer">
                 <label for="checkout_to_customer"><?php echo _l('fe_customer'); ?></label>
               </div>
-            </div>
+            </div> -->
             <div class="pull-left">
               <div class="checkbox">
                 <input type="radio" name="checkout_to" id="checkout_to_asset" value="asset">

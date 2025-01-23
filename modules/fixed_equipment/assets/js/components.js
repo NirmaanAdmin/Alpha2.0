@@ -140,8 +140,10 @@ function edit(id){
 function check_out(el, id){
 	"use strict";
 	var asset_name = $(el).data('asset_name');
+	var model = $(el).data('model');
 	$('#check_out').modal('show');
 	$('#check_out input[name="item_id"]').val(id);
+	$('#check_out input[name="model"]').val(model);
 	$('#check_out input[name="asset_name"]').val(asset_name);
 }
 /**

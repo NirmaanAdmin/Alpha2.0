@@ -852,3 +852,4 @@ $lang['fe_auto_generate_serial_numbers'] = 'Auto generate serial numbers';
 $lang['fe_create_manual_orders'] = 'Create manual orders';
 $lang['fe_edit_manual_orders'] = 'Edit manual orders';
 $lang['select_all'] = 'Select all';
+$lang['fe_avl_quantity'] = 'Available Quantity';

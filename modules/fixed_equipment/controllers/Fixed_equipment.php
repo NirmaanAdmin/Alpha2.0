@@ -2008,7 +2008,7 @@ class fixed_equipment extends AdminController
 					$row[] = '<span class="text-nowrap">' . $last_audit . '</span>';
 					$row[] = '<span class="text-nowrap">' . $next_audit . '</span>';
 
-					
+
 					$output['aaData'][] = $row;
 				}
 
@@ -2260,6 +2260,7 @@ class fixed_equipment extends AdminController
 			}
 		}
 	}
+
 	/**
 	 * licenses
 	 */
@@ -3105,6 +3106,8 @@ class fixed_equipment extends AdminController
 		$data['suppliers'] = $this->fixed_equipment_model->get_suppliers();
 		$data['locations'] = $this->fixed_equipment_model->get_locations();
 		$data['customers'] = $this->clients_model->get();
+		$data['projects'] = $this->fixed_equipment_model->get_projects();
+		$data['models'] = $this->fixed_equipment_model->get_models();
 		$base_currency = $this->currencies_model->get_base_currency();
 
 		$data['currency_name'] = '';
@@ -3179,18 +3182,21 @@ class fixed_equipment extends AdminController
 					'quantity',
 					'min_quantity',
 					'unit_price',
-					'checkin_out'
+					'checkin_out',
+					db_prefix() . 'fe_assets.model_id',
+					'consumable_quantity'
 				]);
 
 
 				$output  = $result['output'];
 				$rResult = $result['rResult'];
-				foreach ($rResult as $aRow) {
+
+				foreach ($rResult as $key => $aRow) {
+
 					$row = [];
 					$row[] = '<input type="checkbox" class="individual" data-id="' . $aRow['id'] . '" onchange="checked_add(this); return false;"/>';
-					$row[] = $aRow['id'];
-
-
+					$start = $this->input->post('start');
+					$row[] = $start + $key + 1;
 					$row[] = '<img class="img img-responsive staff-profile-image-small pull-left" src="' . $this->fixed_equipment_model->get_image_items($aRow['id'], 'consumable') . '">';
 					$_data = '';
 					$_data .= '<div class="row-options">';
@@ -3204,7 +3210,13 @@ class fixed_equipment extends AdminController
 					$_data .= '</div>';
 
 					$min_quantity = $aRow['min_quantity'];
-					$avail = $aRow['quantity'] - $this->fixed_equipment_model->count_checkin_asset_by_parents($aRow['id']);
+
+					if ($aRow['consumable_quantity'] > 0) {
+						$avail = $aRow['quantity'] - $aRow['consumable_quantity'];
+					} else {
+						$avail = $aRow['quantity'] - $this->fixed_equipment_model->count_checkin_asset_by_parents($aRow['id']);
+					}
+
 					$warning_class = '';
 					$warning_attribute = '';
 					if ($avail < $min_quantity) {
@@ -3250,7 +3262,7 @@ class fixed_equipment extends AdminController
 						if ($aRow['checkin_out'] == 1) {
 							$event_add = ' disabled';
 							if ($avail > 0) {
-								$event_add = ' data-asset_name="' . $aRow['assets_name'] . '" onclick="check_out(this, ' . $aRow['id'] . ')"';
+								$event_add = ' data-asset_name="' . $aRow['assets_name'] . '" data-model="' . $aRow['model_no'] . '"   data-avail="' . $avail . '" onclick="check_out(this, ' . $aRow['id'] . ')"';
 							}
 							$row[] = '<a class="btn btn-danger"' . $event_add . '>' . _l('fe_checkout') . '</a>';
 						}
@@ -3258,7 +3270,6 @@ class fixed_equipment extends AdminController
 
 					$output['aaData'][] = $row;
 				}
-
 				echo json_encode($output);
 				die();
 			}
@@ -3976,7 +3987,8 @@ class fixed_equipment extends AdminController
 				$redirect_detailt_page = $data['detailt_page'];
 				unset($data['detailt_page']);
 			}
-			$result = $this->fixed_equipment_model->check_in_consumables($data);
+			// $result = $this->fixed_equipment_model->check_in_consumables($data);
+			$result = $this->fixed_equipment_model->check_in_assets($data);
 			if (is_numeric($result)) {
 				if ($result == -1) {
 					set_alert('danger', _l('fe_this_consumables_has_been_checkout_for_this_user', _l('fe_consumables')));
@@ -4008,6 +4020,7 @@ class fixed_equipment extends AdminController
 	public function detail_consumables($id)
 	{
 		$data['redirect'] = $this->input->get('re');
+
 		$data['title']  = '';
 		$data_asset = $this->fixed_equipment_model->get_assets($id);
 		if ($data_asset) {
@@ -4030,66 +4043,86 @@ class fixed_equipment extends AdminController
 	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
-				$item_id =  $this->input->post('parent_id');
+				$this->load->model('staff_model');
+				$id = $this->input->post('id');
 				$select = [
+					'id',
+					'id',
 					'id',
 					'id',
 					'id',
 					'id'
 				];
-
-				if (is_admin() || has_permission('fixed_equipment_consumables', '', 'view')) {
-					array_push($select, 'id');
-				}
-
 				$where        = [];
+
+				array_push($where, 'where item_id = ' . $id);
+
 				$aColumns     = $select;
 				$sIndexColumn = 'id';
-				$sTable       = db_prefix() . 'fe_checkin_assets';
-				$join         = ['LEFT JOIN ' . db_prefix() . 'staff ON ' . db_prefix() . 'staff.staffid = ' . db_prefix() . 'fe_checkin_assets.staff_id'];
-				array_push($where, 'AND item_id = ' . $item_id . ' AND status = 2');
+				$sTable       = db_prefix() . 'fe_log_assets';
+				$join         = [];
+
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
-					db_prefix() . 'fe_checkin_assets.id',
-					db_prefix() . 'fe_checkin_assets.staff_id',
-					db_prefix() . 'fe_checkin_assets.date_creator',
-					db_prefix() . 'fe_checkin_assets.status',
-					db_prefix() . 'fe_checkin_assets.checkout_to',
-					db_prefix() . 'fe_checkin_assets.customer_id',
-					db_prefix() . 'staff.lastname',
-					db_prefix() . 'staff.firstname',
-					'notes'
+					'id',
+					'admin_id',
+					'action',
+					'target',
+					'changed',
+					db_prefix() . 'fe_log_assets.to',
+					'to_id',
+					'notes',
+					'consumable_quantity',
+					'date_creator'
 				]);
 
-				$assets_name = '';
-				$data_assets = $this->fixed_equipment_model->get_assets($item_id);
-				if ($data_assets) {
-					$assets_name = $data_assets->assets_name;
-				}
 
 				$output  = $result['output'];
 				$rResult = $result['rResult'];
+
 				foreach ($rResult as $aRow) {
 					$row = [];
-					$row[] = $aRow['id'];
+					$row[] = _dt($aRow['date_creator']);
+					$row[] = get_staff_full_name($aRow['admin_id']);
+					$row[] = _l('fe_' . $aRow['action']);
 
-					$checkout_to_name = '';
-					if ($aRow['checkout_to'] == 'user') {
-						$checkout_to_name = _l('fe_staff') . ': ' . $aRow['firstname'] . ' ' . $aRow['lastname'];
-					} else {
-						$checkout_to_name = _l('fe_customer') . ': ' . fe_get_customer_name($aRow['customer_id']);
+					$target = '';
+					switch ($aRow['to']) {
+						case 'user':
+							$department_name = '';
+							$data_staff_department = $this->departments_model->get_staff_departments($aRow['to_id']);
+							if ($data_staff_department) {
+								foreach ($data_staff_department as $key => $staff_department) {
+									$department_name .= $staff_department['name'] . ', ';
+								}
+								if ($department_name != '') {
+									$department_name = '(' . rtrim($department_name, ', ') . ') ';
+								}
+							}
+							$target = '<i class="fa fa-user"></i> ' . $department_name . '' . get_staff_full_name($aRow['to_id']);
+							break;
+						case 'asset':
+							$data_assets = $this->fixed_equipment_model->get_assets($aRow['to_id']);
+							if ($data_assets) {
+								$target =  $data_assets->assets_name;
+							}
+							break;
+						case 'location':
+							$data_locations = $this->fixed_equipment_model->get_locations($aRow['to_id']);
+							if ($data_locations) {
+								$target = '<i class="fa fa-map-marker"></i> ' . $data_locations->location_name;
+							}
+							break;
+						case 'project':
+							$data_projects = $this->fixed_equipment_model->get_projects($aRow['to_id']);
+							if ($data_projects) {
+								$target = '<i class="fa fa-chart-gantt"></i> ' . $data_projects->name;
+							}
+							break;
 					}
-					$row[] = $checkout_to_name;
 
-
+					$row[] = $target;
+					$row[] = $aRow['consumable_quantity'];
 					$row[] = $aRow['notes'];
-					$row[] = _d($aRow['date_creator']);
-					if (is_admin() || has_permission('fixed_equipment_consumables', '', 'create')) {
-						$button = '';
-						if ($aRow['status'] == 2) {
-							$button = '<a class="btn btn-primary" data-asset_name="' . $assets_name . '" onclick="check_in(this, ' . $aRow['id'] . ')" >' . _l('fe_checkin') . '</a>';
-						}
-						$row[] = $button;
-					}
 					$output['aaData'][] = $row;
 				}
 
@@ -8722,6 +8755,7 @@ class fixed_equipment extends AdminController
 			}
 		}
 	}
+
 
 	/**
 	 * delete asset maintenances detail 

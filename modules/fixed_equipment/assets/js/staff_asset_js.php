@@ -9,4 +9,4 @@
 			initDataTable('.table-history', admin_url + 'fixed_equipment/asset_staff_history_table', false, false, fnServerParams, [0, 'desc']);
 		}
 	})(jQuery);
-</script>
+</script> 

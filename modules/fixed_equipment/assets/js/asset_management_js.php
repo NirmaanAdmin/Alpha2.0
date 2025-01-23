@@ -7,7 +7,7 @@
 			"supplier": "[name='supplier_filter']",
 			"location": "[name='location_filter']",
 		}
-		initDataTable('.table-assets_management', admin_url + 'fixed_equipment/all_asset_table', [0, 29], [0, 29], fnServerParams, [1, 'desc']);
+		initDataTable('.table-assets_management', admin_url + 'fixed_equipment/all_asset_table', [0, 29], [0, 29], fnServerParams, [2, 'desc']);
 
 		$("select[name='model_filter'], select[name='status_filter'], select[name='supplier_filter'], select[name='location_filter']").change(function() {
 			$('.table-assets_management').DataTable().ajax.reload()
