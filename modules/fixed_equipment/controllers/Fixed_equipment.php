@@ -1172,12 +1172,11 @@ class fixed_equipment extends AdminController
 				fe_handle_item_file($data['id'], 'models');
 			}
 		}
-		if($assets_check == 1){
+		if ($assets_check == 1) {
 			redirect(admin_url('fixed_equipment/assets'));
-		}else{
+		} else {
 			redirect(admin_url('fixed_equipment/settings?tab=models'));
 		}
-		
 	}
 	/**
 	 * delete models
@@ -1682,7 +1681,7 @@ class fixed_equipment extends AdminController
 		$data['custom_field_lists'] = get_custom_fields('fixed_equipment');
 		$data['field_sets'] = $this->fixed_equipment_model->get_field_set();
 		// $data['models'] = $this->fixed_equipment_model->get_models('');
-		
+
 		$this->load->view('asset_management', $data);
 	}
 
@@ -1841,6 +1840,18 @@ class fixed_equipment extends AdminController
 				foreach ($rResult as $aRow) {
 					$row = [];
 					$row[] = '<input type="checkbox" class="individual" data-id="' . $aRow['id'] . '" onchange="checked_add(this); return false;"/>';
+					$status = '';
+					$status_name = '';
+					if (is_numeric($aRow['status']) && $aRow['status'] > 0) {
+						$data_status = $this->fixed_equipment_model->get_status_labels($aRow['status']);
+						if ($data_status) {
+							$status = $data_status->status_type;
+							if ($aRow['checkin_out'] == 2 && $status == 'deployable') {
+								$status = 'deployed';
+							}
+							$status_name = '<div class="row text-nowrap mleft5 mright5"><span style="color:' . $data_status->chart_color . '">' . $data_status->name . '</span><span class="mleft10 label label-primary">' . _l('fe_' . $status) . '</span></div>';
+						}
+					}
 					$button = '';
 					if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
 						if ($aRow['for_sell'] == 0 && $aRow['for_rent'] == 0) {
@@ -1897,18 +1908,7 @@ class fixed_equipment extends AdminController
 					}
 					$row[] = $category_name;
 
-					$status = '';
-					$status_name = '';
-					if (is_numeric($aRow['status']) && $aRow['status'] > 0) {
-						$data_status = $this->fixed_equipment_model->get_status_labels($aRow['status']);
-						if ($data_status) {
-							$status = $data_status->status_type;
-							if ($aRow['checkin_out'] == 2 && $status == 'deployable') {
-								$status = 'deployed';
-							}
-							$status_name = '<div class="row text-nowrap mleft5 mright5"><span style="color:' . $data_status->chart_color . '">' . $data_status->name . '</span><span class="mleft10 label label-primary">' . _l('fe_' . $status) . '</span></div>';
-						}
-					}
+
 					$row[] = $status_name;
 
 
