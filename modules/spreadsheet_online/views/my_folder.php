@@ -308,13 +308,14 @@
 				<h4 class="modal-title add-new"><?php echo _l('add_new_share') ?></h4>
 			</div>
 			<div class="modal-body">
-				<div class="row">
+				<!-- <div class="row">
 					<div class="col-sm-12">
 						<div class="col-md-3">
 							<h5><span><?php echo _l('what_do_you_want_to_choose') ?></span></h5>
 						</div>
 						<div class="pull-left">
 							<div class="wrapper">
+								
 								<input id="checkbox1" type="checkbox" name="group_share_staff" value="1" />
 								<label for="checkbox1"><?php echo _l('staff') ?></label>
 								<input id="checkbox2" type="checkbox" name="group_share_client" value="2" />
@@ -322,13 +323,13 @@
 							</div>
 						</div>
 					</div>
-				</div>
-
+				</div> -->
+				<input type="hidden" name="group_share_staff" value="1">
 				<div class="row share-row">
 					<div class="col-md-12 choosee-staff">
-						<div class="col-md-12">
+						<!-- <div class="col-md-12">
 							<strong><?php echo _l('staff') ?> </strong>
-						</div>
+						</div> -->
 						<div class="list_information_fields_review">
 							<?php if(!isset($medical_visit->review_result)){ ?>
 								<div id="item_information_fields_review">
@@ -389,7 +390,7 @@
 							</div>
 						</div>
 
-						<div class="col-md-12 choosee-customer">
+						<!-- <div class="col-md-12 choosee-customer">
 							<div class="col-md-12">
 								<strong><?php echo _l('client') ?> </strong>
 
@@ -453,7 +454,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default test_class" data-dismiss="modal"><?php echo _l('close'); ?></button>
 							<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>

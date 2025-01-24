@@ -207,8 +207,8 @@ class Spreadsheet_online extends AdminController
 
     	$staff_notification = get_option('spreadsheet_staff_notification');
     	$staff_sent_email = get_option('spreadsheet_email_templates_staff');
-    	$client_notification = get_option('spreadsheet_client_notification');
-    	$client_sent_email = get_option('spreadsheet_email_templates_client');
+    	// $client_notification = get_option('spreadsheet_client_notification');
+    	// $client_sent_email = get_option('spreadsheet_email_templates_client');
 
     	if($success == true){
     		$message = _l('updated_successfully');
@@ -240,35 +240,7 @@ class Spreadsheet_online extends AdminController
     			}
     		}
 
-    		if(count($data['clients_share']) > 0){
-    			if($data['clients_share'][0] != ''){
-    				foreach ($data['clients_share'] as $key => $value) {
-    					$this->db->where('id', $data['id']);
-    					$share = $this->db->get(db_prefix() . 'spreadsheet_online_my_folder')->row();
-
-    					$this->db->where('id', $value);
-    					$contact = $this->db->get(db_prefix() . 'contacts')->row()->email;
-
-    					if($contact != null || $contact != ''){
-    						$share->receiver = $contact;
-    						$share->client_share_id = $value;
-    						$share->type_template = "client_template";
-    						if($client_sent_email == 1){
-    							$template = mail_template('spreadsheet_share_client', 'spreadsheet_online', array_to_object($share));
-    							$template->send();
-    						}
-
-    						if($client_notification == 1){
-    							$link_client = '';
-    							$link_client = 'spreadsheet_online/new_file_view/'.$data['parent_id'].'/'.$data['id'];
-    							$string_sub = get_staff_full_name($value) . ' ' . _l('share') . ' ' . $share->type . ' ' . $share->name . ' ' . _l('for_you');
-    							$this->spreadsheet_online_model->notifications($value, $link_client, strtolower($string_sub));
-    						}
-
-    					}
-    				}
-    			}
-    		}
+    	
 
 
 
