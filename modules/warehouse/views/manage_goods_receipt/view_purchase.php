@@ -141,9 +141,9 @@
                                      <th colspan="1"><?php echo _l('warehouse_name') ?></th>
                                      <th  colspan="1"><?php echo _l('unit_name') ?></th>
                                      <th  colspan="2" class="text-center"><?php echo _l('quantity') ?></th>
-                                     <th align="right" colspan="1"><?php echo _l('unit_price') ?></th>
+                                     <!-- <th align="right" colspan="1"><?php echo _l('unit_price') ?></th>
                                      <th align="right" colspan="1"><?php echo _l('total_money') ?></th>
-                                     <th align="right" colspan="1"><?php echo _l('tax_money') ?></th>
+                                     <th align="right" colspan="1"><?php echo _l('tax_money') ?></th> -->
                                      <th align="right" colspan="1"><?php echo _l('lot_number') ?></th>
                                      <!-- <th align="right" colspan="1"><?php echo _l('expiry_date') ?></th> -->
                                  </tr>
@@ -195,9 +195,9 @@
                                   <td ><?php echo html_entity_decode($unit_name) ?></td>
                                   <td ></td>
                                   <td class="text-right" ><?php echo html_entity_decode($quantities) ?></td>
-                                  <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
+                                  <!-- <td class="text-right"><?php echo app_format_money((float)$unit_price,'') ?></td>
                                   <td class="text-right"><?php echo app_format_money((float)$goods_money,'') ?></td>
-                                  <td class="text-right"><?php echo app_format_money((float)$tax_money,'') ?></td>
+                                  <td class="text-right"><?php echo app_format_money((float)$tax_money,'') ?></td> -->
                                   <td class="text-right"><?php echo html_entity_decode($lot_number) ?></td>
                                   <!-- <td class="text-right"><?php echo _d($expiry_date) ?></td> -->
                                 </tr>
@@ -208,7 +208,7 @@
                      </div>
 
                      <div class="col-md-6 col-md-offset-6">
-                      <table class="table text-right table-margintop">
+                      <!-- <table class="table text-right table-margintop">
                         <tbody>
                           <tr class="project-overview" id="subtotal">
                             <td class="td_style"><span class="bold"><?php echo _l('total_goods_money'); ?></span>
@@ -243,7 +243,7 @@
 
                           </tr>
                         </tbody>
-                      </table>
+                      </table> -->
                     </div>
 
 
