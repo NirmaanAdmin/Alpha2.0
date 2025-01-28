@@ -109,9 +109,9 @@ class timesheets_model extends app_model
 	{
 		$affectedrows = 0;
 		foreach (json_decode($data['leave_of_the_year_data']) as $key => $value) {
-			 // Remove the second value (index 1) from the array
-			 unset($value[1]);
-			 $value = array_values($value); // Re-index the array after unset
+			// Remove the second value (index 1) from the array
+			unset($value[1]);
+			$value = array_values($value); // Re-index the array after unset
 			if ($value[0] != null) {
 				$this->db->where('staffid', $value[0]);
 				$this->db->where('year', $data['start_year_for_annual_leave_cycle']);
@@ -123,7 +123,7 @@ class timesheets_model extends app_model
 					$data_update['type_of_leave'] = $data['type_of_leave'];
 					$data_update['staffid'] = $value[0];
 					$days_off = $data_staff_leave->days_off;
-					if($days_off == null || $days_off == ''){
+					if ($days_off == null || $days_off == '') {
 						$days_off = 0;
 					}
 					$data_update['remain'] = $value[4] - $days_off;
@@ -2029,13 +2029,12 @@ class timesheets_model extends app_model
 				$dd = $data_requisition->number_of_leaving_day;
 
 				$update_days_off = 0;
-				if($day_off->days_off >= $dd){
+				if ($day_off->days_off >= $dd) {
 					$update_days_off = $day_off->days_off - $dd;
-				}
-				else{
+				} else {
 					$update_days_off = 0;
 				}
-				
+
 				$update_remain = abs($day_off->total - $update_days_off);
 				$this->db->where('type_of_leave', $type_of_leave_data->type_id);
 				$this->db->where('staffid', $data_requisition->staff_id);
@@ -2459,9 +2458,16 @@ class timesheets_model extends app_model
 	 */
 	public function get_staff_query($query = '')
 	{
+		// Ensure the 'active = 1' condition is always included
+		$base_condition = 'active = 1';
+
 		if ($query != '') {
-			$query = ' where ' . $query;
+			$query = ' where ' . $base_condition . ' and (' . $query . ')';
+		} else {
+			$query = ' where ' . $base_condition;
 		}
+
+
 		return $this->db->query('select * from ' . db_prefix() . 'staff' . $query . ' order by firstname desc')->result_array();
 	}
 	/**
@@ -2875,8 +2881,8 @@ class timesheets_model extends app_model
 
 		$result = 0;
 		$data_shift_list = $this->get_shift_work_staff_by_date($staff_id, $date);
-		
-	
+
+
 		foreach ($data_shift_list as $ss) {
 			$data_shift_type = $this->get_shift_type($ss);
 			if ($data_shift_type) {
@@ -2885,8 +2891,8 @@ class timesheets_model extends app_model
 				$result += abs($hour - $lunch_hour);
 			}
 		}
-		
-	
+
+
 		return $result;
 	}
 	/**
@@ -3661,9 +3667,9 @@ class timesheets_model extends app_model
 						$data_send_mail['receiver'] = $email;
 						$data_send_mail['approver'] = get_staff_full_name($value);
 						$data_send_mail['staff_name'] = get_staff_full_name($staff_request);
-						if($rel_type == 'additional_timesheets'){
+						if ($rel_type == 'additional_timesheets') {
 							$data_send_mail['link'] = admin_url('timesheets/requisition_manage?tab=additional_timesheets&additional_timesheets_id=' . $data['rel_id']);
-						}else{
+						} else {
 							$data_send_mail['link'] = admin_url('timesheets/requisition_detail/' . $data['rel_id']);
 						}
 						$template = mail_template('send_request_approval', 'timesheets', array_to_object($data_send_mail));
@@ -3846,7 +3852,7 @@ class timesheets_model extends app_model
 					$mes = $additional_data . ' ' . _l('ts_rejected_by') . ' ' . get_staff_full_name($data['staff_approve']);
 				}
 			}
-			if($mes != ''){
+			if ($mes != '') {
 				$this->db->select('notification_recipient');
 				$this->db->where('related', "leave");
 				$approval_setting = $this->db->get(db_prefix() . 'timesheets_approval_setting')->row();
@@ -3868,13 +3874,13 @@ class timesheets_model extends app_model
 							}
 							$email = $this->get_staff_email($value);
 							if ($email != '') {
-								$this->emails_model->send_simple_email($email, _l('approval_notification'), $mes.'<br>'._l('detail').': <a href="'.admin_url($link).'">' . $additional_data . '</a>');
+								$this->emails_model->send_simple_email($email, _l('approval_notification'), $mes . '<br>' . _l('detail') . ': <a href="' . admin_url($link) . '">' . $additional_data . '</a>');
 							}
 						}
 					}
-				} 
+				}
 			}
-		} 
+		}
 	}
 	/**
 	 * get date time
@@ -4681,9 +4687,9 @@ class timesheets_model extends app_model
 			$data['timekeeping_value'] = number_format($data['timekeeping_value'], 1);
 		}
 
-		if(is_numeric($created_id)){
+		if (is_numeric($created_id)) {
 			$data['creator'] = $created_id;
-		}else{
+		} else {
 			$data['creator'] = $staff_id;
 		}
 
@@ -6333,7 +6339,7 @@ class timesheets_model extends app_model
 	public function get_route_point_id_by_name($name)
 	{
 		$id = '';
-		$data = $this->db->query('select id from '.db_prefix() . 'timesheets_route_point where name like \'%'.$name.'%\'')->row();
+		$data = $this->db->query('select id from ' . db_prefix() . 'timesheets_route_point where name like \'%' . $name . '%\'')->row();
 		if ($data) {
 			$id = $data->id;
 		}
@@ -7658,13 +7664,13 @@ class timesheets_model extends app_model
 		}
 
 		$start_year_for_annual_leave_cycle = date('Y');
-		if($year != ''){
+		if ($year != '') {
 			$start_year_for_annual_leave_cycle = $year;
 		}
 		$from_date = $start_year_for_annual_leave_cycle . '-' . (strlen($start_month_for_annual_leave_cycle) == 1 ? '0' : '') . $start_month_for_annual_leave_cycle . '-01';
 
-		if($check_period == true){
-			if(strtotime(date('Y-m-d')) < strtotime($from_date)){
+		if ($check_period == true) {
+			if (strtotime(date('Y-m-d')) < strtotime($from_date)) {
 				$start_year_for_annual_leave_cycle = date('Y') - 1;
 				$from_date = $start_year_for_annual_leave_cycle . '-' . (strlen($start_month_for_annual_leave_cycle) == 1 ? '0' : '') . $start_month_for_annual_leave_cycle . '-01';
 			}
@@ -8633,12 +8639,12 @@ class timesheets_model extends app_model
 	 * @param  string $date    
 	 * @return boolean          
 	 */
-	public function get_type_check($staffid, $date){
+	public function get_type_check($staffid, $date)
+	{
 		$check_result = $this->check_check_out($staffid, date('Y-m-d', strtotime($date)));
-		if(!$check_result->result){
+		if (!$check_result->result) {
 			return 1;
-		}
-		else{
+		} else {
 			return 2;
 		}
 	}
@@ -8649,7 +8655,7 @@ class timesheets_model extends app_model
 	 */
 	public function get_date_leave_from_date($date = '')
 	{
-		if($date == ''){
+		if ($date == '') {
 			$date = date('Y-m-d');
 		}
 		$start_month_for_annual_leave_cycle = '1';
@@ -8660,7 +8666,7 @@ class timesheets_model extends app_model
 		$year = date('Y', strtotime($date));
 		$start_year_for_annual_leave_cycle = $year;
 		$from_date = $start_year_for_annual_leave_cycle . '-' . (strlen($start_month_for_annual_leave_cycle) == 1 ? '0' : '') . $start_month_for_annual_leave_cycle . '-01';
-		if(strtotime(date('Y-m-d', strtotime($date))) < strtotime($from_date)){
+		if (strtotime(date('Y-m-d', strtotime($date))) < strtotime($from_date)) {
 			$start_year_for_annual_leave_cycle = ($year - 1);
 			$from_date = $start_year_for_annual_leave_cycle . '-' . (strlen($start_month_for_annual_leave_cycle) == 1 ? '0' : '') . $start_month_for_annual_leave_cycle . '-01';
 		}
@@ -8672,22 +8678,22 @@ class timesheets_model extends app_model
 	}
 
 	/**
-	* get first year of period
-	*/
-	public function get_first_year_of_period($date = ''){
-		if($date == ''){
+	 * get first year of period
+	 */
+	public function get_first_year_of_period($date = '')
+	{
+		if ($date == '') {
 			$data_date = $this->get_date_leave('', true);
 			$year = date('Y', strtotime($data_date->from_date));
 			return $year;
-		}
-		else{
+		} else {
 			$data_date = $this->get_date_leave_from_date($date);
 			$year = date('Y', strtotime($data_date->from_date));
 			return $year;
 		}
 	}
 
-		/**
+	/**
 	 * get vacation days of the year
 	 * @param  integer $staff_id
 	 * @return integer $year
@@ -8730,21 +8736,21 @@ class timesheets_model extends app_model
 
 		$where_group = '';
 		if ($role_id != '') {
-			$where_group .= 'IF(position != "", find_in_set('.$role_id.',position), 1=1)';
-		}else{
+			$where_group .= 'IF(position != "", find_in_set(' . $role_id . ',position), 1=1)';
+		} else {
 			$where_group .= 'position = ""';
 		}
 
 		foreach ($departments as $key => $value) {
-			if($where_group != ''){
-				$where_group .= ' AND IF(department != "",find_in_set('.$value.',department), 1=1)';
-			}else{
-				$where_group = 'IF(department != "", find_in_set('.$value.',department), 1=1)';
+			if ($where_group != '') {
+				$where_group .= ' AND IF(department != "",find_in_set(' . $value . ',department), 1=1)';
+			} else {
+				$where_group = 'IF(department != "", find_in_set(' . $value . ',department), 1=1)';
 			}
 		}
 
-		if($where_group != ''){
-			$where_group = ' AND ('.$where_group.')';
+		if ($where_group != '') {
+			$where_group = ' AND (' . $where_group . ')';
 		}
 
 		$day_off = $this->db->query('select * from ' . db_prefix() . 'day_off where ((repeat_by_year = 0 AND break_date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\') OR (repeat_by_year = 1 AND MONTH(break_date) >= MONTH(\'' . $from_date . '\') AND MONTH(break_date) <= MONTH(\'' . $to_date . '\'))) ' . $where_group)->result_array();
@@ -8796,16 +8802,16 @@ class timesheets_model extends app_model
 	{
 		$list_color = [];
 
-		$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check FROM '.db_prefix().'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "'.$staffid.'"')->result_array();;
+		$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '"')->result_array();;
 
 		$has_check_in = [];
 		$has_check_out = [];
 		foreach ($check_in_out as $value) {
-			if($value['type_check'] == 1 && !isset($has_check_in[$value['date']])){
+			if ($value['type_check'] == 1 && !isset($has_check_in[$value['date']])) {
 				$has_check_in[$value['date']] = 1;
 			}
 
-			if($value['type_check'] == 2 && !isset($has_check_out[$value['date']])){
+			if ($value['type_check'] == 2 && !isset($has_check_out[$value['date']])) {
 				$has_check_out[$value['date']] = 1;
 			}
 		}
@@ -8813,16 +8819,15 @@ class timesheets_model extends app_model
 		foreach ($list_date as $date) {
 			$color = '#fff';
 
-			if(isset($has_check_in[$date])){
+			if (isset($has_check_in[$date])) {
 				$color = '#f8e3d3';
 
-				if(isset($has_check_out[$date])){
+				if (isset($has_check_out[$date])) {
 					$color = '#dff0d8';
 				}
 			}
 
 			$list_color[$date] = $color;
-
 		}
 
 		return $list_color;
