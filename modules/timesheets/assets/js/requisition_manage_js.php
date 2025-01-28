@@ -917,4 +917,12 @@
     }
     return result;
   }
+  function edit_leave(staff_id,start_time,end_time,leave_id) {
+    "use strict";
+    $('#editLeaveModal').modal('show');
+    $('#update_staff_id').val(staff_id);
+    $('#update_start_time').val(start_time);
+    $('#update_end_time').val(end_time);
+    $('#update_leave_id').val(leave_id);
+  }
 </script>

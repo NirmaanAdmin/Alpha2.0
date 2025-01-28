@@ -989,7 +989,7 @@ class timesheets extends AdminController {
 		$data['additional_timesheets'] = $this->timesheets_model->get_additional_timesheets();
 		$data['type_of_leave'] = $this->timesheets_model->get_type_of_leave();
 		$data['staffs'] = $this->staff_model->get();
-
+ 
 		$this->load->view('timesheets/timekeeping/manage_requisition_hrm', $data);
 	}
 
@@ -6994,6 +6994,16 @@ public function check_in_ts() {
 	}
 
 
-
+	public function update_leave(){
+		$data = $this->input->post();
+		$result = $this->timesheets_model->update_leave($data);
+		if($result == true){
+			redirect(admin_url('timesheets/requisition_manage'));
+		}else{
+			set_alert('danger', _l('ts_update_fail'));
+			redirect(admin_url('timesheets/requisition_manage'));
+		}
+		
+	}
 
 }

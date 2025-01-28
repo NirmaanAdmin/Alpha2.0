@@ -545,7 +545,7 @@ function _l($line, $label = '', $log_errors = true)
         if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
             try {
                 $_line = sprintf($CI->lang->line(trim($line), $log_errors), $label);
-            } catch (\ValueError|\ArgumentCountError $e) {
+            } catch (\ValueError | \ArgumentCountError $e) {
                 $_line = $CI->lang->line(trim($line), $log_errors);
             }
         } else {
@@ -796,7 +796,7 @@ function pusher_trigger_notification($users = [])
 
     try {
         $CI->app_pusher->trigger($channels, 'notification', []);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
         update_option('pusher_realtime_notifications', '0');
     }
 }
@@ -832,50 +832,50 @@ function get_csrf_for_ajax()
  */
 function csrf_jquery_token()
 {
-    ?>
-<script>
-if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
-    window.deferAfterjQueryLoaded = [];
-    Object.defineProperty(window, "$", {
-        set: function(value) {
-            window.setTimeout(function() {
-                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
-                    fn();
-                });
-            }, 0);
+?>
+    <script>
+        if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+            window.deferAfterjQueryLoaded = [];
             Object.defineProperty(window, "$", {
-                value: value
+                set: function(value) {
+                    window.setTimeout(function() {
+                        $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                            fn();
+                        });
+                    }, 0);
+                    Object.defineProperty(window, "$", {
+                        value: value
+                    });
+                },
+                configurable: true
             });
-        },
-        configurable: true
-    });
-}
-
-var csrfData = <?php echo json_encode(get_csrf_for_ajax()); ?>;
-
-if (typeof(jQuery) == 'undefined') {
-    window.deferAfterjQueryLoaded.push(function() {
-        csrf_jquery_ajax_setup();
-    });
-    window.addEventListener('load', function() {
-        csrf_jquery_ajax_setup();
-    }, true);
-} else {
-    csrf_jquery_ajax_setup();
-}
-
-function csrf_jquery_ajax_setup() {
-    $.ajaxSetup({
-        data: csrfData.formatted
-    });
-
-    $(document).ajaxError(function(event, request, settings) {
-        if (request.status === 419) {
-            alert_float('warning', 'Page expired, refresh the page make an action.')
         }
-    });
-}
-</script>
+
+        var csrfData = <?php echo json_encode(get_csrf_for_ajax()); ?>;
+
+        if (typeof(jQuery) == 'undefined') {
+            window.deferAfterjQueryLoaded.push(function() {
+                csrf_jquery_ajax_setup();
+            });
+            window.addEventListener('load', function() {
+                csrf_jquery_ajax_setup();
+            }, true);
+        } else {
+            csrf_jquery_ajax_setup();
+        }
+
+        function csrf_jquery_ajax_setup() {
+            $.ajaxSetup({
+                data: csrfData.formatted
+            });
+
+            $(document).ajaxError(function(event, request, settings) {
+                if (request.status === 419) {
+                    alert_float('warning', 'Page expired, refresh the page make an action.')
+                }
+            });
+        }
+    </script>
 <?php
 }
 
@@ -1000,8 +1000,37 @@ if (!function_exists('previous_url')) {
      * @since  3.1.3
      * @return string|null
      */
-    function previous_url() 
+    function previous_url()
     {
         return get_instance()->session->userdata('_prev_url');
     }
+}
+
+function get_staff_department($staff_id)
+{
+    $CI = &get_instance();
+    $CI->db->select('departmentid');
+    $CI->db->from('tblstaff_departments');
+    $CI->db->where('staffid', $staff_id);
+    $query = $CI->db->get();
+    return $query->row()->departmentid;
+}
+
+function check_emp_leave_balance($staff_id)
+{
+    $CI = &get_instance();
+    $currentYear = date('Y'); // Get the current year
+
+    // Query the leave balance for the specific staff member
+    $CI->db->select('total, remain, accumulated, days_off');
+    $CI->db->from('tbltimesheets_day_off');
+    $CI->db->where('staffid', $staff_id);
+    $CI->db->where('year', $currentYear);
+    $CI->db->where('type_of_leave', 1);
+    $CI->db->or_where('type_of_leave', 'religiuos-leave-rl');
+    $CI->db->or_where('type_of_leave', 'casual-leave-cl');
+    $query = $CI->db->get();
+
+    // Return leave balance details or null if no record exists
+    return $query->row_array();
 }

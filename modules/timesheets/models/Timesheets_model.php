@@ -8832,4 +8832,50 @@ class timesheets_model extends app_model
 
 		return $list_color;
 	}
+
+	public function update_leave($data)
+	{
+		if (!empty($data)) {
+
+			// Calculate the number of days between the start and end dates
+			$startDate = new DateTime($data['update_start_time']);
+			$endDate = new DateTime($data['update_end_time']);
+			$daysRequested = $endDate->diff($startDate)->days + 1; // Include the start date
+			
+			// Get the staff's remaining leave balance for the type of leave being updated
+			$this->db->where('staffid', $data['update_staff_id']);
+			$this->db->where('year', date('Y')); // Current year
+			$this->db->where('type_of_leave', $data['leave_type']);
+			$leaveBalance = $this->db->get('tbltimesheets_day_off')->row_array();
+
+			// Check if the leave balance exists and is sufficient
+			if (!$leaveBalance || $leaveBalance['remain'] < $daysRequested) {
+				return false;
+			}
+
+			// Deduct the requested days from the remaining leave balance
+			$newRemain = $leaveBalance['remain'] - $daysRequested;
+
+			// Update the leave balance
+			$this->db->where('id', $leaveBalance['id']);
+			$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain]);
+			if($data['leave_type'] == 1){
+				$data['leave_type'] = 'sick_leave';
+				$type_of_leave = 1;
+			}else{
+				$data['leave_type'] = $data['leave_type'];
+				$type_of_leave = 0;
+			}
+			// Update the leave record
+			$this->db->where('id', $data['update_leave_id']);
+			$this->db->update(db_prefix() . 'timesheets_requisition_leave', [
+				'type_of_leave_text' => $data['leave_type'],
+				'type_of_leave' => $type_of_leave,
+			]);
+
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

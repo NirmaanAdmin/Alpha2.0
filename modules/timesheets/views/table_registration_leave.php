@@ -23,7 +23,8 @@ $aColumns = [
 ];
 $sIndexColumn = 'id';
 $sTable = db_prefix() . 'timesheets_requisition_leave';
-$join = ['LEFT JOIN ' . db_prefix() . 'staff b ON b.staffid = ' . db_prefix() . 'timesheets_requisition_leave.staff_id',
+$join = [
+	'LEFT JOIN ' . db_prefix() . 'staff b ON b.staffid = ' . db_prefix() . 'timesheets_requisition_leave.staff_id',
 	'LEFT JOIN ' . db_prefix() . 'roles ON ' . db_prefix() . 'roles.roleid = b.role',
 ];
 $where = [];
@@ -57,7 +58,6 @@ if ($this->ci->input->post('department_filter')) {
 		if ($department != '') {
 			if ($where_dpm == '') {
 				$where_dpm = ' AND (staff_id IN (SELECT staffid FROM ' . db_prefix() . 'staff_departments WHERE departmentid = ' . $statues . ')';
-
 			} else {
 				$where_dpm .= 'OR staff_id IN (SELECT staffid FROM ' . db_prefix() . 'staff_departments WHERE departmentid = ' . $statues . ')';
 			}
@@ -115,27 +115,26 @@ foreach ($rResult as $aRow) {
 	$row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow[db_prefix() . 'timesheets_requisition_leave.id'] . '"><label></label></div>';
 
 	$row[] = '<div class="row">'
-	. '<a class="col-md-10" href="' . admin_url('timesheets/requisition_detail' . '/' . ($aRow[db_prefix() . 'timesheets_requisition_leave.id'])) . '">' . $aRow['subject'] . '</a>'
+		. '<a class="col-md-10" href="' . admin_url('timesheets/requisition_detail' . '/' . ($aRow[db_prefix() . 'timesheets_requisition_leave.id'])) . '">' . $aRow['subject'] . '</a>'
 		. '</div>';
 
 	$row[] = '<a data-toggle="tooltip" data-title="' . get_staff_full_name($aRow[db_prefix() . 'timesheets_requisition_leave.staff_id']) . '" href="' . admin_url('profile/' . $aRow[db_prefix() . 'timesheets_requisition_leave.staff_id']) . '">' . staff_profile_image($aRow[db_prefix() . 'timesheets_requisition_leave.staff_id'], [
 		'staff-profile-image-small',
 	]) . ' ' . get_staff_full_name($aRow[db_prefix() . 'timesheets_requisition_leave.staff_id']) . '</a><span class="hide">' . get_staff_full_name($aRow[db_prefix() . 'timesheets_requisition_leave.staff_id']) . '</span>';
 
-    $start_time = '';
-    $end_time = '';
-    if($aRow['rel_type'] == 1){
-          $start_time = _d(date('Y-m-d', strtotime($aRow[db_prefix().'timesheets_requisition_leave.start_time'])));
-        $end_time = _d(date('Y-m-d', strtotime($aRow[db_prefix().'timesheets_requisition_leave.end_time'])));
-    }
-    else{
-        $start_time = _dt($aRow[db_prefix().'timesheets_requisition_leave.start_time']);
-        $end_time = _dt($aRow[db_prefix().'timesheets_requisition_leave.end_time']);  
-    }
+	$start_time = '';
+	$end_time = '';
+	if ($aRow['rel_type'] == 1) {
+		$start_time = _d(date('Y-m-d', strtotime($aRow[db_prefix() . 'timesheets_requisition_leave.start_time'])));
+		$end_time = _d(date('Y-m-d', strtotime($aRow[db_prefix() . 'timesheets_requisition_leave.end_time'])));
+	} else {
+		$start_time = _dt($aRow[db_prefix() . 'timesheets_requisition_leave.start_time']);
+		$end_time = _dt($aRow[db_prefix() . 'timesheets_requisition_leave.end_time']);
+	}
 
 
-    $row[] = $start_time;  
-    $row[] = $end_time;  
+	$row[] = $start_time;
+	$row[] = $end_time;
 
 	$list_member_approve = [];
 
@@ -143,25 +142,25 @@ foreach ($rResult as $aRow) {
 
 	$members = ($aRow['approver'] ? explode(',', $aRow['approver']) : []);
 	$list_member = '';
-	$exportMembers = '';
+	$exportMembers =  $flag ='';
 	foreach ($members as $key => $member_id) {
 		if ($member_id != '') {
 			$member_name = get_staff_full_name($member_id);
 			$list_member .= '<li class="text-success mbot10 mtop"><a href="' . admin_url('profile/' . $member_id) . '" class="avatar cover-image text-align-left">' .
-			staff_profile_image($member_id, [
-				'staff-profile-image-small mright5',
-			], 'small', [
-				'data-toggle' => 'tooltip',
-				'data-title' => $member_name,
-			]) . ' ' . $member_name . '</a></li>';
-			if ($key <= 2) {
-				$membersOutput .= '<span class="avatar cover-image brround">' .
 				staff_profile_image($member_id, [
 					'staff-profile-image-small mright5',
 				], 'small', [
 					'data-toggle' => 'tooltip',
 					'data-title' => $member_name,
-				]) . '</span>';
+				]) . ' ' . $member_name . '</a></li>';
+			if ($key <= 2) {
+				$membersOutput .= '<span class="avatar cover-image brround">' .
+					staff_profile_image($member_id, [
+						'staff-profile-image-small mright5',
+					], 'small', [
+						'data-toggle' => 'tooltip',
+						'data-title' => $member_name,
+					]) . '</span>';
 			}
 			// For exporting
 			$exportMembers .= $member_name . ', ';
@@ -206,18 +205,18 @@ foreach ($rResult as $aRow) {
 	$rel_type = '';
 	if ($aRow['rel_type'] == 1) {
 		switch ($aRow['type_of_leave']) {
-		case 8:
-			$rel_type = 'Leave';
-			break;
-		case 2:
-			$rel_type = 'maternity_leave';
-			break;
-		case 4:
-			$rel_type = 'private_work_without_pay';
-			break;
-		case 1:
-			$rel_type = 'sick_leave';
-			break;
+			case 8:
+				$rel_type = 'Leave';
+				break;
+			case 2:
+				$rel_type = 'maternity_leave';
+				break;
+			case 4:
+				$rel_type = 'private_work_without_pay';
+				break;
+			case 1:
+				$rel_type = 'sick_leave';
+				break;
 		}
 	} else if ($aRow['rel_type'] == 2) {
 		$rel_type = 'late';
@@ -248,7 +247,7 @@ foreach ($rResult as $aRow) {
 	}
 
 	$row[] = _d(date('Y-m-d', strtotime($aRow[db_prefix() . 'timesheets_requisition_leave.datecreated'])));
-
+	$flag = 0;
 	$action_option = '<div class="row">';
 	if (in_array($user_id, $list_member_approve)) {
 		$data_check_approve_status = $this->ci->timesheets_model->check_approval_details(($aRow[db_prefix() . 'timesheets_requisition_leave.id']), $rel_type);
@@ -257,6 +256,7 @@ foreach ($rResult as $aRow) {
 				if (in_array($user_id, $data_check_approve_status['staffid'])) {
 					$action_option .= '<span data-placement="top" data-toggle="tooltip" data-title="' . _l('approve') . '" onclick="approve_request(' . ($aRow[db_prefix() . 'timesheets_requisition_leave.id']) . ',\'' . $rel_type . '\');" class="btn btn-success btn-icon mright5"><i class="fa fa-check"></i></span>';
 					$action_option .= '<span data-placement="top" data-toggle="tooltip" data-title="' . _l('deny') . '" onclick="deny_request(' . ($aRow[db_prefix() . 'timesheets_requisition_leave.id']) . ',\'' . $rel_type . '\');" class="btn btn-primary btn-icon"><i class="fa fa-ban"></i></span>';
+					$flag = 1;
 				}
 			}
 		}
@@ -264,6 +264,19 @@ foreach ($rResult as $aRow) {
 
 	if (is_admin() || $aRow['status'] == 0) {
 		$action_option .= '<a id="delete-insurance" data-placement="top" data-toggle="tooltip" data-title="' . _l('delete') . '" href="' . admin_url('timesheets/delete_requisition' . '/' . ($aRow[db_prefix() . 'timesheets_requisition_leave.id'])) . '" class="btn btn-danger btn-icon _delete">' . '<i class="fa fa-remove"></i>' . '</a>';
+	}
+
+	$get_deprtment = get_staff_department($user_id);
+	$leaveBalance = check_emp_leave_balance($aRow[db_prefix() . 'timesheets_requisition_leave.staff_id']);
+	$leaveBalance = $leaveBalance['remain'];
+	if($flag == 1){
+		$margin = 'margin-top: 10px;';
+	}else{
+		$margin = '';
+	}
+	if ((is_admin() || $get_deprtment == '8') && $leaveBalance > 0) {
+		$action_option .= '<a style="' . $margin . '" id="edit-leave" data-placement="top" data-toggle="tooltip" data-title="Edit Leave" class="btn btn-info btn-icon" onclick="edit_leave(' . $aRow[db_prefix() . 'timesheets_requisition_leave.staff_id'] . ', \'' . date('Y-m-d', strtotime($aRow[db_prefix() . 'timesheets_requisition_leave.start_time'])) . '\', \'' . date('Y-m-d', strtotime($aRow[db_prefix() . 'timesheets_requisition_leave.end_time'])) . '\', ' . $aRow[db_prefix() . 'timesheets_requisition_leave.id'] . '); return false">' . '<i class="fa fa-pencil"></i>' . '</a>';
+
 	}
 	$row[] = $action_option . '</div>';
 
