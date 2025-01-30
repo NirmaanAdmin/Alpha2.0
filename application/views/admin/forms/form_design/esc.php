@@ -39,7 +39,7 @@
     .agency .dropdown-toggle,
     .laber-type .dropdown-toggle {
         width: 90px !important;
-    } 
+    }
 </style>
 <div class="col-md-12">
     <hr class="hr-panel-separator" />
@@ -49,34 +49,29 @@
     <div class="table-responsive">
         <table class="table dpr-items-table items table-main-dpr-edit has-calculations no-mtop">
 
+            <input type="hidden" name="action" value="apc">
             <thead>
                 <tr>
-                    <th colspan="9" class="daily_report_title">Scaffolds Dismantling Checklist</th>
+                    <th colspan="5" class="daily_report_title">Electrical Safety Checklist</th>
                 </tr>
                 <tr>
-                    <th colspan="2" class="daily_report_head">
+                    <th colspan="3" class="daily_report_head">
                         <span class="daily_report_label">Project: <span class="view_project_name"></span></span>
                     </th>
-                    <th colspan="3" class="daily_report_head">
-                        <span class="daily_report_label">Date: </span><input type="datetime-local" class="form-control" name="date" value="<?= isset($sca_form->date) ? date('Y-m-d\TH:i', strtotime($sca_form->date)) : '' ?>">
+                    <th colspan="2" class="daily_report_head">
+                        <span class="daily_report_label">Date: </span><input type="datetime-local" class="form-control" name="date" value="<?= isset($esc_form->date) ? date('Y-m-d\TH:i', strtotime($esc_form->date)) : '' ?>">
                     </th>
                 </tr>
                 <tr>
-                    <th colspan="2" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Area of Work</span>
-                    </th>
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="area_of_work" name="area_of_work" class="form-control" style="width:100%;" value="<?php echo isset($sca_form->area_of_work) ? $sca_form->area_of_work : '' ?>"></span>
+                    <th colspan="5" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;">Location: <?php echo render_input('location', '', isset($esc_form->location) ? $esc_form->location : '', 'text', ['style' => 'width:150px;']); ?></span>
                     </th>
                 </tr>
                 <tr>
-                    <th colspan="2" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Scaffold Supervisor</span>
-                    </th>
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="scaffold_supervisor" name="scaffold_supervisor" class="form-control" style="width:100%;" value="<?php echo isset($sca_form->scaffold_supervisor) ? $sca_form->scaffold_supervisor : '' ?>"></span>
-                    </th>
+                    <th colspan="5" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;">Inspected by: <?php echo render_select('inspected_by', get_staff_list(), array('staffid', 'name'), '', isset($esc_form->inspected_by) ? $esc_form->inspected_by : ''); ?></span>
 
+                    </th>
                 </tr>
                 <tr class="main">
                     <th class="daily_report_head daily_center">
@@ -86,33 +81,35 @@
                         <span class="daily_report_label">Items</span>
                     </th>
                     <th class="daily_report_head daily_center">
-                        <span class="daily_report_label">Check</span>
+                        <span class="daily_report_label">Status</span>
                     </th>
                     <th class="daily_report_head daily_center">
-                        <span class="daily_report_label">Actions / Comments</span>
+                        <span class="daily_report_label">Remarks</span>
                     </th>
                     <th class="daily_report_head daily_center">
                         <span class="daily_report_label">Attachment</span>
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_sca = get_items_listing_for_sca(); ?>
-
+            <?php $get_items_listing_for_apc = get_items_listing_for_esc(); ?>
             <tbody>
-
                 <?php $sr = 1;
-
-                foreach ($get_items_listing_for_sca as $key => $value):
-                    $id = isset($sca_form_detail) ? $sca_form_detail[$key]['id'] : '';
-                    $ckeck = isset($sca_form_detail) ? $sca_form_detail[$key]['checks'] : '';
-                    $comment = isset($sca_form_detail) ? $sca_form_detail[$key]['comments'] : '';
-                ?>
+                foreach ($get_items_listing_for_apc as $key => $value):
+                    $id = isset($esc_form_detail) ? $esc_form_detail[$key]['id'] : ''; ?>
                     <tr class="main">
-                        <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?php echo $id; ?>">
+                        <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?= $id  ?>">
                         <td><?= $sr ?></td>
                         <td style="font-weight: 600;font-size: 16px;"><?= $value['name'] ?></td>
-                        <td> <span class="daily_report_label" style="display: ruby;"> <input type="text" id="items[<?= $sr ?>][checks]" name="items[<?= $sr ?>][checks]" class="form-control" style="width:100%;" value="<?php echo $ckeck;  ?>"></span></td>
-                        <td> <span class="daily_report_label" style="display: ruby;"> <input type="text" id="items[<?= $sr ?>][comments]" name="items[<?= $sr ?>][comments]" class="form-control" style="width:100%;" value="<?php echo $comment;  ?>"></span></td>
+                        <td>
+                            <span class="daily_report_label" style="display: ruby;">
+                                <?php echo render_select('items[' . $sr . '][status]', get_item_status_listing(), array('id', 'name'), '', isset($esc_form_detail) ? $esc_form_detail[$key]['status'] : ''); ?>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="daily_report_label" style="display: ruby;">
+                                <?php echo render_input('items[' . $sr . '][remarks]', '', isset($esc_form_detail) ? $esc_form_detail[$key]['remarks'] : '', 'text', ['style' => 'width:150px;']); ?>
+                            </span>
+                        </td>
                         <td>
                             <div class="attachment_new">
                                 <div class="col-md-12">
@@ -133,23 +130,22 @@
                                 </div>
                             </div>
                             <?php
-
-                            if (isset($sca_attachments) && count($sca_attachments) > 0) {
-                                foreach ($sca_attachments as $attachment) {
+                            if (isset($esc_attachments) && count($esc_attachments) > 0) {
+                                foreach ($esc_attachments as $attachment) {
                                     if ($attachment['form_detail_id'] == $id) {
                                         echo '<div class="col-md-12">';
 
                                         // Generate the path to the file
-                                        $path = get_upload_path_by_type('form') . 'sca_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
+                                        $path = get_upload_path_by_type('form') . 'esc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
 
                                         // Display the image and delete link
                                         echo '<div class="preview_image" style="margin-bottom: 10px;display: flex;">';
                             ?>
-                                        <a href="<?php echo site_url('uploads/form_attachments/sca_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
+                                        <a href="<?php echo site_url('uploads/form_attachments/esc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
                                             class="display-block mbot5" download>
                                             <i class="<?php echo get_mime_class($attachment['filetype']); ?>"></i> <?php echo $attachment['file_name']; ?>
                                         </a>
-                                        <a href="<?php echo admin_url('forms/delete_sca_attachment/' . $attachment['id']); ?>"
+                                        <a href="<?php echo admin_url('forms/delete_esc_attachment/' . $attachment['id']); ?>"
                                             class="text-danger _delete" style="margin-left: 10px;">
                                             <i class="fa fa-remove"></i>
                                         </a>
@@ -160,12 +156,14 @@
                                 }
                             }
                             ?>
+
                         </td>
                     </tr>
                 <?php $sr++;
                 endforeach; ?>
             </tbody>
         </table>
+
 
     </div>
 </div>
@@ -175,30 +173,6 @@
         // var project_id = $(this).val();
         var project_name = $('#project_id option:selected').text();
         $('.view_project_name').html(project_name);
-    });
-
-
-    $(document).ready(function() {
-        $('input.number').keypress(function(e) {
-            var code = e.which || e.keyCode;
-
-            // Allow backspace, tab, delete, and '/'
-            if (code === 8 || code === 9 || code === 46 || code === 47) {
-                return true;
-            }
-
-            // Allow letters (A-Z, a-z) and numbers (0-9)
-            if (
-                (code >= 48 && code <= 57) || // Numbers 0-9
-                (code >= 65 && code <= 90) || // Uppercase A-Z
-                (code >= 97 && code <= 122) // Lowercase a-z
-            ) {
-                return true;
-            }
-
-            // Block all other characters
-            return false;
-        });
     });
     let addMoreAttachmentsInputKey = 2;
 

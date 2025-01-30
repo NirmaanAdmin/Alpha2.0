@@ -436,7 +436,10 @@ function get_form_listing()
                     'id' => 'sca',
                     'name' => 'Scaffolds Dismantling Checklist',
                 ],
-                
+                [
+                    'id' => 'esc',
+                    'name' => 'Electrical Safety Checklist',
+                ],
             ]
         ]
     ];
@@ -1027,4 +1030,47 @@ function get_staff_list($where = '')
         $CI->db->where($where);
     }
     return $CI->db->get(db_prefix().'staff')->result_array();
+}
+function get_items_listing_for_esc()
+{
+    $result = array();
+
+    $result = [
+        ['id' => 1, 'name' => 'Is the SHOCK TREATMENT CHART displayed at prime locations?'],
+        ['id' => 2, 'name' => 'Are SAFETY HELMETS, SAFETY SHOES compulsorily while working at site?'],
+        ['id' => 3, 'name' => 'Are wires, cables, and switches of approved quality and with ISI mark?'],
+        ['id' => 4, 'name' => 'Are all switch boards, extension boards etc. properly anchored/fixed?'],
+        ['id' => 5, 'name' => 'Are all switch boards, extension boards etc. protected from rain and water?'],
+        ['id' => 6, 'name' => 'Are ELCB/RCCB installed at all main boards & extension boards to avoid fatal shock?'],
+        ['id' => 7, 'name' => 'Are appropriately rated fuses provided always?'],
+        ['id' => 8, 'name' => 'Are industrial safety pin & plugs used for temporary connections?'],
+        ['id' => 9, 'name' => 'Is it ensured that cables for all temporary connections are double insulated type and without joints/damages?'],
+        ['id' => 10, 'name' => 'Are insulated and safely secured electrical conduits used for transmission?'],
+        ['id' => 11, 'name' => 'Is the usage of rubber mat and electrical rubber gloves insisted while handling electrical equipment?'],
+        ['id' => 12, 'name' => 'Are all circuits treated as ‘LIVE’ unless ensured otherwise?'],
+        ['id' => 13, 'name' => 'Are warning signs of high voltage such as “Danger 440 V” posted where unauthorized employees might come in contact with live parts?'],
+        ['id' => 14, 'name' => 'Is the grounding requirement for the systems, circuits, and equipment as per the specification?'],
+        ['id' => 15, 'name' => 'Are all noncurrent-carrying metal parts of portable and fixed equipment grounded?'],
+        ['id' => 16, 'name' => 'Are routine checks of all temporary power connections carried out and records maintained?'],
+        ['id' => 17, 'name' => 'Is periodic check carried out for defective cables, cracked insulation, loose joints, and faulty sockets?'],
+        ['id' => 18, 'name' => 'Is it ensured that kinking, twisting, binding, or crushing of cables is avoided at all times?'],
+        ['id' => 19, 'name' => 'Is it ensured that the Electrical system is not overloaded?'],
+        ['id' => 20, 'name' => 'Are cords around structural steel and sheet metal protected from mechanical damage?'],
+        ['id' => 21, 'name' => 'Is safe overhead distance of HT cables as per Indian Electricity Rules maintained?'],
+        ['id' => 22, 'name' => 'Is routing of temporary cables through floors avoided?'],
+        ['id' => 23, 'name' => 'Is it ensured that routing of temporary cables does not cause hindrance to working persons?'],
+        ['id' => 24, 'name' => 'Is it ensured that temporary cables are fixed firmly to poles/structures/walls?'],
+        ['id' => 25, 'name' => 'Are separate and distinct neutral wire and body earth provided?'],
+        ['id' => 26, 'name' => 'Is it ensured that no electrical work is carried out on wet surfaces or in the open while it is raining?'],
+        ['id' => 27, 'name' => 'Is it ensured that electric equipment/switches are not operated with wet hands?'],
+        ['id' => 28, 'name' => 'Is it ensured that electrical switchboards, portable tools, and equipment don’t get wet during usage? If it happens, is the main supply stopped, the tools dried, and then only used?'],
+        ['id' => 29, 'name' => 'Is it ensured that extension cords are not run from one floor to another on multi-level sites?'],
+        ['id' => 30, 'name' => 'Is it ensured that temporary power connections are not tampered with and no unauthorized connections are made?'],
+        ['id' => 31, 'name' => 'Is it ensured that any electric leads, cables, welding transformers, DBs, switch boards, or any equipment connected to the main supply are not left unattended?'],
+        ['id' => 32, 'name' => 'Is it ensured that no unauthorized person enters electrical equipment rooms or interferes with electrical apparatus?'],
+        ['id' => 33, 'name' => 'Is it ensured that no earthing wire is connected to the pipelines/structures?'],
+        ['id' => 34, 'name' => 'Is it ensured that water/water-type fire extinguishers are not used to put off electrical circuit fires?'],
+    ];
+
+    return $result;
 }

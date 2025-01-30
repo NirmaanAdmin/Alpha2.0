@@ -64,9 +64,10 @@ class Forms extends AdminController
     }
 
     public function add($userid = false)
-    {
+    { 
         if ($this->input->post()) {
             $data = $this->input->post();
+            
             $data['message'] = html_purify($this->input->post('message', false));
             $id              = $this->forms_model->add($data, get_staff_user_id());
             if ($id) {
@@ -875,14 +876,24 @@ class Forms extends AdminController
             $this->load->view('admin/forms/form_design/msh', $data);
         }elseif ($form_type == "sca") {
             if ($form_id != 0) {
-                $msh_form = $this->forms_model->get_msh_form($form_id);
-                $msh_form_detail = $this->forms_model->get_msh_form_detail($form_id);
-                $data['msh_attachments'] = $this->forms_model->get_msh_form_attachments($form_id);
-                $data['msh_form'] = $msh_form;
-                $data['msh_form_detail'] = $msh_form_detail;
+                $sca_form = $this->forms_model->get_sca_form($form_id);
+                $sca_form_detail = $this->forms_model->get_sca_form_detail($form_id);
+                $data['sca_attachments'] = $this->forms_model->get_sca_form_attachments($form_id);
+                $data['sca_form'] = $sca_form;
+                $data['sca_form_detail'] = $sca_form_detail;
                 $data['form_id'] = $form_id;
             }            
             $this->load->view('admin/forms/form_design/sca', $data);
+        }elseif ($form_type == "esc") {
+            if ($form_id != 0) {
+                $esc_form = $this->forms_model->get_esc_form($form_id);
+                $esc_form_detail = $this->forms_model->get_esc_form_detail($form_id);
+                $data['esc_attachments'] = $this->forms_model->get_esc_form_attachments($form_id);
+                $data['esc_form'] = $esc_form;
+                $data['esc_form_detail'] = $esc_form_detail;
+                $data['form_id'] = $form_id;
+            }            
+            $this->load->view('admin/forms/form_design/esc', $data);
         }
     }
 
@@ -917,6 +928,10 @@ class Forms extends AdminController
         $this->forms_model->delete_msh_attachment($id);
         
     }
+    public function delete_sca_attachment($id){
+        $this->forms_model->delete_sca_attachment($id);
+        
+    }
     public function delete_mlg_attachment($id){
         $this->forms_model->delete_mlg_attachment($id);
         
@@ -925,4 +940,9 @@ class Forms extends AdminController
         $this->forms_model->delete_wpc_attachment($id);
         
     }
+    public function delete_esc_attachment($id){
+        $this->forms_model->delete_esc_attachment($id);
+        
+    }
+    
 }

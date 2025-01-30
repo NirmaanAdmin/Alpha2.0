@@ -53,7 +53,7 @@
                 <tr>
                     <th colspan="9" class="daily_report_title">Monthly Safety Harness Inspection</th>
                 </tr>
-                <tr>
+                <tr> 
                     <th colspan="3" class="daily_report_head">
                         <span class="daily_report_label" style="display: ruby;">Trade of Work: <?php echo render_input('trade_of_work', '', isset($msh_form->trade_of_work) ? $msh_form->trade_of_work : '', 'text', ['style' => 'width:150px;']); ?></span>
                     </th>

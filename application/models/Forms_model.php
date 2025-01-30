@@ -955,8 +955,34 @@ class Forms_model extends App_Model
                     $new_order = $data['items'];
                     unset($data['items']);
                 }
+            } elseif ($data['form_type'] == "sca") {
+                $sca_form = [];
+                $sca_form['area_of_work'] = $data['area_of_work'];
+                $sca_form['scaffold_supervisor'] = $data['scaffold_supervisor'];
+                $sca_form['date'] = $data['date'];
+                unset($data['area_of_work']);
+                unset($data['scaffold_supervisor']);
+                unset($data['date']);
+                $new_order = [];
+                if (isset($data['items'])) {
+                    $new_order = $data['items'];
+                    unset($data['items']);
+                }
+            } elseif ($data['form_type'] == "esc") {
+                $esc_form = [];
+                $esc_form['date'] = $data['date'];
+                $esc_form['location'] = $data['location'];
+                $esc_form['inspected_by'] = $data['inspected_by'];
+                unset($data['date']);
+                unset($data['location']);
+                unset($data['inspected_by']);
+                unset($data['action']);
+                $new_order = [];
+                if (isset($data['items'])) {
+                    $new_order = $data['items'];
+                    unset($data['items']);
+                }
             }
-
         }
 
         // $data['message'] = remove_emojis($data['message']);
@@ -1171,6 +1197,83 @@ class Forms_model extends App_Model
                                 }
                             }
 
+                            $sr++;
+                        }
+                    }
+                }
+            } elseif ($data['form_type'] == "sca") {
+                if (isset($sca_form)) {
+                    if (!empty($sca_form)) {
+                        $sca_form['form_id'] = $formid;
+                        $this->db->insert(db_prefix() . $data['form_type'] . '_form', $sca_form);
+                    }
+                }
+                if (isset($new_order)) {
+                    if (!empty($new_order)) {
+                        $sr = 1;
+                        foreach ($new_order as $key => $value) {
+                            $dt_data = [];
+                            $dt_data['form_id'] = $formid;
+                            $dt_data['description'] = $sr;
+                            $dt_data['checks'] = $value['checks'] ?? null;
+                            $dt_data['comments'] = $value['comments'] ?? null;
+                            $this->db->insert(db_prefix() . $data['form_type'] . '_form_detail', $dt_data);
+                            $insert_id = $this->db->insert_id();
+                            // Handle file attachments dynamically for items and attachments_new
+                            $iuploadedFiles = handle_ckecklist_item_attachment_array('sca_checklist', $formid, $insert_id, 'items', $sr);
+
+                            if ($iuploadedFiles && is_array($iuploadedFiles)) {
+                                if (!empty($iuploadedFiles)) {
+                                    foreach ($iuploadedFiles as $file) {
+                                        $idata = [
+                                            'form_id' =>  $formid,
+                                            'form_detail_id' =>  $file['item_id'],
+                                            'file_name' => $file['file_name'],
+                                            'filetype' => $file['filetype'],
+                                        ];
+                                        $this->db->insert(db_prefix() . 'scaattachments', $idata);
+                                    }
+                                }
+                            }
+
+                            $sr++;
+                        }
+                    }
+                }
+            } elseif ($data['form_type'] == "esc") {
+                if (isset($esc_form)) {
+                    if (!empty($esc_form)) {
+                        $esc_form['form_id'] = $formid;
+                        $this->db->insert(db_prefix() . $data['form_type'] . '_form', $esc_form);
+                    }
+                }
+                if (isset($new_order)) {
+                    if (!empty($new_order)) {
+                        $sr = 1;
+                        foreach ($new_order as $key => $value) {
+                            $dt_data = [];
+                            $dt_data['form_id'] = $formid;
+                            $dt_data['items'] = $sr;
+                            $dt_data['status'] = $value['status'];
+                            $dt_data['remarks'] = $value['remarks'];
+                            $this->db->insert(db_prefix() . $data['form_type'] . '_form_detail', $dt_data);
+                            $insert_id = $this->db->insert_id();
+                            // Handle file attachments dynamically for items and attachments_new
+                            $iuploadedFiles = handle_ckecklist_item_attachment_array('esc_checklist', $formid, $insert_id, 'items', $sr);
+
+                            if ($iuploadedFiles && is_array($iuploadedFiles)) {
+                                if (!empty($iuploadedFiles)) {
+                                    foreach ($iuploadedFiles as $file) {
+                                        $idata = [
+                                            'form_id' =>  $formid,
+                                            'form_detail_id' =>  $file['item_id'],
+                                            'file_name' => $file['file_name'],
+                                            'filetype' => $file['filetype'],
+                                        ];
+                                        $this->db->insert(db_prefix() . 'escattachments', $idata);
+                                    }
+                                }
+                            }
                             $sr++;
                         }
                     }
@@ -1546,7 +1649,7 @@ class Forms_model extends App_Model
                 $update_order = $data['items'];
                 unset($data['items']);
             }
-        }  elseif ($formBeforeUpdate->form_type == "msh") {
+        } elseif ($formBeforeUpdate->form_type == "msh") {
             $msh_form = [];
             $msh_form['trade_of_work'] = $data['trade_of_work'];
             $msh_form['inspected_by'] = $data['inspected_by'];
@@ -1563,7 +1666,33 @@ class Forms_model extends App_Model
                 $update_order = $data['items'];
                 unset($data['items']);
             }
-            
+        } elseif ($formBeforeUpdate->form_type == "sca") {
+            $sca_form = [];
+            $sca_form['area_of_work'] = $data['area_of_work'];
+            $sca_form['scaffold_supervisor'] = $data['scaffold_supervisor'];
+            $sca_form['date'] = $data['date'];
+            unset($data['area_of_work']);
+            unset($data['scaffold_supervisor']);
+            unset($data['date']);
+            $update_order = [];
+            if (isset($data['items'])) {
+                $update_order = $data['items'];
+                unset($data['items']);
+            }
+        } elseif ($formBeforeUpdate->form_type == "esc") {
+            $esc_form = [];
+            $esc_form['date'] = $data['date'];
+            $esc_form['location'] = $data['location'];
+            $esc_form['inspected_by'] = $data['inspected_by'];
+            unset($data['date']);
+            unset($data['location']);
+            unset($data['inspected_by']);
+            unset($data['action']);
+            $update_order = [];
+            if (isset($data['items'])) {
+                $update_order = $data['items'];
+                unset($data['items']);
+            }
         }
         $this->db->where('formid', $data['formid']);
         $this->db->update(db_prefix() . 'forms', $data);
@@ -1662,8 +1791,8 @@ class Forms_model extends App_Model
                     }
                 }
             }
-            
-            
+
+
             if (isset($update_order)) {
                 if (!empty($update_order)) {
                     $sr = 1;
@@ -1680,7 +1809,7 @@ class Forms_model extends App_Model
                         }
                         // $insert_id = $this->db->insert_id();
                         // Handle file attachments dynamically for items and attachments_new
-                       
+
                         $iuploadedFiles = handle_ckecklist_item_attachment_array('apc_checklist', $data['formid'], $value['id'], 'items', $sr);
                         if ($iuploadedFiles && is_array($iuploadedFiles)) {
                             if (!empty($iuploadedFiles)) {
@@ -1730,28 +1859,28 @@ class Forms_model extends App_Model
                         if ($this->db->affected_rows() > 0) {
                             $affectedRows++;
                         }
-                       
+
                         // Handle file attachments dynamically for items and attachments_new
                         $iuploadedFiles = handle_ckecklist_item_attachment_array('wpc_checklist', $data['formid'], $value['id'], 'items', $sr);
 
-                            if ($iuploadedFiles && is_array($iuploadedFiles)) {
-                                if (!empty($iuploadedFiles)) {
-                                    foreach ($iuploadedFiles as $file) {
-                                        $idata = [
-                                            'form_id' =>  $data['formid'],
-                                            'form_detail_id' =>  $file['item_id'],
-                                            'file_name' => $file['file_name'],
-                                            'filetype' => $file['filetype'],
-                                        ];
-                                        $this->db->insert(db_prefix() . 'wpcattachments', $idata);
-                                        $last_insert_id = $this->db->insert_id();
+                        if ($iuploadedFiles && is_array($iuploadedFiles)) {
+                            if (!empty($iuploadedFiles)) {
+                                foreach ($iuploadedFiles as $file) {
+                                    $idata = [
+                                        'form_id' =>  $data['formid'],
+                                        'form_detail_id' =>  $file['item_id'],
+                                        'file_name' => $file['file_name'],
+                                        'filetype' => $file['filetype'],
+                                    ];
+                                    $this->db->insert(db_prefix() . 'wpcattachments', $idata);
+                                    $last_insert_id = $this->db->insert_id();
 
                                     if ($last_insert_id) {
                                         $affectedRows++;
                                     }
-                                    }
                                 }
                             }
+                        }
                         $sr++;
                     }
                 }
@@ -1840,7 +1969,7 @@ class Forms_model extends App_Model
                 }
             }
         } elseif ($formBeforeUpdate->form_type == "msh") {
-            
+
             if (isset($msh_form)) {
                 if (!empty($msh_form)) {
                     $this->db->where('form_id', $data['formid']);
@@ -1850,7 +1979,7 @@ class Forms_model extends App_Model
                     }
                 }
             }
-           
+
             if (isset($update_order)) {
                 if (!empty($update_order)) {
                     $sr = 1;
@@ -1889,7 +2018,111 @@ class Forms_model extends App_Model
                     }
                 }
             }
-        } 
+        } elseif ($formBeforeUpdate->form_type == "sca") {
+
+            if (isset($sca_form)) {
+                if (!empty($sca_form)) {
+                    $this->db->where('form_id', $data['formid']);
+                    $this->db->update(db_prefix() . $formBeforeUpdate->form_type . '_form', $sca_form);
+                    if ($this->db->affected_rows() > 0) {
+                        $affectedRows++;
+                    }
+                }
+            }
+
+            if (isset($update_order)) {
+                if (!empty($update_order)) {
+                    $sr = 1;
+                    foreach ($update_order as $key => $value) {
+                        $dt_data = [];
+                        $dt_data['form_id'] = $data['formid'];
+                        $dt_data['description'] = $sr;
+                        $dt_data['checks'] = $value['checks'] ?? null;
+                        $dt_data['comments'] = $value['comments'] ?? null;
+                        $this->db->where('id', $value['id']);
+                        $this->db->update(db_prefix() . $formBeforeUpdate->form_type . '_form_detail', $dt_data);
+                        if ($this->db->affected_rows() > 0) {
+                            $affectedRows++;
+                        }
+                        // Handle file attachments dynamically for items and attachments_new
+                        $iuploadedFiles = handle_ckecklist_item_attachment_array('sca_checklist', $data['formid'], $value['id'], 'items', $sr);
+
+                        if ($iuploadedFiles && is_array($iuploadedFiles)) {
+                            if (!empty($iuploadedFiles)) {
+                                foreach ($iuploadedFiles as $file) {
+                                    $idata = [
+                                        'form_id' =>  $data['formid'],
+                                        'form_detail_id' =>  $file['item_id'],
+                                        'file_name' => $file['file_name'],
+                                        'filetype' => $file['filetype'],
+                                    ];
+                                    $this->db->insert(db_prefix() . 'scaattachments', $idata);
+                                    $last_insert_id = $this->db->insert_id();
+
+                                    if ($last_insert_id) {
+                                        $affectedRows++;
+                                    }
+                                }
+                            }
+                        }
+                        $sr++;
+                    }
+                }
+            }
+        }elseif ($formBeforeUpdate->form_type == "esc") {
+            if (isset($esc_form)) {
+                if (!empty($esc_form)) {
+                    $this->db->where('form_id', $data['formid']);
+                    $this->db->update(db_prefix() . $formBeforeUpdate->form_type . '_form', $esc_form);
+                    if ($this->db->affected_rows() > 0) {
+                        $affectedRows++;
+                    }
+                }
+            }
+
+
+            if (isset($update_order)) {
+                if (!empty($update_order)) {
+                    $sr = 1;
+                    foreach ($update_order as $key => $value) {
+                        $dt_data = [];
+                        $dt_data['form_id'] = $data['formid'];
+                        $dt_data['items'] = $sr;
+                        $dt_data['status'] = $value['status'];
+                        $dt_data['remarks'] = $value['remarks'];
+                        $this->db->where('id', $value['id']);
+                        $this->db->update(db_prefix() .  $formBeforeUpdate->form_type . '_form_detail', $dt_data);
+                        if ($this->db->affected_rows() > 0) {
+                            $affectedRows++;
+                        }
+                        // $insert_id = $this->db->insert_id();
+                        // Handle file attachments dynamically for items and attachments_new
+
+                        $iuploadedFiles = handle_ckecklist_item_attachment_array('esc_checklist', $data['formid'], $value['id'], 'items', $sr);
+                        if ($iuploadedFiles && is_array($iuploadedFiles)) {
+                            if (!empty($iuploadedFiles)) {
+                                foreach ($iuploadedFiles as $file) {
+                                    $idata = [
+                                        'form_id' =>  $data['formid'],
+                                        'form_detail_id' =>  $file['item_id'],
+                                        'file_name' => $file['file_name'],
+                                        'filetype' => $file['filetype'],
+                                    ];
+                                    $this->db->insert(db_prefix() . 'escattachments', $idata);
+                                    $last_insert_id = $this->db->insert_id();
+
+                                    if ($last_insert_id) {
+                                        $affectedRows++;
+                                    }
+                                }
+                            }
+                        }
+
+                        $sr++;
+                    }
+                }
+            }
+        }
 
         $sendAssignedEmail = false;
 
@@ -2650,6 +2883,21 @@ class Forms_model extends App_Model
         $this->db->where('form_id', $id);
         return $this->db->get(db_prefix() . 'apcattachments')->result_array();
     }
+    public function get_esc_form($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix() . 'esc_form')->row();
+    }
+    public function get_esc_form_detail($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix() . 'esc_form_detail')->result_array();
+    }
+    public function get_esc_form_attachments($id)
+    {
+        $this->db->where('form_id', $id);
+        return $this->db->get(db_prefix() . 'escattachments')->result_array();
+    }
     public function delete_apc_attachment($id)
     {
         // Fetch the file details from the database
@@ -2696,12 +2944,27 @@ class Forms_model extends App_Model
         $this->db->where('form_id', $id);
         return $this->db->get(db_prefix() . 'mshattachments')->result_array();
     }
+    public function get_sca_form($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix() . 'sca_form')->row();
+    }
+    public function get_sca_form_detail($form_id)
+    {
+        $this->db->where('form_id', $form_id);
+        return $this->db->get(db_prefix() . 'sca_form_detail')->result_array();
+    }
+    public function get_sca_form_attachments($id)
+    {
+        $this->db->where('form_id', $id);
+        return $this->db->get(db_prefix() . 'scaattachments')->result_array();
+    }
     public function get_mlg_form_attachments($id)
     {
         $this->db->where('form_id', $id);
         return $this->db->get(db_prefix() . 'mlgattachments')->result_array();
     }
-    
+
     public function get_wpc_form_attachments($id)
     {
         $this->db->where('form_id', $id);
@@ -2769,7 +3032,38 @@ class Forms_model extends App_Model
         // Redirect back to the previous page or list
         redirect($_SERVER['HTTP_REFERER']);
     }
-    
+
+    public function delete_sca_attachment($id)
+    {
+        // Fetch the file details from the database
+        $this->db->where('id', $id);
+        $attachment = $this->db->get(db_prefix() . 'scaattachments')->row();
+
+        if ($attachment) {
+            // Construct the file path
+            $file_path = get_upload_path_by_type('form') . 'sca_checklist/' . $attachment->form_id . '/' . $attachment->form_detail_id . '/' . $attachment->file_name;
+
+            // Check if the file exists and unlink it
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
+
+            // Delete the attachment record from the database
+            $this->db->where('id', $id);
+            $this->db->delete(db_prefix() . 'scaattachments');
+
+            if ($this->db->affected_rows() > 0) {
+                set_alert('success', 'Attachment deleted successfully.');
+            } else {
+                set_alert('warning', 'Attachment could not be deleted.');
+            }
+        } else {
+            set_alert('warning', 'Attachment not found.');
+        }
+
+        // Redirect back to the previous page or list
+        redirect($_SERVER['HTTP_REFERER']);
+    }
 
     public function delete_mlg_attachment($id)
     {
@@ -2789,6 +3083,37 @@ class Forms_model extends App_Model
             // Delete the attachment record from the database
             $this->db->where('id', $id);
             $this->db->delete(db_prefix() . 'mlgattachments');
+
+            if ($this->db->affected_rows() > 0) {
+                set_alert('success', 'Attachment deleted successfully.');
+            } else {
+                set_alert('warning', 'Attachment could not be deleted.');
+            }
+        } else {
+            set_alert('warning', 'Attachment not found.');
+        }
+
+        // Redirect back to the previous page or list
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+    public function delete_esc_attachment($id)
+    {
+        // Fetch the file details from the database
+        $this->db->where('id', $id);
+        $attachment = $this->db->get(db_prefix() . 'escattachments')->row();
+
+        if ($attachment) {
+            // Construct the file path
+            $file_path = get_upload_path_by_type('form') . 'esc_checklist/' . $attachment->form_id . '/' . $attachment->form_detail_id . '/' . $attachment->file_name;
+
+            // Check if the file exists and unlink it
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
+
+            // Delete the attachment record from the database
+            $this->db->where('id', $id);
+            $this->db->delete(db_prefix() . 'escattachments');
 
             if ($this->db->affected_rows() > 0) {
                 set_alert('success', 'Attachment deleted successfully.');
