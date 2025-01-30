@@ -8858,7 +8858,7 @@ class timesheets_model extends app_model
 
 			// Update the leave balance
 			$this->db->where('id', $leaveBalance['id']);
-			$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain]);
+			$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain, 'days_off' => $leaveBalance['days_off'] + $daysRequested]);
 			if($data['leave_type'] == 1){
 				$data['leave_type'] = 'sick_leave';
 				$type_of_leave = 1;

@@ -324,7 +324,11 @@ $valid_cur_date = $this->timesheets_model->get_next_shift_date(get_staff_user_id
                               </div>
 
                               <div class="row approx-fr">
-                                <div class="col-md-12">
+                                <div class="col-md-6 start_time">
+                                  <br>
+                                  <?php echo render_date_input('start_time', 'From_Date', _d($valid_cur_date)) ?>
+                                </div>
+                                <div class="col-md-6">
                                   <br>
                                   <?php
                                   $value_number_day = 0.5;
@@ -344,11 +348,9 @@ $valid_cur_date = $this->timesheets_model->get_next_shift_date(get_staff_user_id
                               </div>
                               <br>
                               <div class="row mtop10 date_input">
-                                <div class="col-md-6 start_time">
-                                  <?php echo render_date_input('start_time', 'From_Date', _d($valid_cur_date)) ?>
-                                </div>
+
                                 <div class="col-md-6 end_time">
-                                  <?php echo render_date_input('end_time', 'To_Date', _d($valid_cur_date)) ?>
+                                  <?php echo render_date_input('end_time', 'To_Date', _d($valid_cur_date),['readonly' => true]) ?>
                                 </div>
                               </div>
 
@@ -484,11 +486,11 @@ $valid_cur_date = $this->timesheets_model->get_next_shift_date(get_staff_user_id
 <div class="modal fade" id="editLeaveModal" tabindex="-1" role="dialog" aria-labelledby="editLeaveModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header display-flex" >
+      <div class="modal-header display-flex">
         <h4 class="modal-title" id="editLeaveModalLabel" style="width: 96%;">Edit Leave</h4>
-       
-          <span class="close" data-dismiss="modal" aria-label="Close" aria-hidden="true">&times;</span>
-      
+
+        <span class="close" data-dismiss="modal" aria-label="Close" aria-hidden="true">&times;</span>
+
       </div>
       <div class="modal-body">
 
