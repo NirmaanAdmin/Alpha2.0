@@ -91,11 +91,10 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_wpc = get_items_listing_for_wpc();
-             ?>
+            
             <tbody>
                 <?php $sr = 1;
-                foreach ($get_items_listing_for_wpc as $key => $value):
+                foreach ($form_items as $key => $value):
                 $id = isset($wpc_form_detail) ? $wpc_form_detail[$key]['id'] : ''; ?>
                 
                     <tr class="main">

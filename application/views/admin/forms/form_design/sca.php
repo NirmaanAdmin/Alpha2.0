@@ -96,13 +96,13 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_sca = get_items_listing_for_sca(); ?>
+            
 
             <tbody>
 
                 <?php $sr = 1;
 
-                foreach ($get_items_listing_for_sca as $key => $value):
+                foreach ($form_items as $key => $value):
                     $id = isset($sca_form_detail) ? $sca_form_detail[$key]['id'] : '';
                     $ckeck = isset($sca_form_detail) ? $sca_form_detail[$key]['checks'] : '';
                     $comment = isset($sca_form_detail) ? $sca_form_detail[$key]['comments'] : '';

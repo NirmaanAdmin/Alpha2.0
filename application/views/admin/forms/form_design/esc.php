@@ -91,10 +91,10 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_apc = get_items_listing_for_esc(); ?>
+            
             <tbody>
                 <?php $sr = 1;
-                foreach ($get_items_listing_for_apc as $key => $value):
+                foreach ($form_items as $key => $value):
                     $id = isset($esc_form_detail) ? $esc_form_detail[$key]['id'] : ''; ?>
                     <tr class="main">
                         <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?= $id  ?>">

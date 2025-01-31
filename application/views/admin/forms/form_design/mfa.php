@@ -88,13 +88,13 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_wpc = get_items_listing_for_mfa(); ?>
+            
             <?php $get_items_required_amount_mfa = get_items_required_amount_mfa(); ?>
             <tbody>
                 
                 <?php $sr = 1;
                 
-                foreach ($get_items_listing_for_wpc as $key => $value): 
+                foreach ($form_items as $key => $value): 
                 $id = isset($mfa_form_detail) ? $mfa_form_detail[$key]['id'] : '';
                 ?>
                     <tr class="main">

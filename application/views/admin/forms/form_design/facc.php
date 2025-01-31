@@ -49,71 +49,60 @@
     <div class="table-responsive">
         <table class="table dpr-items-table items table-main-dpr-edit has-calculations no-mtop">
 
+            <input type="hidden" name="action" value="apc">
             <thead>
                 <tr>
-                    <th colspan="9" class="daily_report_title">Monthly Safety Harness Inspection</th>
+                    <th colspan="5" class="daily_report_title">Checklist for First Aid Care Centre (FACC)</th>
                 </tr>
-                <tr> 
+                <tr>
                     <th colspan="3" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Trade of Work: <?php echo render_input('trade_of_work', '', isset($msh_form->trade_of_work) ? $msh_form->trade_of_work : '', 'text', ['style' => 'width:150px;']); ?></span>
+                        <span class="daily_report_label">Project: <span class="view_project_name"></span></span>
                     </th>
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label">Date:
-                            <div class="form-group">
-                                <input type="datetime-local" class="form-control" name="date" style="width: 27%;" value="<?= isset($msh_form->date) ? date('Y-m-d\TH:i', strtotime($msh_form->date)) : '' ?>">
-                            </div>
-                        </span>
-                    </th>
-                </tr>
-                <tr>
-                   
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Inspected by: <?php echo render_select('inspected_by', get_staff_list(), array('staffid', 'name'), '', isset($msh_form->inspected_by) ? $msh_form->inspected_by : ''); ?></span>
-
-                    </th>
-
-                </tr>
-
-                <tr>
                     <th colspan="2" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Safety Harness Identification 
-                        No :</span>
+                        <span class="daily_report_label">Date: </span><input type="datetime-local" class="form-control" name="date" value="<?= isset($facc_form->date) ? date('Y-m-d\TH:i', strtotime($facc_form->date)) : '' ?>">
                     </th>
+                </tr>
+                <tr>
                     <th colspan="5" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="shi" name="shi" class="form-control" style="width:100%;" value="<?php echo isset($msh_form->shi) ? $msh_form->shi : '' ?>"></span>
+                        <span class="daily_report_label" style="display: ruby;">Location: <?php echo render_input('location', '', isset($facc_form->location) ? $facc_form->location : '', 'text', ['style' => 'width:150px;']); ?></span>
                     </th>
+                </tr>
+                <tr>
+                    <th colspan="5" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;">Inspected by: <?php echo render_select('inspected_by', get_staff_list(), array('staffid', 'name'), '', isset($facc_form->inspected_by) ? $facc_form->inspected_by : ''); ?></span>
 
+                    </th>
                 </tr>
                 <tr class="main">
                     <th class="daily_report_head daily_center">
                         <span class="daily_report_label">S.No.</span>
                     </th>
                     <th class="daily_report_head daily_center">
-                        <span class="daily_report_label">Description</span>
+                        <span class="daily_report_label">Items</span>
                     </th>
                     <th class="daily_report_head daily_center">
-                        <span class="daily_report_label">Check</span>
+                        <span class="daily_report_label">Status</span>
                     </th>
+
                     <th class="daily_report_head daily_center">
                         <span class="daily_report_label">Attachment</span>
                     </th>
                 </tr>
             </thead>
-            
-
             <tbody>
-
                 <?php $sr = 1;
-
                 foreach ($form_items as $key => $value):
-                    $id = isset($msh_form_detail) ? $msh_form_detail[$key]['id'] : '';
-                    $ckeck = isset($msh_form_detail) ? $msh_form_detail[$key]['checks'] : '';
-                ?>
+                    $id = isset($facc_form_detail) ? $facc_form_detail[$key]['id'] : ''; ?>
                     <tr class="main">
-                        <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?php echo $id; ?>">
+                        <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?= $id  ?>">
                         <td><?= $sr ?></td>
                         <td style="font-weight: 600;font-size: 16px;"><?= $value['name'] ?></td>
-                        <td> <span class="daily_report_label" style="display: ruby;"> <input type="text" id="items[<?= $sr ?>][checks]" name="items[<?= $sr ?>][checks]" class="form-control" style="width:100%;" value="<?php echo $ckeck;  ?>"></span></td>
+                        <td>
+                            <span class="daily_report_label" style="display: ruby;">
+                                <?php echo render_select('items[' . $sr . '][status]', get_item_status_listing(), array('id', 'name'), '', isset($facc_form_detail) ? $facc_form_detail[$key]['status'] : ''); ?>
+                            </span>
+                        </td>
+
                         <td>
                             <div class="attachment_new">
                                 <div class="col-md-12">
@@ -134,23 +123,22 @@
                                 </div>
                             </div>
                             <?php
-                            
-                            if (isset($msh_attachments) && count($msh_attachments) > 0) {
-                                foreach ($msh_attachments as $attachment) {
+                            if (isset($facc_attachments) && count($facc_attachments) > 0) {
+                                foreach ($facc_attachments as $attachment) {
                                     if ($attachment['form_detail_id'] == $id) {
                                         echo '<div class="col-md-12">';
 
                                         // Generate the path to the file
-                                        $path = get_upload_path_by_type('form') . 'msh_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
+                                        $path = get_upload_path_by_type('form') . 'facc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
 
                                         // Display the image and delete link
                                         echo '<div class="preview_image" style="margin-bottom: 10px;display: flex;">';
                             ?>
-                                        <a href="<?php echo site_url('uploads/form_attachments/msh_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
+                                        <a href="<?php echo site_url('uploads/form_attachments/facc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
                                             class="display-block mbot5" download>
                                             <i class="<?php echo get_mime_class($attachment['filetype']); ?>"></i> <?php echo $attachment['file_name']; ?>
                                         </a>
-                                        <a href="<?php echo admin_url('forms/delete_msh_attachment/' . $attachment['id']); ?>"
+                                        <a href="<?php echo admin_url('forms/delete_facc_attachment/' . $attachment['id']); ?>"
                                             class="text-danger _delete" style="margin-left: 10px;">
                                             <i class="fa fa-remove"></i>
                                         </a>
@@ -161,6 +149,7 @@
                                 }
                             }
                             ?>
+
                         </td>
                     </tr>
                 <?php $sr++;
@@ -168,16 +157,15 @@
             </tbody>
         </table>
 
+
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="form-group">
-                <?php echo render_textarea('remarks', 'Remarks', isset($msh_form) ? $msh_form->remarks : '',  ['style' => 'height:267px;resize: none;']); ?>
+                <?php echo render_textarea('remarks', 'Observation / Areas of Concern / Recommendations :', isset($facc_form) ? $facc_form->remarks : '',  ['style' => 'height:267px;resize: none;']); ?>
             </div>
         </div>
-        <div class="col-md-6">
-            <img src="<?php echo base_url('assets/images/msh.png') ?>" alt="">
-        </div>
+        
     </div>
 </div>
 
@@ -186,30 +174,6 @@
         // var project_id = $(this).val();
         var project_name = $('#project_id option:selected').text();
         $('.view_project_name').html(project_name);
-    });
-
-
-    $(document).ready(function() {
-        $('input.number').keypress(function(e) {
-            var code = e.which || e.keyCode;
-
-            // Allow backspace, tab, delete, and '/'
-            if (code === 8 || code === 9 || code === 46 || code === 47) {
-                return true;
-            }
-
-            // Allow letters (A-Z, a-z) and numbers (0-9)
-            if (
-                (code >= 48 && code <= 57) || // Numbers 0-9
-                (code >= 65 && code <= 90) || // Uppercase A-Z
-                (code >= 97 && code <= 122) // Lowercase a-z
-            ) {
-                return true;
-            }
-
-            // Block all other characters
-            return false;
-        });
     });
     let addMoreAttachmentsInputKey = 2;
 

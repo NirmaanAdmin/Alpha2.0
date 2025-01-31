@@ -420,7 +420,7 @@
                                             <select name="form_type" class="selectpicker no-margin" data-width="100%"  id="form_type" data-none-selected-text="None selected" data-live-search="true" disabled>
                                                 <option value=""></option>
                                                 <?php
-                                                $form_listing = get_form_listing(); 
+                                                // $form_listing = get_form_listing(); 
                                                 foreach($form_listing as $group_id => $_items){ ?>
                                                     <optgroup data-group-id="<?php echo $_items['id']; ?>" label="<?php echo $_items['name']; ?>">
                                                     <?php 

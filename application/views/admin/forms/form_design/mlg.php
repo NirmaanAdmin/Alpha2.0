@@ -123,13 +123,13 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_wpc = get_items_listing_for_mlg(); ?>
+            
 
             <tbody>
 
                 <?php $sr = 1;
 
-                foreach ($get_items_listing_for_wpc as $key => $value):
+                foreach ($form_items as $key => $value):
                     $id = isset($mlg_form_detail) ? $mlg_form_detail[$key]['id'] : '';
                     $ckeck = isset($mlg_form_detail) ? $mlg_form_detail[$key]['checks'] : '';
                 ?>

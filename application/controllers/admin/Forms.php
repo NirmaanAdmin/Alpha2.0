@@ -64,10 +64,10 @@ class Forms extends AdminController
     }
 
     public function add($userid = false)
-    { 
+    {
         if ($this->input->post()) {
             $data = $this->input->post();
-            
+
             $data['message'] = html_purify($this->input->post('message', false));
             $id              = $this->forms_model->add($data, get_staff_user_id());
             if ($id) {
@@ -116,6 +116,7 @@ class Forms extends AdminController
             }
         }
         $data['projects'] = $this->projects_model->get_items();
+        $data['form_listing'] = $this->forms_model->get_form_listing();
         add_admin_forms_js_assets();
         $this->load->view('admin/forms/add', $data);
     }
@@ -256,6 +257,7 @@ class Forms extends AdminController
         $data['title']                = $data['form']->subject;
         $data['form']->form_notes = $this->misc_model->get_notes($id, 'form');
         $data['projects'] = $this->projects_model->get_items();
+        $data['form_listing'] = $this->forms_model->get_form_listing();
         add_admin_forms_js_assets();
         $this->load->view('admin/forms/single', $data);
     }
@@ -806,7 +808,7 @@ class Forms extends AdminController
 
     public function find_form_design($form_type, $form_id = 0)
     {
-        $data = array();
+        
         if ($form_type == "dpr") {
             $dpr_row_template = $this->forms_model->create_dpr_row_template();
             if ($form_id != 0) {
@@ -816,85 +818,78 @@ class Forms extends AdminController
                     $index_order = 0;
                     foreach ($dpr_form_detail as $value) {
                         $index_order++;
-                        $dpr_row_template .= $this->forms_model->create_dpr_row_template('items[' . $index_order . ']', $value['location'], $value['agency'], $value['type'], $value['work_execute'], $value['material_consumption'], $value['machinery'], $value['skilled'], $value['unskilled'], $value['depart'], $value['total'], $value['male'], $value['female'], true, $value['id']);
+                        $dpr_row_template .= $this->forms_model->create_dpr_row_template(
+                            'items[' . $index_order . ']',
+                            $value['location'],
+                            $value['agency'],
+                            $value['type'],
+                            $value['work_execute'],
+                            $value['material_consumption'],
+                            $value['machinery'],
+                            $value['skilled'],
+                            $value['unskilled'],
+                            $value['depart'],
+                            $value['total'],
+                            $value['male'],
+                            $value['female'],
+                            true,
+                            $value['id']
+                        );
                     }
                 }
                 $data['dpr_form'] = $dpr_form;
             }
             $data['dpr_row_template'] = $dpr_row_template;
             $this->load->view('admin/forms/form_design/dpr', $data);
-        } elseif ($form_type == "apc") {
+        } else {
+            $formConfigs = [
+                'apc' => ['has_attachments' => true],
+                'wpc' => ['has_attachments' => true],
+                'mfa' => ['has_attachments' => false],
+                'mlg' => ['has_attachments' => true],
+                'msh' => ['has_attachments' => true],
+                'sca' => ['has_attachments' => true],
+                'esc' => ['has_attachments' => true],
+                'cfwas' => ['has_attachments' => true],
+                'cflc' => ['has_attachments' => true],
+                'facc' => ['has_attachments' => true],
+                'cosc' => ['has_attachments' => true],
+            ];
 
-            if ($form_id != 0) {
-                $apc_form = $this->forms_model->get_apc_form($form_id);
-                $apc_form_detail = $this->forms_model->get_apc_form_detail($form_id);
-                $data['apc_attachments'] = $this->forms_model->get_apc_form_attachments($form_id);
-                $data['apc_form'] = $apc_form;
-                $data['apc_form_detail'] = $apc_form_detail;
-                $data['form_id'] = $form_id;
+            if (isset($formConfigs[$form_type])) {
+                $this->handleCommonForm(
+                    $form_type,
+                    $formConfigs[$form_type]['has_attachments'],
+                    $form_id
+                );
+            } else {
+                show_error('Invalid form type specified.');
             }
-         
-            $this->load->view('admin/forms/form_design/apc', $data);
-        } elseif ($form_type == "wpc") {
-            if ($form_id != 0) {
-                $wpc_form = $this->forms_model->get_wpc_form($form_id);
-                $wpc_form_detail = $this->forms_model->get_wpc_form_detail($form_id);                 
-                $data['wpc_form'] = $wpc_form;
-                $data['wpc_form_detail'] = $wpc_form_detail;
-                $data['wpc_attachments'] = $this->forms_model->get_wpc_form_attachments($form_id);
-                $data['form_id'] = $form_id;
-            }
-            $this->load->view('admin/forms/form_design/wpc', $data);
-        }elseif ($form_type == "mfa") {
-            if ($form_id != 0) {
-                $mfa_form = $this->forms_model->get_mfa_form($form_id);
-                $mfa_form_detail = $this->forms_model->get_mfa_form_detail($form_id);
-                $data['mfa_form'] = $mfa_form;
-                $data['mfa_form_detail'] = $mfa_form_detail;
-                $data['form_id'] = $form_id;
-            }
-            $this->load->view('admin/forms/form_design/mfa', $data);
-        }elseif ($form_type == "mlg") {
-            if ($form_id != 0) {
-                $mlg_form = $this->forms_model->get_mlg_form($form_id);
-                $mlg_form_detail = $this->forms_model->get_mlg_form_detail($form_id);
-                $data['mlg_attachments'] = $this->forms_model->get_mlg_form_attachments($form_id);
-                $data['mlg_form'] = $mlg_form;
-                $data['mlg_form_detail'] = $mlg_form_detail;
-                $data['form_id'] = $form_id;               
-            }            
-            $this->load->view('admin/forms/form_design/mlg', $data);
-        }elseif ($form_type == "msh") {
-            if ($form_id != 0) {
-                $msh_form = $this->forms_model->get_msh_form($form_id);
-                $msh_form_detail = $this->forms_model->get_msh_form_detail($form_id);
-                $data['msh_attachments'] = $this->forms_model->get_msh_form_attachments($form_id);
-                $data['msh_form'] = $msh_form;
-                $data['msh_form_detail'] = $msh_form_detail;
-                $data['form_id'] = $form_id;
-            }            
-            $this->load->view('admin/forms/form_design/msh', $data);
-        }elseif ($form_type == "sca") {
-            if ($form_id != 0) {
-                $sca_form = $this->forms_model->get_sca_form($form_id);
-                $sca_form_detail = $this->forms_model->get_sca_form_detail($form_id);
-                $data['sca_attachments'] = $this->forms_model->get_sca_form_attachments($form_id);
-                $data['sca_form'] = $sca_form;
-                $data['sca_form_detail'] = $sca_form_detail;
-                $data['form_id'] = $form_id;
-            }            
-            $this->load->view('admin/forms/form_design/sca', $data);
-        }elseif ($form_type == "esc") {
-            if ($form_id != 0) {
-                $esc_form = $this->forms_model->get_esc_form($form_id);
-                $esc_form_detail = $this->forms_model->get_esc_form_detail($form_id);
-                $data['esc_attachments'] = $this->forms_model->get_esc_form_attachments($form_id);
-                $data['esc_form'] = $esc_form;
-                $data['esc_form_detail'] = $esc_form_detail;
-                $data['form_id'] = $form_id;
-            }            
-            $this->load->view('admin/forms/form_design/esc', $data);
         }
+    }
+    private function handleCommonForm($form_type, $has_attachments, $form_id)
+    {
+        $form_items = $this->forms_model->get_form_items($form_type);
+        $data = [];
+        if ($form_id != 0) {
+            
+            $getFormMethod = "get_{$form_type}_form";
+            $data["{$form_type}_form"] = $this->forms_model->$getFormMethod($form_id);
+
+            $getDetailMethod = "get_{$form_type}_form_detail";
+            $data["{$form_type}_form_detail"] = $this->forms_model->$getDetailMethod($form_id);
+
+            if ($has_attachments) {
+                $getAttachmentsMethod = "get_{$form_type}_form_attachments";
+                $data["{$form_type}_attachments"] = $this->forms_model->$getAttachmentsMethod($form_id);
+            }
+
+            $data['form_id'] = $form_id;
+            
+
+        }
+        $data['form_items'] = $form_items;
+        $this->load->view("admin/forms/form_design/{$form_type}", $data);
     }
 
     /**
@@ -920,29 +915,46 @@ class Forms extends AdminController
         echo $this->forms_model->create_dpr_row_template($name, $location, $agency, $type, $work_execute, $material_consumption, $machinery, $skilled, $unskilled, $depart, $total, $male, $female, false, $item_key);
     }
 
-    public function delete_apc_attachment($id){
+    public function delete_apc_attachment($id)
+    {
         $this->forms_model->delete_apc_attachment($id);
-        
     }
-    public function delete_msh_attachment($id){
+    public function delete_msh_attachment($id)
+    {
         $this->forms_model->delete_msh_attachment($id);
-        
     }
-    public function delete_sca_attachment($id){
+    public function delete_sca_attachment($id)
+    {
         $this->forms_model->delete_sca_attachment($id);
-        
     }
-    public function delete_mlg_attachment($id){
+    public function delete_mlg_attachment($id)
+    {
         $this->forms_model->delete_mlg_attachment($id);
-        
     }
-    public function delete_wpc_attachment($id){
+    public function delete_wpc_attachment($id)
+    {
         $this->forms_model->delete_wpc_attachment($id);
-        
     }
-    public function delete_esc_attachment($id){
+    public function delete_esc_attachment($id)
+    {
         $this->forms_model->delete_esc_attachment($id);
-        
+    }
+    
+    public function delete_cfwas_attachment($id)
+    {
+        $this->forms_model->delete_cfwas_attachment($id);
+    }
+    public function delete_cflc_attachment($id)
+    {
+        $this->forms_model->delete_cflc_attachment($id);
+    }
+    public function delete_facc_attachment($id)
+    {
+        $this->forms_model->delete_facc_attachment($id);
+    }
+    public function delete_cosc_attachment($id)
+    {
+        $this->forms_model->delete_cosc_attachment($id);
     }
     
 }

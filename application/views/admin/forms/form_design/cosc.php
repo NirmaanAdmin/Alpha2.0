@@ -39,7 +39,7 @@
     .agency .dropdown-toggle,
     .laber-type .dropdown-toggle {
         width: 90px !important;
-    }
+    } 
 </style>
 <div class="col-md-12">
     <hr class="hr-panel-separator" />
@@ -51,36 +51,30 @@
 
             <thead>
                 <tr>
-                    <th colspan="9" class="daily_report_title">Monthly Safety Harness Inspection</th>
+                    <th colspan="9" class="daily_report_title">Construction of coscffolds Checklist</th>
                 </tr>
-                <tr> 
-                    <th colspan="3" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Trade of Work: <?php echo render_input('trade_of_work', '', isset($msh_form->trade_of_work) ? $msh_form->trade_of_work : '', 'text', ['style' => 'width:150px;']); ?></span>
-                    </th>
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label">Date:
-                            <div class="form-group">
-                                <input type="datetime-local" class="form-control" name="date" style="width: 27%;" value="<?= isset($msh_form->date) ? date('Y-m-d\TH:i', strtotime($msh_form->date)) : '' ?>">
-                            </div>
-                        </span>
-                    </th>
-                </tr>
-                <tr>
-                   
-                    <th colspan="6" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Inspected by: <?php echo render_select('inspected_by', get_staff_list(), array('staffid', 'name'), '', isset($msh_form->inspected_by) ? $msh_form->inspected_by : ''); ?></span>
-
-                    </th>
-
-                </tr>
-
                 <tr>
                     <th colspan="2" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;">Safety Harness Identification 
-                        No :</span>
+                        <span class="daily_report_label">Project: <span class="view_project_name"></span></span>
                     </th>
-                    <th colspan="5" class="daily_report_head">
-                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="shi" name="shi" class="form-control" style="width:100%;" value="<?php echo isset($msh_form->shi) ? $msh_form->shi : '' ?>"></span>
+                    <th colspan="3" class="daily_report_head">
+                        <span class="daily_report_label">Date: </span><input type="datetime-local" class="form-control" name="date" value="<?= isset($cosc_form->date) ? date('Y-m-d\TH:i', strtotime($cosc_form->date)) : '' ?>">
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;">Area of Work</span>
+                    </th>
+                    <th colspan="6" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="area_of_work" name="area_of_work" class="form-control" style="width:100%;" value="<?php echo isset($cosc_form->area_of_work) ? $cosc_form->area_of_work : '' ?>"></span>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;">Scaffold Supervisor</span>
+                    </th>
+                    <th colspan="6" class="daily_report_head">
+                        <span class="daily_report_label" style="display: ruby;"> <input type="text" id="scaffold_supervisor" name="scaffold_supervisor" class="form-control" style="width:100%;" value="<?php echo isset($cosc_form->scaffold_supervisor) ? $cosc_form->scaffold_supervisor : '' ?>"></span>
                     </th>
 
                 </tr>
@@ -89,31 +83,35 @@
                         <span class="daily_report_label">S.No.</span>
                     </th>
                     <th class="daily_report_head daily_center">
-                        <span class="daily_report_label">Description</span>
+                        <span class="daily_report_label">Items</span>
                     </th>
                     <th class="daily_report_head daily_center">
                         <span class="daily_report_label">Check</span>
+                    </th>
+                    <th class="daily_report_head daily_center">
+                        <span class="daily_report_label">Actions / Comments</span>
                     </th>
                     <th class="daily_report_head daily_center">
                         <span class="daily_report_label">Attachment</span>
                     </th>
                 </tr>
             </thead>
-            
 
             <tbody>
 
                 <?php $sr = 1;
 
                 foreach ($form_items as $key => $value):
-                    $id = isset($msh_form_detail) ? $msh_form_detail[$key]['id'] : '';
-                    $ckeck = isset($msh_form_detail) ? $msh_form_detail[$key]['checks'] : '';
+                    $id = isset($cosc_form_detail) ? $cosc_form_detail[$key]['id'] : '';
+                    $ckeck = isset($cosc_form_detail) ? $cosc_form_detail[$key]['checks'] : '';
+                    $comment = isset($cosc_form_detail) ? $cosc_form_detail[$key]['comments'] : '';
                 ?>
                     <tr class="main">
                         <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?php echo $id; ?>">
                         <td><?= $sr ?></td>
                         <td style="font-weight: 600;font-size: 16px;"><?= $value['name'] ?></td>
                         <td> <span class="daily_report_label" style="display: ruby;"> <input type="text" id="items[<?= $sr ?>][checks]" name="items[<?= $sr ?>][checks]" class="form-control" style="width:100%;" value="<?php echo $ckeck;  ?>"></span></td>
+                        <td> <span class="daily_report_label" style="display: ruby;"> <input type="text" id="items[<?= $sr ?>][comments]" name="items[<?= $sr ?>][comments]" class="form-control" style="width:100%;" value="<?php echo $comment;  ?>"></span></td>
                         <td>
                             <div class="attachment_new">
                                 <div class="col-md-12">
@@ -134,23 +132,23 @@
                                 </div>
                             </div>
                             <?php
-                            
-                            if (isset($msh_attachments) && count($msh_attachments) > 0) {
-                                foreach ($msh_attachments as $attachment) {
+
+                            if (isset($cosc_attachments) && count($cosc_attachments) > 0) {
+                                foreach ($cosc_attachments as $attachment) {
                                     if ($attachment['form_detail_id'] == $id) {
                                         echo '<div class="col-md-12">';
 
                                         // Generate the path to the file
-                                        $path = get_upload_path_by_type('form') . 'msh_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
+                                        $path = get_upload_path_by_type('form') . 'cosc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name'];
 
                                         // Display the image and delete link
                                         echo '<div class="preview_image" style="margin-bottom: 10px;display: flex;">';
                             ?>
-                                        <a href="<?php echo site_url('uploads/form_attachments/msh_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
+                                        <a href="<?php echo site_url('uploads/form_attachments/cosc_checklist/' . $form_id . '/' . $attachment['form_detail_id'] . '/' . $attachment['file_name']); ?>"
                                             class="display-block mbot5" download>
                                             <i class="<?php echo get_mime_class($attachment['filetype']); ?>"></i> <?php echo $attachment['file_name']; ?>
                                         </a>
-                                        <a href="<?php echo admin_url('forms/delete_msh_attachment/' . $attachment['id']); ?>"
+                                        <a href="<?php echo admin_url('forms/delete_cosc_attachment/' . $attachment['id']); ?>"
                                             class="text-danger _delete" style="margin-left: 10px;">
                                             <i class="fa fa-remove"></i>
                                         </a>
@@ -168,16 +166,6 @@
             </tbody>
         </table>
 
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <?php echo render_textarea('remarks', 'Remarks', isset($msh_form) ? $msh_form->remarks : '',  ['style' => 'height:267px;resize: none;']); ?>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <img src="<?php echo base_url('assets/images/msh.png') ?>" alt="">
-        </div>
     </div>
 </div>
 

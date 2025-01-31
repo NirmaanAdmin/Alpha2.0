@@ -91,10 +91,12 @@
                     </th>
                 </tr>
             </thead>
-            <?php $get_items_listing_for_apc = get_items_listing_for_apc(); ?>
+            
+
+
             <tbody>
-                <?php $sr = 1;
-                foreach ($get_items_listing_for_apc as $key => $value):
+                <?php $sr = 1;  
+                foreach ($form_items as $key => $value):
                     $id = isset($apc_form_detail) ? $apc_form_detail[$key]['id'] : ''; ?>
                     <tr class="main">
                         <input type="hidden" class="ids" name="items[<?= $sr ?>][id]" value="<?= $id  ?>">
