@@ -1119,14 +1119,14 @@ class fixed_equipment_model extends app_model
 	{
 		$consumable_quantity = '';
 
-		if($data['consumable_quantity'] != '') {
+		if ($data['consumable_quantity'] != '') {
 			$consumable_quantity = $data['consumable_quantity'];
-		}else{
+		} else {
 			$consumable_quantity = 0;
 		}
 
 		unset($data['consumable_quantity']);
-		unset($data['avl_quantity']); 
+		unset($data['avl_quantity']);
 
 		if (isset($data['checkin_date'])) {
 			$data['checkin_date'] = fe_format_date($data['checkin_date']);
@@ -1181,13 +1181,11 @@ class fixed_equipment_model extends app_model
 						}
 					}
 				}
-				if($data_assets->consumable_quantity > 0){
+				if ($data_assets->consumable_quantity > 0) {
 					$avail_quantity = $data_assets->consumable_quantity + $consumable_quantity;
-				}else{
+				} else {
 					$avail_quantity = $consumable_quantity;
 				}
-				
-
 			}
 			$data_asset['consumable_quantity'] = $avail_quantity;
 			if (isset($data['asset_name']) && $data['asset_name'] != '') {
@@ -1207,7 +1205,7 @@ class fixed_equipment_model extends app_model
 			} else {
 				$data_asset['status'] = $data['status'];
 			}
-			
+
 			$this->db->where('id', $data['item_id']);
 			$this->db->update(db_prefix() . 'fe_assets', $data_asset);
 			if ($data['type'] == 'checkout') {
@@ -1229,7 +1227,7 @@ class fixed_equipment_model extends app_model
 						break;
 				}
 				// Add log checkout
-				$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $data['checkout_to'], $to_id, $data['notes'],$consumable_quantity);
+				$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $data['checkout_to'], $to_id, $data['notes'], $consumable_quantity);
 			} elseif ($data['type'] == 'checkin') {
 				$to_id = '';
 				$to = '';
@@ -1268,7 +1266,7 @@ class fixed_equipment_model extends app_model
 					$this->db->update(db_prefix() . 'fe_checkin_assets', ['staff_id' => $data_checkout->staff_id]);
 				}
 				// Add log checkin
-				$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $to, $to_id, $data['notes'],$consumable_quantity);
+				$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $to, $to_id, $data['notes'], $consumable_quantity);
 			}
 			return $insert_id;
 		}
@@ -1285,7 +1283,7 @@ class fixed_equipment_model extends app_model
 	 * @param string $to_id    
 	 * @param string $notes    
 	 */
-	public function add_log($admin_id = '', $action = '', $item_id = '', $target = '', $changed = '', $to = '', $to_id = '', $notes = '',$consumable_quantity = '')
+	public function add_log($admin_id = '', $action = '', $item_id = '', $target = '', $changed = '', $to = '', $to_id = '', $notes = '', $consumable_quantity = '')
 	{
 		$data['admin_id'] = $admin_id;
 		$data['action'] = $action;
@@ -2915,6 +2913,100 @@ class fixed_equipment_model extends app_model
 			return $this->db->get(db_prefix() . 'fe_checkin_assets')->result_array();
 		}
 	}
+	public function get_to_location($id)
+	{
+		if ($id != '') {
+			$this->db->where(db_prefix() . 'fe_checkin_assets.id', $id);
+			$this->db->select(db_prefix() . 'fe_locations.location_name');
+
+			// Join fe_assets first since fe_checkin_assets references fe_assets.item_id
+			$this->db->join(db_prefix() . 'fe_assets', db_prefix() . 'fe_assets.id = ' . db_prefix() . 'fe_checkin_assets.item_id', 'left');
+
+			// Now join fe_locations using fe_assets.asset_location
+			$this->db->join(db_prefix() . 'fe_locations', db_prefix() . 'fe_assets.location_id = ' . db_prefix() . 'fe_locations.id', 'left');
+
+			return $this->db->get(db_prefix() . 'fe_checkin_assets')->row();
+		}
+	}
+
+	public function get_from_location($id)
+	{
+		if ($id != '') {
+			$this->db->where(db_prefix() . 'fe_checkin_assets.id', $id);
+			$this->db->select('COUNT(*) as total_logs');
+			$this->db->join(
+				db_prefix() . 'fe_log_assets',
+				db_prefix() . 'fe_log_assets.item_id = ' . db_prefix() . 'fe_checkin_assets.item_id',
+				'left'
+			);
+
+			// Count how many logs exist for this item
+			$log_count = $this->db->get(db_prefix() . 'fe_checkin_assets')->row()->total_logs;
+
+			// Now fetch the actual location data
+			$this->db->where(db_prefix() . 'fe_checkin_assets.id', $id);
+			$this->db->select([
+				db_prefix() . 'fe_locations.location_name AS location_name',
+				db_prefix() . 'staff.firstname AS staff_name',
+				db_prefix() . 'projects.name AS project_name',
+				db_prefix() . 'fe_assets.assets_name AS asset_name'
+			]);
+
+			// Join fe_log_assets first to get the location change reference
+			$this->db->join(
+				db_prefix() . 'fe_log_assets',
+				db_prefix() . 'fe_log_assets.item_id = ' . db_prefix() . 'fe_checkin_assets.item_id',
+				'left'
+			);
+
+			// Join fe_locations when to = 'location'
+			$this->db->join(
+				db_prefix() . 'fe_locations',
+				db_prefix() . 'fe_log_assets.to_id = ' . db_prefix() . 'fe_locations.id AND ' . db_prefix() . 'fe_log_assets.to = "location"',
+				'left'
+			);
+
+			// Join staff when to = 'user'
+			$this->db->join(
+				db_prefix() . 'staff',
+				db_prefix() . 'fe_log_assets.to_id = ' . db_prefix() . 'staff.staffid AND ' . db_prefix() . 'fe_log_assets.to = "user"',
+				'left'
+			);
+
+			// Join projects when to = 'project'
+			$this->db->join(
+				db_prefix() . 'projects',
+				db_prefix() . 'fe_log_assets.to_id = ' . db_prefix() . 'projects.id AND ' . db_prefix() . 'fe_log_assets.to = "project"',
+				'left'
+			);
+
+			// Join assets when to = 'asset'
+			$this->db->join(
+				db_prefix() . 'fe_assets',
+				db_prefix() . 'fe_log_assets.to_id = ' . db_prefix() . 'fe_assets.id AND ' . db_prefix() . 'fe_log_assets.to = "asset"',
+				'left'
+			);
+
+			// Ensure the log entries are sorted by ID (oldest first)
+			$this->db->order_by(db_prefix() . 'fe_log_assets.id', 'DESC');
+
+			// If more than one log exists, get the second entry, else get the first
+			if ($log_count > 1) {
+				$this->db->limit(1, 1); // Get the second record
+			} else {
+				$this->db->limit(1); // Get the first record (only one exists)
+			}
+
+			// Execute the query and return the result
+			return $this->db->get(db_prefix() . 'fe_checkin_assets')->row();
+		}
+		return null;
+	}
+
+
+
+
+
 	/**
 	 * get approval details
 	 * @param  integer $rel_id   

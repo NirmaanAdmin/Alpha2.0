@@ -27,9 +27,11 @@
 <table cellpadding="10">
    <thead>
       <tr class="dark-background">
-       <th width="40%" align="left"><h4 class="text-white"><?php echo _l('fe_item') ?></h4></th>
-       <th width="30%" align="left"><h4 class="text-white"><?php echo _l('fe_asset_tag') ?></h4></th>
-       <th width="30%" align="right"><h4 class="text-white"><?php echo _l('fe_check_in_out_date') ?></h4></th>
+       <th width="30%" align="left"><h4 class="text-white"><?php echo _l('fe_item') ?></h4></th>
+       <th width="10%" align="left"><h4 class="text-white"><?php echo _l('fe_asset_tag') ?></h4></th>
+       <th width="20%" align="left"><h4 class="text-white"><?php echo _l('from') ?></h4></th>
+       <th width="20%" align="left"><h4 class="text-white"><?php echo _l('to') ?></h4></th>
+       <th width="20%" align="right"><h4 class="text-white"><?php echo _l('fe_check_in_out_date') ?></h4></th>
     </tr>
  </thead>
  <tbody>
@@ -38,6 +40,23 @@
    $item_list_id = explode(',', $sign_documents->checkin_out_id);
    foreach ($item_list_id as $key => $item_id) {
       $data_check_in_out = $this->fixed_equipment_model->get_checkin_out_data($item_id);
+      $get_from_location = $this->fixed_equipment_model->get_from_location($item_id);
+      $get_to_location = $this->fixed_equipment_model->get_to_location($item_id);
+      $from_location = '';
+
+      if (!empty($get_from_location)) {
+         if (!empty($get_from_location->location_name)) {
+            $from_location = $get_from_location->location_name;
+         } elseif (!empty($get_from_location->staff_name)) {
+            $from_location = $get_from_location->staff_name;
+         } elseif (!empty($get_from_location->project_name)) {
+            $from_location = $get_from_location->project_name;
+         } elseif (!empty($get_from_location->asset_name)) {
+            $from_location = $get_from_location->asset_name;
+         }
+      }
+      // Ensure $get_to_location is not NULL
+      $to_location = !empty($get_to_location) ? $get_to_location->location_name : '';
       if($data_check_in_out){
          $asset_tag = '';
          $asset_id = $data_check_in_out->item_id;
@@ -53,9 +72,11 @@
          }                                                                           
          ?>
          <tr>
-            <td width="40%" align="left"><strong><?php echo fe_htmldecode($data_check_in_out->asset_name); ?></strong></td>
-            <td width="30%" align="left"><strong><?php echo fe_htmldecode($asset_tag); ?></strong></td>
-            <td width="30%" align="right"><?php echo _dt($data_check_in_out->date_creator); ?></td>
+            <td width="30%" align="left"><strong><?php echo fe_htmldecode($data_check_in_out->asset_name); ?></strong></td>
+            <td width="10%" align="left"><strong><?php echo fe_htmldecode($asset_tag); ?></strong></td>
+            <td width="20%" align="left"><strong><?php echo $from_location; ?></strong></td>
+            <td width="20%" align="left"><strong><?php echo $to_location; ?></strong></td>
+            <td width="20%" align="right"><?php echo _dt($data_check_in_out->date_creator); ?></td>
          </tr>
       <?php }} ?>
    </tbody>
