@@ -38,12 +38,6 @@
                                         <?php echo render_select('department', $departments, ['departmentid', 'name'], 'form_settings_departments', (count($departments) == 1) ? $departments[0]['departmentid'] : ''); ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <?php echo render_input('cc', 'CC'); ?>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
                                         <div class="form-group select-placeholder">
                                         <label for="form" class="control-label">Forms</label>
                                             <select name="form_type" class="selectpicker no-margin" data-width="100%"  id="form_type" data-none-selected-text="None selected" data-live-search="true">
@@ -88,6 +82,8 @@
                                     <?php } ?>
                                 </select>
                             </div>
+
+                            <?php /*
                             <div class="row">
                                 <div class="col-md-6">
                                     <?php $priorities['callback_translate'] = 'form_priority_translate';
@@ -112,6 +108,7 @@
                                     </div>
                                 <?php } ?>
                             </div>
+                            */ ?>
                         </div>
                         <div class="col-md-12">
                             <?php echo render_custom_fields('forms'); ?>

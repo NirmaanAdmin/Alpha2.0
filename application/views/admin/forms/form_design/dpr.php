@@ -27,7 +27,7 @@
         width: max-content !important;
     }
     .agency .dropdown-toggle, .laber-type .dropdown-toggle {
-        width: 90px !important;
+        max-width: 180px !important;
     }
 </style>
 <div class="col-md-12">

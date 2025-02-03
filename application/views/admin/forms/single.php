@@ -415,22 +415,6 @@
                                         </div>
 
                                         <?php echo render_select('department', $departments, ['departmentid', 'name'], 'form_settings_departments', $form->department); ?>
-
-                                        <div class="form-group select-placeholder">
-                                            <select name="form_type" class="selectpicker no-margin" data-width="100%"  id="form_type" data-none-selected-text="None selected" data-live-search="true" disabled>
-                                                <option value=""></option>
-                                                <?php
-                                                // $form_listing = get_form_listing(); 
-                                                foreach($form_listing as $group_id => $_items){ ?>
-                                                    <optgroup data-group-id="<?php echo $_items['id']; ?>" label="<?php echo $_items['name']; ?>">
-                                                    <?php 
-                                                    foreach($_items['options'] as $item) { ?>
-                                                        <option value="<?php echo $item['id']; ?>" <?php echo ($item['id'] == $form->form_type) ? 'selected' : ''; ?>><?php echo $item['name']; ?></option>
-                                                    <?php } ?>
-                                                    </optgroup>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
                                     </div>
                                     <div class="col-md-6">
 
@@ -461,27 +445,23 @@
                                             </select>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <?php
-                           $priorities['callback_translate'] = 'form_priority_translate';
-                           echo render_select('priority', $priorities, ['priorityid', 'name'], 'form_settings_priority', $form->priority); ?>
+                                            <div class="col-md-12">
+                                                <div class="form-group select-placeholder">
+                                                    <select name="form_type" class="selectpicker no-margin" data-width="100%"  id="form_type" data-none-selected-text="None selected" data-live-search="true" disabled>
+                                                        <option value=""></option>
+                                                        <?php
+                                                        // $form_listing = get_form_listing(); 
+                                                        foreach($form_listing as $group_id => $_items){ ?>
+                                                            <optgroup data-group-id="<?php echo $_items['id']; ?>" label="<?php echo $_items['name']; ?>">
+                                                            <?php 
+                                                            foreach($_items['options'] as $item) { ?>
+                                                                <option value="<?php echo $item['id']; ?>" <?php echo ($item['id'] == $form->form_type) ? 'selected' : ''; ?>><?php echo $item['name']; ?></option>
+                                                            <?php } ?>
+                                                            </optgroup>
+                                                        <?php } ?>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6">
-                                               <?php 
-                                               $value = (isset($form) ? _d($form->duedate) : '');
-                                               echo render_date_input('duedate', 'task_add_edit_due_date', $value);
-                                               ?>
-                                            </div>
-                                            <?php if (get_option('services') == 1) { ?>
-                                            <div class="col-md-6 hide">
-                                                <?php if (is_admin() || get_option('staff_members_create_inline_form_services') == '1') {
-                               echo render_select_with_input_group('service', $services, ['serviceid', 'name'], 'form_settings_service', $form->service, '<div class="input-group-btn"><a href="#" class="btn btn-default" onclick="new_service();return false;"><i class="fa fa-plus"></i></a></div>');
-                           } else {
-                               echo render_select('service', $services, ['serviceid', 'name'], 'form_settings_service', $form->service);
-                           }
-                              ?>
-                                            </div>
-                                            <?php } ?>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
