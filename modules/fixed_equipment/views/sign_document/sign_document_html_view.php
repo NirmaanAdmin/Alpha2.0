@@ -2,9 +2,10 @@
    <tr>
 
       <td width="30%">
+      <?php echo pdf_logo_url() ?>
          <h1>#<?php echo fe_htmldecode($sign_documents->reference); ?></h1>
          <?php echo format_organization_info() ?>
-         <?php echo pdf_logo_url() ?>
+         
       </td>
 
       <td width="70%" class="text-right">
