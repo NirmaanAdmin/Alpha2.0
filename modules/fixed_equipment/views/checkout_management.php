@@ -5,6 +5,13 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
   $create_for_view_own = true;
 }
 ?>
+<style>
+  .show_hide_columns {
+    position: absolute;
+    z-index: 99999;
+    left: 350px
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row panel_s mbot10">
@@ -88,7 +95,42 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
               <?php if (is_admin() || has_permission('fixed_equipment_sign_manager', '', 'create')) {  ?>
                 <a href="#" onclick="bulk_sign(); return false;" data-toggle="modal" data-table=".table-checkout_managements" data-target="#leads_bulk_actions" class=" hide bulk-actions-btn table-btn"><?php echo _l('fe_create_sign_document'); ?></a>
               <?php } ?>
+              <div class="btn-group show_hide_columns" id="show_hide_columns">
+                <!-- Settings Icon -->
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
+                  <i class="fa fa-cog"></i> <?php  ?> <span class="caret"></span>
+                </button>
+                <!-- Dropdown Menu with Checkboxes -->
+                <div class="dropdown-menu" style="padding: 10px; min-width: 250px;">
+                  <!-- Select All / Deselect All -->
+                  <div>
+                    <input type="checkbox" id="select-all-columns"> <strong><?php echo _l('select_all'); ?></strong>
+                  </div>
+                  <hr>
+                  <!-- Column Checkboxes -->
+                  <?php
+                  $columns = [
+                    _l('checkbox'),
+                    _l('id'),
+                    _l('fe_asset_name'),
+                    _l('fe_image'),
+                    _l('fe_serial'),
+                    _l('fe_type'),
+                    _l('staff'),
+                    _l('fe_check_type'),
+                    _l('fe_check_in_out_date'),
+                    _l('fe_sign_document'),
+                  ];
+                  ?>
+                  <div>
+                    <?php foreach ($columns as $key => $label): ?>
+                      <input type="checkbox" class="toggle-column" value="<?php echo $key; ?>" checked>
+                      <?php echo $label; ?><br>
+                    <?php endforeach; ?>
+                  </div>
 
+                </div>
+              </div>
               <?php
               $table_data = array();
               $table_data[] = '<input type="checkbox" id="mass_select_all" data-to-table="checkout_managements">';
@@ -168,6 +210,38 @@ $this->load->view('includes/sign_document_modal.php');
 <input type="hidden" name="check">
 <input type="hidden" name="please_select_at_least_one_item_from_the_list" value="<?php echo _l('please_select_at_least_one_item_from_the_list'); ?>">
 <?php init_tail(); ?>
+<script>
+  $(document).ready(function() {
+    var table = $('.table-consumables').DataTable();
+
+    // Handle "Select All" checkbox
+    $('#select-all-columns').on('change', function() {
+      var isChecked = $(this).is(':checked');
+      $('.toggle-column').prop('checked', isChecked).trigger('change');
+    });
+
+    // Handle individual column visibility toggling
+    $('.toggle-column').on('change', function() {
+      var column = table.column($(this).val());
+      column.visible($(this).is(':checked'));
+
+      // Sync "Select All" checkbox state
+      var allChecked = $('.toggle-column').length === $('.toggle-column:checked').length;
+      $('#select-all-columns').prop('checked', allChecked);
+    });
+
+    // Sync checkboxes with column visibility on page load
+    table.columns().every(function(index) {
+      var column = this;
+      $('.toggle-column[value="' + index + '"]').prop('checked', column.visible());
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    $('.dropdown-menu').on('click', function(e) {
+      e.stopPropagation();
+    });
+  });
+</script>
 </body>
 
 </html>

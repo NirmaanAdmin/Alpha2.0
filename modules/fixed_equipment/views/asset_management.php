@@ -1,5 +1,12 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+  .show_hide_columns {
+    position: absolute;
+    z-index: 99999;
+    left: 375px
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row panel">
@@ -56,6 +63,62 @@
         ?>
           <a href="#" onclick="bulk_delete(); return false;" data-toggle="modal" data-table=".table-assets_management" data-target="#leads_bulk_actions" class=" hide bulk-actions-btn table-btn"><?php echo _l('fe_bulk_delete'); ?></a>
         <?php } ?>
+        <div class="btn-group show_hide_columns" id="show_hide_columns">
+          <!-- Settings Icon -->
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
+            <i class="fa fa-cog"></i> <?php  ?> <span class="caret"></span>
+          </button>
+          <!-- Dropdown Menu with Checkboxes -->
+          <div class="dropdown-menu" style="padding: 10px; min-width: 250px;">
+            <!-- Select All / Deselect All -->
+            <div>
+              <input type="checkbox" id="select-all-columns"> <strong><?php echo _l('select_all'); ?></strong>
+            </div>
+            <hr>
+            <!-- Column Checkboxes -->
+            <?php
+            $columns = [
+              _l('chcekbox'),
+              _l('fe_checkin_checkout'),
+              _l('id'),
+              _l('fe_asset_name'),
+              _l('fe_image'),
+              _l('fe_serial'),
+              _l('fe_model'),
+              _l('fe_model_no'),
+              _l('fe_category'),
+              _l('fe_status'),
+              _l('fe_checkout_to'),
+              _l('fe_location'),
+              _l('fe_default_location'),
+              _l('fe_manufacturer'),
+              _l('fe_supplier'),
+              _l('fe_purchase_date'),
+              _l('fe_purchase_cost'),
+              _l('fe_order_number'),
+              _l('fe_warranty'),
+              _l('fe_warranty_expires'),
+              _l('fe_notes'),
+              _l('fe_checkouts'),
+              _l('fe_checkins'),
+              _l('fe_requests'),
+              _l('fe_created_at'),
+              _l('fe_updated_at'),
+              _l('fe_checkout_date'),
+              _l('fe_expected_checkin_date'),
+              _l('fe_last_audit'),
+              _l('fe_next_audit_date'),
+            ];
+            ?>
+            <div>
+              <?php foreach ($columns as $key => $label): ?>
+                <input type="checkbox" class="toggle-column" value="<?php echo $key; ?>" checked>
+                <?php echo $label; ?><br>
+              <?php endforeach; ?>
+            </div>
+
+          </div>
+        </div>
         <table class="table table-assets_management scroll-responsive">
           <thead>
             <tr>
@@ -92,7 +155,7 @@
               <?php
               if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
               ?>
-                
+
               <?php } ?>
             </tr>
           </thead>
@@ -326,6 +389,38 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <?php init_tail(); ?>
+<script>
+  $(document).ready(function() {
+    var table = $('.table-assets_management').DataTable();
+
+    // Handle "Select All" checkbox
+    $('#select-all-columns').on('change', function() {
+      var isChecked = $(this).is(':checked');
+      $('.toggle-column').prop('checked', isChecked).trigger('change');
+    });
+
+    // Handle individual column visibility toggling
+    $('.toggle-column').on('change', function() {
+      var column = table.column($(this).val());
+      column.visible($(this).is(':checked'));
+
+      // Sync "Select All" checkbox state
+      var allChecked = $('.toggle-column').length === $('.toggle-column:checked').length;
+      $('#select-all-columns').prop('checked', allChecked);
+    });
+
+    // Sync checkboxes with column visibility on page load
+    table.columns().every(function(index) {
+      var column = this;
+      $('.toggle-column[value="' + index + '"]').prop('checked', column.visible());
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    $('.dropdown-menu').on('click', function(e) {
+      e.stopPropagation();
+    });
+  });
+</script>
 <?php
 require('modules/fixed_equipment/assets/js/asset_management_js.php');
 
