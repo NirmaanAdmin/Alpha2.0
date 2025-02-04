@@ -60,15 +60,14 @@ return App_table::find('forms')
         extract($params);
 
         $aColumns = [
-            '1', // bulk actions
+            '1',
             'formid',
             'subject',
-            '(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'forms.formid and rel_type="form" ORDER by tag_order ASC) as tags',
             db_prefix() . 'departments.name as department_name',
-            db_prefix() . 'services.name as service_name',
-            'CONCAT(' . db_prefix() . 'contacts.firstname, \' \', ' . db_prefix() . 'contacts.lastname) as contact_full_name',
-            'status',
-            'priority',
+            db_prefix() . 'projects.name as project_name',
+            'form_type',
+            'CONCAT(' . db_prefix() . 'staff.firstname, \' \', ' . db_prefix() . 'staff.lastname) as assigned_full_name',
+            db_prefix() . 'forms.status',
             'lastreply',
             db_prefix() . 'forms.date',
         ];
@@ -81,20 +80,18 @@ return App_table::find('forms')
             'formkey',
             db_prefix() . 'forms.userid',
             'statuscolor',
+            db_prefix() . 'forms.status',
             db_prefix() . 'forms.name as form_opened_by_name',
             db_prefix() . 'forms.email',
             db_prefix() . 'forms.userid',
             'assigned',
-            db_prefix() . 'clients.company',
         ];
 
         $join = [
-            'LEFT JOIN ' . db_prefix() . 'contacts ON ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'forms.contactid',
-            'LEFT JOIN ' . db_prefix() . 'services ON ' . db_prefix() . 'services.serviceid = ' . db_prefix() . 'forms.service',
+            'LEFT JOIN ' . db_prefix() . 'projects ON ' . db_prefix() . 'projects.id = ' . db_prefix() . 'forms.project_id',
             'LEFT JOIN ' . db_prefix() . 'departments ON ' . db_prefix() . 'departments.departmentid = ' . db_prefix() . 'forms.department',
+            'LEFT JOIN ' . db_prefix() . 'staff ON ' . db_prefix() . 'staff.staffid = ' . db_prefix() . 'forms.assigned',
             'LEFT JOIN ' . db_prefix() . 'forms_status ON ' . db_prefix() . 'forms_status.formstatusid = ' . db_prefix() . 'forms.status',
-            'LEFT JOIN ' . db_prefix() . 'clients ON ' . db_prefix() . 'clients.userid = ' . db_prefix() . 'forms.userid',
-            'LEFT JOIN ' . db_prefix() . 'forms_priorities ON ' . db_prefix() . 'forms_priorities.priorityid = ' . db_prefix() . 'forms.priority',
         ];
 
         $custom_fields = get_table_custom_fields('forms');
@@ -175,7 +172,6 @@ return App_table::find('forms')
                         $_data = e(_dt($aRow[$aColumns[$i]]));
                     }
                 } elseif ($aColumns[$i] == 'subject' || $aColumns[$i] == 'formid') {
-                    // Form is assigned
                     if ($aRow['assigned'] != 0) {
                         if ($aColumns[$i] != 'formid') {
                             $_data .= '<a href="' . admin_url('profile/' . $aRow['assigned']) . '" data-toggle="tooltip" title="' . e(get_staff_full_name($aRow['assigned'])) . '" class="pull-left mright5">' . staff_profile_image($aRow['assigned'], [
@@ -194,32 +190,16 @@ return App_table::find('forms')
                         $_data .= '<div class="row-options">';
                         $_data .= '<a href="' . $url . '">' . _l('view') . '</a>';
                         $_data .= ' | <a href="' . $url . '?tab=settings">' . _l('edit') . '</a>';
-                        $_data .= ' | <a href="' . get_form_public_url($aRow) . '" target="_blank">' . _l('view_public_form') . '</a>';
                         if (can_staff_delete_form()) {
                             $_data .= ' | <a href="' . admin_url('forms/delete/' . $aRow['formid']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
                         }
                         $_data .= '</div>';
                     }
-                } elseif ($i == $tagsColumns) {
-                    $_data = render_tags($_data);
-                } elseif ($i == $contactColumn) {
-                    if ($aRow['userid'] != 0) {
-                        $_data = '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?group=contacts') . '">' . e($aRow['contact_full_name']);
-                        if (!empty($aRow['company'])) {
-                            $_data .= ' (' . e($aRow['company']) . ')';
-                        }
-                        $_data .= '</a>';
-                    } else {
-                        $_data = e($aRow['form_opened_by_name']);
-                    }
-                } elseif ($aColumns[$i] == 'status') {
-                    $_data = '<span class="label form-status-' . $aRow['status'] . '" style="border:1px solid ' . adjust_hex_brightness($aRow['statuscolor'], 0.4) . '; color:' . $aRow['statuscolor'] . ';background: ' . adjust_hex_brightness($aRow['statuscolor'], 0.04) . ';">' . e(form_status_translate($aRow['status'])) . '</span>';
-                } elseif ($aColumns[$i] == db_prefix() . 'forms.date') {
-                    $_data = e(_dt($_data));
-                } elseif (strpos($aColumns[$i],'service_name') !== false) {
-                    $_data = e($_data);
-                } elseif ($aColumns[$i] == 'priority') {
-                    $_data = e(form_priority_translate($aRow['priority']));
+                } elseif ($aColumns[$i] == db_prefix() . 'forms.status') {
+                    $_data = '<span class="label form-status-' . $aRow['status'] . '" style="border:1px solid black; color: black ;background: white;">' . e(form_status_translate($aRow['status'])) . '</span>';
+                } elseif ($aColumns[$i] == 'form_type') {
+                    $form_type = get_form_name($aRow['form_type']);
+                    $_data = !empty($form_type) ? $form_type->name : '';
                 } else {
                     if (strpos($aColumns[$i], 'date_picker_') !== false) {
                         $_data = (strpos($_data, ' ') !== false ? _dt($_data) : _d($_data));

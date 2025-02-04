@@ -9,15 +9,6 @@
                     <h4 class="tw-my-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mr-4">
                         <?php echo _l('clients_single_form_information_heading'); ?>
                     </h4>
-                    <?php if (!isset($project_id) && !isset($contact)) { ?>
-                        <a href="#" id="form_no_contact" class="label label-default">
-                            <i class="fa-regular fa-envelope tw-mr-1"></i> <?php echo _l('form_create_no_contact'); ?>
-                        </a>
-                        <a href="#" class="hide label label-default" id="form_to_contact">
-                            <i class="fa-regular fa-user tw-mr-1"></i>
-                            <?php echo _l('form_create_to_contact'); ?>
-                        </a>
-                    <?php } ?>
                 </div>
                 <div class="panel_s">
                     <div class="panel-body">

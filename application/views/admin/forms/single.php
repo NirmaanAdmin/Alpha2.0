@@ -48,13 +48,11 @@
                                 <div class="scroller arrow-right"><i class="fa fa-angle-right"></i></div>
                                 <div class="horizontal-tabs">
                                     <ul class="nav nav-tabs nav-tabs-horizontal" role="tablist">
-                                        <!-- <li role="presentation" class="<?php if (!$this->session->flashdata('active_tab')) {
-                                echo 'active';
-                            } ?>">
-                                            <a href="#addreply" aria-controls="addreply" role="tab" data-toggle="tab">
-                                                <?php echo _l('form_single_add_reply'); ?>
+                                        <li role="presentation" class="active">
+                                            <a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">
+                                                <?php echo _l('form_detail'); ?>
                                             </a>
-                                        </li> -->
+                                        </li>
                                         <li role="presentation">
                                             <a href="#note" aria-controls="note" role="tab" data-toggle="tab">
                                                 <?php echo _l('form_single_add_note'); ?>
@@ -81,24 +79,11 @@
                                 ?>
                                             </a>
                                         </li>
-                                        <!-- <li role="presentation">
-                                            <a href="#otherforms" onclick="init_table_forms(true);"
-                                                aria-controls="otherforms" role="tab" data-toggle="tab">
-                                                <?php echo _l('form_single_other_user_forms'); ?>
-                                            </a>
-                                        </li> -->
                                         <li role="presentation">
                                             <a href="#tasks"
                                                 onclick="init_rel_tasks_table(<?php echo e($form->formid); ?>,'form'); return false;"
                                                 aria-controls="tasks" role="tab" data-toggle="tab">
                                                 <?php echo _l('tasks'); ?>
-                                            </a>
-                                        </li>
-                                        <li role="presentation" class="<?php if ($this->session->flashdata('active_tab_settings')) {
-                                    echo 'active';
-                                } ?>">
-                                            <a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">
-                                                <?php echo _l('form_single_settings'); ?>
                                             </a>
                                         </li>
                                         <?php do_action_deprecated('add_single_form_tab_menu_item', $form, '3.0.7', 'after_admin_single_form_tab_menu_last_item'); ?>
@@ -108,9 +93,7 @@
                             </div>
                         </div>
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane <?php if (!$this->session->flashdata('active_tab')) {
-                                    echo 'active';
-                                } ?>" id="addreply">
+                            <div role="tabpanel" class="tab-pane" id="addreply">
                                 <?php $tags = get_tags_in($form->formid, 'form'); ?>
                                 <?php if (count($tags) > 0) { ?>
                                 <div class="row">
@@ -400,9 +383,7 @@
                                 <hr class="no-mtop" />
                                 <?php init_relation_tasks_table(['data-new-rel-id' => $form->formid, 'data-new-rel-type' => 'form']); ?>
                             </div>
-                            <div role="tabpanel" class="tab-pane <?php if ($this->session->flashdata('active_tab_settings')) {
-                                   echo 'active';
-                               } ?>" id="settings">
+                            <div role="tabpanel" class="tab-pane active" id="settings">
                                 <hr class="no-mtop" />
                                 <div class="row">
                                     <div class="col-md-6">
@@ -464,9 +445,6 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <?php  echo render_input('merge_form_ids', 'merge_form_ids_field_label', '', 'text', $form->merged_form_id === null ? ['placeholder' => _l('merge_form_ids_field_placeholder')] : ['disabled' => true]); ?>
-                                            </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mbot20">
                                                     <label for="tags" class="control-label"><i class="fa fa-tag"
