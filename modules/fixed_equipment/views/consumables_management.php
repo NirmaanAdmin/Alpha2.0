@@ -1,5 +1,12 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+	.show_hide_columns {
+		position: absolute;
+		z-index: 9999;
+		left: 278px
+	}
+</style>
 <div id="wrapper">
 	<div class="content">
 		<div class="row panel_s">
@@ -17,6 +24,7 @@
 								<button class="btn btn-primary" onclick="add();"><?php echo _l('add'); ?></button>
 								<a class="btn btn-warning mleft10" href="<?php echo admin_url('fixed_equipment/bulk_upload/consumable'); ?>"><?php echo _l('fe_bulk_upload'); ?></a>
 							<?php } ?>
+							<button class="btn btn-primary" onclick="check_out(this);">Site</button>
 						</div>
 
 						<div class="col-md-3">
@@ -40,6 +48,44 @@
 					?>
 						<a href="#" onclick="bulk_delete(); return false;" data-toggle="modal" data-table=".table-consumables" data-target="#leads_bulk_actions" class=" hide bulk-actions-btn table-btn"><?php echo _l('fe_bulk_delete'); ?></a>
 					<?php } ?>
+					<div class="btn-group show_hide_columns" id="show_hide_columns">
+						<!-- Settings Icon -->
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
+							<i class="fa fa-cog"></i> <?php  ?> <span class="caret"></span>
+						</button>
+						<!-- Dropdown Menu with Checkboxes -->
+						<div class="dropdown-menu" style="padding: 10px; min-width: 250px;">
+							<!-- Select All / Deselect All -->
+							<div>
+								<input type="checkbox" id="select-all-columns"> <strong><?php echo _l('select_all'); ?></strong>
+							</div>
+							<hr>
+							<!-- Column Checkboxes -->
+							<?php
+							$columns = [
+								_l('checkbox'),
+								_l('id'),
+								_l('fe_image'),
+								_l('fe_name'),
+								_l('fe_category'),
+								_l('fe_model_no'),
+								_l('fe_manufacturer'),
+								_l('fe_location'),
+								_l('fe_total'),
+								_l('fe_min_quantity'),
+								_l('fe_avail'),
+								_l('fe_purchase_cost'),
+							];
+							?>
+							<div>
+								<?php foreach ($columns as $key => $label): ?>
+									<input type="checkbox" class="toggle-column" value="<?php echo $key; ?>" checked>
+									<?php echo $label; ?><br>
+								<?php endforeach; ?>
+							</div>
+
+						</div>
+					</div>
 					<table class="table table-consumables scroll-responsive">
 						<thead>
 							<tr>
@@ -88,7 +134,7 @@
 				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
 				<button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
 			</div>
-			<?php echo form_close(); ?> 
+			<?php echo form_close(); ?>
 		</div>
 	</div>
 </div>
@@ -99,7 +145,7 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title">
 					<!-- <span class="add-title"></span> -->
-					 Check Out
+					Check Out
 				</h4>
 			</div>
 			<?php echo form_open(admin_url('fixed_equipment/check_in_consumables'), array('id' => 'check_out_assets-form')); ?>
@@ -117,7 +163,7 @@
 						<?php echo render_input('asset_name', 'fe_consumables_name'); ?>
 					</div>
 				</div>
-				
+
 
 				<div class="row mbot15">
 					<div class="col-md-12">
@@ -185,18 +231,18 @@
 				</div>
 				<div class="row">
 					<div class="col-md-6">
-						<?php echo render_input('consumable_quantity', 'fe_quantity','', 'number'); ?>
+						<?php echo render_input('consumable_quantity', 'fe_quantity', '', 'number'); ?>
 					</div>
 					<div class="col-md-6">
-						<?php echo render_input('avl_quantity', 'fe_avl_quantity','', 'number',['readonly' => true]); ?>
+						<?php echo render_input('avl_quantity', 'fe_avl_quantity', '', 'number', ['readonly' => true]); ?>
 					</div>
-				</div>			
+				</div>
 				<div class="row">
 					<div class="col-md-12">
 						<?php echo render_date_input('checkin_date', 'fe_checkout_date'); ?>
 					</div>
 				</div>
-				
+
 				<div class="row">
 					<div class="col-md-12">
 						<?php echo render_textarea('notes', 'fe_notes'); ?>
@@ -257,9 +303,42 @@
 <input type="hidden" name="are_you_sure_you_want_to_delete_these_items" value="<?php echo _l('fe_are_you_sure_you_want_to_delete_these_items') ?>">
 <input type="hidden" name="please_select_at_least_one_item_from_the_list" value="<?php echo _l('please_select_at_least_one_item_from_the_list') ?>">
 
-<?php init_tail(); 
+<?php init_tail();
+
 require('modules/fixed_equipment/assets/js/consumables_js.php');
 ?>
+<script>
+	$(document).ready(function() {
+		var table = $('.table-consumables').DataTable();
+
+		// Handle "Select All" checkbox
+		$('#select-all-columns').on('change', function() {
+			var isChecked = $(this).is(':checked');
+			$('.toggle-column').prop('checked', isChecked).trigger('change');
+		});
+
+		// Handle individual column visibility toggling
+		$('.toggle-column').on('change', function() {
+			var column = table.column($(this).val());
+			column.visible($(this).is(':checked'));
+
+			// Sync "Select All" checkbox state
+			var allChecked = $('.toggle-column').length === $('.toggle-column:checked').length;
+			$('#select-all-columns').prop('checked', allChecked);
+		});
+
+		// Sync checkboxes with column visibility on page load
+		table.columns().every(function(index) {
+			var column = this;
+			$('.toggle-column[value="' + index + '"]').prop('checked', column.visible());
+		});
+
+		// Prevent dropdown from closing when clicking inside
+		$('.dropdown-menu').on('click', function(e) {
+			e.stopPropagation();
+		});
+	});
+</script>
 </body>
 
 </html>

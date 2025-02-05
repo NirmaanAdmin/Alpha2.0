@@ -3,9 +3,10 @@
 <style>
   .show_hide_columns {
     position: absolute;
-    z-index: 99999;
+    z-index: 9999;
     left: 375px
   }
+  
 </style>
 <div id="wrapper">
   <div class="content">
@@ -119,6 +120,7 @@
 
           </div>
         </div>
+        
         <table class="table table-assets_management scroll-responsive">
           <thead>
             <tr>

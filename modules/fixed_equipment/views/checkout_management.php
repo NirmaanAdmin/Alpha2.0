@@ -8,7 +8,7 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
 <style>
   .show_hide_columns {
     position: absolute;
-    z-index: 99999;
+    z-index: 9999;
     left: 350px
   }
 </style>
