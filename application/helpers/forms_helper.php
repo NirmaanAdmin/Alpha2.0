@@ -19,16 +19,11 @@ function AdminFormsTableStructure($name = '', $bulk_action = false)
 
     $table .= '<th class="toggleable" id="th-number">' . _l('the_number_sign') . '</th>';
     $table .= '<th class="toggleable" id="th-subject">' . _l('form_dt_subject') . '</th>';
-    $table .= '<th class="toggleable" id="th-tags">' . _l('tags') . '</th>';
     $table .= '<th class="toggleable" id="th-department">' . _l('form_dt_department') . '</th>';
-    $services_th_attrs = '';
-    if (get_option('services') == 0) {
-        $services_th_attrs = ' class="not_visible"';
-    }
-    $table .= '<th' . $services_th_attrs . '>' . _l('form_dt_service') . '</th>';
-    $table .= '<th class="toggleable" id="th-submitter">' . _l('form_dt_submitter') . '</th>';
+    $table .= '<th class="toggleable" id="th-project">' . _l('project') . '</th>';
+    $table .= '<th class="toggleable" id="th-forms">' . _l('forms') . '</th>';
+    $table .= '<th class="toggleable" id="th-form-settings-assign-to">' . _l('form_settings_assign_to') . '</th>';
     $table .= '<th class="toggleable" id="th-status">' . _l('form_dt_status') . '</th>';
-    $table .= '<th class="toggleable" id="th-priority">' . _l('form_dt_priority') . '</th>';
     $table .= '<th class="toggleable" id="th-last-reply">' . _l('form_dt_last_reply') . '</th>';
     $table .= '<th class="toggleable form_created_column" id="th-created">' . _l('form_date_created') . '</th>';
 
@@ -676,4 +671,29 @@ function get_staff_list($where = '')
         $CI->db->where($where);
     }
     return $CI->db->get(db_prefix() . 'staff')->result_array();
+}
+
+function get_form_name($form_id)
+{
+    $CI = &get_instance();
+    $CI->db->select('*');
+    if ($form_id != '') {
+        $CI->db->where('form_id', $form_id);
+        return $CI->db->get(db_prefix() . 'form_options')->row();
+    }
+    return $CI->db->get(db_prefix() . 'form_options')->result_array();
+}
+
+function get_work_execute_unit($name_work_execute_unit, $work_execute_unit)
+{
+    $CI = &get_instance();
+    $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->result_array();
+    return render_select($name_work_execute_unit, $pur_unit, array('unit_id', 'unit_name'), '', $work_execute_unit);
+}
+
+function get_material_consumption_unit($name_material_consumption_unit, $material_consumption_unit)
+{
+    $CI = &get_instance();
+    $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->result_array();
+    return render_select($name_material_consumption_unit, $pur_unit, array('unit_id', 'unit_name'), '', $material_consumption_unit);
 }

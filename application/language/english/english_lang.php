@@ -4153,4 +4153,5 @@ $lang['allow_non_admin_members_to_edit_form_messages'] = 'Allow non-admin staff 
 $lang['forms_chart_weekly_opening_stats']  = 'Weekly Stats';
 $lang['access_forms_to_none_staff_members'] = 'Allow access to Form for non staff members';
 $lang['settings_group_forms'] = 'RFI';
+$lang['form_detail'] = 'Form detail';
 
