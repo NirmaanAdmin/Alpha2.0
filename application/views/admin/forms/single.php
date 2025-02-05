@@ -857,7 +857,6 @@ if(form_type != '') {
 function find_form_design(form_type) {
     var form_id = $('input[name="formid"]').val();
     $.post(admin_url + 'forms/find_form_design/'+form_type+'/'+form_id).done(function(response){
-        console.log(response);
         $('.view_form_design').html('');
         $('.view_form_design').html(response);
         $('.view_project_name').html('');

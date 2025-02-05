@@ -144,7 +144,7 @@
         var item_key = lastAddedItemKey ? lastAddedItemKey += 1 : $("body").find('.dpr-items-table tbody .item').length + 1;
         lastAddedItemKey = item_key;
 
-        dpr_get_item_row_template('newitems[' + item_key + ']', data.location, data.agency, data.type, data.work_execute, data.material_consumption, data.machinery, data.skilled, data.unskilled, data.depart, data.total, data.male, data.female, item_key).done(function(output){
+        dpr_get_item_row_template('newitems[' + item_key + ']', data.location, data.agency, data.type, data.work_execute, data.material_consumption, data.work_execute_unit, data.material_consumption_unit, data.machinery, data.skilled, data.unskilled, data.depart, data.total, data.male, data.female, item_key).done(function(output){
             table_row += output;
 
             $('.dpr_body').append(table_row);
@@ -160,7 +160,7 @@
         return false;
     });
 
-    function dpr_get_item_row_template(name, location, agency, type, work_execute, material_consumption, machinery, skilled, unskilled, depart, total, male, female, item_key)  {
+    function dpr_get_item_row_template(name, location, agency, type, work_execute, material_consumption, work_execute_unit, material_consumption_unit, machinery, skilled, unskilled, depart, total, male, female, item_key)  {
       "use strict";
 
       jQuery.ajaxSetup({
@@ -174,6 +174,8 @@
         type : type,
         work_execute : work_execute,
         material_consumption : material_consumption,
+        work_execute_unit : work_execute_unit,
+        material_consumption_unit : material_consumption_unit,
         machinery : machinery,
         skilled : skilled,
         unskilled : unskilled,
@@ -191,13 +193,15 @@
 
     function dpr_get_item_preview_values() {
       "use strict";
-
+      
       var response = {};
       response.location = $('.dpr-items-table input[name="location"]').val();
       response.agency = $('.dpr-items-table select[name="agency"]').selectpicker('val');
       response.type = $('.dpr-items-table select[name="type"]').selectpicker('val');
       response.work_execute = $('.dpr-items-table input[name="work_execute"]').val();
       response.material_consumption = $('.dpr-items-table input[name="material_consumption"]').val();
+      response.work_execute_unit = $('.dpr-items-table select[name="work_execute_unit"]').selectpicker('val');
+      response.material_consumption_unit = $('.dpr-items-table select[name="material_consumption_unit"]').selectpicker('val');
       response.machinery = $('.dpr-items-table input[name="machinery"]').val();
       response.skilled = $('.dpr-items-table input[name="skilled"]').val();
       response.unskilled = $('.dpr-items-table input[name="unskilled"]').val();

@@ -861,6 +861,8 @@ class Forms_model extends App_Model
                 unset($data['type']);
                 unset($data['work_execute']);
                 unset($data['material_consumption']);
+                unset($data['work_execute_unit']);
+                unset($data['material_consumption_unit']);
                 unset($data['machinery']);
                 unset($data['skilled']);
                 unset($data['unskilled']);
@@ -1073,6 +1075,8 @@ class Forms_model extends App_Model
                             $dt_data['type'] = $value['type'];
                             $dt_data['work_execute'] = $value['work_execute'];
                             $dt_data['material_consumption'] = $value['material_consumption'];
+                            $dt_data['work_execute_unit'] = $value['work_execute_unit'];
+                            $dt_data['material_consumption_unit'] = $value['material_consumption_unit'];
                             $dt_data['machinery'] = $value['machinery'];
                             $dt_data['skilled'] = $value['skilled'];
                             $dt_data['unskilled'] = $value['unskilled'];
@@ -1773,6 +1777,8 @@ class Forms_model extends App_Model
             unset($data['type']);
             unset($data['work_execute']);
             unset($data['material_consumption']);
+            unset($data['work_execute_unit']);
+            unset($data['material_consumption_unit']);
             unset($data['machinery']);
             unset($data['skilled']);
             unset($data['unskilled']);
@@ -2007,6 +2013,8 @@ class Forms_model extends App_Model
                         $dt_data['type'] = $value['type'];
                         $dt_data['work_execute'] = $value['work_execute'];
                         $dt_data['material_consumption'] = $value['material_consumption'];
+                        $dt_data['work_execute_unit'] = $value['work_execute_unit'];
+                        $dt_data['material_consumption_unit'] = $value['material_consumption_unit'];
                         $dt_data['machinery'] = $value['machinery'];
                         $dt_data['skilled'] = $value['skilled'];
                         $dt_data['unskilled'] = $value['unskilled'];
@@ -2033,6 +2041,8 @@ class Forms_model extends App_Model
                         $dt_data['type'] = $value['type'];
                         $dt_data['work_execute'] = $value['work_execute'];
                         $dt_data['material_consumption'] = $value['material_consumption'];
+                        $dt_data['work_execute_unit'] = $value['work_execute_unit'];
+                        $dt_data['material_consumption_unit'] = $value['material_consumption_unit'];
                         $dt_data['machinery'] = $value['machinery'];
                         $dt_data['skilled'] = $value['skilled'];
                         $dt_data['unskilled'] = $value['unskilled'];
@@ -3240,7 +3250,7 @@ class Forms_model extends App_Model
      * @param      array   $unit_data  The unit data
      * @param      string  $name       The name
      */
-    public function create_dpr_row_template($name = '', $location = '', $agency = '', $type = '', $work_execute = '', $material_consumption = '', $machinery = '', $skilled = '', $unskilled = '', $depart = '', $total = '', $male = '', $female = '', $is_edit = false, $item_key = '')
+    public function create_dpr_row_template($name = '', $location = '', $agency = '', $type = '', $work_execute = '', $material_consumption = '', $work_execute_unit = '', $material_consumption_unit = '', $machinery = '', $skilled = '', $unskilled = '', $depart = '', $total = '', $male = '', $female = '', $is_edit = false, $item_key = '')
     {
         $row = '';
 
@@ -3249,6 +3259,8 @@ class Forms_model extends App_Model
         $name_type = 'type';
         $name_work_execute = 'work_execute';
         $name_material_consumption = 'material_consumption';
+        $name_work_execute_unit = 'work_execute_unit';
+        $name_material_consumption_unit = 'material_consumption_unit';
         $name_machinery = 'machinery';
         $name_skilled = 'skilled';
         $name_unskilled = 'unskilled';
@@ -3268,6 +3280,8 @@ class Forms_model extends App_Model
             $name_type = $name . '[type]';
             $name_work_execute = $name . '[work_execute]';
             $name_material_consumption = $name . '[material_consumption]';
+            $name_work_execute_unit = $name . '[work_execute_unit]';
+            $name_material_consumption_unit = $name . '[material_consumption_unit]';
             $name_machinery = $name . '[machinery]';
             $name_skilled = $name . '[skilled]';
             $name_unskilled = $name . '[unskilled]';
@@ -3287,8 +3301,8 @@ class Forms_model extends App_Model
         $row .= '<td class="location">' . render_input($name_location, '', $location) . '</td>';
         $row .= '<td class="agency">' . get_vendor($name_agency, $agency) . '</td>';
         $row .= '<td class="laber-type">' . get_laber_type_listing($name_type, $type) . '</td>';
-        $row .= '<td class="work_execute">' . render_input($name_work_execute, '', $work_execute) . '</td>';
-        $row .= '<td class="material_consumption">' . render_input($name_material_consumption, '', $material_consumption) . '</td>';
+        $row .= '<td class="work_execute">' . render_input($name_work_execute, '', $work_execute) . '' . get_work_execute_unit($name_work_execute_unit, '', $work_execute_unit) . '</td>';
+        $row .= '<td class="material_consumption">' . render_input($name_material_consumption, '', $material_consumption) . '' . get_material_consumption_unit($name_material_consumption_unit, '', $material_consumption_unit) . '</td>';
         $row .= '<td class="machinery">' . render_input($name_machinery, '', $machinery) . '</td>';
         $row .= '<td class="skilled">' . render_input($name_skilled, '', $skilled, 'nubmer') . '</td>';
         $row .= '<td class="unskilled">' . render_input($name_unskilled, '', $unskilled, 'nubmer') . '</td>';

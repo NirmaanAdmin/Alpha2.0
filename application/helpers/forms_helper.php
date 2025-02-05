@@ -683,3 +683,17 @@ function get_form_name($form_id)
     }
     return $CI->db->get(db_prefix() . 'form_options')->result_array();
 }
+
+function get_work_execute_unit($name_work_execute_unit, $work_execute_unit)
+{
+    $CI = &get_instance();
+    $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->result_array();
+    return render_select($name_work_execute_unit, $pur_unit, array('unit_id', 'unit_name'), '', $work_execute_unit);
+}
+
+function get_material_consumption_unit($name_material_consumption_unit, $material_consumption_unit)
+{
+    $CI = &get_instance();
+    $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->result_array();
+    return render_select($name_material_consumption_unit, $pur_unit, array('unit_id', 'unit_name'), '', $material_consumption_unit);
+}

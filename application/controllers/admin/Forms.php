@@ -825,6 +825,8 @@ class Forms extends AdminController
                             $value['type'],
                             $value['work_execute'],
                             $value['material_consumption'],
+                            $value['work_execute_unit'],
+                            $value['material_consumption_unit'],
                             $value['machinery'],
                             $value['skilled'],
                             $value['unskilled'],
@@ -903,6 +905,8 @@ class Forms extends AdminController
         $type = $this->input->post('type');
         $work_execute = $this->input->post('work_execute');
         $material_consumption = $this->input->post('material_consumption');
+        $work_execute_unit = $this->input->post('work_execute_unit');
+        $material_consumption_unit = $this->input->post('material_consumption_unit');
         $machinery = $this->input->post('machinery');
         $skilled = $this->input->post('skilled');
         $unskilled = $this->input->post('unskilled');
@@ -912,7 +916,7 @@ class Forms extends AdminController
         $female = $this->input->post('female');
         $item_key = $this->input->post('item_key');
 
-        echo $this->forms_model->create_dpr_row_template($name, $location, $agency, $type, $work_execute, $material_consumption, $machinery, $skilled, $unskilled, $depart, $total, $male, $female, false, $item_key);
+        echo $this->forms_model->create_dpr_row_template($name, $location, $agency, $type, $work_execute, $material_consumption, $work_execute_unit, $material_consumption_unit, $machinery, $skilled, $unskilled, $depart, $total, $male, $female, false, $item_key);
     }
 
     public function delete_apc_attachment($id)
