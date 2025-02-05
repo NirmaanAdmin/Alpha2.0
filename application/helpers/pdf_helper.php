@@ -311,3 +311,12 @@ function pdf_multi_row($left, $right, $pdf, $left_width = 40)
     $pdf->setPage(max($page_end_1, $page_end_2));
     $pdf->SetXY($pdf->GetX(), $ynew);
 }
+
+/**
+ * Prepare general form pdf
+ */
+function create_form_pdf($form_data)
+{
+    $pdf_file = ucfirst($form_data->form_type);
+    return app_pdf($form_data->form_type, LIBSPATH . 'pdf/'.$pdf_file.'_pdf', $form_data);
+}

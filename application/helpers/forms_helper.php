@@ -26,6 +26,7 @@ function AdminFormsTableStructure($name = '', $bulk_action = false)
     $table .= '<th class="toggleable" id="th-status">' . _l('form_dt_status') . '</th>';
     $table .= '<th class="toggleable" id="th-last-reply">' . _l('form_dt_last_reply') . '</th>';
     $table .= '<th class="toggleable form_created_column" id="th-created">' . _l('form_date_created') . '</th>';
+    $table .= '<th class="toggleable" id="th-export">' . _l('Export') . '</th>';
 
     $custom_fields = get_table_custom_fields('forms');
 

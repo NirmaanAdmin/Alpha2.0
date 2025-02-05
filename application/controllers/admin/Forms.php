@@ -960,5 +960,29 @@ class Forms extends AdminController
     {
         $this->forms_model->delete_cosc_attachment($id);
     }
+
+    /* Generates form PDF */
+    public function form_pdf($id)
+    {
+        if (!$id) {
+            redirect(admin_url('forms'));
+        }
+
+        $form_data = $this->forms_model->get_form_data($id);
+
+        if(!empty($form_data)) {
+            $pdf = create_form_pdf($form_data);
+            $type = 'D';
+            if ($this->input->get('output_type')) {
+                $type = $this->input->get('output_type');
+            }
+            if ($this->input->get('print')) {
+                $type = 'I';
+            }
+            $pdf->Output(mb_strtoupper($form_data->name) . '.pdf', $type);
+        } else {
+            echo "PDF have not created yet.";
+        }
+    }
     
 }

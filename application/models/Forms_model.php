@@ -3853,4 +3853,13 @@ class Forms_model extends App_Model
         $query = $this->db->get('tblform_items');
         return $query->result_array();
     }
+
+    public function get_form_data($id)
+    {
+        $this->db->select('*');
+        $this->db->join(db_prefix() . 'form_options', db_prefix() . 'form_options.form_id = ' . db_prefix() . 'forms.form_type', 'inner');
+        $this->db->where('formid', $id);
+        $query = $this->db->get(db_prefix().'forms');
+        return $query->row();
+    }
 }

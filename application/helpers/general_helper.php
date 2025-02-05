@@ -1034,3 +1034,19 @@ function check_emp_leave_balance($staff_id)
     // Return leave balance details or null if no record exists
     return $query->row_array();
 }
+
+function get_staff_department_name($department)
+{
+    if(!empty($department)) {
+        $CI = &get_instance();
+        $CI->db->select('name');
+        $CI->db->from('tbldepartments');
+        $CI->db->where('departmentid', $department);
+        $query = $CI->db->get();
+        $result = $query->row();
+        if(!empty($result)) {
+            return $result->name;
+        }
+    } 
+    return '';
+}
