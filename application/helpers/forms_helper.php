@@ -427,7 +427,7 @@ function get_work_stop_listing()
     return $result;
 }
 
-function get_laber_type_listing($name_type, $type)
+function get_laber_type_listing($name_type, $type, $pdf = false)
 {
     $result = array();
     $result = [
@@ -512,7 +512,11 @@ function get_laber_type_listing($name_type, $type)
             'name' => 'Electrician - helper',
         ],
     ];
-    return render_select($name_type, $result, array('id', 'name'), '', $type);
+    if($pdf == false) {
+        return render_select($name_type, $result, array('id', 'name'), '', $type);
+    } else {
+        return $result;
+    }
 }
 
 function get_vendor($name_agency, $agency)
@@ -697,4 +701,17 @@ function get_material_consumption_unit($name_material_consumption_unit, $materia
     $CI = &get_instance();
     $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->result_array();
     return render_select($name_material_consumption_unit, $pur_unit, array('unit_id', 'unit_name'), '', $material_consumption_unit);
+}
+
+function get_pur_unit($unit_id)
+{
+    if(!empty($unit_id)) {
+        $CI = &get_instance();
+        $CI->db->where('unit_id', $unit_id);
+        $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->row();
+        if(!empty($pur_unit)) {
+            return $pur_unit->unit_name;
+        }
+    }
+    return '';
 }
