@@ -9028,10 +9028,10 @@ class fixed_equipment extends AdminController
 					array_push($where, ' AND IF(item_type = "license", (select license_id from ' . db_prefix() . 'fe_seats where ' . db_prefix() . 'fe_seats.id = ' . db_prefix() . 'fe_checkin_assets.item_id), ' . db_prefix() . 'fe_checkin_assets.item_id) = ' . $asset_id . '');
 				}
 
-				$staff_id = $this->input->post('staff_id');
-				if ($staff_id != '') {
-					array_push($where, ' AND ' . db_prefix() . 'fe_checkin_assets.staff_id = ' . $staff_id . '');
-				}
+				// $staff_id = $this->input->post('staff_id');
+				// if ($staff_id != '') {
+				// 	array_push($where, ' AND ' . db_prefix() . 'fe_checkin_assets.staff_id = ' . $staff_id . '');
+				// }
 
 				$date_creator = $this->input->post('date');
 				if ($date_creator != '') {
@@ -12812,5 +12812,82 @@ class fixed_equipment extends AdminController
 			set_alert('warning', _l('problem_deleting'));
 		}
 		redirect(admin_url('fixed_equipment/view_order_detailt/' . $issue->cart_id));
+	}
+	public function get_bulk_checkout_details()
+	{
+		// Get the posted id_list.
+		$id_list = $this->input->post('id_list');
+		if (!$id_list) {
+			echo json_encode([
+				'success' => false,
+				'message' => _l('no_items_selected')
+			]);
+			return;
+		}
+
+		// Convert the comma‑separated string into an array.
+		$ids = explode(',', $id_list);
+		if (count($ids) < 2) {
+			echo json_encode([
+				'success' => false,
+				'message' => _l('please_select_at_least_two_items_from_the_list')
+			]);
+			return;
+		}
+
+		// Load the model and fetch asset details.
+		$this->load->model('fixed_equipment_model');
+		$assets = $this->fixed_equipment_model->get_assets_by_ids($id_list);
+
+		// **New Validation:** Check that none of the assets are already checked out.
+		foreach ($assets as $asset) {
+			if ($asset['checkin_out'] == 2) { // Assuming 1 means the asset is already checked out.
+				echo json_encode([
+					'success' => false,
+					'message' => _l('one_or_more_assets_already_checked_out')
+				]);
+				return;
+			}
+		}
+
+		// Prepare arrays for models and asset names.
+		$models = [];
+		$asset_names = [];
+		foreach ($assets as $asset) {
+			$models[] = $asset['model'];
+			$asset_names[] = $asset['asset_name'];
+		}
+
+		// Create comma‑separated strings.
+		$bulk_models      = implode(', ', $models);
+		$bulk_asset_names = implode(', ', $asset_names);
+
+		echo json_encode([
+			'success'          => true,
+			'bulk_models'      => $bulk_models,
+			'bulk_asset_names' => $bulk_asset_names,
+		]);
+	}
+	public  function bulk_checkout()
+	{
+		if ($this->input->post()) {
+			$data             = $this->input->post();
+			
+			$result = $this->fixed_equipment_model->bulk_checkout_assets($data);
+			if ($result > 0) {
+				if ($data['type'] == 'checkout') {
+					set_alert('success', _l('fe_checkout_successfully', _l('fe_assets')));
+				} else {
+					set_alert('success', _l('fe_checkin_successfully', _l('fe_assets')));
+				}
+			} else {
+				if ($data['type'] == 'checkout') {
+					set_alert('danger', _l('fe_checkout_fail', _l('fe_assets')));
+				} else {
+					set_alert('danger', _l('fe_checkin_fail', _l('fe_assets')));
+				}
+			}
+			redirect(admin_url('fixed_equipment/assets'));
+		}
 	}
 }

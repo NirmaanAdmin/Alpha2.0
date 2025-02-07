@@ -853,3 +853,6 @@ $lang['fe_create_manual_orders'] = 'Create manual orders';
 $lang['fe_edit_manual_orders'] = 'Edit manual orders';
 $lang['select_all'] = 'Select all';
 $lang['fe_avl_quantity'] = 'Available Quantity';
+$lang['fe_bulk_checkout'] = 'Bulk Check-out';
+$lang['please_select_at_least_two_items_from_the_list'] = 'Please select at least two assets from the list';
+$lang['one_or_more_assets_already_checked_out'] = 'One or more assets already checked out';

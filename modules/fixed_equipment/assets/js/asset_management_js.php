@@ -538,4 +538,48 @@
 				.columns.adjust();
 		});
 	})(jQuery);
+
+	function bulk_checkout() {
+		"use strict";
+		// Get the selected asset IDs from the hidden input named 'check'
+		var checked_ids = $('input[name="check"]').val();
+
+		// If nothing is selected, show an alert.
+		if (!checked_ids) {
+			alert_float('danger', '<?php echo _l('please_select_at_least_two_items_from_the_list'); ?>');
+			return;
+		}
+
+		// Convert the comma-separated list into an array.
+		var selected_ids = checked_ids.split(',');
+		if (selected_ids.length < 2) {
+			alert_float('danger', '<?php echo _l('please_select_at_least_two_items_from_the_list'); ?>');
+			return;
+		}
+
+		// Make an AJAX request to fetch aggregated details for the selected assets.
+		$.ajax({
+			url: admin_url + 'fixed_equipment/get_bulk_checkout_details',
+			type: 'POST',
+			data: {
+				id_list: checked_ids
+			},
+			dataType: 'json',
+			success: function(response) {
+				if (response.success) {
+					// Populate the modal's fields with the aggregated models and asset names.
+					$('#bulk_models').val(response.bulk_models);
+					$('#bulk_asset_names').val(response.bulk_asset_names);
+					$('#item_ids').val(checked_ids);
+					// Open the bulk checkout modal.
+					$('#bulk_checkout_modal').modal('show');
+				} else {
+					alert_float('danger', response.message);
+				}
+			},
+			error: function() {
+				alert_float('danger', 'Error fetching bulk checkout details.');
+			}
+		});
+	}
 </script>

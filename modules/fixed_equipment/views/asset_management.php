@@ -6,7 +6,12 @@
     z-index: 9999;
     left: 375px
   }
-  
+
+  .bulk-checkout {
+    position: absolute;
+    z-index: 9999;
+    left: 423px
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -120,7 +125,11 @@
 
           </div>
         </div>
-        
+        <div class="btn btn-default bulk-checkout" id="bulk-checkout" style="padding:4px 10px;">
+          <a href="#" onclick="bulk_checkout(); return false;" class=" bulk-actions-btn table-btn" style="color: #000000;">
+            <?php echo _l('fe_bulk_checkout'); ?>
+          </a>
+        </div>
         <table class="table table-assets_management scroll-responsive">
           <thead>
             <tr>
@@ -194,6 +203,131 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="modal fade" id="bulk_checkout_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title"><?php echo _l('fe_bulk_checkout'); ?></h4>
+      </div>
+      <?php echo form_open(admin_url('fixed_equipment/bulk_checkout'), array('id' => 'bulk_checkout_form')); ?>
+      <input type="hidden" name="item_ids" id="item_ids" value="">
+      <input type="hidden" name="type" value="checkout">
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <!-- Display aggregated models -->
+            <div class="form-group">
+              <label for="bulk_models"><?php echo _l('fe_model'); ?></label>
+              <input type="text" class="form-control" id="bulk_models" name="bulk_models" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <!-- Display aggregated asset names -->
+            <div class="form-group">
+              <label for="bulk_asset_names"><?php echo _l('fe_asset_name'); ?></label>
+              <input type="text" class="form-control" id="bulk_asset_names" name="bulk_asset_names" readonly>
+            </div>
+          </div>
+        </div>
+        <!-- Additional checkout fields (similar to your check out modal) -->
+        <div class="row">
+          <div class="col-md-12">
+            <?php echo render_select('status', $status_label_checkout, array('id', 'name'), 'fe_status'); ?>
+          </div>
+        </div>
+        <div class="row mbot15">
+          <div class="col-md-12">
+            <label for="location" class="control-label"><?php echo _l('fe_checkout_to'); ?></label>
+          </div>
+          <div class="col-md-12">
+
+            <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to" id="checkout_to_user" value="user" checked>
+                <label for="checkout_to_user"><?php echo _l('fe_staffs'); ?></label>
+              </div>
+            </div>
+            <!-- <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to" id="checkout_to_customer" value="customer">
+                <label for="checkout_to_customer"><?php echo _l('fe_customer'); ?></label>
+              </div>
+            </div> -->
+            <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to" id="checkout_to_asset" value="asset">
+                <label for="checkout_to_asset"><?php echo _l('fe_asset'); ?></label>
+              </div>
+            </div>
+            <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to" id="checkout_to_location" value="location">
+                <label for="checkout_to_location"><?php echo _l('fe_location'); ?></label>
+              </div>
+            </div>
+            <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to" id="checkout_to_project" value="project">
+                <label for="checkout_to_project"><?php echo _l('fe_project'); ?></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12 checkout_to_fr checkout_to_location_fr hide">
+            <?php echo render_select('location_id', $locations, array('id', 'location_name'), 'fe_location'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 checkout_to_fr checkout_to_asset_fr hide">
+            <?php echo render_select('asset_id', $assets, array('id', array('series', 'assets_name')), 'fe_asset'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 checkout_to_fr checkout_to_customer_fr hide">
+            <?php echo render_select('customer_id', $customers, array('userid', 'company'), 'fe_customer'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 checkout_to_fr checkout_to_staff_fr">
+            <?php echo render_select('staff_id', $staffs, array('staffid', array('firstname', 'lastname')), 'fe_staff'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 checkout_to_fr checkout_to_project_fr">
+            <?php echo render_select('project_id', $projects, array('id', array('name', 'project_created')), 'fe_project'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <?php echo render_date_input('checkin_date', 'fe_checkout_date'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <?php echo render_date_input('expected_checkin_date', 'fe_expected_checkin_date'); ?>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <?php echo render_textarea('notes', 'fe_notes'); ?>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-info"><?php echo _l('fe_checkout'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="check_in" tabindex="-1" role="dialog">
   <div class="modal-dialog">

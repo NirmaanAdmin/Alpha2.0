@@ -1150,7 +1150,7 @@ class fixed_equipment_model extends app_model
 		} else {
 			$data['item_type'] = 'asset';
 		}
-
+		
 		$this->db->insert(db_prefix() . 'fe_checkin_assets', $data);
 		$insert_id = $this->db->insert_id();
 		if ($insert_id) {
@@ -4465,16 +4465,16 @@ class fixed_equipment_model extends app_model
 	{
 		$query = 'select * from ' . db_prefix() . 'fe_checkin_assets';
 		$id_used = $this->db->query('select GROUP_CONCAT(checkin_out_id SEPARATOR \',\') as id FROM ' . db_prefix() . 'fe_sign_documents')->row();
-		if (isset($id_used->id) && $id_used->id != '') {
-			$query = $query . ' where NOT find_in_set(id, "' . $id_used->id . '")';
-			if (is_numeric($staff_id)) {
-				$query = $query . ' and staff_id = ' . $staff_id;
-			}
-		} else {
-			if (is_numeric($staff_id)) {
-				$query = $query . ' where staff_id = ' . $staff_id;
-			}
-		}
+		// if (isset($id_used->id) && $id_used->id != '') {
+		// 	$query = $query . ' where NOT find_in_set(id, "' . $id_used->id . '")';
+		// 	if (is_numeric($staff_id)) {
+		// 		$query = $query . ' and staff_id = ' . $staff_id;
+		// 	}
+		// } else {
+		// 	if (is_numeric($staff_id)) {
+		// 		$query = $query . ' where staff_id = ' . $staff_id;
+		// 	}
+		// }
 		return $this->db->query($query)->result_array();
 	}
 
@@ -12766,6 +12766,234 @@ class fixed_equipment_model extends app_model
 			$this->db->where('product_id', $product_id);
 			$this->db->where('cart_id', $cart_id);
 			return $this->db->get(db_prefix() . 'fe_cart_detailt')->result_array();
+		}
+	}
+
+	/**
+	 * Get assets by their IDs.
+	 *
+	 * @param mixed $asset_ids An array of asset IDs or a comma‐separated string.
+	 * @return array         List of assets.
+	 */
+	public function get_assets_by_ids($asset_ids)
+	{
+		// Convert a comma‑separated string to an array if needed.
+		if (!is_array($asset_ids)) {
+			$asset_ids = array_map('trim', explode(',', $asset_ids));
+		}
+
+		// Make sure the array is not empty.
+		if (empty($asset_ids)) {
+			return [];
+		}
+
+		// Use CodeIgniter's where_in to filter by the given asset IDs.
+		$this->db->where_in('id', $asset_ids);
+		$query = $this->db->get(db_prefix() . 'fe_assets');
+		$data = $query->result_array();
+
+		$assets = [];
+		foreach ($data as $val) {
+			// Fetch the model details for the given asset.
+			$model_obj = $this->get_models($val['model_id']);
+			$assets[] = [
+				'asset_name'  => $val['assets_name'],
+				'model'       => $model_obj->model_name,
+				'checkin_out' => $val['checkin_out'], // Include the checkout status.
+			];
+		}
+
+		return $assets;
+	}
+
+	/**
+	 * bulk check in ans check out assets
+	 * @param  array $data 
+	 * @return array       
+	 */
+	public function bulk_checkout_assets($data)
+	{
+		$consumable_quantity = '';
+
+		if ($data['consumable_quantity'] != '') {
+			$consumable_quantity = $data['consumable_quantity'];
+		} else {
+			$consumable_quantity = 0;
+		}
+
+		unset($data['consumable_quantity']);
+		unset($data['avl_quantity']);
+
+		if (isset($data['checkin_date'])) {
+			$data['checkin_date'] = fe_format_date($data['checkin_date']);
+		}
+
+		if (isset($data['expected_checkin_date'])) {
+			$data['expected_checkin_date'] = fe_format_date($data['expected_checkin_date']);
+		}
+
+		if ($data['type'] == 'checkin') {
+			$data['check_status'] = 1;
+		} else {
+			if ($data['checkout_to'] == 'asset') {
+				$data['staff_id'] = $this->get_manager_asset($data['asset_id']);
+			} elseif ($data['checkout_to'] == 'location') {
+				$data['staff_id'] = $this->get_manager_location($data['location_id']);
+			}
+		}
+		if (isset($data['item_type'])) {
+			$data['item_type'] = $data['item_type'];
+		} else {
+			$data['item_type'] = 'asset';
+		}
+		
+		$item_ids = $data['item_ids'];
+		unset($data['item_ids']);
+		if (!is_array($item_ids)) {
+			$item_ids = array_map('trim', explode(',', $item_ids));
+		}
+		$model = $data['bulk_models'];
+		unset($data['bulk_models']);
+		if (!is_array($model)) {
+			$model = array_map('trim', explode(',', $model));
+		}
+		$asset_name = $data['bulk_asset_names'];
+		unset($data['bulk_asset_names']);
+		if (!is_array($asset_name)) {
+			$asset_name = array_map('trim', explode(',', $asset_name));
+		}
+		$insert_id1 = [];
+		foreach ($item_ids as $key => $item_id) {
+			// Set the current asset id.
+			$data['item_id'] = $item_id;
+			$data['model'] = $model[$key];
+			$data['asset_name'] = $asset_name[$key];
+			$this->db->insert(db_prefix() . 'fe_checkin_assets', $data);
+			$insert_id = $this->db->insert_id();
+			
+			if ($insert_id) {
+				//Get checkout id to update status after checkin
+				$checkin_out_id = '';
+				$data_assets = $this->get_assets($data['item_id']);
+				if ($data_assets) {
+					$checkin_out_id = $data_assets->checkin_out_id;
+					// If has select location
+					if (isset($data['location_id']) && $data['location_id'] != '') {
+						$data_asset['location_id'] = $data['location_id'];
+					} else {
+						// Not select location then using default location
+						$data_asset['location_id'] = $data_assets->asset_location;
+						// If is check out and check out to asset then get location of this asset	
+						if ((isset($data['type']) && $data['type'] == 'checkout')) {
+
+							if ((isset($data['checkout_to']) && $data['checkout_to'] == 'asset') && (isset($data['asset_id']) && is_numeric($data['asset_id']))) {
+								$data_asset_checkout = $this->get_assets($data['asset_id']);
+								if (is_numeric($data_asset_checkout->location_id) && $data_asset_checkout->location_id > 0) {
+									$data_asset['location_id'] = $data_asset_checkout->location_id;
+									if (!is_numeric($data_asset['location_id']) && ($data_asset['location_id'] == 0 || $data_asset['location_id'] == null || $data_asset['location_id'] == '')) {
+										if (is_numeric($data_asset_checkout->asset_location) && $data_asset_checkout->asset_location > 0) {
+											$data_asset['location_id'] = $data_asset_checkout->asset_location;
+										}
+									}
+								}
+							}
+						}
+					}
+					if ($data_assets->consumable_quantity > 0) {
+						$avail_quantity = $data_assets->consumable_quantity + $consumable_quantity;
+					} else {
+						$avail_quantity = $consumable_quantity;
+					}
+				}
+				$data_asset['consumable_quantity'] = $avail_quantity;
+				if (isset($data['asset_name']) && $data['asset_name'] != '') {
+					$data_asset['assets_name'] = $data['asset_name'];
+				}
+				$checkin_out = 1;
+				if ($data['type'] == 'checkout' && $data['item_type'] != 'consumable') {
+					$checkin_out = 2;
+				}
+
+				$data_asset['checkin_out'] = $checkin_out;
+
+
+				$data_asset['checkin_out_id'] = $insert_id;
+				if ($data['item_type'] == 'consumable') {
+					$data_asset['status'] = 1;
+				} else {
+					$data_asset['status'] = $data['status'];
+				}
+
+				$this->db->where('id', $data['item_id']);
+				$this->db->update(db_prefix() . 'fe_assets', $data_asset);
+				if ($data['type'] == 'checkout') {
+					$to_id = '';
+					switch ($data['checkout_to']) {
+						case 'user':
+							$to_id = $data['staff_id'];
+							break;
+						case 'asset':
+							$to_id = $data['asset_id'];
+							$this->update_location_for_checkout_to_asset($data['item_id'], $data_asset['location_id']);
+							break;
+						case 'location':
+							$to_id = $data['location_id'];
+							$this->update_location_for_checkout_to_asset($data['item_id'], $data_asset['location_id']);
+							break;
+						case 'project':
+							$to_id = $data['project_id'];
+							break;
+					}
+					// Add log checkout
+					$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $data['checkout_to'], $to_id, $data['notes'], $consumable_quantity);
+				} elseif ($data['type'] == 'checkin') {
+					$to_id = '';
+					$to = '';
+
+					$data_checkout = '';
+					if ($checkin_out_id == '' || $checkin_out_id == null) {
+						$data_checkout = $this->db->query('select * from ' . db_prefix() . 'fe_checkin_assets where item_id = ' . $data['item_id'] . ' and (type="checkout" OR type="request") order by date_creator desc limit 0,1')->row();
+					} else {
+						$data_checkout = $this->get_checkin_out_data($checkin_out_id);
+					}
+
+					if ($data_checkout != '') {
+						// Update status of checkout when checkin
+						$this->db->where('id', $data_checkout->id);
+						$this->db->update(db_prefix() . 'fe_checkin_assets', ['check_status' => 1]);
+						//
+						$to_id = '';
+						$to = $data_checkout->checkout_to;
+						switch ($to) {
+							case 'user':
+								$to_id = $data_checkout->staff_id;
+								break;
+							case 'asset':
+								$to_id = $data_checkout->asset_id;
+								$this->update_location_for_checkout_to_asset($data_checkout->item_id, $data_asset['location_id']);
+								break;
+							case 'location':
+								$to_id = $data_checkout->location_id;
+								$this->update_location_for_checkout_to_asset($data_checkout->item_id, $data_asset['location_id']);
+								break;
+							case 'project':
+								$to_id = $data['project_id'];
+								break;
+						}
+						$this->db->where('id', $insert_id);
+						$this->db->update(db_prefix() . 'fe_checkin_assets', ['staff_id' => $data_checkout->staff_id]);
+					}
+					// Add log checkin
+					$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $to, $to_id, $data['notes'], $consumable_quantity);
+				}
+				$insert_id1[] = $insert_id;
+			}
+		}
+		
+		if (!empty($insert_id1)) {
+			return 1;
+		} else {
+			return 0;
 		}
 	}
 }
