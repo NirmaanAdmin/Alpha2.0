@@ -1069,6 +1069,7 @@ warehouse_type_value = warehouse_type;
     $('#commodity_list-add-edit input[id="can_be_inventory"]').prop('checked', true);
 
     $('#tags_value').find('ul li.tagit-choice').remove();
+    $('.submit_btn').removeAttr('disabled');
     /*init tags input*/
     init_tags_inputs();
     init_selectpicker();
