@@ -6,7 +6,7 @@
 
     <?php echo form_open_multipart(admin_url('purchase/pur_invoice_form'),array('id'=>'pur_invoice-form','class'=>'_pur_invoice_form _transaction_form')); ?>
     	<?php
-    		if(isset($pur_order)){
+    		if(isset($pur_invoice)){
 		        echo form_hidden('isedit');
 		    }
     	 ?>
