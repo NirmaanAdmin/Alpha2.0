@@ -3,13 +3,13 @@
 <style>
   .show_hide_columns {
     position: absolute;
-    z-index: 9999;
+    z-index: 999;
     left: 375px
   }
 
   .bulk-checkout {
     position: absolute;
-    z-index: 9999;
+    z-index: 999;
     left: 423px
   }
 </style>
