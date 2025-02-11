@@ -2166,6 +2166,7 @@ class Hr_profile extends AdminController {
 			$this->app->get_table_data(module_views_path('hr_profile', 'table_staff'));
 		}
 		$data['departments'] = $this->departments_model->get();
+		
 		$data['staff_members'] = $this->hr_profile_model->get_staff('', ['active' => 1]);
 		$data['title'] = _l('hr_hr_profile');
 		$data['dep_tree'] = json_encode($this->hr_profile_model->get_department_tree());
@@ -5627,7 +5628,7 @@ class Hr_profile extends AdminController {
 
 		$data['hr_profile_member_add'] = true;
 		$title = _l('add_new', _l('staff_member_lowercase'));
-
+ 
 		$this->load->model('currencies_model');
 		$data['positions'] = $this->hr_profile_model->get_job_position();
 		$data['workplace'] = $this->hr_profile_model->get_workplace();
@@ -5688,7 +5689,7 @@ class Hr_profile extends AdminController {
 				$manage_staff = false;
 				if (isset($data['manage_staff'])) {
 					$manage_staff = true;
-					unset($data['manage_staff']);
+					unset($data['manage_staff']); 
 				}
 				hr_profile_handle_staff_profile_image_upload($id);
 				$response = $this->hr_profile_model->update_staff($data, $id);

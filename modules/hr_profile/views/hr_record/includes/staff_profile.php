@@ -102,7 +102,28 @@
 				<div class="card-header">
 					<div class="float-left">
 						<br>
-						<h4 class="card-title text-left"><?php echo _l('hr_team_manage') . ':  ' . staff_profile_image($member->team_manage, ['staff-profile-image-small']) . '  ' . get_staff_full_name($member->team_manage) ?></h4>
+						<?php
+						$get_team_manage = get_team_manage($member->staffid); // Fetch selected staff IDs
+						$team_members_output = '';
+
+						if (!empty($get_team_manage)) {
+							foreach ($get_team_manage as $team_member) {
+								$staff_id = $team_member['team_manage_id'];
+
+								// Get staff profile image & full name
+								$profile_image = staff_profile_image($staff_id, ['staff-profile-image-small']);
+								$full_name = get_staff_full_name($staff_id);
+
+								// Append to output string
+								$team_members_output .= '<span class="team-member-item">' . $profile_image . ' ' . $full_name . '</span> <br> ';
+							}
+						}
+						?>
+
+						<h4 class="card-title text-left">
+							<?php echo _l('hr_team_manage') . ': ' . $team_members_output; ?>
+						</h4>
+
 					</div>
 					<div class="clearfix"></div>
 				</div>

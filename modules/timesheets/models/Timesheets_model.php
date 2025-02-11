@@ -1515,71 +1515,70 @@ class timesheets_model extends app_model
 		if (!isset($data['status'])) {
 			$data['status'] = '';
 		}
+
 		$staff_addedfrom = $data['addedfrom'];
 		$date_send = date('Y-m-d H:i:s');
 
 		$data_new = $this->get_approve_setting($data['rel_type'], true, $staff_addedfrom);
 		$data_setting = $this->get_approve_setting($data['rel_type'], false, $staff_addedfrom);
+
 		if (!$data_new) {
 			$this->update_approve_request($data['rel_id'], $data['rel_type'], 1);
 			return false;
 		}
-		$this->delete_approval_details($data['rel_id'], $data['rel_type']);
-		$list_staff = $this->staff_model->get();
-		$list = [];
 
+		$this->delete_approval_details($data['rel_id'], $data['rel_type']);
 		$sender = $staff_addedfrom;
 
 		foreach ($data_new as $value) {
 			$row = [];
 			$row['notification_recipient'] = $data_setting->notification_recipient;
-			$row['approval_deadline'] = date('Y-m-d', strtotime(date('Y-m-d') . ' +' . $data_setting->number_day_approval . ' day'));
+			$row['approval_deadline'] = date('Y-m-d', strtotime('+' . $data_setting->number_day_approval . ' days'));
 
 			if ($value->approver !== 'specific_personnel') {
 				$value->staff_addedfrom = $staff_addedfrom;
 				$value->rel_type = $data['rel_type'];
 				$value->rel_id = $data['rel_id'];
 
-				$approve_value = $this->get_staff_id_by_approve_value($value, $value->approver);
+				$staff_ids = $this->get_staff_id_by_approve_value($value, $value->approver); // Returns array
 
-				if (is_numeric($approve_value) && $approve_value > 0) {
-					$approve_value = $this->staff_model->get($approve_value)->email;
-				} else {
-
+				if (empty($staff_ids)) {
+					// Delete and return if no valid approvers found
 					$this->db->where('rel_id', $data['rel_id']);
 					$this->db->where('rel_type', $data['rel_type']);
 					$this->db->delete(db_prefix() . 'timesheets_approval_details');
 
 					return $value->approver;
 				}
-				$row['approve_value'] = $approve_value;
 
-				$staffid = $this->get_staff_id_by_approve_value($value, $value->approver);
+				foreach ($staff_ids as $staff_id) {
+					$staff_info = $this->staff_model->get($staff_id);
+					if (!$staff_info) {
+						continue; // Skip invalid staff IDs
+					}
 
-				if (empty($staffid)) {
-					$this->db->where('rel_id', $data['rel_id']);
-					$this->db->where('rel_type', $data['rel_type']);
-					$this->db->delete(db_prefix() . 'timesheets_approval_details');
+					$row['approve_value'] = $staff_info->email; // Email for notifications
+					$row['staffid'] = $staff_id;
+					$row['date_send'] = $date_send;
+					$row['rel_id'] = $data['rel_id'];
+					$row['rel_type'] = $data['rel_type'];
+					$row['sender'] = $sender;
 
-					return $value->approver;
+					$this->db->insert(db_prefix() . 'timesheets_approval_details', $row);
 				}
-				$row['staffid'] = $staffid;
-				$row['date_send'] = $date_send;
-				$row['rel_id'] = $data['rel_id'];
-				$row['rel_type'] = $data['rel_type'];
-				$row['sender'] = $sender;
-				$this->db->insert(db_prefix() . 'timesheets_approval_details', $row);
-			} else if ($value->approver == 'specific_personnel') {
+			} elseif ($value->approver == 'specific_personnel') {
 				$row['staffid'] = $value->staff;
 				$row['date_send'] = $date_send;
 				$row['rel_id'] = $data['rel_id'];
 				$row['rel_type'] = $data['rel_type'];
 				$row['sender'] = $sender;
+
 				$this->db->insert(db_prefix() . 'timesheets_approval_details', $row);
 			}
 		}
 		return true;
 	}
+
 	/**
 	 * get approve setting
 	 * @param  integer $type
@@ -7873,17 +7872,30 @@ class timesheets_model extends app_model
 	public function get_staff_id_by_approve_value($data, $approve_value)
 	{
 		$this->load->model('departments_model');
-		$list_staff = $this->staff_model->get();
-		$list = [];
-		$staffid = [];
+		$this->load->model('staff_model');
 
+		$staff_ids = []; // Store multiple IDs if applicable
+		
 		if ($approve_value == 'head_of_department') {
-			$staffid = $this->departments_model->get_staff_departments($data->staff_addedfrom)[0]['manager_id'];
+			$department_info = $this->departments_model->get_staff_departments($data->staff_addedfrom);
+
+			if (!empty($department_info) && isset($department_info[0]['manager_id'])) {
+				$staff_ids[] = $department_info[0]['manager_id'];
+			}
 		} elseif ($approve_value == 'direct_manager') {
-			$staffid = $this->staff_model->get($data->staff_addedfrom)->team_manage;
+			
+			$team_manage = get_team_manage($data->staff_addedfrom);
+			
+			if (!empty($team_manage)) {
+				foreach ($team_manage as $team_member) {
+					$staff_ids[] = $team_member['team_manage_id']; // Extract all team managers
+				}
+			}
 		}
-		return $staffid;
+		
+		return $staff_ids; // Return an array of IDs (can be single or multiple)
 	}
+
 	/**
 	 * add timesheet leave
 	 * @param string $type
@@ -8841,7 +8853,7 @@ class timesheets_model extends app_model
 			$startDate = new DateTime($data['update_start_time']);
 			$endDate = new DateTime($data['update_end_time']);
 			$daysRequested = $endDate->diff($startDate)->days + 1; // Include the start date
-			
+
 			// Get the staff's remaining leave balance for the type of leave being updated
 			$this->db->where('staffid', $data['update_staff_id']);
 			$this->db->where('year', date('Y')); // Current year
@@ -8859,10 +8871,10 @@ class timesheets_model extends app_model
 			// Update the leave balance
 			$this->db->where('id', $leaveBalance['id']);
 			$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain, 'days_off' => $leaveBalance['days_off'] + $daysRequested]);
-			if($data['leave_type'] == 1){
+			if ($data['leave_type'] == 1) {
 				$data['leave_type'] = 'sick_leave';
 				$type_of_leave = 1;
-			}else{
+			} else {
 				$data['leave_type'] = $data['leave_type'];
 				$type_of_leave = 0;
 			}
