@@ -2568,17 +2568,12 @@ class timesheets_model extends app_model
 	public function check_in($data)
 	{	
 		
-		if($data['not_api'] == 0){
-			
+		if($data['not_api'] == 0){			
 			$get_staff_id =  get_staff_id($data['staff_id']);
 			$data['staff_id'] =  $get_staff_id;
-			
-			
 		}
 		unset($data['not_api']);
-		echo '<pre>';
-		print_r($data);
-		die;
+		
 		// Check valid IP 
 		$enable_check_valid_ip = get_timesheets_option('timekeeping_enable_valid_ip');
 		if ($enable_check_valid_ip && $enable_check_valid_ip == 1) {

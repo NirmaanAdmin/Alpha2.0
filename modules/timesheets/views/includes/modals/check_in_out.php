@@ -117,6 +117,7 @@
                         <input type="hidden" name="edit_date" value="">
                         <input type="hidden" name="point_id" value="">
                         <input type="hidden" name="location_user" value="">
+                        <input type="hidden" name="not_api" value="1">
                         <button class="btn btn-primary check_in"><?php echo _l('check_in'); ?></button>
                       <?php echo form_close();
                       } ?>
@@ -130,6 +131,7 @@
                         <input type="hidden" name="edit_date" value="">
                         <input type="hidden" name="point_id" value="">
                         <input type="hidden" name="location_user" value="">
+                        <input type="hidden" name="not_api" value="1">
                         <button class="btn btn-warning check_out"><?php echo _l('check_out'); ?></button>
                       <?php echo form_close();
                       } ?>
