@@ -10,7 +10,8 @@ hooks()->add_action('after_email_templates', 'add_timesheets_email_templates');
  * @return boolean
  */
 
-function get_timesheets_option($name) {
+function get_timesheets_option($name)
+{
 	$CI = &get_instance();
 	$options = [];
 	$val = '';
@@ -36,7 +37,8 @@ function get_timesheets_option($name) {
  * @param  string $name
  * @return
  */
-function row_timesheets_options_exist($name) {
+function row_timesheets_options_exist($name)
+{
 	$CI = &get_instance();
 	$i = count($CI->db->query('Select * from ' . db_prefix() . 'timesheets_option where option_name = ' . $name)->result_array());
 	if ($i == 0) {
@@ -53,12 +55,15 @@ function row_timesheets_options_exist($name) {
  * @param  string $index_name
  * @return
  */
-function handle_timesheets_attachments_array($staffid, $index_name = 'attachments') {
+function handle_timesheets_attachments_array($staffid, $index_name = 'attachments')
+{
 	$uploaded_files = [];
 	$path = TIMESHEETS_MODULE_UPLOAD_FOLDER . '/' . $staffid . '/';
 	$CI = &get_instance();
-	if (isset($_FILES[$index_name]['name'])
-		&& ($_FILES[$index_name]['name'] != '' || is_array($_FILES[$index_name]['name']) && count($_FILES[$index_name]['name']) > 0)) {
+	if (
+		isset($_FILES[$index_name]['name'])
+		&& ($_FILES[$index_name]['name'] != '' || is_array($_FILES[$index_name]['name']) && count($_FILES[$index_name]['name']) > 0)
+	) {
 		if (!is_array($_FILES[$index_name]['name'])) {
 			$_FILES[$index_name]['name'] = [$_FILES[$index_name]['name']];
 			$_FILES[$index_name]['type'] = [$_FILES[$index_name]['type']];
@@ -74,8 +79,10 @@ function handle_timesheets_attachments_array($staffid, $index_name = 'attachment
 
 			// Make sure we have a filepath
 			if (!empty($tmpFilePath) && $tmpFilePath != '') {
-				if (_perfex_upload_error($_FILES[$index_name]['error'][$i])
-					|| !_upload_extension_allowed($_FILES[$index_name]['name'][$i])) {
+				if (
+					_perfex_upload_error($_FILES[$index_name]['error'][$i])
+					|| !_upload_extension_allowed($_FILES[$index_name]['name'][$i])
+				) {
 					continue;
 				}
 
@@ -115,31 +122,32 @@ function handle_timesheets_attachments_array($staffid, $index_name = 'attachment
  * @param  string $replace_0
  * @return
  */
-function render_timesheets_yes_no_option($option_value, $label, $tooltip = '', $replace_yes_text = '', $replace_no_text = '', $replace_1 = '', $replace_0 = '') {
-	ob_start();?>
-    <div class="form-group">
-        <label for="<?php echo html_entity_decode($option_value); ?>" class="control-label clearfix">
-            <?php echo ($tooltip != '' ? '<i class="fa fa-question-circle" data-toggle="tooltip" data-title="' . _l($tooltip, '', false) . '"></i> ' : '') . _l($label, '', false); ?>
-        </label>
-        <div class="radio radio-primary radio-inline">
-            <input type="radio" id="y_opt_1_<?php echo html_entity_decode($label); ?>" name="timesheets_setting[<?php echo html_entity_decode($option_value); ?>]" value="<?php echo html_entity_decode($replace_1) == '' ? 1 : $replace_1; ?>" <?php if (get_timesheets_option($option_value) == ($replace_1 == '' ? '1' : $replace_1)) {
-		echo 'checked';
-	}?>>
-            <label for="y_opt_1_<?php echo html_entity_decode($label); ?>">
-                <?php echo html_entity_decode($replace_yes_text) == '' ? _l('settings_yes') : $replace_yes_text; ?>
-            </label>
-        </div>
-        <div class="radio radio-primary radio-inline">
-            <input type="radio" id="y_opt_2_<?php echo html_entity_decode($label); ?>" name="timesheets_setting[<?php echo html_entity_decode($option_value); ?>]" value="<?php echo html_entity_decode($replace_0) == '' ? 0 : $replace_0; ?>" <?php if (get_timesheets_option($option_value) == ($replace_0 == '' ? '0' : $replace_0)) {
-		echo 'checked';
-	}?>>
-            <label for="y_opt_2_<?php echo html_entity_decode($label); ?>">
-                <?php echo html_entity_decode($replace_no_text) == '' ? _l('settings_no') : $replace_no_text; ?>
-            </label>
-        </div>
-    </div>
-    <?php
-$settings = ob_get_contents();
+function render_timesheets_yes_no_option($option_value, $label, $tooltip = '', $replace_yes_text = '', $replace_no_text = '', $replace_1 = '', $replace_0 = '')
+{
+	ob_start(); ?>
+	<div class="form-group">
+		<label for="<?php echo html_entity_decode($option_value); ?>" class="control-label clearfix">
+			<?php echo ($tooltip != '' ? '<i class="fa fa-question-circle" data-toggle="tooltip" data-title="' . _l($tooltip, '', false) . '"></i> ' : '') . _l($label, '', false); ?>
+		</label>
+		<div class="radio radio-primary radio-inline">
+			<input type="radio" id="y_opt_1_<?php echo html_entity_decode($label); ?>" name="timesheets_setting[<?php echo html_entity_decode($option_value); ?>]" value="<?php echo html_entity_decode($replace_1) == '' ? 1 : $replace_1; ?>" <?php if (get_timesheets_option($option_value) == ($replace_1 == '' ? '1' : $replace_1)) {
+																																																													echo 'checked';
+																																																												} ?>>
+			<label for="y_opt_1_<?php echo html_entity_decode($label); ?>">
+				<?php echo html_entity_decode($replace_yes_text) == '' ? _l('settings_yes') : $replace_yes_text; ?>
+			</label>
+		</div>
+		<div class="radio radio-primary radio-inline">
+			<input type="radio" id="y_opt_2_<?php echo html_entity_decode($label); ?>" name="timesheets_setting[<?php echo html_entity_decode($option_value); ?>]" value="<?php echo html_entity_decode($replace_0) == '' ? 0 : $replace_0; ?>" <?php if (get_timesheets_option($option_value) == ($replace_0 == '' ? '0' : $replace_0)) {
+																																																													echo 'checked';
+																																																												} ?>>
+			<label for="y_opt_2_<?php echo html_entity_decode($label); ?>">
+				<?php echo html_entity_decode($replace_no_text) == '' ? _l('settings_no') : $replace_no_text; ?>
+			</label>
+		</div>
+	</div>
+<?php
+	$settings = ob_get_contents();
 	ob_end_clean();
 	echo html_entity_decode($settings);
 }
@@ -149,7 +157,8 @@ $settings = ob_get_contents();
  * @param  int $value
  * @return
  */
-function timesheets_reformat_currency_asset($value) {
+function timesheets_reformat_currency_asset($value)
+{
 	return str_replace(',', '', $value);
 }
 
@@ -158,33 +167,34 @@ function timesheets_reformat_currency_asset($value) {
  * @param  int $id
  * @return
  */
-function get_type_of_leave_name($id) {
+function get_type_of_leave_name($id)
+{
 	$name = '';
 	switch ($id) {
-	case 1:
-		$name = _l('sick_leave');
-		break;
-	case 2:
-		$name = _l('maternity_leave');
-		break;
-	case 3:
-		$name = _l('private_work_with_pay');
-		break;
-	case 4:
-		$name = _l('private_work_without_pay');
-		break;
-	case 5:
-		$name = _l('child_sick');
-		break;
-	case 6:
-		$name = _l('power_outage');
-		break;
-	case 7:
-		$name = _l('meeting_or_studying');
-		break;
-	case 8:
-		$name = _l('annual_leave');
-		break;
+		case 1:
+			$name = _l('sick_leave');
+			break;
+		case 2:
+			$name = _l('maternity_leave');
+			break;
+		case 3:
+			$name = _l('private_work_with_pay');
+			break;
+		case 4:
+			$name = _l('private_work_without_pay');
+			break;
+		case 5:
+			$name = _l('child_sick');
+			break;
+		case 6:
+			$name = _l('power_outage');
+			break;
+		case 7:
+			$name = _l('meeting_or_studying');
+			break;
+		case 8:
+			$name = _l('annual_leave');
+			break;
 	}
 	return $name;
 }
@@ -194,7 +204,8 @@ function get_type_of_leave_name($id) {
  * @param  int $id
  * @return
  */
-function handle_requisition_attachments($id) {
+function handle_requisition_attachments($id)
+{
 	if (isset($_FILES['file']) && _perfex_upload_error($_FILES['file']['error'])) {
 		header('HTTP/1.0 400 Bad error');
 		echo _perfex_upload_error($_FILES['file']['error']);
@@ -231,7 +242,8 @@ if (!function_exists('add_timesheets_email_templates')) {
 	 * Init appointly email templates and assign languages
 	 * @return void
 	 */
-	function add_timesheets_email_templates() {
+	function add_timesheets_email_templates()
+	{
 		$CI = &get_instance();
 
 		$data['timesheets_attendance_mgt_templates'] = $CI->emails_model->get(['type' => 'timesheets_attendance_mgt', 'language' => 'english']);
@@ -246,7 +258,8 @@ if (!function_exists('add_timesheets_email_templates')) {
  * @param  string $header
  * @return string
  */
-function crawl_get(&$curl, $link, $header = null) {
+function crawl_get(&$curl, $link, $header = null)
+{
 	$cookie_file = dirname(__FILE__) . '/' . 'cookie.txt';
 	curl_setopt($curl, CURLOPT_URL, $link);
 	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -272,7 +285,8 @@ function crawl_get(&$curl, $link, $header = null) {
  * @param  string
  * @return json
  */
-function address2geo($address) {
+function address2geo($address)
+{
 	$googlemap_api_key = '';
 	$api_key = get_timesheets_option('googlemap_api_key');
 	if ($api_key) {
@@ -292,7 +306,8 @@ function address2geo($address) {
  * @param  $workplace_id
  * @return string $name
  */
-function get_workplace_name($workplace_id) {
+function get_workplace_name($workplace_id)
+{
 	$CI = &get_instance();
 	$data = $CI->timesheets_model->get_workplace($workplace_id);
 	$name = '';
@@ -306,7 +321,8 @@ function get_workplace_name($workplace_id) {
  * list timesheet permisstion
  * @return [type]
  */
-function list_timesheet_permisstion() {
+function list_timesheet_permisstion()
+{
 	$timesheet_permission = [];
 	// Attendance
 	$timesheet_permission[] = 'attendance_management';
@@ -334,7 +350,8 @@ function list_timesheet_permisstion() {
  * timesheet get staff id permissions
  * @return array
  */
-function timesheet_get_staff_id_permissions() {
+function timesheet_get_staff_id_permissions()
+{
 	$CI = &get_instance();
 	$array_staff_id = [];
 	$index = 0;
@@ -346,7 +363,6 @@ function timesheet_get_staff_id_permissions() {
 		} else {
 			$str_permissions .= "'" . $per_value . "'";
 		}
-
 	}
 
 	$sql_where = "SELECT distinct staff_id FROM " . db_prefix() . "staff_permissions
@@ -368,14 +384,14 @@ function timesheet_get_staff_id_permissions() {
  * get staff id not permissions
  * @return array
  */
-function timesheet_get_staff_id_not_permissions() {
+function timesheet_get_staff_id_not_permissions()
+{
 	$CI = &get_instance();
 	$CI->db->where('admin != ', 1);
 	if (count(timesheet_get_staff_id_permissions()) > 0) {
 		$CI->db->where_not_in('staffid', timesheet_get_staff_id_permissions());
 	}
 	return $CI->db->get(db_prefix() . 'staff')->result_array();
-
 }
 
 /**
@@ -383,7 +399,8 @@ function timesheet_get_staff_id_not_permissions() {
  * @param  string $module_name
  * @return boolean
  */
-function timesheet_get_status_modules($module_name) {
+function timesheet_get_status_modules($module_name)
+{
 	$CI = &get_instance();
 
 	$sql = 'select * from ' . db_prefix() . 'modules where module_name = "' . $module_name . '" AND active =1 ';
@@ -401,7 +418,8 @@ function timesheet_get_status_modules($module_name) {
  * @param  string $and
  * @return string
  */
-function timesheet_staff_manager_query($permission, $column = 'staffid', $and = 'AND') {
+function timesheet_staff_manager_query($permission, $column = 'staffid', $and = 'AND')
+{
 	$query = '';
 	$CI = &get_instance();
 	if (!is_admin() && !has_permission($permission, '', 'view')) {
@@ -422,7 +440,8 @@ function timesheet_staff_manager_query($permission, $column = 'staffid', $and = 
 }
 if (!function_exists('cal_days_in_month')) {
 	define('CAL_GREGORIAN', 0);
-	function cal_days_in_month($calendar, $month, $year) {
+	function cal_days_in_month($calendar, $month, $year)
+	{
 		return date('t', mktime(0, 0, 0, $month, 1, $year));
 	}
 }
@@ -430,7 +449,8 @@ if (!function_exists('cal_days_in_month')) {
  * get client IP
  * @return string
  */
-function get_client_ip() {
+function get_client_ip()
+{
 	//whether ip is from the share internet
 	$ip = '';
 	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -442,44 +462,66 @@ function get_client_ip() {
 	}
 	return $ip;
 }
-	/**
-	 * get staff department names
-	 * @param  integer $staffid 
-	 * @return string          
-	 */
-	function ts_get_staff_department_names($staffid)
-	{
-		$list_department='';
-		$CI = & get_instance();
-		$arr_department = $CI->timesheets_model->get_staff_departments($staffid, true);
-		if(count($arr_department) > 0){
-			foreach ($arr_department as $key => $department) {
-				$department_value   = $CI->departments_model->get($department);
+/**
+ * get staff department names
+ * @param  integer $staffid 
+ * @return string          
+ */
+function ts_get_staff_department_names($staffid)
+{
+	$list_department = '';
+	$CI = &get_instance();
+	$arr_department = $CI->timesheets_model->get_staff_departments($staffid, true);
+	if (count($arr_department) > 0) {
+		foreach ($arr_department as $key => $department) {
+			$department_value   = $CI->departments_model->get($department);
 
-				if($department_value){
-					if(strlen($list_department) != 0){
-						$list_department .= ';'.$department_value->name;
-					}else{
-						$list_department .= $department_value->name;
-					}
+			if ($department_value) {
+				if (strlen($list_department) != 0) {
+					$list_department .= ';' . $department_value->name;
+				} else {
+					$list_department .= $department_value->name;
 				}
 			}
 		}
-		return $list_department;
 	}
-	/**
-	 * html decode
-	 */
-	function ts_htmldecode($string){
-		return html_entity_decode($string ?? '');
-	}
-	/**
-	 * trim
-	 */
-	function ts_trim($string){
-		return trim($string ?? '');
-	}
+	return $list_department;
+}
+/**
+ * html decode
+ */
+function ts_htmldecode($string)
+{
+	return html_entity_decode($string ?? '');
+}
+/**
+ * trim
+ */
+function ts_trim($string)
+{
+	return trim($string ?? '');
+}
 
-	function ts_htmlspecialchars($string){
-		return htmlspecialchars($string ?? '');
+function ts_htmlspecialchars($string)
+{
+	return htmlspecialchars($string ?? '');
+}
+
+function get_staff_id($staff_code)
+{
+	$CI = &get_instance();
+
+	// Using query bindings for security
+	$sql = "SELECT id FROM " . db_prefix() . "staff WHERE staff_identifi = ? AND active = 1";
+	$query = $CI->db->query($sql, array($staff_code));
+
+	// Get the first row from the result
+	$row = $query->row();
+
+	if ($row) {
+		// Return only the id value
+		return $row->id;
+	} else {
+		return false;
 	}
+}
