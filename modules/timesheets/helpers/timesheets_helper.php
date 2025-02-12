@@ -512,7 +512,7 @@ function get_staff_id($staff_code)
 	$CI = &get_instance();
 
 	// Using query bindings for security
-	$sql = "SELECT id FROM " . db_prefix() . "staff WHERE staff_identifi = ? AND active = 1";
+	$sql = "SELECT staffid FROM " . db_prefix() . "staff WHERE staff_identifi = ? AND active = 1";
 	$query = $CI->db->query($sql, array($staff_code));
 
 	// Get the first row from the result
@@ -520,7 +520,7 @@ function get_staff_id($staff_code)
 
 	if ($row) {
 		// Return only the id value
-		return $row->id;
+		return $row->staffid;
 	} else {
 		return false;
 	}
