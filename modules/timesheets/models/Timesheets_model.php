@@ -2567,6 +2567,14 @@ class timesheets_model extends app_model
 	 */
 	public function check_in($data)
 	{
+		if($data['not_api'] == 0){
+			$this->load->model('staff_model');
+			$get_staff_id =  $this->staff_model->get($data['staff_id'], ['active' => 1]);
+			echo '<pre>';
+			print_r($get_staff_id);
+			die;
+		}
+		unset($data['not_api']);
 		// Check valid IP 
 		$enable_check_valid_ip = get_timesheets_option('timekeeping_enable_valid_ip');
 		if ($enable_check_valid_ip && $enable_check_valid_ip == 1) {

@@ -193,14 +193,15 @@ class Api_timesheets extends API_timesheets_Controller {
 			$this->load->helper('timesheets');
 			$this->load->helper('email_templates');
 			$this->load->model('departments_model');
-			$type = $this->input->post('type_check', TRUE);
+			$type = $this->input->post('type_check', TRUE); 
 			$payload = [
 				'staff_id' => $this->input->post('staff_id', TRUE),
 				'type_check' => $type,
 				'edit_date' => $this->input->post('edit_date', TRUE),
 				'point_id' => $this->input->post('point_id', TRUE),
 				'location_user' => $this->input->post('location_user', TRUE),
-				'ip_address' => $this->input->post('ip_address', TRUE)
+				'ip_address' => $this->input->post('ip_address', TRUE),
+				'not_api' => 0
 			];
 			$re = $this->timesheets_model->check_in($payload);
 			if (is_numeric($re)) {
