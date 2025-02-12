@@ -2566,10 +2566,12 @@ class timesheets_model extends app_model
 	 * @return integer
 	 */
 	public function check_in($data)
-	{
+	{	
+		$this->load->model('staff_model');
 		if($data['not_api'] == 0){
-			$this->load->model('staff_model');
+			
 			$get_staff_id =  $this->staff_model->get($data['staff_id'], ['active' => 1]);
+			var_dump($get_staff_id);
 			echo '<pre>';
 			print_r($get_staff_id);
 			die;
