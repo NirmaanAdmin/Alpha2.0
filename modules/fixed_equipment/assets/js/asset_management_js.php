@@ -100,6 +100,48 @@
 					break;
 			}
 		});
+		// Listen for bulk checkout radio button clicks
+		$('input[name="checkout_to_bulk"]').click(function() {
+			$('.checkout_bulk_to_fr').addClass('hide');
+			var val = $(this).val();
+			switch (val) {
+				case 'user':
+					$('.checkout_to_bulk_staff_fr').removeClass('hide');
+					appValidateForm($('#bulk_checkout_form'), {
+						'staff_id': 'required',
+						'status': 'required'
+					});
+					break;
+				case 'asset':
+					$('.checkout_to_asset_fr').removeClass('hide');
+					appValidateForm($('#bulk_checkout_form'), {
+						'asset_id': 'required',
+						'status': 'required'
+					});
+					break;
+				case 'location':
+					$('.checkout_to_location_fr').removeClass('hide');
+					appValidateForm($('#bulk_checkout_form'), {
+						'location_id': 'required',
+						'status': 'required'
+					});
+					break;
+				case 'customer':
+					$('.checkout_to_customer_fr').removeClass('hide');
+					appValidateForm($('#bulk_checkout_form'), {
+						'customer_id': 'required',
+						'status': 'required'
+					});
+					break;
+				case 'project':
+					$('.checkout_to_project_fr').removeClass('hide');
+					appValidateForm($('#bulk_checkout_form'), {
+						'project_id': 'required',
+						'status': 'required'
+					});
+					break;
+			}
+		});
 
 		$(document).on("change", 'select[name="model_id"]', function() {
 			var id = $(this).val();

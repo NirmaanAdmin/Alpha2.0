@@ -245,62 +245,65 @@
             <label for="location" class="control-label"><?php echo _l('fe_checkout_to'); ?></label>
           </div>
           <div class="col-md-12">
-
             <div class="pull-left">
               <div class="checkbox">
-                <input type="radio" name="checkout_to" id="checkout_to_user" value="user" checked>
-                <label for="checkout_to_user"><?php echo _l('fe_staffs'); ?></label>
+                <input type="radio" name="checkout_to_bulk" id="checkout_to_user_bulk" value="user" checked>
+                <label for="checkout_to_user_bulk"><?php echo _l('fe_staffs'); ?></label>
               </div>
             </div>
-            <!-- <div class="pull-left">
-              <div class="checkbox">
-                <input type="radio" name="checkout_to" id="checkout_to_customer" value="customer">
-                <label for="checkout_to_customer"><?php echo _l('fe_customer'); ?></label>
-              </div>
-            </div> -->
+            <!-- Uncomment if needed -->
+            <!--
             <div class="pull-left">
               <div class="checkbox">
-                <input type="radio" name="checkout_to" id="checkout_to_asset" value="asset">
-                <label for="checkout_to_asset"><?php echo _l('fe_asset'); ?></label>
+                <input type="radio" name="checkout_to_bulk" id="checkout_to_customer_bulk" value="customer">
+                <label for="checkout_to_customer_bulk"><?php echo _l('fe_customer'); ?></label>
               </div>
             </div>
+            -->
             <div class="pull-left">
               <div class="checkbox">
-                <input type="radio" name="checkout_to" id="checkout_to_location" value="location">
-                <label for="checkout_to_location"><?php echo _l('fe_location'); ?></label>
+                <input type="radio" name="checkout_to_bulk" id="checkout_to_asset_bulk" value="asset">
+                <label for="checkout_to_asset_bulk"><?php echo _l('fe_asset'); ?></label>
               </div>
             </div>
             <div class="pull-left">
               <div class="checkbox">
-                <input type="radio" name="checkout_to" id="checkout_to_project" value="project">
-                <label for="checkout_to_project"><?php echo _l('fe_project'); ?></label>
+                <input type="radio" name="checkout_to_bulk" id="checkout_to_location_bulk" value="location">
+                <label for="checkout_to_location_bulk"><?php echo _l('fe_location'); ?></label>
+              </div>
+            </div>
+            <div class="pull-left">
+              <div class="checkbox">
+                <input type="radio" name="checkout_to_bulk" id="checkout_to_project_bulk" value="project">
+                <label for="checkout_to_project_bulk"><?php echo _l('fe_project'); ?></label>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Conditional fields that are shown based on the selected option -->
         <div class="row">
-          <div class="col-md-12 checkout_to_fr checkout_to_location_fr hide">
+          <div class="col-md-12 checkout_bulk_to_fr checkout_to_location_fr hide">
             <?php echo render_select('location_id', $locations, array('id', 'location_name'), 'fe_location'); ?>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12 checkout_to_fr checkout_to_asset_fr hide">
+          <div class="col-md-12 checkout_bulk_to_fr checkout_to_asset_fr hide">
             <?php echo render_select('asset_id', $assets, array('id', array('series', 'assets_name')), 'fe_asset'); ?>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12 checkout_to_fr checkout_to_customer_fr hide">
+          <div class="col-md-12 checkout_bulk_to_fr checkout_to_customer_fr hide">
             <?php echo render_select('customer_id', $customers, array('userid', 'company'), 'fe_customer'); ?>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12 checkout_to_fr checkout_to_staff_fr">
+          <div class="col-md-12 checkout_bulk_to_fr checkout_to_bulk_staff_fr">
             <?php echo render_select('staff_id', $staffs, array('staffid', array('firstname', 'lastname')), 'fe_staff'); ?>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12 checkout_to_fr checkout_to_project_fr">
+          <div class="col-md-12 checkout_bulk_to_fr checkout_to_project_fr">
             <?php echo render_select('project_id', $projects, array('id', array('name', 'project_created')), 'fe_project'); ?>
           </div>
         </div>

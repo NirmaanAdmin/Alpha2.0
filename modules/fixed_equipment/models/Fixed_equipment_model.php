@@ -12813,6 +12813,9 @@ class fixed_equipment_model extends app_model
 	 */
 	public function bulk_checkout_assets($data)
 	{
+
+		$data['checkout_to'] = $data['checkout_to_bulk'];
+		unset($data['checkout_to_bulk']);
 		$consumable_quantity = '';
 
 		if ($data['consumable_quantity'] != '') {
