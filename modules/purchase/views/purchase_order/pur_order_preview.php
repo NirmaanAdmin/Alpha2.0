@@ -355,7 +355,11 @@
                                   ?></p>
                                  <?php if($value['approve'] == 2){ 
                                   ?>
-                                  <img src="<?php echo site_url(PURCHASE_PATH.'approval/approved.png'); ?>" class="img_style">
+                                  <?php if(is_admin($value['staffid'])) { ?>
+                                    <img src="<?php echo site_url(PURCHASE_PATH.'approval/approved_by_admin.png'); ?>" class="img_style">
+                                  <?php } else { ?>
+                                    <img src="<?php echo site_url(PURCHASE_PATH.'approval/approved_by_admin.png'); ?>" class="img_style">
+                                  <?php } ?>
                                  <?php }elseif($value['approve'] == 3){ ?>
                                     <img src="<?php echo site_url(PURCHASE_PATH.'approval/rejected.png'); ?>" class="img_style">
                                 <?php } ?> 
