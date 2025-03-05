@@ -354,7 +354,7 @@
                                   ?></p>
                                  <?php if($value['approve'] == 2){ 
                                   ?>
-                                  <?php if(is_admin($value['staffid'])) { ?>
+                                  <?php if($value['approve_by_admin'] == 1) { ?>
                                     <img src="<?php echo site_url(PURCHASE_PATH.'approval/approved_by_admin.png'); ?>" class="img_style">
                                   <?php } else { ?>
                                     <img src="<?php echo site_url(PURCHASE_PATH.'approval/approved.png'); ?>" class="img_style">
