@@ -1535,9 +1535,10 @@ class Purchase_model extends App_Model
         if ($status == 2) {
             $this->update_item_pur_request($id);
         }
-
+        
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_request', ['status' => $status]);
+      
         if ($this->db->affected_rows() > 0) {
             if ($status == 2 || $status == 3) {
                 // $this->send_mail_to_sender('purchase_request', $status, $id);
@@ -1554,13 +1555,12 @@ class Purchase_model extends App_Model
                 $this->db->insert(db_prefix() . 'cron_email', $cron_email);
             }
         }
-
+        
         if ($status == 2) {
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'pur_request');
             $this->db->where('staffid', get_staff_user_id());
             $this->db->update(db_prefix() . 'pur_approval_details', ['approve_by_admin' => 1, 'approve' => 2, 'date' => date('Y-m-d H:i:s')]);
-
             if ($this->db->affected_rows() == 0) {
                 $row = array();
                 $row['approve'] = 2;
@@ -1575,6 +1575,27 @@ class Purchase_model extends App_Model
             }
             return true;
         }
+
+        if ($status == 3) {
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'pur_request');
+            $this->db->where('staffid', get_staff_user_id());
+            $this->db->update(db_prefix() . 'pur_approval_details', ['rejected_by_admin' => 1, 'approve' => 3, 'date' => date('Y-m-d H:i:s')]);
+            if ($this->db->affected_rows() == 0) {
+                $row = array();
+                $row['approve'] = 3;
+                $row['action'] = 'approve';
+                $row['staffid'] = get_staff_user_id();
+                $row['date'] = date('Y-m-d H:i:s');
+                $row['date_send'] = date('Y-m-d H:i:s');
+                $row['rel_id'] = $id;
+                $row['rel_type'] = 'pur_request';
+                $row['rejected_by_admin'] = 1;
+                $this->db->insert('tblpur_approval_details', $row);
+            }
+            return true;
+        }
+        
         return false;
     }
 
