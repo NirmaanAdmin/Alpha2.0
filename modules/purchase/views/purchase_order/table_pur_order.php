@@ -242,7 +242,7 @@ foreach ($rResult as $aRow) {
                 $delivery_status = '<span class="inline-block label label-warning" id="status_span_'.$aRow['id'].'" task-status-table="partially_delivered">'._l('partially_delivered');
             }
             
-            if(has_permission('purchase_orders', '', 'edit') || is_admin()){
+            if(false){
                 $delivery_status .= '<div class="dropdown inline-block mleft5 table-export-exclude">';
                 $delivery_status .= '<a href="#" class="dropdown-toggle text-dark" id="tablePurOderStatus-' . $aRow['id'] . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                 $delivery_status .= '<span data-toggle="tooltip" title="' . _l('ticket_single_change_status') . '"><i class="fa fa-caret-down" aria-hidden="true"></i></span>';

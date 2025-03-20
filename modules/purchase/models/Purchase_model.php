@@ -14304,4 +14304,53 @@ class Purchase_model extends App_Model
         $this->db->delete(db_prefix() . 'cron_email');
         return true;
     }
+
+    public function update_delivery_status()
+    {
+        $this->db->select('id');
+        $pur_orders = $this->db->get(db_prefix() . 'pur_orders')->result_array();
+
+        if(!empty($pur_orders)) {
+            foreach ($pur_orders as $key => $value) {
+                $delivery_status = 0;
+                $pur_order_qty = 0;
+
+                $this->db->select_sum('quantity');
+                $this->db->where('pur_order', $value['id']);
+                $pur_order_detail = $this->db->get(db_prefix() . 'pur_order_detail')->row();
+                
+                $pur_order_qty = !empty($pur_order_detail->quantity) ? $pur_order_detail->quantity : 0;
+
+                $this->db->select('id');
+                $this->db->where('pr_order_id', $value['id']);
+                $goods_receipt = $this->db->get(db_prefix() . 'goods_receipt')->result_array();
+
+                if(!empty($goods_receipt)) {
+                    $goods_receipt = implode(',', array_column($goods_receipt, 'id'));
+                    $goods_receipt = explode(",", $goods_receipt);
+
+                    $this->db->select_sum('quantities');
+                    $this->db->where_in('goods_receipt_id', $goods_receipt);
+                    $goods_receipt_detail = $this->db->get(db_prefix() . 'goods_receipt_detail')->row();
+
+                    $goods_receipt_qty = !empty($goods_receipt_detail->quantities) ? $goods_receipt_detail->quantities : 0;
+
+                    if($pur_order_qty == 0 && $goods_receipt_qty == 0) {
+                        $delivery_status = 0;
+                    } else if($pur_order_qty > $goods_receipt_qty) {
+                        $delivery_status = 3;
+                    } else if($pur_order_qty < $goods_receipt_qty) {
+                        $delivery_status = 1;
+                    } else if($pur_order_qty == $goods_receipt_qty) {
+                        $delivery_status = 1;
+                    }
+
+                    $this->db->where('id', $value['id']);
+                    $this->db->update(db_prefix() . 'pur_orders', ['delivery_status' => $delivery_status]);
+                }
+            }
+        }
+
+        return true;
+    }
 }
