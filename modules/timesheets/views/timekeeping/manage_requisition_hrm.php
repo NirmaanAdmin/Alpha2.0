@@ -501,6 +501,7 @@ $valid_cur_date = $this->timesheets_model->get_next_shift_date(get_staff_user_id
             <!-- Leave type options will be populated dynamically -->
             <option value="">Select Option</option>
             <option value="1"><?php echo _l('sick_leave') ?>(SL)</option>
+            <option value="4">Leave Without Pay(LWP)</option>
             <?php foreach ($type_of_leave as $leave) { ?>
               <option value="<?php echo $leave['slug']; ?>"><?php echo $leave['type_name']; ?></option>
             <?php } ?>

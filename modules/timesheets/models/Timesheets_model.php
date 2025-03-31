@@ -2566,14 +2566,14 @@ class timesheets_model extends app_model
 	 * @return integer
 	 */
 	public function check_in($data)
-	{	
-		
-		if($data['not_api'] == 0){			
+	{
+
+		if ($data['not_api'] == 0) {
 			$get_staff_id =  get_staff_id($data['staff_id']);
 			$data['staff_id'] =  $get_staff_id;
 		}
 		unset($data['not_api']);
-		
+
 		// Check valid IP 
 		$enable_check_valid_ip = get_timesheets_option('timekeeping_enable_valid_ip');
 		if ($enable_check_valid_ip && $enable_check_valid_ip == 1) {
@@ -7882,7 +7882,7 @@ class timesheets_model extends app_model
 		$this->load->model('staff_model');
 
 		$staff_ids = []; // Store multiple IDs if applicable
-		
+
 		if ($approve_value == 'head_of_department') {
 			$department_info = $this->departments_model->get_staff_departments($data->staff_addedfrom);
 
@@ -7890,16 +7890,16 @@ class timesheets_model extends app_model
 				$staff_ids[] = $department_info[0]['manager_id'];
 			}
 		} elseif ($approve_value == 'direct_manager') {
-			
+
 			$team_manage = get_team_manage($data->staff_addedfrom);
-			
+
 			if (!empty($team_manage)) {
 				foreach ($team_manage as $team_member) {
 					$staff_ids[] = $team_member['team_manage_id']; // Extract all team managers
 				}
 			}
 		}
-		
+
 		return $staff_ids; // Return an array of IDs (can be single or multiple)
 	}
 
@@ -8855,32 +8855,38 @@ class timesheets_model extends app_model
 	public function update_leave($data)
 	{
 		if (!empty($data)) {
+			if ($data['leave_type'] != 4) {
 
-			// Calculate the number of days between the start and end dates
-			$startDate = new DateTime($data['update_start_time']);
-			$endDate = new DateTime($data['update_end_time']);
-			$daysRequested = $endDate->diff($startDate)->days + 1; // Include the start date
+				// Calculate the number of days between the start and end dates
+				$startDate = new DateTime($data['update_start_time']);
+				$endDate = new DateTime($data['update_end_time']);
+				$daysRequested = $endDate->diff($startDate)->days + 1; // Include the start date
 
-			// Get the staff's remaining leave balance for the type of leave being updated
-			$this->db->where('staffid', $data['update_staff_id']);
-			$this->db->where('year', date('Y')); // Current year
-			$this->db->where('type_of_leave', $data['leave_type']);
-			$leaveBalance = $this->db->get('tbltimesheets_day_off')->row_array();
+				// Get the staff's remaining leave balance for the type of leave being updated
+				$this->db->where('staffid', $data['update_staff_id']);
+				$this->db->where('year', date('Y')); // Current year
+				$this->db->where('type_of_leave', $data['leave_type']);
+				$leaveBalance = $this->db->get('tbltimesheets_day_off')->row_array();
 
-			// Check if the leave balance exists and is sufficient
-			if (!$leaveBalance || $leaveBalance['remain'] < $daysRequested) {
-				return false;
+				// Check if the leave balance exists and is sufficient
+				if (!$leaveBalance || $leaveBalance['remain'] < $daysRequested) {
+					return false;
+				}
+
+				// Deduct the requested days from the remaining leave balance
+				$newRemain = $leaveBalance['remain'] - $daysRequested;
+
+				// Update the leave balance
+				$this->db->where('id', $leaveBalance['id']);
+				$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain, 'days_off' => $leaveBalance['days_off'] + $daysRequested]);
 			}
 
-			// Deduct the requested days from the remaining leave balance
-			$newRemain = $leaveBalance['remain'] - $daysRequested;
-
-			// Update the leave balance
-			$this->db->where('id', $leaveBalance['id']);
-			$this->db->update('tbltimesheets_day_off', ['remain' => $newRemain, 'days_off' => $leaveBalance['days_off'] + $daysRequested]);
 			if ($data['leave_type'] == 1) {
 				$data['leave_type'] = 'sick_leave';
 				$type_of_leave = 1;
+			} elseif ($data['leave_type'] == 4) {
+				$data['leave_type'] = 'private_work_without_pay';
+				$type_of_leave = 4;
 			} else {
 				$data['leave_type'] = $data['leave_type'];
 				$type_of_leave = 0;
