@@ -4,19 +4,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /**
  * timesheets
  */
-class timesheets extends AdminController {
-	public function __construct() {
+class timesheets extends AdminController
+{
+	public function __construct()
+	{
 		parent::__construct();
 		$this->load->model('timesheets_model');
 		$this->load->model('departments_model');
-		hooks()->do_action('timesheets_init'); 
-		if(!class_exists('qrstr')){
-			include_once(TIMESHEETS_PATH_PLUGIN.'/phpqrcode/qrlib.php');		
+		hooks()->do_action('timesheets_init');
+		if (!class_exists('qrstr')) {
+			include_once(TIMESHEETS_PATH_PLUGIN . '/phpqrcode/qrlib.php');
 		}
 	}
 
 	/* List all announcements */
-	public function index() {
+	public function index()
+	{
 		if (!has_permission('timesheets_dashboard', '', 'view')) {
 			access_denied('timesheets');
 		}
@@ -30,7 +33,8 @@ class timesheets extends AdminController {
 	 * setting
 	 * @return
 	 */
-	public function setting() {
+	public function setting()
+	{
 		if (!has_permission('timesheet_settings', '', 'view')) {
 			access_denied('timesheets');
 		}
@@ -131,7 +135,8 @@ class timesheets extends AdminController {
 	 * leave
 	 * @return view
 	 */
-	public function leave() {
+	public function leave()
+	{
 		$data['title'] = _l('manage_leave');
 
 		$data['positions'] = $this->timesheets_model->get_job_position();
@@ -148,7 +153,8 @@ class timesheets extends AdminController {
 	 * table leave
 	 * @return view
 	 */
-	public function table_leave() {
+	public function table_leave()
+	{
 
 		$this->app->get_table_data(module_views_path('timesheets', 'table_leave'));
 	}
@@ -159,7 +165,8 @@ class timesheets extends AdminController {
 	 * @param  int $rel_id
 	 * @return view
 	 */
-	public function timesheets_file($id, $rel_id) {
+	public function timesheets_file($id, $rel_id)
+	{
 		$data['discussion_user_profile_image_url'] = staff_profile_image_url(get_staff_user_id());
 		$data['current_user_is_admin'] = is_admin();
 		$data['file'] = $this->timesheets_model->get_file($id, $rel_id);
@@ -174,7 +181,8 @@ class timesheets extends AdminController {
 	 * get staff role
 	 * @return json
 	 */
-	public function get_staff_role() {
+	public function get_staff_role()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 
@@ -193,7 +201,8 @@ class timesheets extends AdminController {
 	 * timekeeping
 	 * @return view
 	 */
-	public function timekeeping() {
+	public function timekeeping()
+	{
 		if (!(has_permission('attendance_management', '', 'view_own') || has_permission('attendance_management', '', 'view') || is_admin())) {
 			access_denied('timekeeping');
 		}
@@ -247,10 +256,11 @@ class timesheets extends AdminController {
 		$data['set_col_tk'] = json_encode($data['set_col_tk']);
 		$this->load->view('timekeeping/manage_timekeeping', $data);
 	}
-/**
- * add or update day off
- */
-	public function day_off() {
+	/**
+	 * add or update day off
+	 */
+	public function day_off()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (!$this->input->post('id')) {
@@ -276,7 +286,8 @@ class timesheets extends AdminController {
 	 * delete day off
 	 * @param  int $id
 	 */
-	public function delete_day_off($id) {
+	public function delete_day_off($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/setting?group=manage_dayoff'));
 		}
@@ -293,7 +304,8 @@ class timesheets extends AdminController {
 	/**
 	 * add or edit shifts
 	 */
-	public function shifts() {
+	public function shifts()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if ($data['id'] == '') {
@@ -317,7 +329,8 @@ class timesheets extends AdminController {
 	 * get_data_edit_shift
 	 * @param int $id
 	 */
-	public function get_data_edit_shift($id) {
+	public function get_data_edit_shift($id)
+	{
 		$shift_handson = $this->timesheets_model->get_data_edit_shift($id);
 		$result = [];
 		$node = [];
@@ -350,7 +363,8 @@ class timesheets extends AdminController {
 	 * delete shift
 	 * @param int $id
 	 */
-	public function delete_shift($id) {
+	public function delete_shift($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/shift_management'));
 		}
@@ -367,7 +381,8 @@ class timesheets extends AdminController {
 	/**
 	 * manage timesheets
 	 */
-	public function manage_timesheets() {
+	public function manage_timesheets()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (isset($data)) {
@@ -474,7 +489,8 @@ class timesheets extends AdminController {
 	 * approval status
 	 * @return json
 	 */
-	public function approval_status() {
+	public function approval_status()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$data = $this->input->post();
@@ -495,13 +511,13 @@ class timesheets extends AdminController {
 				}
 			}
 		}
-
 	}
 	/**
 	 * reload timesheets byfilter
 	 * @return json
 	 */
-	public function reload_timesheets_byfilter() {
+	public function reload_timesheets_byfilter()
+	{
 		$data = $this->input->post();
 		$date_ts = $this->timesheets_model->format_date($data['month'] . '-01');
 		$date_ts_end = $this->timesheets_model->format_date($data['month'] . '-' . date('t'));
@@ -574,7 +590,6 @@ class timesheets extends AdminController {
 					}
 				}
 			}
-
 		}
 
 		$arrQuery = array($staff_querystring, $department_querystring, $month_year_querystring, $job_position_querystring, $querystring);
@@ -659,10 +674,11 @@ class timesheets extends AdminController {
 		die;
 	}
 
-/**
- * add requisition ajax
- */
-	public function add_requisition_ajax() {
+	/**
+	 * add requisition ajax
+	 */
+	public function add_requisition_ajax()
+	{
 		if ($_FILES['file']['name'] != '') {
 			$_FILES = $_FILES;
 		} else {
@@ -696,18 +712,18 @@ class timesheets extends AdminController {
 			$rel_type = '';
 			if ($data['rel_type'] == '1') {
 				switch ($data['type_of_leave']) {
-				case 8:
-					$rel_type = 'leave';
-					break;
-				case 2:
-					$rel_type = 'maternity_leave';
-					break;
-				case 4:
-					$rel_type = 'private_work_without_pay';
-					break;
-				case 1:
-					$rel_type = 'sick_leave';
-					break;
+					case 8:
+						$rel_type = 'leave';
+						break;
+					case 2:
+						$rel_type = 'maternity_leave';
+						break;
+					case 4:
+						$rel_type = 'private_work_without_pay';
+						break;
+					case 1:
+						$rel_type = 'sick_leave';
+						break;
 				}
 				// Rel type is custom type
 				if ($rel_type == '') {
@@ -789,36 +805,40 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * table registration leave
- * @return
- */
-	public function table_registration_leave() {
+	/**
+	 * table registration leave
+	 * @return
+	 */
+	public function table_registration_leave()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'table_registration_leave'));
 	}
 
-/**
- * table additional timesheets
- * @return
- */
-	public function table_additional_timesheets() {
+	/**
+	 * table additional timesheets
+	 * @return
+	 */
+	public function table_additional_timesheets()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'timekeeping/table_additional_timesheets'));
 	}
 
-/**
- * get request leave data ajax
- * @return
- */
-	public function get_request_leave_data_ajax() {
+	/**
+	 * get request leave data ajax
+	 * @return
+	 */
+	public function get_request_leave_data_ajax()
+	{
 		$data[] = $this->timesheets_model->get_category_for_leave();
 	}
 
-/**
- * requisition detail
- * @param  int $id
- * @return view
- */
-	public function requisition_detail($id) {
+	/**
+	 * requisition detail
+	 * @param  int $id
+	 * @return view
+	 */
+	public function requisition_detail($id)
+	{
 		if (!(has_permission('leave_management', '', 'view_own') || has_permission('leave_management', '', 'view') || is_admin())) {
 			access_denied('approval_process');
 		}
@@ -846,18 +866,18 @@ class timesheets extends AdminController {
 		$rel_type = '';
 		if ($data['request_leave']->rel_type == 1) {
 			switch ($data['request_leave']->type_of_leave) {
-			case 8:
-				$rel_type = 'Leave';
-				break;
-			case 2:
-				$rel_type = 'maternity_leave';
-				break;
-			case 4:
-				$rel_type = 'private_work_without_pay';
-				break;
-			case 1:
-				$rel_type = 'sick_leave';
-				break;
+				case 8:
+					$rel_type = 'Leave';
+					break;
+				case 2:
+					$rel_type = 'maternity_leave';
+					break;
+				case 4:
+					$rel_type = 'private_work_without_pay';
+					break;
+				case 1:
+					$rel_type = 'sick_leave';
+					break;
 			}
 			if ($rel_type == '') {
 				$rel_type = $data['request_leave']->type_of_leave_text;
@@ -888,12 +908,13 @@ class timesheets extends AdminController {
 		$this->load->view('timesheets/requisition_detail', $data);
 	}
 
-/**
- * delete requisition
- * @param  int $id
- * @return redirect
- */
-	public function delete_requisition($id) {
+	/**
+	 * delete requisition
+	 * @param  int $id
+	 * @return redirect
+	 */
+	public function delete_requisition($id)
+	{
 		$response = $this->timesheets_model->delete_requisition($id);
 		if (is_array($response) && isset($response['referenced'])) {
 			set_alert('warning', _l('is_referenced', _l('lead_source_lowercase')));
@@ -905,12 +926,13 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/requisition_manage'));
 	}
 
-/**
- * infor staff
- * @param  int $id
- * @return data
- */
-	public function infor_staff($id) {
+	/**
+	 * infor staff
+	 * @param  int $id
+	 * @return data
+	 */
+	public function infor_staff($id)
+	{
 		$this->db->select('s.email,r.name as name_role, d.name');
 		$this->db->from('staff as s');
 		$this->db->join('staff_departments as sd', 's.staffid = sd.staffid');
@@ -922,13 +944,14 @@ class timesheets extends AdminController {
 		return $data;
 	}
 
-/**
- * approve request leave
- * @param  int $status
- * @param  int $id
- * @return redirect
- */
-	public function approve_request_leave($status, $id) {
+	/**
+	 * approve request leave
+	 * @param  int $status
+	 * @param  int $id
+	 * @return redirect
+	 */
+	public function approve_request_leave($status, $id)
+	{
 		$result = $this->timesheets_model->approve_request_leave($status, $id);
 		if ($result == 'approved') {
 			set_alert('success', _l('approved') . ' ' . _l('request_leave') . ' ' . _l('successfully'));
@@ -940,13 +963,14 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/requisition_detail/' . $id));
 	}
 
-/**
- * file
- * @param  int $id
- * @param  int $rel_id
- * @return view
- */
-	public function file($id, $rel_id) {
+	/**
+	 * file
+	 * @param  int $id
+	 * @param  int $rel_id
+	 * @return view
+	 */
+	public function file($id, $rel_id)
+	{
 		$data['discussion_user_profile_image_url'] = staff_profile_image_url(get_staff_user_id());
 		$data['current_user_is_admin'] = is_admin();
 		$data['file'] = $this->timesheets_model->get_file($id, $rel_id);
@@ -957,11 +981,12 @@ class timesheets extends AdminController {
 		$this->load->view('_file', $data);
 	}
 
-/**
- * requisition manage
- * @return view
- */
-	public function requisition_manage() {
+	/**
+	 * requisition manage
+	 * @return view
+	 */
+	public function requisition_manage()
+	{
 		if (!(has_permission('leave_management', '', 'view_own') || has_permission('leave_management', '', 'view') || is_admin())) {
 			access_denied('approval_process');
 		}
@@ -982,23 +1007,24 @@ class timesheets extends AdminController {
 		$data['current_date'] = date('Y-m-d H:i:s');
 		$status_leave = $this->timesheets_model->get_option_val();
 		$this->load->model('staff_model');
-		$data['pro'] = $this->staff_model->get('','active = 1');
+		$data['pro'] = $this->staff_model->get('', 'active = 1');
 		$data['tab'] = $this->input->get('tab');
 		$data['title'] = _l('leave');
 		$data['additional_timesheets_id'] = $this->input->get('additional_timesheets_id');
 		$data['additional_timesheets'] = $this->timesheets_model->get_additional_timesheets();
 		$data['type_of_leave'] = $this->timesheets_model->get_type_of_leave();
 		$data['staffs'] = $this->staff_model->get();
- 
+
 		$this->load->view('timesheets/timekeeping/manage_requisition_hrm', $data);
 	}
 
-/**
- * automatic timekeeping
- * @param  $data
- * @return json
- */
-	public function automatic_timekeeping($data) {
+	/**
+	 * automatic timekeeping
+	 * @param  $data
+	 * @return json
+	 */
+	public function automatic_timekeeping($data)
+	{
 
 		$success = $this->timesheets_model->automatic_timekeeping($data);
 
@@ -1014,11 +1040,12 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * setting timekeeper
- * @return redirect
- */
-	public function setting_timekeeper() {
+	/**
+	 * setting timekeeper
+	 * @return redirect
+	 */
+	public function setting_timekeeper()
+	{
 		$data = $this->input->post();
 		$success = $this->timesheets_model->setting_timekeeper($data);
 		if ($success) {
@@ -1029,11 +1056,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/setting?group=timekeeping_settings'));
 	}
 
-/**
- * edit timesheets
- * @return redirect
- */
-	public function edit_timesheets() {
+	/**
+	 * edit timesheets
+	 * @return redirect
+	 */
+	public function edit_timesheets()
+	{
 		$data = $this->input->post();
 		$success = $this->timesheets_model->edit_timesheets($data);
 		if ($success) {
@@ -1044,11 +1072,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/timekeeping?group=timesheets'));
 	}
 
-/**
- * send additional timesheets
- * @return redirect
- */
-	public function send_additional_timesheets() {
+	/**
+	 * send additional timesheets
+	 * @return redirect
+	 */
+	public function send_additional_timesheets()
+	{
 		$data = $this->input->post();
 		$success = false;
 		if (isset($data['additional_day'])) {
@@ -1058,8 +1087,8 @@ class timesheets extends AdminController {
 				redirect(admin_url('timesheets/member/' . get_staff_user_id() . '?tab=timekeeping'));
 			}
 			$staff_id = '';
-			if(is_admin() || has_permission('additional_timesheets_specific_employees', '', 'create')){
-				if(isset($data['staff_id'])){
+			if (is_admin() || has_permission('additional_timesheets_specific_employees', '', 'create')) {
+				if (isset($data['staff_id'])) {
 					$staff_id = $data['staff_id'];
 				}
 			}
@@ -1074,12 +1103,13 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/requisition_manage?tab=additional_timesheets&additional_timesheets_id=' . $success));
 	}
 
-/**
- * approve additional timesheets
- * @param  int $id
- * @return json
- */
-	public function approve_additional_timesheets($id) {
+	/**
+	 * approve additional timesheets
+	 * @param  int $id
+	 * @return json
+	 */
+	public function approve_additional_timesheets($id)
+	{
 		$data = $this->input->post();
 
 		$message = _l('rejected_successfully');
@@ -1143,11 +1173,12 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * show detail timesheets
- * @return json
- */
-	public function show_detail_timesheets() {
+	/**
+	 * show detail timesheets
+	 * @return json
+	 */
+	public function show_detail_timesheets()
+	{
 		$data = $this->input->post();
 		$d = substr($data['ColHeader'], 4, 2);
 		$time = $data['month'] . '-' . $d;
@@ -1168,120 +1199,120 @@ class timesheets extends AdminController {
 			$value = explode(':', $value);
 			if (isset($value[1]) && $value[1] > 0 || $value[0] == 'M' || $value[0] == 'HO' || $value[0] == 'B') {
 				switch ($value[0]) {
-				case 'AL':
-					$html .= '<li class="list-group-item justify-content-between">
+					case 'AL':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('p_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_p">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'W':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'W':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('W_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_w" data-toggle="tooltip" data-placement="top" data-original-title="' . $this->timesheets_model->calculate_working_hour($value[1]) . '">' . $value[1] . '</span>
 				</li>';
-					break;
-				case 'A':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'A':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('A_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_a">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'HO':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'HO':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('Le_timekeeping') . '
 				</li>';
-					break;
-				case 'E':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'E':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('E_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_e">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'L':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'L':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('L_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_l">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'B':
-					$tripid = '';
-					$bstrip = $this->timesheets_model->get_bussiness_trip_info($time);
-					if ($bstrip) {
-						$tripid = $bstrip->id;
-					}
-					$html .= '<li class="list-group-item justify-content-between"><a href="' . admin_url('timesheets/requisition_detail/' . $tripid) . '">
+						break;
+					case 'B':
+						$tripid = '';
+						$bstrip = $this->timesheets_model->get_bussiness_trip_info($time);
+						if ($bstrip) {
+							$tripid = $bstrip->id;
+						}
+						$html .= '<li class="list-group-item justify-content-between"><a href="' . admin_url('timesheets/requisition_detail/' . $tripid) . '">
 				' . _l('CT_timekeeping') . '
 				</a><span class="badgetext badge badge-primary badge-pill style_b"></span>
 				</li>';
-					break;
-				case 'U':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'U':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('U_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'OM':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'OM':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('OM_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_om">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'M':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'M':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('maternity_leave') . '
 				</li>';
-					break;
-				case 'R':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'R':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('R_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'P':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'P':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('P_timekeepings') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'SI':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'SI':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('CD_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'CO':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'CO':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('CO_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'ME':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'ME':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('H_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_me">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'OT':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'OT':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('OT_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_me">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'PO':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'PO':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('PN_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_po">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				default:
-					$custome_name = $this->timesheets_model->get_custom_leave_name_by_symbol($value[0]);
-					if ($custome_name) {
-						$html .= '<li class="list-group-item justify-content-between">
+						break;
+					default:
+						$custome_name = $this->timesheets_model->get_custom_leave_name_by_symbol($value[0]);
+						if ($custome_name) {
+							$html .= '<li class="list-group-item justify-content-between">
 					' . $custome_name . '
 					<span class="badgetext badge badge-primary badge-pill style_po">' . round($value[1], 2) . '</span>
 					</li>';
-					}
-					break;
+						}
+						break;
 				}
 			}
 		}
@@ -1325,12 +1356,13 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * approval process
- * @param  string $id
- * @return redirect
- */
-	public function approval_process($id = '') {
+	/**
+	 * approval process
+	 * @param  string $id
+	 * @return redirect
+	 */
+	public function approval_process($id = '')
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$id = $data['approval_setting_id'];
@@ -1350,28 +1382,31 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * table approval process
- * @return
- */
-	public function table_approval_process() {
+	/**
+	 * table approval process
+	 * @return
+	 */
+	public function table_approval_process()
+	{
 		if ($this->input->is_ajax_request()) {
 			$this->app->get_table_data(module_views_path('timesheets', 'approval_process/table_approval_process'));
 		}
 	}
 
-/**
- * get html approval setting
- * @param  string $id
- * @return
- */
-	public function get_html_approval_setting($id = '') {
+	/**
+	 * get html approval setting
+	 * @param  string $id
+	 * @return
+	 */
+	public function get_html_approval_setting($id = '')
+	{
 		$html = '';
 		$staffs = $this->staff_model->get();
 		$approver = [
 			0 => ['id' => 'direct_manager', 'name' => _l('direct_manager')],
 			1 => ['id' => 'department_manager', 'name' => _l('department_manager')],
-			2 => ['id' => 'staff', 'name' => _l('staff')]];
+			2 => ['id' => 'staff', 'name' => _l('staff')]
+		];
 		if (is_numeric($id)) {
 			$approval_setting = $this->accounting_model->get_approval_setting($id);
 
@@ -1382,7 +1417,7 @@ class timesheets extends AdminController {
 					$html .= '<div id="item_approve">
 					<div class="col-md-11">
 					<div class="col-md-4"> ' .
-					render_select('approver[' . $key . ']', $approver, array('id', 'name'), 'task_single_related', $value->approver) . '
+						render_select('approver[' . $key . ']', $approver, array('id', 'name'), 'task_single_related', $value->approver) . '
 					</div>
 					<div class="col-md-4">
 					' . render_select('staff[' . $key . ']', $staffs, array('staffid', 'full_name'), 'staff', $value->staff) . '
@@ -1403,10 +1438,8 @@ class timesheets extends AdminController {
 					$staff = '';
 					if ($value->approver == 'direct_manager') {
 						$direct_manager = 'selected';
-
 					} elseif ($value->approver == 'department_manager') {
 						$department_manager = 'selected';
-
 					} elseif ($value->approver == 'staff') {
 						$staff = 'selected';
 					}
@@ -1414,7 +1447,7 @@ class timesheets extends AdminController {
 					<div class="col-md-11">
 					<div class="col-md-4">
 					' .
-					render_select('approver[' . $key . ']', $approver, array('id', 'name'), 'task_single_related', $value->approver) . '
+						render_select('approver[' . $key . ']', $approver, array('id', 'name'), 'task_single_related', $value->approver) . '
 					</div>
 
 					<div class="col-md-6">
@@ -1497,11 +1530,12 @@ class timesheets extends AdminController {
 		]);
 	}
 
-/**
- * new approval setting
- * @return view
- */
-	public function new_approval_setting() {
+	/**
+	 * new approval setting
+	 * @return view
+	 */
+	public function new_approval_setting()
+	{
 
 		$data['title'] = _l('add_approval_process');
 		$this->load->model('roles_model');
@@ -1512,12 +1546,13 @@ class timesheets extends AdminController {
 		$this->load->view('approval_process/add_edit_approval_process', $data);
 	}
 
-/**
- * edit approval setting
- * @param  string $id
- * @return
- */
-	public function edit_approval_setting($id = '') {
+	/**
+	 * edit approval setting
+	 * @param  string $id
+	 * @return
+	 */
+	public function edit_approval_setting($id = '')
+	{
 		$data['approval_setting'] = $this->timesheets_model->get_approval_process($id);
 		$data['title'] = _l('edit_approval_process');
 
@@ -1529,12 +1564,13 @@ class timesheets extends AdminController {
 		$this->load->view('approval_process/add_edit_approval_process', $data);
 	}
 
-/**
- * delete approval setting
- * @param  [type] $id [description]
- * @return [type]     [description]
- */
-	public function delete_approval_setting($id) {
+	/**
+	 * delete approval setting
+	 * @param  [type] $id [description]
+	 * @return [type]     [description]
+	 */
+	public function delete_approval_setting($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/approval_process'));
 		}
@@ -1549,11 +1585,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/setting?group=approval_process'));
 	}
 
-/**
- * send request approve
- * @return json
- */
-	public function send_request_approve() {
+	/**
+	 * send request approve
+	 * @return json
+	 */
+	public function send_request_approve()
+	{
 		$data = $this->input->post();
 		$message = 'Send request approval fail';
 		$check = $this->timesheets_model->check_choose_when_approving($data['rel_type']);
@@ -1567,7 +1604,6 @@ class timesheets extends AdminController {
 			} elseif ($success === false) {
 				$message = _l('no_matching_process_found');
 				$success = false;
-
 			} else {
 				$message = _l('could_not_find_approver_with', _l($success));
 				$success = false;
@@ -1604,12 +1640,13 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * send request approve requisition
- * @param  data
- * @return
- */
-	public function send_request_approve_requisition($data) {
+	/**
+	 * send request approve requisition
+	 * @param  data
+	 * @return
+	 */
+	public function send_request_approve_requisition($data)
+	{
 
 		$message = 'Send request approval fail';
 
@@ -1623,19 +1660,18 @@ class timesheets extends AdminController {
 		} elseif ($success === false) {
 			$message = _l('no_matching_process_found');
 			$success = false;
-
 		} else {
 			$message = _l('could_not_find_approver_with', _l($success));
 			$success = false;
 		}
-
 	}
 
-/**
- * approve request
- * @return json
- */
-	public function approve_request() {
+	/**
+	 * approve request
+	 * @return json
+	 */
+	public function approve_request()
+	{
 		$data = $this->input->post();
 		$data['staff_approve'] = get_staff_user_id();
 		$success = false;
@@ -1679,9 +1715,7 @@ class timesheets extends AdminController {
 									$this->timesheets_model->add_tbllist_staff_quitting_work($data_quitting_work);
 								}
 							}
-
 						}
-
 					}
 				} else {
 					$message = _l('rejected_successfully');
@@ -1706,7 +1740,8 @@ class timesheets extends AdminController {
 	 * send mail
 	 * @return json
 	 */
-	public function send_mail() {
+	public function send_mail()
+	{
 		if ($this->input->is_ajax_request()) {
 			$data = $this->input->post();
 			if ((isset($data)) && $data != '') {
@@ -1723,7 +1758,8 @@ class timesheets extends AdminController {
 	 * choose approver
 	 * @return json
 	 */
-	public function choose_approver() {
+	public function choose_approver()
+	{
 		$data = $this->input->post();
 		$message = 'Send request approval fail';
 
@@ -1737,7 +1773,6 @@ class timesheets extends AdminController {
 		} elseif ($success === false) {
 			$message = _l('no_matching_process_found');
 			$success = false;
-
 		} else {
 			$message = _l('could_not_find_approver_with', _l($success));
 			$success = false;
@@ -1748,10 +1783,10 @@ class timesheets extends AdminController {
 			'message' => $message,
 		]);
 		die;
-
 	}
 
-	public function get_data_additional_timesheets($id) {
+	public function get_data_additional_timesheets($id)
+	{
 		$check_approve_status = $this->timesheets_model->check_approval_details($id, 'additional_timesheets');
 		$list_approve_status = $this->timesheets_model->get_list_approval_details($id, 'additional_timesheets');
 
@@ -1847,9 +1882,8 @@ class timesheets extends AdminController {
 						$staff_name .= ' or ';
 					}
 					$get_staff = $this->staff_model->get($val);
-					if($get_staff){
-						$staff_name .= $get_staff->firstname.' '.$get_staff->lastname;
-
+					if ($get_staff) {
+						$staff_name .= $get_staff->firstname . ' ' . $get_staff->lastname;
 					}
 				}
 				$html .= $staff_name . '</p>';
@@ -1859,7 +1893,6 @@ class timesheets extends AdminController {
 					$html .= '<br><br>
 				<p class="bold text-center text-success">' . _dt($value['date']) . '</p>
 				';
-
 				} elseif ($value['approve'] == 2) {
 					$html .= '<img src="' . site_url(TIMESHEETS_PATH . 'approval/rejected.png') . '" class="wh-150-80">';
 					$html .= '<br><br>
@@ -1905,7 +1938,6 @@ class timesheets extends AdminController {
 				$html .= '</select></div>';
 				$html .= '<div class="col-md-5"><a href="#" class="btn btn-default pull-right mleft15" data-toggle="modal" data-target=".additional-timesheets-sidebar">' . _l('close') . '</a>';
 				$html .= '<a href="#" onclick="choose_approver(' . $additional_timesheets->id . ',' . $additional_timesheets->creator . ');" class="btn btn-success lead-top-btn lead-view pull-right" data-loading-text="' . _l('wait_text') . '">' . _l('choose') . '</a></div></div></div>';
-
 			}
 		}
 		if (isset($check_approve_status['staffid'])) {
@@ -1945,11 +1977,12 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * reports
- * @return view
- */
-	public function reports() {
+	/**
+	 * reports
+	 * @return view
+	 */
+	public function reports()
+	{
 		if (!(has_permission('report_management', '', 'view_own') || has_permission('report_management', '', 'view') || is_admin())) {
 			access_denied('reports');
 		}
@@ -1968,56 +2001,51 @@ class timesheets extends AdminController {
 		$this->load->view('reports/manage_reports', $data);
 	}
 
-/**
- * report by leave statistics
- * @return json
- */
-	public function report_by_leave_statistics() {
+	/**
+	 * report by leave statistics
+	 * @return json
+	 */
+	public function report_by_leave_statistics()
+	{
 		echo json_encode($this->timesheets_model->report_by_leave_statistics());
 	}
 
-/**
- * report by working hours
- * @return json
- */
-	public function report_by_working_hours() {
+	/**
+	 * report by working hours
+	 * @return json
+	 */
+	public function report_by_working_hours()
+	{
 		echo json_encode($this->timesheets_model->report_by_working_hours());
 	}
 
-/**
- * [HR_is_working description]
- */
-	public function HR_is_working() {
+	/**
+	 * [HR_is_working description]
+	 */
+	public function HR_is_working()
+	{
 		if ($this->input->is_ajax_request()) {
 			$year = (string) date('Y');
 			$months_report = $this->input->post('months_report');
 
 			if ($months_report == '' || !isset($months_report)) {
-
 			}
 			if ($months_report == 'this_month') {
-
 			}
 			if ($months_report == '1') {
-
 			}
 			if ($months_report == 'this_year') {
 				$year = (string) date('Y');
-
 			}
 			if ($months_report == 'last_year') {
 				$year = (string) ((int) date('Y') - 1);
-
 			}
 
 			if ($months_report == '3') {
-
 			}
 			if ($months_report == '6') {
-
 			}
 			if ($months_report == '12') {
-
 			}
 			$month_default = 12;
 
@@ -2035,13 +2063,14 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * file view requisition
- * @param  int $id
- * @param  int $rel_id
- * @return
- */
-	public function file_view_requisition($id, $rel_id) {
+	/**
+	 * file view requisition
+	 * @param  int $id
+	 * @param  int $rel_id
+	 * @return
+	 */
+	public function file_view_requisition($id, $rel_id)
+	{
 		$data['file'] = $this->timesheets_model->get_file_requisition($id, $rel_id);
 		$data['rel_id'] = $rel_id;
 		if (!$data['file']) {
@@ -2051,11 +2080,12 @@ class timesheets extends AdminController {
 		$this->load->view('includes/_file', $data);
 	}
 
-/**
- * leave reports
- * @return json
- */
-	public function leave_reports() {
+	/**
+	 * leave reports
+	 * @return json
+	 */
+	public function leave_reports()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$months_report = $this->input->post('months_filter');
@@ -2167,14 +2197,15 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * general summation
- * @param  int $month
- * @param  int $year
- * @param  int $staffid
- * @return
- */
-	public function general_summation($month, $year, $staffid) {
+	/**
+	 * general summation
+	 * @param  int $month
+	 * @param  int $year
+	 * @param  int $staffid
+	 * @return
+	 */
+	public function general_summation($month, $year, $staffid)
+	{
 		$result = 0;
 		$data_leave = $this->timesheets_model->get_timesheets_day_leave_by_staffid($staffid, $year);
 		foreach ($data_leave as $key => $value) {
@@ -2197,11 +2228,12 @@ class timesheets extends AdminController {
 		return $result;
 	}
 
-/**
- * general public report
- * @return json
- */
-	public function general_public_report() {
+	/**
+	 * general public report
+	 * @return json
+	 */
+	public function general_public_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$months_report = $this->input->post('months_filter');
@@ -2245,7 +2277,6 @@ class timesheets extends AdminController {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				}
 
 				if ($months_report == 'custom') {
@@ -2415,10 +2446,10 @@ class timesheets extends AdminController {
 									}
 								}
 							}
-							
+
 							$index++;
 						}
-						
+
 						$row[] = $total_shift;
 						$row[] = ($total > 0) ? (float) number_format($total, 2) : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
@@ -2441,8 +2472,9 @@ class timesheets extends AdminController {
 		}
 	}
 
-/*mass delete for multiple feature*/
-	public function timesheets_delete_bulk_action() {
+	/*mass delete for multiple feature*/
+	public function timesheets_delete_bulk_action()
+	{
 		if (!is_staff_member()) {
 			ajax_access_denied();
 		}
@@ -2456,14 +2488,14 @@ class timesheets extends AdminController {
 
 			/*check permission*/
 			switch ($rel_type) {
-			case 'timesheets_requisition':
-				if (!has_permission('timesheets_manage_requisition', '', 'delete') && !is_admin()) {
-					access_denied('manage_requisition');
-				}
-				break;
-			default:
-# code...
-				break;
+				case 'timesheets_requisition':
+					if (!has_permission('timesheets_manage_requisition', '', 'delete') && !is_admin()) {
+						access_denied('manage_requisition');
+					}
+					break;
+				default:
+					# code...
+					break;
 			}
 
 			/*delete data*/
@@ -2472,50 +2504,51 @@ class timesheets extends AdminController {
 					foreach ($ids as $id) {
 
 						switch ($rel_type) {
-						case 'timesheets_requisition':
-							if ($this->timesheets_model->delete_requisition($id)) {
-								$total_deleted++;
+							case 'timesheets_requisition':
+								if ($this->timesheets_model->delete_requisition($id)) {
+									$total_deleted++;
+									break;
+								} else {
+									break;
+								}
+							default:
+								# code...
 								break;
-							} else {
-								break;
-							}
-						default:
-# code...
-							break;
 						}
-
 					}
 				}
 
 				/*return result*/
 				switch ($rel_type) {
-				case 'timesheets_requisition':
-					set_alert('success', _l('total_requisition') . ": " . $total_deleted);
-					break;
-				default:
-# code...
-					break;
+					case 'timesheets_requisition':
+						set_alert('success', _l('total_requisition') . ": " . $total_deleted);
+						break;
+					default:
+						# code...
+						break;
 				}
 			}
 		}
 	}
 
-/**
- * get rest time
- * @return json
- */
-	public function get_rest_time() {
+	/**
+	 * get rest time
+	 * @return json
+	 */
+	public function get_rest_time()
+	{
 		$data = $this->input->post();
 		$rest_time = $this->timesheets_model->get_rest_time($data['date']);
 		echo json_encode($rest_time);
 	}
 
-/**
- * delete additional timesheets
- * @param  int $id
- * @return redirect
- */
-	public function delete_additional_timesheets($id) {
+	/**
+	 * delete additional timesheets
+	 * @param  int $id
+	 * @return redirect
+	 */
+	public function delete_additional_timesheets($id)
+	{
 		$response = $this->timesheets_model->delete_additional_timesheets($id);
 		if (is_array($response) && isset($response['referenced'])) {
 			set_alert('warning', _l('is_referenced'));
@@ -2527,11 +2560,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/requisition_manage?tab=additional_timesheets'));
 	}
 
-/**
- * table shiftwork
- * @return view
- */
-	public function table_shiftwork() {
+	/**
+	 * table shiftwork
+	 * @return view
+	 */
+	public function table_shiftwork()
+	{
 		if (!(has_permission('table_shiftwork_management', '', 'view_own') || has_permission('table_shiftwork_management', '', 'view') || is_admin())) {
 			access_denied('table_shiftwork');
 		}
@@ -2599,11 +2633,12 @@ class timesheets extends AdminController {
 		$this->load->view('timekeeping/manage_table_shiftwork', $data);
 	}
 
-/**
- * reload shift work byfilter
- * @return json
- */
-	public function reload_shift_work_byfilter() {
+	/**
+	 * reload shift work byfilter
+	 * @return json
+	 */
+	public function reload_shift_work_byfilter()
+	{
 		$data = $this->input->post();
 		$year = date('Y', strtotime(to_sql_date('01/' . $data['month'])));
 		$g_month = date('m', strtotime(to_sql_date('01/' . $data['month'])));
@@ -2692,7 +2727,6 @@ class timesheets extends AdminController {
 
 					array_push($data['day_by_month'], date('D d', $time));
 					array_push($data['set_col'], ['data' => date('D d', $time), 'type' => 'text']);
-
 				}
 			}
 
@@ -2731,7 +2765,6 @@ class timesheets extends AdminController {
 				if ($shift_staff != 'null' && $shift_staff != '') {
 
 					array_push($data['staff_row'], $shift_staff);
-
 				}
 			}
 		}
@@ -2743,11 +2776,12 @@ class timesheets extends AdminController {
 		die;
 	}
 
-/**
- * show detail timesheets mem
- * @return
- */
-	public function show_detail_timesheets_mem() {
+	/**
+	 * show detail timesheets mem
+	 * @return
+	 */
+	public function show_detail_timesheets_mem()
+	{
 		$data = $this->input->post();
 		$year = date("Y");
 
@@ -2768,100 +2802,100 @@ class timesheets extends AdminController {
 			$value = explode(':', $value);
 			if (isset($value[1]) && $value[1] > 0 || $value[0] == 'M' || $value[0] == 'HO') {
 				switch ($value[0]) {
-				case 'L':
-					$html .= '<li class="list-group-item justify-content-between">
+					case 'L':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('p_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_p">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'W':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'W':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('W_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_w">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'U':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'U':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('A_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_a">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'HO':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'HO':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('Le_timekeeping') . '
 				</li>';
-					break;
-				case 'E':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'E':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('E_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_e">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'L':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'L':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('L_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_l">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'B':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'B':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('CT_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_l">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'OM':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'OM':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('OM_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'M':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'M':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('TS_timekeeping') . '
 				</li>';
-					break;
-				case 'R':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'R':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('R_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'P':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'P':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('P_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'SI':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'SI':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('CD_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'CO':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'CO':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('CO_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_u">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'H':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'H':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('H_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_me">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'OT':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'OT':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('OT_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_me">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
-				case 'PN':
-					$html .= '<li class="list-group-item justify-content-between">
+						break;
+					case 'PN':
+						$html .= '<li class="list-group-item justify-content-between">
 				' . _l('PN_timekeeping') . '
 				<span class="badgetext badge badge-primary badge-pill style_p">' . round($value[1], 2) . '</span>
 				</li>';
-					break;
+						break;
 				}
 			}
 		}
@@ -2928,10 +2962,11 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * Calculates the number days off.
- */
-	public function calculate_number_days_off() {
+	/**
+	 * Calculates the number days off.
+	 */
+	public function calculate_number_days_off()
+	{
 		$data = $this->input->post();
 		$start_time = $this->timesheets_model->format_date($data['start_time']);
 		$end_time = $this->timesheets_model->format_date($data['end_time']);
@@ -2954,19 +2989,21 @@ class timesheets extends AdminController {
 		echo json_encode($count);
 	}
 
-/**
- * table registration leave
- */
-	public function table_registration_leave_by_staff() {
+	/**
+	 * table registration leave
+	 */
+	public function table_registration_leave_by_staff()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'table_registration_leave_by_staff'));
 	}
 
-/**
- * [get_data_date_leave description]
- * @param  [type] $id [description]
- * @return [type]     [description]
- */
-	public function get_data_date_leave() {
+	/**
+	 * [get_data_date_leave description]
+	 * @param  [type] $id [description]
+	 * @return [type]     [description]
+	 */
+	public function get_data_date_leave()
+	{
 		$memberid = $this->input->post('memberid');
 		$year_requisition = $this->input->post('year_requisition');
 
@@ -2980,11 +3017,12 @@ class timesheets extends AdminController {
 		]);
 	}
 
-/**
- * shifts sc
- * @return [type] [description]
- */
-	public function shifts_sc() {
+	/**
+	 * shifts sc
+	 * @return [type] [description]
+	 */
+	public function shifts_sc()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (!$this->input->post('id')) {
@@ -3007,12 +3045,13 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * delete shift sc
- * @param  int $id
- * @return redirect
- */
-	public function delete_shift_sc($id) {
+	/**
+	 * delete shift sc
+	 * @param  int $id
+	 * @return redirect
+	 */
+	public function delete_shift_sc($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/setting?group=shift'));
 		}
@@ -3025,11 +3064,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/setting?group=shift'));
 	}
 
-/**
- * setting shift
- * @return redirect
- */
-	public function setting_shift() {
+	/**
+	 * setting shift
+	 * @return redirect
+	 */
+	public function setting_shift()
+	{
 		$data = $this->input->post();
 		$success = $this->timesheets_model->setting_shift($data);
 		if ($success) {
@@ -3038,14 +3078,14 @@ class timesheets extends AdminController {
 			set_alert('danger', _l('save_setting_fail'));
 		}
 		redirect(admin_url('timesheets/setting?group=shift_setting'));
-
 	}
 
-/**
- * [shiftwork_sc description]
- * @return [type] [description]
- */
-	public function shiftwork_sc() {
+	/**
+	 * [shiftwork_sc description]
+	 * @return [type] [description]
+	 */
+	public function shiftwork_sc()
+	{
 		$data = $this->input->post();
 		$success = $this->timesheets_model->update_shiftwork_sc($data);
 		if ($success > 0) {
@@ -3055,11 +3095,12 @@ class timesheets extends AdminController {
 		redirect(admin_url('timesheets/timekeeping?group=table_shiftwork_sc'));
 	}
 
-/**
- * reload shiftwork sc by filter
- * @return json
- */
-	public function reload_shiftwork_sc_byfilter() {
+	/**
+	 * reload shiftwork sc by filter
+	 * @return json
+	 */
+	public function reload_shiftwork_sc_byfilter()
+	{
 		$data = $this->input->post();
 		$year = date('Y', strtotime(to_sql_date('01/' . $data['month'])));
 		$g_month = date('m', strtotime(to_sql_date('01/' . $data['month'])));
@@ -3196,11 +3237,12 @@ class timesheets extends AdminController {
 		die;
 	}
 
-/**
- * cancel request
- * @return
- */
-	public function cancel_request() {
+	/**
+	 * cancel request
+	 * @return
+	 */
+	public function cancel_request()
+	{
 		$data = $this->input->post();
 		$success = false;
 		$message = '';
@@ -3217,11 +3259,12 @@ class timesheets extends AdminController {
 		die();
 	}
 
-/**
- * add allocate shiftwork
- * @param string $id
- */
-	public function add_allocate_shiftwork($id = '') {
+	/**
+	 * add allocate shiftwork
+	 * @param string $id
+	 */
+	public function add_allocate_shiftwork($id = '')
+	{
 		$this->load->model('staff_model');
 
 		$data['additional_timesheets_id'] = $this->input->get('additional_timesheets_id');
@@ -3294,7 +3337,6 @@ class timesheets extends AdminController {
 			$ts_type = $this->timesheets_model->get_ts_by_date_and_staff($ts['date_work'], $ts['staff_id']);
 			if (count($ts_type) <= 1) {
 				$staff_info['ts'] = $ts['type'] . ':' . $ts['value'];
-
 			} else {
 				$str = '';
 				foreach ($ts_type as $tp) {
@@ -3361,7 +3403,6 @@ class timesheets extends AdminController {
 					$ts_ts = $data_map[$s['staffid']][$key]['ts'];
 					$result_tb[] = [$ts_date => $ts_ts];
 				}
-
 			}
 			$dt_ts = [];
 			$dt_ts = [_l('staff_id') => $s['staffid'], _l('hr_code') => $s['staff_identifi'], _l('staff') => $s['firstname'] . ' ' . $s['lastname']];
@@ -3375,14 +3416,14 @@ class timesheets extends AdminController {
 
 		$data['tabs']['view'] = 'timekeeping/' . $data['group'];
 		$this->load->view('timekeeping/add_allocate_shiftwork', $data);
-
 	}
 
 	/**
 	 * get date leave
 	 * @return date
 	 */
-	public function get_date_leave() {
+	public function get_date_leave()
+	{
 		$data = $this->input->post();
 		$staffid = $data['staffid'];
 		$number_of_days = $data['number_of_days'];
@@ -3410,12 +3451,11 @@ class timesheets extends AdminController {
 			}
 		}
 		$end_date = $start_date;
-		if(count($list_date) > 0){
-			if(isset($list_date[count($list_date) - 1])){
+		if (count($list_date) > 0) {
+			if (isset($list_date[count($list_date) - 1])) {
 				$end_date = ($list_date[count($list_date) - 1]);
 			}
-		}
-		else{
+		} else {
 			$end_date = '';
 			$start_date = '';
 		}
@@ -3429,7 +3469,8 @@ class timesheets extends AdminController {
 	 * table shift type
 	 * @return json
 	 */
-	public function table_shift_type() {
+	public function table_shift_type()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$select = [
@@ -3483,7 +3524,8 @@ class timesheets extends AdminController {
 			}
 		}
 	}
-	public function manage_shift_type() {
+	public function manage_shift_type()
+	{
 		if (!(has_permission('table_shiftwork_management', '', 'view_own') || has_permission('table_shiftwork_management', '', 'view') || is_admin())) {
 			access_denied('timekeeping');
 		}
@@ -3510,7 +3552,8 @@ class timesheets extends AdminController {
 		}
 		$this->load->view('manage_shift_type', $data);
 	}
-	public function shift_management() {
+	public function shift_management()
+	{
 		if (!(has_permission('table_shiftwork_management', '', 'view_own') || has_permission('table_shiftwork_management', '', 'view') || is_admin())) {
 			access_denied('timekeeping');
 		}
@@ -3518,7 +3561,8 @@ class timesheets extends AdminController {
 		$this->load->view('shift_management', $data);
 	}
 
-	public function set_col_tk($from_day, $to_day, $month, $month_year, $absolute_type = true, $stafflist = '', $work_shift_id = '') {
+	public function set_col_tk($from_day, $to_day, $month, $month_year, $absolute_type = true, $stafflist = '', $work_shift_id = '')
+	{
 		$list_data = [];
 		$data_day_by_month = [];
 		$data_time = [];
@@ -3534,10 +3578,14 @@ class timesheets extends AdminController {
 				array_push($data_day_by_month, 'staffid');
 				array_push($data_day_by_month, _l('staff'));
 				array_push($list_data, [
-					'data' => 'staffid', 'type' => 'text', 'readOnly' => true,
+					'data' => 'staffid',
+					'type' => 'text',
+					'readOnly' => true,
 				]);
 				array_push($list_data, [
-					'data' => 'staff', 'type' => 'text', 'readOnly' => true,
+					'data' => 'staff',
+					'type' => 'text',
+					'readOnly' => true,
 				]);
 			}
 			for ($d = $from_day; $d <= $to_day; $d++) {
@@ -3600,10 +3648,14 @@ class timesheets extends AdminController {
 				array_push($data_day_by_month, 'staffid');
 				array_push($data_day_by_month, _l('staff'));
 				array_push($list_data, [
-					'data' => 'staffid', 'type' => 'text', 'readOnly' => true,
+					'data' => 'staffid',
+					'type' => 'text',
+					'readOnly' => true,
 				]);
 				array_push($list_data, [
-					'data' => 'staff', 'type' => 'text', 'readOnly' => true,
+					'data' => 'staff',
+					'type' => 'text',
+					'readOnly' => true,
 				]);
 			}
 			foreach ($day_list as $key => $value) {
@@ -3665,15 +3717,16 @@ class timesheets extends AdminController {
 		$obj->data_object = $data_object;
 		return $obj;
 	}
-/**
- * add allocation shiftwork
- * @param integer $id
- * @param view
- */
-	public function add_allocation_shiftwork($id = '') {
+	/**
+	 * add allocation shiftwork
+	 * @param integer $id
+	 * @param view
+	 */
+	public function add_allocation_shiftwork($id = '')
+	{
 		$data['title'] = _l('new_shift');
 		$data['departments'] = $this->departments_model->get();
-		$data['staffs'] = $this->staff_model->get('','active = 1');
+		$data['staffs'] = $this->staff_model->get('', 'active = 1');
 		$data['roles'] = $this->roles_model->get();
 
 		$month = date('m');
@@ -3694,7 +3747,8 @@ class timesheets extends AdminController {
 			$e_2 = explode(':', $end_date);
 			$e_time = $e_2[0] . 'h' . $e_2[1];
 
-			array_push($new_list_shift, array('id' => $value['id'],
+			array_push($new_list_shift, array(
+				'id' => $value['id'],
 				'label' => $value['shift_type_name'] . ' (' . $st_time . ' - ' . $e_time . ')',
 
 			));
@@ -3746,7 +3800,8 @@ class timesheets extends AdminController {
 		$this->load->view('timekeeping/add_allocate_shiftwork', $data);
 	}
 
-	public function delete_shift_type($id) {
+	public function delete_shift_type($id)
+	{
 		if ($id != '') {
 			$message = '';
 			$result = $this->timesheets_model->delete_shift_type($id);
@@ -3760,11 +3815,12 @@ class timesheets extends AdminController {
 		}
 	}
 
-/**
- * get hanson shiftwork
- * @return json
- */
-	function get_hanson_shiftwork() {
+	/**
+	 * get hanson shiftwork
+	 * @return json
+	 */
+	function get_hanson_shiftwork()
+	{
 		$month = date('m');
 		$month_year = date('Y');
 		$department = $this->input->post('department');
@@ -3811,16 +3867,18 @@ class timesheets extends AdminController {
 		die;
 	}
 
-	function get_custom_type_shiftwork() {
+	function get_custom_type_shiftwork()
+	{
 		$department = $this->input->post('department');
 		$role = $this->input->post('role');
 		$staff = $this->input->post('staff');
 	}
-/**
- * shift table
- * @return json
- */
-	function shift_table() {
+	/**
+	 * shift table
+	 * @return json
+	 */
+	function shift_table()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$this->load->model('departments_model');
@@ -3945,55 +4003,57 @@ class timesheets extends AdminController {
 			}
 		}
 	}
-/**
- * check in timesheet
- */
-public function check_in_ts() {
-	if ($this->input->post()) {
-		$data = $this->input->post();
-		$type = $data['type_check'];
-		$data['send_notify'] = true;
-		$re = $this->timesheets_model->check_in($data);
-		if (is_numeric($re)) {
-			// Error
-			if ($re == 2) {
-				set_alert('warning', _l('your_current_location_is_not_allowed_to_take_attendance'));
-			}
-			if ($re == 3) {
-				set_alert('warning', _l('location_information_is_unknown'));
-			}
-			if ($re == 4) {
-				set_alert('warning', _l('route_point_is_unknown'));
-			}
-			if ($re == 5) {
-				set_alert('danger', _l('ts_access_denie'));
-			}
-			if ($re == 6) {
-				set_alert('danger', _l('ts_cannot_get_client_ip_address'));
-			}
-		} else {
-			if ($re == true) {
-				if ($type == 1) {
-					set_alert('success', _l('check_in_successfull'));
-				} else {
-					set_alert('success', _l('check_out_successfull'));
+	/**
+	 * check in timesheet
+	 */
+	public function check_in_ts()
+	{
+		if ($this->input->post()) {
+			$data = $this->input->post();
+			$type = $data['type_check'];
+			$data['send_notify'] = true;
+			$re = $this->timesheets_model->check_in($data);
+			if (is_numeric($re)) {
+				// Error
+				if ($re == 2) {
+					set_alert('warning', _l('your_current_location_is_not_allowed_to_take_attendance'));
+				}
+				if ($re == 3) {
+					set_alert('warning', _l('location_information_is_unknown'));
+				}
+				if ($re == 4) {
+					set_alert('warning', _l('route_point_is_unknown'));
+				}
+				if ($re == 5) {
+					set_alert('danger', _l('ts_access_denie'));
+				}
+				if ($re == 6) {
+					set_alert('danger', _l('ts_cannot_get_client_ip_address'));
 				}
 			} else {
-				if ($type == 1) {
-					set_alert('warning', _l('check_in_not_successfull'));
+				if ($re == true) {
+					if ($type == 1) {
+						set_alert('success', _l('check_in_successfull'));
+					} else {
+						set_alert('success', _l('check_out_successfull'));
+					}
 				} else {
-					set_alert('warning', _l('check_out_not_successfull'));
+					if ($type == 1) {
+						set_alert('warning', _l('check_in_not_successfull'));
+					} else {
+						set_alert('warning', _l('check_out_not_successfull'));
+					}
 				}
 			}
+			redirect(admin_url('timesheets/timekeeping?group=timesheets'));
 		}
-		redirect(admin_url('timesheets/timekeeping?group=timesheets'));
 	}
-}
-/**
- * get leave setting
- * @return json
- */
-	public function get_leave_setting() {
+	/**
+	 * get leave setting
+	 * @return json
+	 */
+	public function get_leave_setting()
+	{
 		$new_array_obj = [];
 		$data = $this->input->post();
 		$staffid = isset($data['staffid']) ? $data['staffid'] : '';
@@ -4032,7 +4092,7 @@ public function check_in_ts() {
 		$data_staff = $this->timesheets_model->get_staff_query($query);
 		foreach ($data_staff as $key => $value) {
 			$result = $this->get_norms_of_leave_staff($value, $year, $type_of_leave);
-			if($result){
+			if ($result) {
 				array_push($new_array_obj, $result);
 			}
 		}
@@ -4041,11 +4101,12 @@ public function check_in_ts() {
 		]);
 	}
 
-/**
- * requisition report
- * @return
- */
-	public function requisition_report() {
+	/**
+	 * requisition report
+	 * @return
+	 */
+	public function requisition_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$months_report = $this->input->post('months_filter');
@@ -4084,7 +4145,6 @@ public function check_in_ts() {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				} //12 thang qua
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -4126,19 +4186,17 @@ public function check_in_ts() {
 				}
 
 				$data_staff = $this->staff_model->get('', 'active = 1');
-				if($data_staff){
+				if ($data_staff) {
 					$staff_id_list = [];
 					foreach ($data_staff as $key => $value) {
 						$staff_id_list[] = $value['staffid'];
 					}
-					if(count($staff_id_list) > 0){
+					if (count($staff_id_list) > 0) {
 						$query .= ' staff_id in (' . implode(',', $staff_id_list) . ') and';
-					}
-					else{
+					} else {
 						$query .= ' staff_id in (0) and';
 					}
-				}
-				else{
+				} else {
 					$query .= ' staff_id in (0) and';
 				}
 
@@ -4162,7 +4220,6 @@ public function check_in_ts() {
 				if (isset($position_filter)) {
 					$position_list = implode(',', $position_filter);
 					$where[] = 'and ' . db_prefix() . 'timesheets_requisition_leave.staff_id IN (SELECT  staffid FROM ' . db_prefix() . 'staff where role  IN (' . $position_list . '))';
-
 				}
 
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
@@ -4208,7 +4265,6 @@ public function check_in_ts() {
 						$row[] = '<p>' . _l('early') . '</p>';
 					}
 					$output['aaData'][] = $row;
-
 				}
 
 				echo json_encode($output);
@@ -4217,11 +4273,12 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * import timesheets
- * @return
- */
-	public function import_timesheets() {
+	/**
+	 * import timesheets
+	 * @return
+	 */
+	public function import_timesheets()
+	{
 		if (!class_exists('XLSXReader_fin')) {
 			require_once module_dir_path(TIMESHEETS_MODULE_NAME) . '/assets/plugins/XLSXReader/XLSXReader.php';
 		}
@@ -4232,13 +4289,13 @@ public function check_in_ts() {
 		$dataerror = 0;
 		$total_row_success = 0;
 		if (isset($_FILES['file_timesheets']['name']) && $_FILES['file_timesheets']['name'] != '') {
-// Get the temp file path
+			// Get the temp file path
 			$tmpFilePath = $_FILES['file_timesheets']['tmp_name'];
-// Make sure we have a filepath
+			// Make sure we have a filepath
 			if (!empty($tmpFilePath) && $tmpFilePath != '') {
 				$rows = [];
-// Setup our new file path
-				$newFilePath = TIMESHEETS_PATH .'timesheets/' . $_FILES['file_timesheets']['name'];
+				// Setup our new file path
+				$newFilePath = TIMESHEETS_PATH . 'timesheets/' . $_FILES['file_timesheets']['name'];
 				if (move_uploaded_file($tmpFilePath, $newFilePath)) {
 					$xlsx = new XLSXReader_fin($newFilePath);
 					$sheetNames = $xlsx->getSheetNames();
@@ -4270,20 +4327,21 @@ public function check_in_ts() {
 	/**
 	 * Sets the leave.
 	 */
-	public function set_leave() {
+	public function set_leave()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
-			
+
 			$not_show_notify = 0;
-			if(isset($data['not_show_notify']) && $data['not_show_notify'] == '1'){
+			if (isset($data['not_show_notify']) && $data['not_show_notify'] == '1') {
 				$not_show_notify = 1;
 				unset($data['not_show_notify']);
 			}
-			
+
 			$success = $this->timesheets_model->set_leave($data);
 			if ($success > 0) {
 				$message = _l('ts_updated_successfully', _l('setting'));
-				if($not_show_notify == 0){
+				if ($not_show_notify == 0) {
 					set_alert('success', $message);
 				}
 			}
@@ -4291,11 +4349,12 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * send notifi handover recipients
- * @return
- */
-	public function send_notifi_handover_recipients() {
+	/**
+	 * send notifi handover recipients
+	 * @return
+	 */
+	public function send_notifi_handover_recipients()
+	{
 		if ($this->input->is_ajax_request()) {
 			$data = $this->input->post();
 			if ((isset($data)) && $data != '') {
@@ -4313,7 +4372,8 @@ public function check_in_ts() {
 	 * send notification recipient
 	 * @return [type] [description]
 	 */
-	public function send_notification_recipient() {
+	public function send_notification_recipient()
+	{
 		if ($this->input->is_ajax_request()) {
 			$data = $this->input->post();
 			if ((isset($data)) && $data != '') {
@@ -4332,18 +4392,20 @@ public function check_in_ts() {
 	 * @param  int $attachment_id
 	 * @return
 	 */
-	public function delete_timesheets_attachment_file($attachment_id) {
+	public function delete_timesheets_attachment_file($attachment_id)
+	{
 		$file = $this->misc_model->get_file($attachment_id);
 		echo json_encode([
 			'success' => $this->timesheets_model->delete_timesheets_attachment_file($attachment_id),
 		]);
 	}
 
-/**
- * reload shiftwork byfilter
- * @return json
- */
-	public function reload_shiftwork_byfilter() {
+	/**
+	 * reload shiftwork byfilter
+	 * @return json
+	 */
+	public function reload_shiftwork_byfilter()
+	{
 		$data = $this->input->post();
 		$query = "";
 		if (isset($data["staff"])) {
@@ -4375,7 +4437,7 @@ public function check_in_ts() {
 		$this->load->model('staff_model');
 		$list_staff_id = [];
 		if (is_admin()) {
-			$data_staff_list = $this->timesheets_model->get_staff_list($query != '' ? $query = 'where ' . $query.' AND active = 1' : 'where active = 1');
+			$data_staff_list = $this->timesheets_model->get_staff_list($query != '' ? $query = 'where ' . $query . ' AND active = 1' : 'where active = 1');
 			foreach ($data_staff_list as $key => $value) {
 				$list_staff_id[] = $value['staffid'];
 			}
@@ -4434,10 +4496,11 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * advance payment go on bussiness update
- */
-	public function advance_payment_update() {
+	/**
+	 * advance payment go on bussiness update
+	 */
+	public function advance_payment_update()
+	{
 		if ($this->input->post()) {
 			$this->load->model('expenses_model');
 			$data = $this->input->post();
@@ -4470,7 +4533,8 @@ public function check_in_ts() {
 		}
 	}
 
-	public function add_expense_category() {
+	public function add_expense_category()
+	{
 		if (!is_admin() && get_option('staff_members_create_inline_expense_categories') == '0') {
 			access_denied('expenses');
 		}
@@ -4486,11 +4550,12 @@ public function check_in_ts() {
 			redirect(admin_url('timesheets/requisition_detail/' . $id));
 		}
 	}
-/**
- * setting timekeeper
- * @return redirect
- */
-	public function default_settings() {
+	/**
+	 * setting timekeeper
+	 * @return redirect
+	 */
+	public function default_settings()
+	{
 		$data = $this->input->post();
 		$success = $this->timesheets_model->default_settings($data);
 		if ($success) {
@@ -4500,11 +4565,12 @@ public function check_in_ts() {
 		}
 		redirect(admin_url('timesheets/setting?group=default_settings'));
 	}
-/**
- * get data attendance
- * @return json
- */
-	public function get_data_attendance() {
+	/**
+	 * get data attendance
+	 * @return json
+	 */
+	public function get_data_attendance()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if ((isset($data['date']) && $data['date'] == '') || !isset($data['date'])) {
@@ -4538,11 +4604,12 @@ public function check_in_ts() {
 			die;
 		}
 	}
-/**
- * workplace management
- * @return view
- */
-	public function workplace_mgt() {
+	/**
+	 * workplace management
+	 * @return view
+	 */
+	public function workplace_mgt()
+	{
 		if (!(has_permission('table_workplace_management', '', 'view_own') || has_permission('table_workplace_management', '', 'view') || is_admin())) {
 			access_denied('timekeeping');
 		}
@@ -4563,10 +4630,11 @@ public function check_in_ts() {
 		$data['staffs'] = $this->staff_model->get('', 'active = 1');
 		$this->load->view('workplace_mgt/management', $data);
 	}
-/**
- * add workplace
- **/
-	public function add_workplace() {
+	/**
+	 * add workplace
+	 **/
+	public function add_workplace()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if ($data['id'] == '') {
@@ -4585,11 +4653,12 @@ public function check_in_ts() {
 			redirect(admin_url('timesheets/workplace_mgt?group=workplace'));
 		}
 	}
-/**
- * delete workplace
- * @param  integer $id
- */
-	public function delete_workplace($id) {
+	/**
+	 * delete workplace
+	 * @param  integer $id
+	 */
+	public function delete_workplace($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/workplace_mgt?group=workplace'));
 		}
@@ -4601,10 +4670,11 @@ public function check_in_ts() {
 		}
 		redirect(admin_url('timesheets/workplace_mgt?group=workplace'));
 	}
-/**
- * add workplace assign
- */
-	public function add_workplace_assign() {
+	/**
+	 * add workplace assign
+	 */
+	public function add_workplace_assign()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$success = $this->timesheets_model->add_workplace_assign($data);
@@ -4618,11 +4688,12 @@ public function check_in_ts() {
 			redirect(admin_url('timesheets/workplace_mgt?group=workplace_assign'));
 		}
 	}
-/**
- * delete workplace assign
- * @param  integer $id
- */
-	public function delete_workplace_assign($id) {
+	/**
+	 * delete workplace assign
+	 * @param  integer $id
+	 */
+	public function delete_workplace_assign($id)
+	{
 		if (!$id) {
 			redirect(admin_url('timesheets/workplace_mgt?group=workplace_assign'));
 		}
@@ -4634,18 +4705,20 @@ public function check_in_ts() {
 		}
 		redirect(admin_url('timesheets/workplace_mgt?group=workplace_assign'));
 	}
-/**
- * table registration leave
- * @return
- */
-	public function table_workplace_assign() {
+	/**
+	 * table registration leave
+	 * @return
+	 */
+	public function table_workplace_assign()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'workplace_mgt/includes/table_workplace_assign'));
 	}
 
-/**
- * @return view
- */
-	public function timekeeping_data() {
+	/**
+	 * @return view
+	 */
+	public function timekeeping_data()
+	{
 		if (!(has_permission('attendance_management', '', 'view_own') || has_permission('attendance_management', '', 'view') || is_admin())) {
 			access_denied('timekeeping');
 		}
@@ -4763,7 +4836,6 @@ public function check_in_ts() {
 								}
 							}
 						}
-
 					}
 				}
 				foreach ($list_in_out as $date_ => $in_out) {
@@ -4833,7 +4905,6 @@ public function check_in_ts() {
 						$result_lack = 'NS';
 					}
 					$dt_ts[$date_s] = $result_lack;
-
 				}
 				array_push($data['staff_row_tk'], $dt_ts);
 			}
@@ -4972,7 +5043,6 @@ public function check_in_ts() {
 					$data_map[$ts['staff_id']] = array();
 				}
 				$data_map[$ts['staff_id']][$staff_info['date']] = $staff_info;
-
 			}
 
 			foreach ($staffs as $s) {
@@ -5037,13 +5107,14 @@ public function check_in_ts() {
 		$data['set_col_tk'] = json_encode($data['set_col_tk']);
 		return $data;
 	}
-/**
- * timesheets task by staff
- * @param  integer $list_in_out
- * @param  integer $staffid
- * @return array
- */
-	public function timesheets_task_by_staff($list_in_out, $staffid) {
+	/**
+	 * timesheets task by staff
+	 * @param  integer $list_in_out
+	 * @param  integer $staffid
+	 * @return array
+	 */
+	public function timesheets_task_by_staff($list_in_out, $staffid)
+	{
 		$data_map = [];
 		foreach ($list_in_out as $date_ => $in_out) {
 			$vl = $this->timesheets_model->get_data_insert_timesheets($staffid, $in_out['in'], $in_out['out']);
@@ -5064,13 +5135,14 @@ public function check_in_ts() {
 		}
 		return $data_map;
 	}
-/**
- * get layout timesheets
- * @param  string $from_date
- * @param  string $to_date
- * @return array
- */
-	public function get_layout_timesheets($from_date, $to_date) {
+	/**
+	 * get layout timesheets
+	 * @param  string $from_date
+	 * @param  string $to_date
+	 * @return array
+	 */
+	public function get_layout_timesheets($from_date, $to_date)
+	{
 		$data['day_by_month_tk'] = [];
 		$data['day_by_month_tk'][] = _l('staff_id');
 		$data['day_by_month_tk'][] = _l('staff');
@@ -5087,7 +5159,8 @@ public function check_in_ts() {
 		}
 		return $data;
 	}
-	function delete_mass_workplace_assign() {
+	function delete_mass_workplace_assign()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$success = $this->timesheets_model->delete_mass_workplace_assign($data);
@@ -5101,7 +5174,8 @@ public function check_in_ts() {
 			redirect(admin_url('timesheets/workplace_mgt?group=workplace_assign'));
 		}
 	}
-	public function route_management() {
+	public function route_management()
+	{
 		$allow_attendance_by_route = 0;
 		$data_by_route = get_timesheets_option('allow_attendance_by_route');
 		if ($data_by_route) {
@@ -5179,7 +5253,8 @@ public function check_in_ts() {
 		$this->load->view('route_management/manage', $data);
 	}
 
-	public function get_route_map_data($staffid = '', $current_date = '') {
+	public function get_route_map_data($staffid = '', $current_date = '')
+	{
 		if ($staffid == '') {
 			$staffid = get_staff_user_id();
 		}
@@ -5244,10 +5319,11 @@ public function check_in_ts() {
 		}
 		return $coordinates_list;
 	}
-/**
- * add route point
- */
-	public function add_route_point() {
+	/**
+	 * add route point
+	 */
+	public function add_route_point()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			if (!$this->input->post('id')) {
@@ -5273,18 +5349,20 @@ public function check_in_ts() {
 			}
 		}
 	}
-/**
- * table route point
- * @return view
- */
-	public function table_route_point() {
+	/**
+	 * table route point
+	 * @return view
+	 */
+	public function table_route_point()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'route_management/table_route_point'));
 	}
-/**
- * delete shift
- * @param int $id
- */
-	public function delete_route_point($id) {
+	/**
+	 * delete shift
+	 * @param int $id
+	 */
+	public function delete_route_point($id)
+	{
 		$response = $this->timesheets_model->delete_route_point($id);
 		if ($response == true) {
 			set_alert('success', _l('deleted') . ' ' . _l('route_point'));
@@ -5297,13 +5375,15 @@ public function check_in_ts() {
 	 * table route
 	 * @return view
 	 */
-	public function table_route() {
+	public function table_route()
+	{
 		$this->app->get_table_data(module_views_path('timesheets', 'route_management/table_route'));
 	}
 	/**
 	 * add route
 	 */
-	public function add_route() {
+	public function add_route()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$add = $this->timesheets_model->add_route($data);
@@ -5320,7 +5400,8 @@ public function check_in_ts() {
 	/**
 	 * add new root
 	 */
-	public function add_new_root() {
+	public function add_new_root()
+	{
 		$data['title'] = _l('route_management');
 		$this->load->model('staff_model');
 		$header = [];
@@ -5350,11 +5431,12 @@ public function check_in_ts() {
 		$data['data_object'] = $data_object;
 		$this->load->view('route_management/add_new_root', $data);
 	}
-/**
- * get ui create root
- * @return json
- */
-	public function get_ui_create_root() {
+	/**
+	 * get ui create root
+	 * @return json
+	 */
+	public function get_ui_create_root()
+	{
 		$staff = $this->input->post('staff');
 		$date = $this->input->post('date');
 		$route_point = $this->input->post('route_point');
@@ -5379,7 +5461,7 @@ public function check_in_ts() {
 				$where .= ' AND staffid in (' . implode(',', $staff) . ')';
 			}
 		}
-//department
+		//department
 		if ($department) {
 			if ($where != '') {
 				$where .= ' AND ';
@@ -5424,28 +5506,30 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * get cordinate
- * @return json
- */
-	public function get_coordinate() {
+	/**
+	 * get cordinate
+	 * @return json
+	 */
+	public function get_coordinate()
+	{
 		$address = $this->input->post('address');
 		$coordinate = address2geo($address);
 		echo $coordinate;
 		die;
 	}
-/**
- * get data relate
- * @return json
- */
-	public function get_data_relate() {
+	/**
+	 * get data relate
+	 * @return json
+	 */
+	public function get_data_relate()
+	{
 		$data = $this->input->post();
 		$route_point_address = '';
 		$latitude = '';
 		$longitude = '';
 		$distance = '';
 		if ($data['related_to'] == 1) {
-// Related to customer
+			// Related to customer
 			$this->load->model('clients_model');
 			$data_customer = $this->clients_model->get($data['related_id']);
 			$route_point_address = $data_customer->address .
@@ -5453,7 +5537,7 @@ public function check_in_ts() {
 				(($data_customer->state != '' || $data_customer->state != null) ? ', ' . $data_customer->state : '');
 		}
 		if ($data['related_to'] == 2) {
-// Related to workplace
+			// Related to workplace
 			$data_workplace = $this->timesheets_model->get_workplace($data['related_id']);
 			$latitude = $data_workplace->latitude;
 			$longitude = $data_workplace->longitude;
@@ -5468,11 +5552,12 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * get data map
- * @return json
- */
-	public function get_data_map() {
+	/**
+	 * get data map
+	 * @return json
+	 */
+	public function get_data_map()
+	{
 		$data = $this->input->post();
 		$route_point_list = (isset($data['route_point']) ? $data['route_point'] : []);
 		$flightPlanCoordinates = [];
@@ -5480,7 +5565,7 @@ public function check_in_ts() {
 		if (isset($data['staff'])) {
 			if ($data['staff'] && $current_date) {
 				$staff_list = $data['staff'];
-				if(!is_array($staff_list)){
+				if (!is_array($staff_list)) {
 					$staff_list = [];
 					$staff_list[] = $data['staff'];
 				}
@@ -5567,7 +5652,8 @@ public function check_in_ts() {
 	 * get route point combobox
 	 * @return json
 	 */
-	public function get_route_point_combobox() {
+	public function get_route_point_combobox()
+	{
 		$data = $this->input->post();
 		$latitude = $data['lat'];
 		$longitude = $data['lng'];
@@ -5615,7 +5701,8 @@ public function check_in_ts() {
 	 * check route point name
 	 * @return json
 	 */
-	public function check_route_point_name() {
+	public function check_route_point_name()
+	{
 		$data = $this->input->post();
 		$exist = false;
 		$message = "";
@@ -5633,11 +5720,12 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * get default lat long
- * @return json
- */
-	public function get_default_lat_long() {
+	/**
+	 * get default lat long
+	 * @return json
+	 */
+	public function get_default_lat_long()
+	{
 		$latitude = 40.90011966771429;
 		$longitude = -74.10928986604924;
 		$data = $this->timesheets_model->get_route_point();
@@ -5651,11 +5739,12 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * get check in out history
- * @return json
- */
-	public function get_check_in_out_history() {
+	/**
+	 * get check in out history
+	 * @return json
+	 */
+	public function get_check_in_out_history()
+	{
 		$data = $this->input->post();
 		$staffid = explode(',', $data['list_staffid']);
 		$content = '';
@@ -5685,12 +5774,13 @@ public function check_in_ts() {
 		]);
 	}
 
-/**
- * export attendance excel
- * @return json
- */
+	/**
+	 * export attendance excel
+	 * @return json
+	 */
 
-	public function export_attendance_excel() {
+	public function export_attendance_excel()
+	{
 		if (!class_exists('XLSXReader_fin')) {
 			require_once module_dir_path(TIMESHEETS_MODULE_NAME) . '/assets/plugins/XLSXReader/XLSXReader.php';
 		}
@@ -5701,7 +5791,7 @@ public function check_in_ts() {
 			$department_filter = $this->input->post('department');
 			$role_filter = $this->input->post('role');
 			$staff_filter = $this->input->post('staff');
-			if($staff_filter == ''){
+			if ($staff_filter == '') {
 				$staff_id_arr = [];
 				$staffs = $this->timesheets_model->get_staff_timekeeping_applicable_object();
 				foreach ($staffs as $key => $staff) {
@@ -5761,11 +5851,12 @@ public function check_in_ts() {
 			die;
 		}
 	}
-/**
- * history check in out report
- * @return
- */
-	public function history_check_in_out_report() {
+	/**
+	 * history check in out report
+	 * @return
+	 */
+	public function history_check_in_out_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$months_report = $this->input->post('months_filter');
@@ -5810,7 +5901,6 @@ public function check_in_ts() {
 					$months_report--;
 					$from_date = date('Y-m-01', strtotime("-$months_report MONTH"));
 					$to_date = date('Y-m-t');
-
 				} //12 thang qua
 				if ($months_report == 'custom') {
 					$from_date = to_sql_date($this->input->post('report_from'));
@@ -5868,19 +5958,17 @@ public function check_in_ts() {
 				}
 
 				$data_staff = $this->staff_model->get('', 'active = 1');
-				if($data_staff){
+				if ($data_staff) {
 					$staff_id_list = [];
 					foreach ($data_staff as $key => $value) {
 						$staff_id_list[] = $value['staffid'];
 					}
-					if(count($staff_id_list) > 0){
+					if (count($staff_id_list) > 0) {
 						$query .= ' staff_id in (' . implode(',', $staff_id_list) . ') and';
-					}
-					else{
+					} else {
 						$query .= ' staff_id in (0) and';
 					}
-				}
-				else{
+				} else {
 					$query .= ' staff_id in (0) and';
 				}
 				/*get requisition approval*/
@@ -5923,7 +6011,7 @@ public function check_in_ts() {
 					}
 					$row[] = $type_check;
 					$shift_name = '';
-// Shift
+					// Shift
 					$list_shift = $this->timesheets_model->get_shift_work_staff_by_date($aRow['staff_id'], date('Y-m-d', strtotime($aRow['date'])));
 					if (isset($word_shift_fillter) && $word_shift_fillter != '') {
 						if (count(array_intersect($list_shift, $word_shift_fillter)) == 0) {
@@ -5937,10 +6025,10 @@ public function check_in_ts() {
 							$shift_s .= $data_shift_type->shift_type_name . "\n";
 						}
 					}
-// End shift
+					// End shift
 					$row[] = $shift_s;
 
-// Workplace
+					// Workplace
 					$workplace_name = '';
 					if ($aRow['workplace_id'] && $aRow['workplace_id'] != '' && $aRow['workplace_id'] != 0) {
 						$datawplace = $this->timesheets_model->get_workplace($aRow['workplace_id']);
@@ -5948,10 +6036,10 @@ public function check_in_ts() {
 							$workplace_name = $datawplace->name;
 						}
 					}
-// End workplace
+					// End workplace
 					$row[] = $workplace_name;
 
-// Route
+					// Route
 					$route_name = '';
 					if ($aRow['route_point_id'] && $aRow['route_point_id'] != '' && $aRow['route_point_id'] != 0) {
 						$route_data = $this->timesheets_model->get_route_point($aRow['route_point_id']);
@@ -5959,7 +6047,7 @@ public function check_in_ts() {
 							$route_name = $route_data->name;
 						}
 					}
-// End route
+					// End route
 					$row[] = $route_name;
 					if ($allow_add == true) {
 						$output['aaData'][] = $row;
@@ -5973,10 +6061,11 @@ public function check_in_ts() {
 	}
 
 	/**
- 	* check in out progress according to the route report
- 	* @return
- 	*/
-	public function check_in_out_progress_according_to_the_route_report() {
+	 * check in out progress according to the route report
+	 * @return
+	 */
+	public function check_in_out_progress_according_to_the_route_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$month = $this->input->post('months_2_report');
@@ -6086,32 +6175,36 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * report by working hours
- * @return json
- */
-	public function report_of_leave() {
+	/**
+	 * report by working hours
+	 * @return json
+	 */
+	public function report_of_leave()
+	{
 		echo json_encode($this->timesheets_model->report_of_leave_by_month());
 	}
-/**
- * leave by department report
- * @return json
- */
-	public function leave_by_department() {
+	/**
+	 * leave by department report
+	 * @return json
+	 */
+	public function leave_by_department()
+	{
 		echo json_encode($this->timesheets_model->report_leave_by_department());
 	}
-/**
- * ratio check in out by workplace
- * @return json
- */
-	public function ratio_check_in_out_by_workplace() {
+	/**
+	 * ratio check in out by workplace
+	 * @return json
+	 */
+	public function ratio_check_in_out_by_workplace()
+	{
 		echo json_encode($this->timesheets_model->report_ratio_check_in_out_by_workplace());
 	}
-/**
- * get header report check in out
- * @return json
- */
-	public function get_header_report_check_in_out($month, $year) {
+	/**
+	 * get header report check in out
+	 * @return json
+	 */
+	public function get_header_report_check_in_out($month, $year)
+	{
 		if (isset($month) && isset($year)) {
 			if ($month != '' && $year != '') {
 				$col_header = '';
@@ -6142,11 +6235,12 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * check in out progress according to the route report
- * @return
- */
-	public function check_in_out_progress_report() {
+	/**
+	 * check in out progress according to the route report
+	 * @return
+	 */
+	public function check_in_out_progress_report()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$month = $this->input->post('months_2_report');
@@ -6259,12 +6353,13 @@ public function check_in_ts() {
 			}
 		}
 	}
-/**
- * get remain day of
- * @param  integer $id
- * @return json
- */
-	public function get_remain_day_of($id, $type_of_leave) {
+	/**
+	 * get remain day of
+	 * @param  integer $id
+	 * @return json
+	 */
+	public function get_remain_day_of($id, $type_of_leave)
+	{
 		$html = '';
 		$day_off = $this->timesheets_model->get_current_date_off($id, $type_of_leave);
 		$number_day_off = $day_off->number_day_off;
@@ -6280,10 +6375,11 @@ public function check_in_ts() {
 		]);
 		die;
 	}
-/**
- * calendar leave application
- */
-	public function calendar_leave_application() {
+	/**
+	 * calendar leave application
+	 */
+	public function calendar_leave_application()
+	{
 		$this->load->model('staff_model');
 		$this->load->model('departments_model');
 
@@ -6306,9 +6402,9 @@ public function check_in_ts() {
 		$data['current_date'] = date('Y-m-d H:i:s');
 
 
-		$data['pro'] = $this->staff_model->get('','active = 1');
+		$data['pro'] = $this->staff_model->get('', 'active = 1');
 		$data['staff'] = $data['pro'];
-		
+
 		$data['google_calendar_api'] = get_option('google_calendar_api_key');
 		add_calendar_assets();
 		$data['title'] = _l('ts_calendar_view');
@@ -6320,10 +6416,11 @@ public function check_in_ts() {
 		$data['department_filter'] = (isset($dta['department_filter']) ? $dta['department_filter'] : []);
 		$this->load->view('leave/calendar', $data);
 	}
-/**
- * get calendar data
- */
-	public function get_calendar_data() {
+	/**
+	 * get calendar data
+	 */
+	public function get_calendar_data()
+	{
 		if ($this->input->is_ajax_request()) {
 			$data = $this->input->get();
 			$data_calendar = $this->timesheets_model->get_calendar_leave_data($data);
@@ -6332,10 +6429,11 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * timesheet permission table
- */
-	public function timesheet_permission_table() {
+	/**
+	 * timesheet permission table
+	 */
+	public function timesheet_permission_table()
+	{
 		if ($this->input->is_ajax_request()) {
 
 			$select = [
@@ -6394,10 +6492,11 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * permission modal
- */
-	public function permission_modal() {
+	/**
+	 * permission modal
+	 */
+	public function permission_modal()
+	{
 		if (!$this->input->is_ajax_request()) {
 			show_404();
 		}
@@ -6429,12 +6528,13 @@ public function check_in_ts() {
 		}
 	}
 
-/**
- * staff id changed
- * @param  integer $staff_id
- * @return json
- */
-	public function staff_id_changed($staff_id) {
+	/**
+	 * staff id changed
+	 * @param  integer $staff_id
+	 * @return json
+	 */
+	public function staff_id_changed($staff_id)
+	{
 		$role_id = '';
 		$status = 'false';
 
@@ -6442,7 +6542,6 @@ public function check_in_ts() {
 		if ($staff) {
 			$role_id = $staff->role;
 			$status = 'true';
-
 		}
 
 		echo json_encode([
@@ -6452,11 +6551,12 @@ public function check_in_ts() {
 		die;
 	}
 
-/**
- * hr profile update permissions
- * @param  string $id
- */
-	public function update_permissions($id = '') {
+	/**
+	 * hr profile update permissions
+	 * @param  string $id
+	 */
+	public function update_permissions($id = '')
+	{
 		$data = $this->input->post();
 
 		if (!isset($id) || $id == '') {
@@ -6511,11 +6611,12 @@ public function check_in_ts() {
 		redirect(admin_url('timesheets/setting?group=permission'));
 	}
 
-/**
- * delete permission
- * @param  integer $id
- */
-	public function delete_permission($id) {
+	/**
+	 * delete permission
+	 * @param  integer $id
+	 */
+	public function delete_permission($id)
+	{
 		$response = $this->timesheets_model->delete_permission($id);
 		if (is_array($response) && isset($response['referenced'])) {
 			set_alert('warning', _l('hr_is_referenced', _l('department_lowercase')));
@@ -6527,38 +6628,39 @@ public function check_in_ts() {
 		redirect(admin_url('timesheets/setting?group=permission'));
 	}
 
-/**
- * reset data
- */
-	public function reset_data() {
+	/**
+	 * reset data
+	 */
+	public function reset_data()
+	{
 		if (!is_admin()) {
 			access_denied('timesheets');
 		}
 
-// Workplace
+		// Workplace
 		$this->db->truncate(db_prefix() . 'timesheets_workplace_assign');
 
-// Shift
+		// Shift
 		$this->db->truncate(db_prefix() . 'work_shift');
 		$this->db->truncate(db_prefix() . 'work_shift_detail_number_day');
 		$this->db->truncate(db_prefix() . 'work_shift_detail');
 
-// Leave
+		// Leave
 		$this->db->truncate(db_prefix() . 'timesheets_requisition_leave');
 		$this->db->truncate(db_prefix() . 'timesheets_approval_details');
 		$this->db->truncate(db_prefix() . 'timesheets_go_bussiness_advance_payment');
 
-// Additional work hours
+		// Additional work hours
 		$this->db->truncate(db_prefix() . 'timesheets_additional_timesheet');
 
-// Work route
+		// Work route
 		$this->db->truncate(db_prefix() . 'timesheets_route');
 
-// Attendance
+		// Attendance
 		$this->db->truncate(db_prefix() . 'timesheets_timesheet');
 		$this->db->truncate(db_prefix() . 'check_in_out');
 
-//delete folder leave application
+		//delete folder leave application
 		foreach (glob(TIMESHEETS_MODULE_UPLOAD_FOLDER . '/requisition_leave/' . '*') as $file) {
 			$file_arr = explode("/", $file);
 			$filename = array_pop($file_arr);
@@ -6567,7 +6669,7 @@ public function check_in_ts() {
 			}
 		}
 
-// delete file
+		// delete file
 		$this->db->where('rel_type', 'requisition');
 		$this->db->delete(db_prefix() . 'files');
 
@@ -6576,12 +6678,13 @@ public function check_in_ts() {
 			'message' => _l('ts_reset_data_successful'),
 		]);
 	}
-/**
- * get setting annual leave
- * @param  string $year
- * @return array
- */
-	public function get_setting_annual_leave($year = '', $type_of_leave = '') {
+	/**
+	 * get setting annual leave
+	 * @param  string $year
+	 * @return array
+	 */
+	public function get_setting_annual_leave($year = '', $type_of_leave = '')
+	{
 		$max_row = 0;
 		$new_array_obj = [];
 		$this->load->model('staff_model');
@@ -6589,7 +6692,7 @@ public function check_in_ts() {
 		foreach ($data_staff as $key => $value) {
 			$max_row++;
 			$result = $this->get_norms_of_leave_staff($value, $year, $type_of_leave);
-			if($result){
+			if ($result) {
 				array_push($new_array_obj, $result);
 			}
 		}
@@ -6597,10 +6700,11 @@ public function check_in_ts() {
 		$data['leave_of_the_year'] = json_encode($new_array_obj);
 		return $data;
 	}
-/**
- * add type of leave
- */
-	public function add_type_of_leave() {
+	/**
+	 * add type of leave
+	 */
+	public function add_type_of_leave()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$is_redirect = 0;
@@ -6686,11 +6790,12 @@ public function check_in_ts() {
 			redirect(admin_url('timesheets/requisition_manage'));
 		}
 	}
-/**
- * delete type of leave
- * @param  integer $id
- */
-	public function delete_type_of_leave($id) {
+	/**
+	 * delete type of leave
+	 * @param  integer $id
+	 */
+	public function delete_type_of_leave($id)
+	{
 		$response = $this->timesheets_model->delete_type_of_leave($id);
 		if ($response == true) {
 			set_alert('success', _l('ts_delete_successfully'));
@@ -6704,7 +6809,8 @@ public function check_in_ts() {
 	 * table leave
 	 * @return view
 	 */
-	public function table_holiday() {
+	public function table_holiday()
+	{
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$select = [
@@ -6808,29 +6914,30 @@ public function check_in_ts() {
 
 
 	/**
- 	* set valid ip
- 	*/
-	public function set_valid_ip() {
+	 * set valid ip
+	 */
+	public function set_valid_ip()
+	{
 		if ($this->input->post()) {
 			$data = $this->input->post();
 			$success = $this->timesheets_model->set_valid_ip($data);
 			if ($success > 0) {
 				$message = _l('ts_updated_successfully', _l('setting'));
 				set_alert('success', $message);
-			}
-			else{
-				set_alert('danger', _l('no_data_changes'));				
+			} else {
+				set_alert('danger', _l('no_data_changes'));
 			}
 			redirect(admin_url('timesheets/setting?group=valid_ip'));
 		}
 	}
 
 
-/**
- * get setting valid ip
- * @return array
- */
-	public function get_setting_valid_ip() {
+	/**
+	 * get setting valid ip
+	 * @return array
+	 */
+	public function get_setting_valid_ip()
+	{
 		$new_array_obj = [];
 		$max_row = 0;
 		$data_ip = $this->timesheets_model->get_valid_ip();
@@ -6849,7 +6956,8 @@ public function check_in_ts() {
 	 * @param  string $type_of_leave 
 	 * @return array                
 	 */
-	public function get_norms_of_leave_staff($data_staff, $year, $type_of_leave = ''){
+	public function get_norms_of_leave_staff($data_staff, $year, $type_of_leave = '')
+	{
 		$department_name = '';
 		$data_department = $this->departments_model->get_staff_departments($data_staff['staffid']);
 		if ($data_department) {
@@ -6883,38 +6991,39 @@ public function check_in_ts() {
 				$remain_day = $data_leave->remain;
 			}
 		}
-		return array('staffid' => $data_staff['staffid'],'staffcode' => $data_staff['staff_identifi'] ,'staff' => $data_staff['firstname'] . ' ' . $data_staff['lastname'], 'department' => $department_name, 'role' => $role_name, 'maximum_leave_of_the_year' => $day, 'number_of_leave_days_remaining' => $remain_day);
+		return array('staffid' => $data_staff['staffid'], 'staffcode' => $data_staff['staff_identifi'], 'staff' => $data_staff['firstname'] . ' ' . $data_staff['lastname'], 'department' => $department_name, 'role' => $role_name, 'maximum_leave_of_the_year' => $day, 'number_of_leave_days_remaining' => $remain_day);
 	}
 
 	/**
 	 * api document
 	 */
 	public function api_document()
-    {
-        $data['title'] = _l('ts_api_document');
-        $this->load->view('../apidoc/index.html');
-    }
+	{
+		$data['title'] = _l('ts_api_document');
+		$this->load->view('../apidoc/index.html');
+	}
 
 	/**
 	 * get staff qr code
 	 * @return string
 	 */
-	public function get_staff_qr_code(){
+	public function get_staff_qr_code()
+	{
 		$user_id = get_staff_user_id();
-		if($user_id){
+		if ($user_id) {
 			$data_staff = $this->staff_model->get($user_id);
-			if($data_staff){
-				$staff = $data_staff->firstname.' '.$data_staff->lastname;
-				$tempDir = TIMESHEETS_PATH.'staff_qrcodes/';
+			if ($data_staff) {
+				$staff = $data_staff->firstname . ' ' . $data_staff->lastname;
+				$tempDir = TIMESHEETS_PATH . 'staff_qrcodes/';
 				$code_content = '';
-				$code_content .= '#'._l('ts_id').': '.$user_id."\n";
-				$code_content .= _l('ts_staff').': '.$staff."\n";
-				$code_content .= _l('ts_department').': '.ts_get_staff_department_names($user_id)."\n";
-				$code_content .= _l('ts_email').': '.$data_staff->email."\n";
-				$code_content .= _l('ts_phonenumber').': '.$data_staff->phonenumber."\n";
-				$code_content .= _l('ts_position').': '.$data_staff->job_position."\n";
-				$file_name = $user_id.'.png';
-				$image_path = $tempDir.$file_name;
+				$code_content .= '#' . _l('ts_id') . ': ' . $user_id . "\n";
+				$code_content .= _l('ts_staff') . ': ' . $staff . "\n";
+				$code_content .= _l('ts_department') . ': ' . ts_get_staff_department_names($user_id) . "\n";
+				$code_content .= _l('ts_email') . ': ' . $data_staff->email . "\n";
+				$code_content .= _l('ts_phonenumber') . ': ' . $data_staff->phonenumber . "\n";
+				$code_content .= _l('ts_position') . ': ' . $data_staff->job_position . "\n";
+				$file_name = $user_id . '.png';
+				$image_path = $tempDir . $file_name;
 				QRcode::png($code_content, $image_path, "L", 4, 4);
 				$data['user_id'] = $user_id;
 				$data['image_path'] = site_url($image_path);
@@ -6931,7 +7040,8 @@ public function check_in_ts() {
 	 * get scan qr code
 	 * @return string
 	 */
-	public function get_scan_qr_code_content(){
+	public function get_scan_qr_code_content()
+	{
 		$data['user_id'] = get_staff_user_id();
 		$html = $this->load->view('includes/modals/includes/scan_qr_content', $data, true);
 		echo $html;
@@ -6942,17 +7052,18 @@ public function check_in_ts() {
 	 * checkin from qr code
 	 * @return json
 	 */
-	public function checkin_from_qr_code($staff_id){
+	public function checkin_from_qr_code($staff_id)
+	{
 		$success = false;
 		$message = '';
 		$html_list = '';
-		if(is_numeric($staff_id) && $staff_id > 0){
+		if (is_numeric($staff_id) && $staff_id > 0) {
 			$date = date('Y-m-d H:i:s');
 			$data['staff_id'] = $staff_id;
 			$data['date'] = $date;
 			$type_check = $this->timesheets_model->get_type_check($staff_id, $date);
 			$data['type_check'] = $type_check;
-			if(is_admin() || (!is_admin() && get_staff_user_id() == $staff_id)){
+			if (is_admin() || (!is_admin() && get_staff_user_id() == $staff_id)) {
 				$success = $this->timesheets_model->checkin_timesheet($data);
 				if ($success == true) {
 					$data_check_in_out = $this->timesheets_model->get_list_check_in_out(date('Y-m-d', strtotime($date)), $staff_id);
@@ -6977,12 +7088,10 @@ public function check_in_ts() {
 						$message = _l('check_out_not_successfull');
 					}
 				}
-			}
-			else{
+			} else {
 				$message = _l('ts_permision_denied');
 			}
-		}
-		else{
+		} else {
 			$message = _l('ts_unable_to_identify_staff');
 		}
 		echo json_encode([
@@ -6994,16 +7103,85 @@ public function check_in_ts() {
 	}
 
 
-	public function update_leave(){
+	public function update_leave()
+	{
 		$data = $this->input->post();
 		$result = $this->timesheets_model->update_leave($data);
-		if($result == true){
+		if ($result == true) {
 			redirect(admin_url('timesheets/requisition_manage'));
-		}else{
+		} else {
 			set_alert('danger', _l('ts_update_fail'));
 			redirect(admin_url('timesheets/requisition_manage'));
 		}
-		
 	}
+	public function add_overtime()
+	{
+		// 1. Get today's date
+		$today = date('Y-m-d');
 
+		// 2. Fetch today's timesheets
+		$this->db->where('DATE(date_work)', $today);
+		$timesheets = $this->db->get('tbltimesheets_timesheet')->result_array();
+
+		// 3. Process each staff member
+		foreach ($timesheets as $timesheet) {
+			$staff_id = $timesheet['staff_id'];
+
+			// 4. Get staff's shift information
+			$this->db->select('tblshift_type.time_start_work, tblshift_type.time_end_work');
+			$this->db->join('tblshift_type', 'tblshift_type.id = tblwork_shift_detail_number_day.shift_id', 'left');
+			$this->db->where('tblwork_shift_detail_number_day.staff_id', $staff_id);
+			$shift = $this->db->get('tblwork_shift_detail_number_day')->row_array();
+
+			if (!$shift) {
+				log_message('warning', "No shift found for staff ID: $staff_id");
+				continue;
+			}
+
+			// 5. Calculate scheduled vs actual hours
+			$scheduled_start = strtotime($shift['time_start_work']);
+			$scheduled_end = strtotime($shift['time_end_work']);
+			$scheduled_hours = ($scheduled_end - $scheduled_start) / 3600;
+
+			$actual_hours = (float) $timesheet['value'];
+			$overtime_difference = $actual_hours - $scheduled_hours;
+
+			// 6. Apply only if overtime is 2.5 hours or more
+			if ($overtime_difference >= 2.5) {
+				$timesheets_additional_timesheet_arr = [
+					'staff_id' => $staff_id,
+					'additional_day' => $today,
+					'time_in' => $shift['time_start_work'],
+					'time_out' => $shift['time_end_work'],
+					'timekeeping_value' => $actual_hours,
+					'reason' => 'Overtime',
+					'status' => 0,
+					'creator' => $staff_id
+				];
+
+				$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', $timesheets_additional_timesheet_arr);
+				$insert_id = $this->db->insert_id();
+
+				if ($insert_id) {
+					mail('pawan.codrity@gmail.com', 'Timesheets Additional Hour Cron', 'Successfully added overtime for staff ID: ' . $staff_id);
+					$check_proccess = $this->timesheets_model->get_approve_setting('additional_timesheets');
+					if ($check_proccess) {
+						$checks = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
+						if ($checks == 0) {
+							$data_new = [
+								'rel_id' => $insert_id,
+								'rel_type' => 'additional_timesheets',
+								'addedfrom' => $staff_id,
+							];
+							$success = $this->send_request_approve($data_new, $staff_id);
+
+							if ($success && $staff_id == '') {
+								$this->send_mail($data_new);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
