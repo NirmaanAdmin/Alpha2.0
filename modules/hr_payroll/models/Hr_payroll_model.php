@@ -1350,10 +1350,7 @@ order by staff_id, header_oder
 
 				$array_earnings_list_probationary_header[] = $name . $prefix_probationary;
 				$array_earnings_list_formal_header[] = $name . $prefix_formal;
-				
-				
 			}
-			
 		} else {
 			$earnings_list = $this->get_earnings_list();
 
@@ -1417,7 +1414,7 @@ order by staff_id, header_oder
 		]);
 
 		$array_earnings_list_formal = array_reverse($array_earnings_list_formal);
-		
+
 		foreach ($array_earnings_list_formal as $key => $value) {
 			array_push($column_format, [
 				'data' => $key,
@@ -1452,7 +1449,7 @@ order by staff_id, header_oder
 
 		$results['header']		= array_merge($staff_information_header, $array_earnings_list_probationary_header, $probationary_date, $array_earnings_list_formal_header, $primary_date);
 		$results['column_format']		= $column_format;
-		
+
 		return $results;
 	}
 
@@ -2651,7 +2648,63 @@ order by staff_id, header_oder
 		}
 
 		if (count($row['insert']) != 0) {
-			$affected_rows = $this->db->insert_batch(db_prefix() . 'hrp_employees_timesheets', $row['insert']);
+
+			$transformedData = [];
+			foreach ($row['insert'] as $item) {
+				$transformed = [
+					'staff_id' => $item['staff_id'] ?? null,
+					'month' => $item['Month'] ?? null,
+					'rel_type' => $item['Rel type'] ?? null,
+					'standard_workday' => $item['Standard working time of the month (hours)'] ?? 0.00,
+					'actual_workday' => $item['Actual working time of formal contract (hours)'] ?? 0.00,
+					'actual_workday_probation' => $item['Actual working time of probation contract (hours)'] ?? 0.00,
+					'paid_leave' => $item['Paid leave time (hours)'] ?? 0.00,
+					'unpaid_leave' => $item['Unpaid leave time (hours)'] ?? 0.00
+				];
+
+				// Map day values (Sunday 1 => day_1, Monday 2 => day_2, etc.)
+				$dayMap = [
+					'Sunday 1' => 'day_1',
+					'Monday 2' => 'day_2',
+					'Tuesday 3' => 'day_3',
+					'Wednesday 4' => 'day_4',
+					'Thursday 5' => 'day_5',
+					'Friday 6' => 'day_6',
+					'Saturday 7' => 'day_7',
+					'Sunday 8' => 'day_8',
+					'Monday 9' => 'day_9',
+					'Tuesday 10' => 'day_10',
+					'Wednesday 11' => 'day_11',
+					'Thursday 12' => 'day_12',
+					'Friday 13' => 'day_13',
+					'Saturday 14' => 'day_14',
+					'Sunday 15' => 'day_15',
+					'Monday 16' => 'day_16',
+					'Tuesday 17' => 'day_17',
+					'Wednesday 18' => 'day_18',
+					'Thursday 19' => 'day_19',
+					'Friday 20' => 'day_20',
+					'Saturday 21' => 'day_21',
+					'Sunday 22' => 'day_22',
+					'Monday 23' => 'day_23',
+					'Tuesday 24' => 'day_24',
+					'Wednesday 25' => 'day_25',
+					'Thursday 26' => 'day_26',
+					'Friday 27' => 'day_27',
+					'Saturday 28' => 'day_28',
+					'Sunday 29' => 'day_29',
+					'Monday 30' => 'day_30',
+					'Tuesday 31' => 'day_31'
+				];
+
+				foreach ($dayMap as $source => $target) {
+					$transformed[$target] = $item[$source] ?? 0.00;
+				}
+
+				$transformedData[] = $transformed;
+			}
+			
+			$affected_rows = $this->db->insert_batch(db_prefix() . 'hrp_employees_timesheets', $transformedData);
 			if ($affected_rows > 0) {
 				$affectedRows++;
 			}
@@ -5119,7 +5172,7 @@ order by staff_id, header_oder
 		// if (isset($attendance_calculation_v2)) {
 		// 	$hrp_attendance = $attendance_calculation_v2;
 		// }
-		
+
 		foreach ($hrp_attendance as $attendance_key => $attendance_value) {
 
 			$attendances[$attendance_value['staff_id']] = $attendance_value;
@@ -5177,7 +5230,7 @@ order by staff_id, header_oder
 				$staffs_id[$deduction_value['staff_id']] = $deduction_value;
 			}
 		}
-		
+
 		//get commission
 		$commissions_data = $this->get_commissions_data($payslip_month, $str_sql);
 		foreach ($commissions_data as $commission_key => $commission_value) {
@@ -5217,7 +5270,7 @@ order by staff_id, header_oder
 
 		//get salary deduction from setting
 		$get_salary_deductions_list_setting = $this->get_salary_deductions_list();
-		
+
 		$salary_deductions_list_setting = [];
 		foreach ($get_salary_deductions_list_setting as $sl_key =>  $sl_value) {
 			$salary_deductions_list_setting['deduction_' . $sl_value['id']] = $sl_value['basis'];
@@ -5333,7 +5386,6 @@ order by staff_id, header_oder
 										//6 is formular is row 6
 										$payroll_formular = "=" . $number_to_anphabe[$gross_pay_index] . "6*" . $value . "/100";
 									}
-									
 								} elseif (preg_match('/^st_/', $salary_deductions_list_setting[$payroll_key]) || preg_match('/^al_/', $salary_deductions_list_setting[$payroll_key]) || preg_match('/^earning_/', $salary_deductions_list_setting[$payroll_key])) {
 
 									$salary_deductions_list_setting[$payroll_key];
@@ -5371,8 +5423,6 @@ order by staff_id, header_oder
 									}
 								}
 							}
-
-							
 						} elseif (preg_match('/^st_insurance_/', $payroll_key)) {
 							$value = isset($staff_value[$payroll_key]) ? $staff_value[$payroll_key] : 0;
 
@@ -5451,7 +5501,6 @@ order by staff_id, header_oder
 
 				$staff_row++;
 			}
-			
 		} else {
 			$payslip_cell_data[] = $this->general_cell_data(5, 4, _l('no_eligible_employee_was_found_for_this_payslip_template'), $t = 'g', $f = '', false, false, true);
 		}
@@ -6973,13 +7022,13 @@ order by staff_id, header_oder
 		if ($where != '') {
 			$this->db->where($where);
 		}
-		
+
 		$this->db->where('rel_type', $rel_type);
 		$this->db->where("date_format(month, '%Y-%m-%d') = '" . $month . "'");
 		$this->db->order_by('staff_id', 'asc');
 		$employees_timesheets = $this->db->get(db_prefix() . 'hrp_employees_timesheets')->result_array();
-		
-		
+
+
 		// get employees_timesheet leaves
 		$this->db->select($str_select_temp . ', id, staff_id, month');
 		if ($where != '') {
@@ -7068,7 +7117,7 @@ order by staff_id, header_oder
 
 			$attendance_data[$timesheet['staff_id']] = $employees_timesheets[$em_key];
 		}
-		
+
 		return $employees_timesheets;
 	}
 
@@ -7570,8 +7619,8 @@ order by staff_id, header_oder
 
 		$result = 0;
 		$data_shift_list = $this->get_shift_work_staff_by_date($staff_id, $date);
-		
-	
+
+
 		foreach ($data_shift_list as $ss) {
 			$data_shift_type = $this->get_shift_type($ss);
 			if ($data_shift_type) {
@@ -7580,8 +7629,8 @@ order by staff_id, header_oder
 				$result += abs($hour - $lunch_hour);
 			}
 		}
-		
-	
+
+
 		return $result;
 	}
 	/**

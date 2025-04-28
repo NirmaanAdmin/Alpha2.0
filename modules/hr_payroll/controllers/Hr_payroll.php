@@ -718,7 +718,7 @@ class hr_payroll extends AdminController
 		foreach ($staffs as $staff_key => $staff_value) {
 			/*check value from database*/
 			$data_object_kpi[$staff_key]['staff_id'] = $staff_value['staffid'];
-			
+
 			$staff_i = $this->hr_payroll_model->get_staff_info($staff_value['staffid']);
 			if ($staff_i) {
 
@@ -819,7 +819,7 @@ class hr_payroll extends AdminController
 
 			$data_object_kpi[$staff_key]['rel_type'] = $rel_type;
 		}
-		
+
 		//check is add new or update data
 		if (count($employees_value) > 0) {
 			$data['button_name'] = _l('hrp_update');
@@ -832,10 +832,10 @@ class hr_payroll extends AdminController
 		$data['staffs'] = $staffs;
 
 		$data['body_value'] = json_encode($data_object_kpi);
-		
+
 		$data['columns'] = json_encode($format_employees_value['column_format']);
 		$data['col_header'] = json_encode($format_employees_value['header']);
-		
+
 		$this->load->view('employees/employees_manage', $data);
 	}
 
@@ -2058,7 +2058,7 @@ class hr_payroll extends AdminController
 						$xlsx = new XLSXReader_fin($newFilePath);
 						$sheetNames = $xlsx->getSheetNames();
 						$data = $xlsx->getSheetData($sheetNames[1]);
-
+						
 						$arr_header = [];
 
 						$arr_header['staff_id'] = 0;
@@ -2075,7 +2075,7 @@ class hr_payroll extends AdminController
 						$total_rows = 0;
 						$total_row_false = 0;
 
-						$column_key = $data[1];
+						$column_key = $data[0];
 						for ($row = 1; $row < count($data); $row++) {
 
 							$total_rows++;
@@ -2111,6 +2111,7 @@ class hr_payroll extends AdminController
 							if ($flag == 0 && $flag2 == 0) {
 
 								$rd = array_combine($column_key, $data[$row]);
+								$rd['id'] = isset($rd['id']) ? $rd['id'] : 0;
 								unset($rd['employee_number']);
 								unset($rd['employee_name']);
 								unset($rd['department_name']);
@@ -5463,8 +5464,8 @@ class hr_payroll extends AdminController
 				$data['payslip']->to_currency_name = $base_currency->name;
 			}
 		}
-		$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'],$data['payslip_detail']['staff_id']);
-	
+		$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'], $data['payslip_detail']['staff_id']);
+
 		$html = $this->load->view('hr_payroll/employee_payslip/export_employee_payslip', $data, true);
 		$html .= '<link href="' . module_dir_url(HR_PAYROLL_MODULE_NAME, 'assets/css/export_employee_pdf.css') . '"  rel="stylesheet" type="text/css" />';
 
@@ -5572,8 +5573,8 @@ class hr_payroll extends AdminController
 						$data['payslip']->to_currency_name = $base_currency->name;
 					}
 				}
-				$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'],$data['payslip_detail']['staff_id']);
-				
+				$data['get_data_for_month'] = $this->general_public_report($data['payslip_detail']['month'], $data['payslip_detail']['staff_id']);
+
 				$html = $this->load->view('hr_payroll/employee_payslip/export_employee_payslip', $data, true);
 				$html .= '<link href="' . module_dir_url(HR_PAYROLL_MODULE_NAME, 'assets/css/export_employee_pdf.css') . '"  rel="stylesheet" type="text/css" />';
 
@@ -6420,18 +6421,17 @@ class hr_payroll extends AdminController
 	 * general public report
 	 * @return json
 	 */
-	public function general_public_report($month,$staff_id)
-	{	
-		
+	public function general_public_report($month, $staff_id)
+	{
 
-		if ($month != '') 
-		{
+
+		if ($month != '') {
 			$from_date = date('Y-m-01', strtotime($month));
 			$to_date = date('Y-m-t', strtotime($month));
 			// $from_date = $this->timesheets_model->format_date($this->input->post('report_from'));
 			// $to_date = $this->timesheets_model->format_date($this->input->post('report_to'));
 		}
-		
+
 		$select = [
 			'staffid',
 			'firstname',
@@ -6455,7 +6455,7 @@ class hr_payroll extends AdminController
 			$query .= ' staffid in (' . $staffid_list . ') and';
 		}
 
-		
+
 		$query .= ' active = 1 and';
 		$total_query = '';
 		if (($query) && ($query != '')) {
@@ -6477,13 +6477,13 @@ class hr_payroll extends AdminController
 		// $output = $result['output'];
 		$rResult = $result['rResult'];
 		$data_timesheet = [];
-		
+
 		$this->load->model('timesheets/timesheets_model');
-		
+
 		$data_timesheet = $this->timesheets_model->get_attendance_manual($rResult, '', '', $from_date, $to_date);
-		
+
 		$index_hr_code = _l('staff_id');
-		
+
 		if ($data_timesheet) {
 			foreach ($rResult as $aRow) {
 				$row = [];
@@ -6589,7 +6589,7 @@ class hr_payroll extends AdminController
 
 				$row[] = $total_shift;
 				$row[] = ($total > 0) ? (float) number_format($total, 2) : 0;
-				
+
 				$output[] = $row;
 			}
 		}
