@@ -6366,7 +6366,7 @@ class timesheets extends AdminController
 		$days_off = $day_off->days_off;
 
 		$valid_cur_date = $this->timesheets_model->get_next_shift_date($id, date('Y-m-d'));
-		$html .= '<label class="control-label">' . _l('number_of_days_off') . ': ' . $days_off . '</label><br>';
+		// $html .= '<label class="control-label">' . _l('number_of_days_off') . ': ' . $days_off . '</label><br>';
 		$html .= '<label class="control-label' . ($number_day_off == 0 ? ' text-danger' : '') . '">' . _l('number_of_leave_days_allowed') . ': ' . $number_day_off . '</label>';
 		$html .= '<input type="hidden" name="number_day_off" value="' . $number_day_off . '">';
 		echo json_encode([

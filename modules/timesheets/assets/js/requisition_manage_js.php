@@ -122,11 +122,11 @@
         $('.approx-fr').removeClass('hide');
         $('#number_of_leaving_day').val(0.5);
         var val = $('select[name="type_of_leave"]').val();
-        if (val == 8) {
-          $('div[id="number_days_off_2"]').removeClass('hide');
-        } else {
-          $('div[id="number_days_off_2"]').addClass('hide');
-        }
+        // if (val != 4) {
+        //   $('div[id="number_days_off_2"]').removeClass('hide');
+        // } else {
+        //   $('div[id="number_days_off_2"]').addClass('hide');
+        // }
 
         $('div[id="number_days_off"]').removeClass('hide');
 
