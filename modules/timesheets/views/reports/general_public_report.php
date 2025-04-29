@@ -19,7 +19,7 @@
             <th><?php echo _l('early'); ?></th>
             <th><?php echo _l('late'); ?></th>
             <th><?php echo _l('ME_value'); ?></th>
-            <th><?php echo _l('ts_total_working_hours'); ?></th>
+            <!-- <th><?php echo _l('ts_total_working_hours'); ?></th> -->
          </tr>
       </thead>
       <tbody></tbody>
@@ -39,7 +39,7 @@
          <td></td>
          <td></td>
          <td></td>
-         <td></td>
+         <!-- <td></td> -->
       </tfoot>
    </table>
 </div>

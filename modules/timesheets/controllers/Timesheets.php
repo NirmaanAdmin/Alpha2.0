@@ -2462,7 +2462,7 @@ class timesheets extends AdminController
 						$row[] = ($total12 > 0) ? (float) number_format($total12, 2) : 0;
 						$row[] = ($total13 > 0) ? (float) number_format($total13, 2) : 0;
 						$row[] = ($total14 > 0) ? (float) number_format($total14, 2) : 0;
-						$row[] = (count($data_working_hour) > 0) ? $this->timesheets_model->calculate_total_working_hour($data_working_hour) : '';
+						// $row[] = (count($data_working_hour) > 0) ? $this->timesheets_model->calculate_total_working_hour($data_working_hour) : '';
 						$output['aaData'][] = $row;
 					}
 				}
