@@ -243,7 +243,7 @@ class timesheets extends AdminController
 			$result = $this->timesheets_model->get_attendance_task($staffs, $month, $month_year);
 			$data['staff_row_tk'] = $result['staff_row_tk'];
 			$data['cell_background'] = $result['cell_background'];
-		} else {
+		} else {	
 			if ($data['check_latch_timesheet'] == false) {
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $month, $month_year);
 				$data['staff_row_tk'] = $result['staff_row_tk'];
@@ -254,6 +254,7 @@ class timesheets extends AdminController
 		$data_lack = [];
 		$data['data_lack'] = $data_lack;
 		$data['set_col_tk'] = json_encode($data['set_col_tk']);
+		
 		$this->load->view('timekeeping/manage_timekeeping', $data);
 	}
 	/**
@@ -1195,6 +1196,7 @@ class timesheets extends AdminController
 
 		$data['value'] = explode('; ', $data['value']);
 		$html = '';
+		
 		foreach ($data['value'] as $key => $value) {
 			$value = explode(':', $value);
 			if (isset($value[1]) && $value[1] > 0 || $value[0] == 'M' || $value[0] == 'HO' || $value[0] == 'B') {
@@ -2451,7 +2453,7 @@ class timesheets extends AdminController
 						}
 
 						$row[] = $total_shift;
-						$row[] = ($total > 0) ? (float) number_format($total, 2) : 0;
+						$row[] = ($total > 0) ? ceil($total * 2) / 2 : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
 						$row[] = ($total3 > 0) ? (float) number_format($total3, 2) : 0;
 						$row[] = ($total7 > 0) ? (float) number_format($total7, 2) : 0;
