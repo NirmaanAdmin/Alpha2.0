@@ -7146,8 +7146,8 @@ class timesheets extends AdminController
 			$scheduled_hours = ($scheduled_end - $scheduled_start) / 3600;
 
 			$actual_hours = (float) $timesheet['value'];
-			$overtime_difference = $actual_hours - $scheduled_hours;
-
+			$overtime_difference = $scheduled_hours - $actual_hours;
+			
 			// 6. Apply only if overtime is 2.5 hours or more
 			if ($overtime_difference >= 2.5) {
 				$timesheets_additional_timesheet_arr = [
