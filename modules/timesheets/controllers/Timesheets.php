@@ -243,7 +243,7 @@ class timesheets extends AdminController
 			$result = $this->timesheets_model->get_attendance_task($staffs, $month, $month_year);
 			$data['staff_row_tk'] = $result['staff_row_tk'];
 			$data['cell_background'] = $result['cell_background'];
-		} else {
+		} else {	
 			if ($data['check_latch_timesheet'] == false) {
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $month, $month_year);
 				$data['staff_row_tk'] = $result['staff_row_tk'];
@@ -254,7 +254,7 @@ class timesheets extends AdminController
 		$data_lack = [];
 		$data['data_lack'] = $data_lack;
 		$data['set_col_tk'] = json_encode($data['set_col_tk']);
-
+		
 		$this->load->view('timekeeping/manage_timekeeping', $data);
 	}
 	/**
@@ -1196,7 +1196,7 @@ class timesheets extends AdminController
 
 		$data['value'] = explode('; ', $data['value']);
 		$html = '';
-
+		
 		foreach ($data['value'] as $key => $value) {
 			$value = explode(':', $value);
 			if (isset($value[1]) && $value[1] > 0 || $value[0] == 'M' || $value[0] == 'HO' || $value[0] == 'B') {
@@ -1596,7 +1596,6 @@ class timesheets extends AdminController
 		$data = $this->input->post();
 		$message = 'Send request approval fail';
 		$check = $this->timesheets_model->check_choose_when_approving($data['rel_type']);
-	
 		if ($check == 0) {
 			$success = $this->timesheets_model->send_request_approve($data);
 			if ($success === true) {
@@ -7117,90 +7116,18 @@ class timesheets extends AdminController
 			redirect(admin_url('timesheets/requisition_manage'));
 		}
 	}
-	// public function add_overtime()
-	// {
-	// 	// 1. Get today's date
-	// 	$today = date('Y-m-d');
-
-	// 	// 2. Fetch today's timesheets
-	// 	$this->db->where('DATE(date_work)', $today);
-	// 	$timesheets = $this->db->get('tbltimesheets_timesheet')->result_array();
-
-	// 	// 3. Process each staff member
-	// 	foreach ($timesheets as $timesheet) {
-	// 		$staff_id = $timesheet['staff_id'];
-
-	// 		// 4. Get staff's shift information
-	// 		$this->db->select('tblshift_type.time_start_work, tblshift_type.time_end_work');
-	// 		$this->db->join('tblshift_type', 'tblshift_type.id = tblwork_shift_detail_number_day.shift_id', 'left');
-	// 		$this->db->where('tblwork_shift_detail_number_day.staff_id', $staff_id);
-	// 		$shift = $this->db->get('tblwork_shift_detail_number_day')->row_array();
-
-	// 		if (!$shift) {
-	// 			log_message('warning', "No shift found for staff ID: $staff_id");
-	// 			continue;
-	// 		}
-
-	// 		// 5. Calculate scheduled vs actual hours
-	// 		$scheduled_start = strtotime($shift['time_start_work']);
-	// 		$scheduled_end = strtotime($shift['time_end_work']);
-	// 		$scheduled_hours = ($scheduled_end - $scheduled_start) / 3600;
-
-	// 		$actual_hours = (float) $timesheet['value'];
-	// 		$overtime_difference = $scheduled_hours - $actual_hours;
-
-	// 		// 6. Apply only if overtime is 2.5 hours or more
-	// 		if ($overtime_difference >= 2.5) {
-	// 			$timesheets_additional_timesheet_arr = [
-	// 				'staff_id' => $staff_id,
-	// 				'additional_day' => $today,
-	// 				'time_in' => $shift['time_start_work'],
-	// 				'time_out' => $shift['time_end_work'],
-	// 				'timekeeping_value' => $actual_hours,
-	// 				'reason' => 'Overtime',
-	// 				'status' => 0,
-	// 				'creator' => $staff_id
-	// 			];
-
-	// 			$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', $timesheets_additional_timesheet_arr);
-	// 			$insert_id = $this->db->insert_id();
-
-	// 			if ($insert_id) {
-
-	// 				$check_proccess = $this->timesheets_model->get_approve_setting('additional_timesheets');
-	// 				if ($check_proccess) {
-	// 					$checks = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
-	// 					if ($checks == 0) {
-	// 						$data_new = [
-	// 							'rel_id' => $insert_id,
-	// 							'rel_type' => 'additional_timesheets',
-	// 							'addedfrom' => $staff_id,
-	// 						];
-	// 						$success = $this->send_request_approve($data_new, $staff_id);
-
-
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 	public function add_overtime()
 	{
-		// 1. Set date range for May (1st to 31st)
-		$year = date('Y'); // Current year
-		$start_date = $year . '-05-01';
-		$end_date = $year . '-05-31';
+		// 1. Get today's date
+		$today = date('Y-m-d');
 
-		// 2. Fetch all timesheets for May
-		$this->db->where('DATE(date_work) >=', $start_date);
-		$this->db->where('DATE(date_work) <=', $end_date);
+		// 2. Fetch today's timesheets
+		$this->db->where('DATE(date_work)', $today);
 		$timesheets = $this->db->get('tbltimesheets_timesheet')->result_array();
 
-		// 3. Process each staff member's timesheet
+		// 3. Process each staff member
 		foreach ($timesheets as $timesheet) {
 			$staff_id = $timesheet['staff_id'];
-			$date_worked = $timesheet['date_work']; // Use the actual date from timesheet
 
 			// 4. Get staff's shift information
 			$this->db->select('tblshift_type.time_start_work, tblshift_type.time_end_work');
@@ -7209,7 +7136,7 @@ class timesheets extends AdminController
 			$shift = $this->db->get('tblwork_shift_detail_number_day')->row_array();
 
 			if (!$shift) {
-				log_message('warning', "No shift found for staff ID: $staff_id on date: $date_worked");
+				log_message('warning', "No shift found for staff ID: $staff_id");
 				continue;
 			}
 
@@ -7220,12 +7147,12 @@ class timesheets extends AdminController
 
 			$actual_hours = (float) $timesheet['value'];
 			$overtime_difference = $scheduled_hours - $actual_hours;
-			echo $staff_id .'-'.$date_worked.' - '.$overtime_difference.'<br>';
+			
 			// 6. Apply only if overtime is 2.5 hours or more
 			if ($overtime_difference >= 2.5) {
 				$timesheets_additional_timesheet_arr = [
 					'staff_id' => $staff_id,
-					'additional_day' => $date_worked, // Use the actual worked date from timesheet
+					'additional_day' => $today,
 					'time_in' => $shift['time_start_work'],
 					'time_out' => $shift['time_end_work'],
 					'timekeeping_value' => $actual_hours,
@@ -7238,6 +7165,7 @@ class timesheets extends AdminController
 				$insert_id = $this->db->insert_id();
 
 				if ($insert_id) {
+					
 					$check_proccess = $this->timesheets_model->get_approve_setting('additional_timesheets');
 					if ($check_proccess) {
 						$checks = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
@@ -7247,7 +7175,8 @@ class timesheets extends AdminController
 								'rel_type' => 'additional_timesheets',
 								'addedfrom' => $staff_id,
 							];
-							$this->timesheets_model->send_request_approve($data_new, $staff_id);
+							$success = $this->timesheets_model->send_request_approve($data_new, $staff_id);
+
 						}
 					}
 				}
