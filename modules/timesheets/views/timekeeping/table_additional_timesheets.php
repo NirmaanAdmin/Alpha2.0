@@ -127,7 +127,7 @@ foreach ($rResult as $aRow) {
     $row[] = $aRow['department_name'];
     $row[] = _d($aRow['additional_day']);
     $row[] = ($aRow['timekeeping_type'] != null ? _l($aRow['timekeeping_type']) : '');
-    $row[] = $aRow['timekeeping_value'];
+    $row[] = ceil($aRow['timekeeping_value']);
 
     $membersOutput = '';
 
