@@ -3,8 +3,8 @@
 $hasPermission = staff_can('edit', 'expenses') || staff_can('edit', 'expenses');
 if ($withBulkActions === true && $hasPermission) { ?>
   <a href="#" data-toggle="modal" data-target="#expenses_bulk_actions" class="hide bulk-actions-btn table-btn"
-      data-table=".table-expenses">
-      <?php echo _l('bulk_actions'); ?>
+    data-table=".table-expenses">
+    <?php echo _l('bulk_actions'); ?>
   </a>
 <?php } ?>
 <?php
@@ -22,13 +22,13 @@ $table_data = [
 ];
 
 if (!isset($project)) {
-    array_push($table_data, _l('project'));
-    array_push($table_data, [
+  array_push($table_data, _l('project'));
+  array_push($table_data, [
     'name'     => _l('expense_dt_table_heading_customer'),
     'th_attrs' => ['class' => (isset($client) ? 'not_visible' : '')],
   ]);
 } else {
-    array_shift($table_data);
+  array_shift($table_data);
 }
 
 $table_data = array_merge($table_data, [
@@ -40,17 +40,20 @@ $table_data = array_merge($table_data, [
 $custom_fields = get_custom_fields('expenses', ['show_on_table' => 1]);
 
 foreach ($custom_fields as $field) {
-    array_push($table_data, [
-   'name'     => $field['name'],
-   'th_attrs' => ['data-type' => $field['type'], 'data-custom-field' => 1],
- ]);
+  array_push($table_data, [
+    'name'     => $field['name'],
+    'th_attrs' => ['data-type' => $field['type'], 'data-custom-field' => 1],
+  ]);
+}
+if (!isset($project)) {
+  $table_data = hooks()->apply_filters('expenses_table_columns', $table_data);
+} else {
 }
 
-$table_data = hooks()->apply_filters('expenses_table_columns', $table_data);
 render_datatable($table_data, (isset($class) ? $class : 'expenses'), [], [
   'data-last-order-identifier' => 'expenses',
   'data-default-order'         => get_table_last_order('expenses'),
-  'id'=>$table_id ?? 'expenses',
+  'id' => $table_id ?? 'expenses',
 ]);
 
 echo $this->view('admin/expenses/_bulk_actions_modal');
