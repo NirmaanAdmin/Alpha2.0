@@ -6920,7 +6920,7 @@ class timesheets_model extends app_model
 						$total_lack = $ts_lack;
 						if ($total_lack) {
 							$total_lack = rtrim($total_lack, '; ');
-						}						
+						}
 						$result_lack = $this->merge_ts($total_lack, $max_hour, $type_valid);
 					} else {
 						if ($check_holiday == 'holiday') {
@@ -6934,7 +6934,33 @@ class timesheets_model extends app_model
 						}
 					}
 				} else {
-					$result_lack = 'NS';
+					// $result_lack = 'NS'; 
+					if (!$check_holiday) {
+
+						$ts_lack = '';
+						if (isset($list_dtts[$date_s])) {
+							$ts_lack = $list_dtts[$date_s] . '; ';
+						}
+						$total_lack = $ts_lack;
+						if ($total_lack) {
+							$total_lack = rtrim($total_lack, '; ');
+						}
+
+						$result_lack = $this->merge_ts($total_lack, $max_hour, $type_valid);
+						if (empty($result_lack)) {
+							$result_lack = 'NS';
+						}
+					} else {
+						if ($check_holiday == 'holiday') {
+							$result_lack = "HO";
+						}
+						if ($check_holiday == 'event_break') {
+							$result_lack = "EB";
+						}
+						if ($check_holiday == 'unexpected_break') {
+							$result_lack = "UB";
+						}
+					}
 				}
 				$dt_ts[$date_s] = $result_lack;
 				$dt_ts_detail[$value] = $result_lack;
