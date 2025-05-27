@@ -7116,107 +7116,44 @@ class timesheets extends AdminController
 			redirect(admin_url('timesheets/requisition_manage'));
 		}
 	}
-	// public function add_overtime()
-	// {
-	// 	// 1. Get today's date
-	// 	$today = date('Y-m-d');
-
-	// 	// 2. Fetch today's timesheets
-	// 	$this->db->where('DATE(date_work)', $today);
-	// 	$timesheets = $this->db->get('tbltimesheets_timesheet')->result_array();
-
-	// 	// 3. Process each staff member
-	// 	foreach ($timesheets as $timesheet) {
-	// 		$staff_id = $timesheet['staff_id'];
-
-	// 		// 4. Get staff's shift information
-	// 		$this->db->select('tblshift_type.time_start_work, tblshift_type.time_end_work');
-	// 		$this->db->join('tblshift_type', 'tblshift_type.id = tblwork_shift_detail_number_day.shift_id', 'left');
-	// 		$this->db->where('tblwork_shift_detail_number_day.staff_id', $staff_id);
-	// 		$shift = $this->db->get('tblwork_shift_detail_number_day')->row_array();
-
-	// 		if (!$shift) {
-	// 			log_message('warning', "No shift found for staff ID: $staff_id");
-	// 			continue;
-	// 		}
-
-	// 		// 5. Calculate scheduled vs actual hours
-	// 		$scheduled_start = strtotime($shift['time_start_work']);
-	// 		$scheduled_end = strtotime($shift['time_end_work']);
-	// 		$scheduled_hours = ($scheduled_end - $scheduled_start) / 3600;
-
-	// 		$actual_hours = (float) $timesheet['value'];
-	// 		if($scheduled_hours < $actual_hours){
-	// 			$overtime_difference = $actual_hours - $scheduled_hours;
-	// 		}else{
-	// 			$overtime_difference = 0;
-	// 		}
-	// 		// 6. Apply only if overtime is 2.5 hours or more
-	// 		if ($overtime_difference >= 2.5) {
-	// 			$timesheets_additional_timesheet_arr = [
-	// 				'staff_id' => $staff_id,
-	// 				'additional_day' => $today,
-	// 				'time_in' => $shift['time_start_work'],
-	// 				'time_out' => $shift['time_end_work'],
-	// 				'timekeeping_value' => $overtime_difference - 2.5,
-	// 				'reason' => 'Overtime',
-	// 				'status' => 0,
-	// 				'creator' => $staff_id
-	// 			];
-
-	// 			$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', $timesheets_additional_timesheet_arr);
-	// 			$insert_id = $this->db->insert_id();
-
-	// 			if ($insert_id) {
-	// 				$check_proccess = $this->timesheets_model->get_approve_setting('additional_timesheets');
-	// 				if ($check_proccess) {
-	// 					$checks = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
-	// 					if ($checks == 0) {
-	// 						$data_new = [
-	// 							'rel_id' => $insert_id,
-	// 							'rel_type' => 'additional_timesheets',
-	// 							'addedfrom' => $staff_id,
-	// 						];
-	// 						$success = $this->timesheets_model->send_request_approve($data_new, $staff_id);
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 	public function add_overtime()
 	{
-		// 1. Define range: from May 1, 2025 up to yesterday
-		$start_date = '2025-05-01';
-		$end_date   = date('Y-m-d', strtotime('-1 day'));
+		// 0. (Optional) Ensure correct timezone
+		date_default_timezone_set('Asia/Kolkata');
 
-		// 2. Fetch all timesheet entries in that date_work range
-		$this->db
-			->where('date_work >=', $start_date)
-			->where('date_work <=', $end_date);
+		// 1. Use today’s date as the “work date”
+		$date_work = date('Y-m-d');
+
+		// 2. Fetch all timesheet entries on that date
 		$timesheets = $this->db
+			->where('date_work', $date_work)
 			->get(db_prefix() . 'timesheets_timesheet')
 			->result_array();
 
-		foreach ($timesheets as $ts) {
-			$staff_id  = $ts['staff_id'];
-			$date_work = $ts['date_work'];
+		if (empty($timesheets)) {
+			log_message('info', "No timesheet records for {$date_work}");
+			return;
+		}
 
-			// 3. Load that staff’s shift for the specific day
+		foreach ($timesheets as $ts) {
+			$staff_id = $ts['staff_id'];
+
+			// 3. Load that staff’s shift for that day
 			$shift = $this->db
 				->select('st.time_start_work, st.time_end_work')
 				->from(db_prefix() . 'work_shift_detail_number_day sd')
 				->join(db_prefix() . 'shift_type st', 'st.id = sd.shift_id', 'left')
 				->where('sd.staff_id', $staff_id)
+				// ->where('sd.date',     $date_work)  // if you track shifts per date
 				->get()
 				->row_array();
 
 			if (!$shift) {
-				log_message('warning', "No shift found for staff {$staff_id} on {$date_work}");
+				log_message('warning', "No shift for staff {$staff_id} on {$date_work}");
 				continue;
 			}
 
-			// 4. Fetch only the first check-in of the day
+			// 4. First check-in
 			$in = $this->db
 				->select('date')
 				->from(db_prefix() . 'check_in_out')
@@ -7228,7 +7165,7 @@ class timesheets extends AdminController
 				->get()
 				->row_array();
 
-			// 5. Fetch only the last check-out of the day
+			// 5. Last check-out
 			$out = $this->db
 				->select('date')
 				->from(db_prefix() . 'check_in_out')
@@ -7245,52 +7182,144 @@ class timesheets extends AdminController
 				continue;
 			}
 
-			// 6. Turn them into timestamps
+			// 6. Compute timestamps
 			$actual_start = strtotime($in['date']);
 			$actual_end   = strtotime($out['date']);
 
-			// 7. Scheduled hours for that shift
+			// 7. Scheduled shift hours
 			$sched_start = strtotime("{$date_work} {$shift['time_start_work']}");
 			$sched_end   = strtotime("{$date_work} {$shift['time_end_work']}");
 			$scheduled_h = max(0, ($sched_end - $sched_start) / 3600);
 
-			// 8. Actual hours worked
+			// 8. Actual hours worked (from timesheet value or clock-in/out—choose one)
+			$actual_hours_logged = (float) $ts['value'];
 			$actual_h = max(0, ($actual_end - $actual_start) / 3600);
-			$actual_hours = (float) $ts['value'];
+
 			// 9. Overtime beyond scheduled
-			$overtime = $actual_hours - $scheduled_h;
+			$overtime = $actual_hours_logged - $scheduled_h;
 
-			// 10. If ≥ 2.5 h overtime, record the excess above 2.5
+			// 10. If ≥ 2.5 h, store the excess
 			if ($overtime >= 2.5) {
-				$insert = [
-					'staff_id'           => $staff_id,
-					'additional_day'     => $date_work,
-					'time_in'            => date('Y-m-d H:i:s', $actual_start),
-					'time_out'           => date('Y-m-d H:i:s', $actual_end),
-					'timekeeping_value'  => $overtime - 2.5, // Store only the excess above 2.5
-					'reason'             => 'Overtime',
-					'status'             => 1,
-					'creator'            => $staff_id,
-				];
-				$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', $insert);
-				// $insert_id = $this->db->insert_id();
-
-				// if ($insert_id) {
-				// 	// trigger approval workflow if configured
-				// 	$needs_approval = $this->timesheets_model->get_approve_setting('additional_timesheets');
-				// 	if ($needs_approval) {
-				// 		$auto_approve = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
-				// 		if ($auto_approve === 0) {
-				// 			$data_new = [
-				// 				'rel_id'    => $insert_id,
-				// 				'rel_type'  => 'additional_timesheets',
-				// 				'addedfrom' => $staff_id,
-				// 			];
-				// 			$this->timesheets_model->send_request_approve($data_new, $staff_id);
-				// 		}
-				// 	}
-				// }
+				$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', [
+					'staff_id'          => $staff_id,
+					'additional_day'    => $date_work,
+					'time_in'           => date('Y-m-d H:i:s', $actual_start),
+					'time_out'          => date('Y-m-d H:i:s', $actual_end),
+					'timekeeping_value' => $overtime - 2.5,
+					'reason'            => 'Overtime',
+					'status'            => 1,
+					'creator'           => $staff_id,
+				]);
 			}
 		}
 	}
+	// public function add_overtime()
+	// {
+	// 	// 1. Define range: from May 1, 2025 up to yesterday
+	// 	$start_date = '2025-05-01';
+	// 	$end_date   = date('Y-m-d', strtotime('-1 day'));
+
+	// 	// 2. Fetch all timesheet entries in that date_work range
+	// 	$this->db
+	// 		->where('date_work >=', $start_date)
+	// 		->where('date_work <=', $end_date);
+	// 	$timesheets = $this->db
+	// 		->get(db_prefix() . 'timesheets_timesheet')
+	// 		->result_array();
+
+	// 	foreach ($timesheets as $ts) {
+	// 		$staff_id  = $ts['staff_id'];
+	// 		$date_work = $ts['date_work'];
+
+	// 		// 3. Load that staff’s shift for the specific day
+	// 		$shift = $this->db
+	// 			->select('st.time_start_work, st.time_end_work')
+	// 			->from(db_prefix() . 'work_shift_detail_number_day sd')
+	// 			->join(db_prefix() . 'shift_type st', 'st.id = sd.shift_id', 'left')
+	// 			->where('sd.staff_id', $staff_id)
+	// 			->get()
+	// 			->row_array();
+
+	// 		if (!$shift) {
+	// 			log_message('warning', "No shift found for staff {$staff_id} on {$date_work}");
+	// 			continue;
+	// 		}
+
+	// 		// 4. Fetch only the first check-in of the day
+	// 		$in = $this->db
+	// 			->select('date')
+	// 			->from(db_prefix() . 'check_in_out')
+	// 			->where('staff_id',  $staff_id)
+	// 			->where('type_check', 1)
+	// 			->where('DATE(date)', $date_work)
+	// 			->order_by('date', 'ASC')
+	// 			->limit(1)
+	// 			->get()
+	// 			->row_array();
+
+	// 		// 5. Fetch only the last check-out of the day
+	// 		$out = $this->db
+	// 			->select('date')
+	// 			->from(db_prefix() . 'check_in_out')
+	// 			->where('staff_id',   $staff_id)
+	// 			->where('type_check',  2)
+	// 			->where('DATE(date)',  $date_work)
+	// 			->order_by('date', 'DESC')
+	// 			->limit(1)
+	// 			->get()
+	// 			->row_array();
+
+	// 		if (empty($in) || empty($out)) {
+	// 			log_message('warning', "Incomplete CICO for staff {$staff_id} on {$date_work}");
+	// 			continue;
+	// 		}
+
+	// 		// 6. Turn them into timestamps
+	// 		$actual_start = strtotime($in['date']);
+	// 		$actual_end   = strtotime($out['date']);
+
+	// 		// 7. Scheduled hours for that shift
+	// 		$sched_start = strtotime("{$date_work} {$shift['time_start_work']}");
+	// 		$sched_end   = strtotime("{$date_work} {$shift['time_end_work']}");
+	// 		$scheduled_h = max(0, ($sched_end - $sched_start) / 3600);
+
+	// 		// 8. Actual hours worked
+	// 		$actual_h = max(0, ($actual_end - $actual_start) / 3600);
+	// 		$actual_hours = (float) $ts['value'];
+	// 		// 9. Overtime beyond scheduled
+	// 		$overtime = $actual_hours - $scheduled_h;
+
+	// 		// 10. If ≥ 2.5 h overtime, record the excess above 2.5
+	// 		if ($overtime >= 2.5) {
+	// 			$insert = [
+	// 				'staff_id'           => $staff_id,
+	// 				'additional_day'     => $date_work,
+	// 				'time_in'            => date('Y-m-d H:i:s', $actual_start),
+	// 				'time_out'           => date('Y-m-d H:i:s', $actual_end),
+	// 				'timekeeping_value'  => $overtime - 2.5, // Store only the excess above 2.5
+	// 				'reason'             => 'Overtime',
+	// 				'status'             => 1,
+	// 				'creator'            => $staff_id,
+	// 			];
+	// 			$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', $insert);
+	// 			// $insert_id = $this->db->insert_id();
+
+	// 			// if ($insert_id) {
+	// 			// 	// trigger approval workflow if configured
+	// 			// 	$needs_approval = $this->timesheets_model->get_approve_setting('additional_timesheets');
+	// 			// 	if ($needs_approval) {
+	// 			// 		$auto_approve = $this->timesheets_model->check_choose_when_approving('additional_timesheets');
+	// 			// 		if ($auto_approve === 0) {
+	// 			// 			$data_new = [
+	// 			// 				'rel_id'    => $insert_id,
+	// 			// 				'rel_type'  => 'additional_timesheets',
+	// 			// 				'addedfrom' => $staff_id,
+	// 			// 			];
+	// 			// 			$this->timesheets_model->send_request_approve($data_new, $staff_id);
+	// 			// 		}
+	// 			// 	}
+	// 			// }
+	// 		}
+	// 	}
+	// }
 }
