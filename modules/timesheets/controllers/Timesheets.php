@@ -1849,10 +1849,16 @@ class timesheets extends AdminController
 		<td>' . $additional_timesheets->time_out . '</td>
 		</tr>
 		';
+			// ensure it's a float
+			$value = (float)$additional_timesheets->timekeeping_value;
+
+			// round up to the nearest 0.5
+			$rounded = ceil($value * 2) / 2;
+			$row[] = $rounded;
 
 			$html .= '  <tr class="project-overview">
 		<td class="bold" width="30%">' . _l('timekeeping_value') . '</td>
-		<td>' . ceil($additional_timesheets->timekeeping_value) . '</td>
+		<td>' . $rounded . '</td>
 		</tr>
 		<tr class="project-overview">
 		<td class="bold" width="30%">' . _l('reason_') . '</td>
