@@ -7328,4 +7328,209 @@ class timesheets extends AdminController
 	// 		}
 	// 	}
 	// }
+
+	// public function add_overtime_sunday_work()
+	// {
+	// 	// 0. Ensure correct timezone
+	// 	date_default_timezone_set('Asia/Kolkata');
+
+	// 	$today = date('Y-m-d');
+	// 	// 1. Only run on Mondays
+	// 	if ((int)date('N', strtotime($today)) !== 1) {
+	// 		log_message('info', "add_overtime skipped: not Monday ({$today})");
+	// 		return;
+	// 	}
+
+	// 	// 2. Determine last Sunday's date and its weekday number (7)
+	// 	$sunday   = date('Y-m-d', strtotime('-1 day', strtotime($today)));
+	// 	$dayNum   = (int)date('N', strtotime($sunday)); // Sun => 7
+
+	// 	// 3. Find all staff who clocked in/out on Sunday
+	// 	$workedStaff = $this->db
+	// 		->select('staff_id')
+	// 		->from(db_prefix() . 'check_in_out')
+	// 		->where('DATE(date)', $sunday)
+	// 		->group_by('staff_id')
+	// 		->get()
+	// 		->result_array();
+
+	// 	if (empty($workedStaff)) {
+	// 		log_message('info', "No one worked on Sunday ({$sunday})");
+	// 		return;
+	// 	}
+
+	// 	foreach ($workedStaff as $row) {
+	// 		$staff_id = $row['staff_id'];
+
+	// 		// 4. Skip if staff had a scheduled shift on Sunday (number = 7)
+	// 		$hasShift = $this->db
+	// 			->from(db_prefix() . 'work_shift_detail_number_day sd')
+	// 			->where('sd.staff_id', $staff_id)
+	// 			->where('sd.number',   $dayNum)
+	// 			->count_all_results();
+
+	// 		if ($hasShift > 0) {
+	// 			// They had a regular Sunday shift; assume overtime is handled elsewhere
+	// 			continue;
+	// 		}
+
+	// 		// 5. First check-in on Sunday
+	// 		$in = $this->db
+	// 			->select('date')
+	// 			->from(db_prefix() . 'check_in_out')
+	// 			->where('staff_id',   $staff_id)
+	// 			->where('type_check', 1)
+	// 			->where('DATE(date)', $sunday)
+	// 			->order_by('date', 'ASC')
+	// 			->limit(1)
+	// 			->get()
+	// 			->row_array();
+
+	// 		// 6. Last check-out on Sunday
+	// 		$out = $this->db
+	// 			->select('date')
+	// 			->from(db_prefix() . 'check_in_out')
+	// 			->where('staff_id',   $staff_id)
+	// 			->where('type_check', 2)
+	// 			->where('DATE(date)', $sunday)
+	// 			->order_by('date', 'DESC')
+	// 			->limit(1)
+	// 			->get()
+	// 			->row_array();
+
+	// 		// if (empty($in) || empty($out)) {
+	// 		// 	log_message('warning', "Incomplete CICO for staff {$staff_id} on {$sunday}");
+	// 		// 	continue;
+	// 		// }
+
+	// 		// 7. Compute worked hours
+	// 		$startTs     = strtotime($in['date']);
+	// 		$endTs       = strtotime($out['date']);
+	// 		$hoursWorked = max(0, ($endTs - $startTs) / 3600);
+
+	// 		// 8. Insert as full‐day Sunday overtime
+	// 		$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', [
+	// 			'staff_id'          => $staff_id,
+	// 			'additional_day'    => $sunday,
+	// 			'time_in'           => date('Y-m-d H:i:s', $startTs),
+	// 			'time_out'          => date('Y-m-d H:i:s', $endTs),
+	// 			'timekeeping_value' => $hoursWorked,
+	// 			'reason'            => 'Sunday work',
+	// 			'status'            => 1,
+	// 			'creator'           => $staff_id,
+	// 		]);
+
+	// 		// log_message('info', "Recorded {$hoursWorked}h Sunday-overtime for staff {$staff_id}");
+	// 	}
+	// }
+	public function add_overtime_sundays_since_may()
+	{
+		// 0. Ensure correct timezone
+		date_default_timezone_set('Asia/Kolkata');
+
+		// 1. Define your date range
+		$startDate = new DateTime('2025-05-01');
+		$endDate   = new DateTime(date('Y-m-d'));  // today
+
+		// 2. Iterate day by day
+		$interval = new DateInterval('P1D');
+		$period   = new DatePeriod($startDate, $interval, $endDate->modify('+1 day'));
+
+		foreach ($period as $dt) {
+			// 3. Only process Sundays
+			if ((int)$dt->format('N') !== 7) {
+				continue;
+			}
+
+			$sunday = $dt->format('Y-m-d');
+
+			// 4. Find everyone who clocked in/out on that Sunday
+			$workedStaff = $this->db
+				->select('staff_id')
+				->from(db_prefix() . 'check_in_out')
+				->where('DATE(date)', $sunday)
+				->group_by('staff_id')
+				->get()
+				->result_array();
+
+			if (empty($workedStaff)) {
+				continue;
+			}
+
+			foreach ($workedStaff as $row) {
+				$staff_id = $row['staff_id'];
+
+				// 5. Skip if they had a scheduled shift on weekday=7
+				$hasShift = $this->db
+					->from(db_prefix() . 'work_shift_detail_number_day sd')
+					->where('sd.staff_id', $staff_id)
+					->where('sd.number',   7)
+					->count_all_results();
+
+				if ($hasShift > 0) {
+					continue;
+				}
+
+				// 6. First check-in
+				$in = $this->db
+					->select('date')
+					->from(db_prefix() . 'check_in_out')
+					->where('staff_id',   $staff_id)
+					->where('type_check', 1)
+					->where('DATE(date)', $sunday)
+					->order_by('date', 'ASC')
+					->limit(1)
+					->get()
+					->row_array();
+
+				// 7. Last check-out
+				$out = $this->db
+					->select('date')
+					->from(db_prefix() . 'check_in_out')
+					->where('staff_id',   $staff_id)
+					->where('type_check', 2)
+					->where('DATE(date)', $sunday)
+					->order_by('date', 'DESC')
+					->limit(1)
+					->get()
+					->row_array();
+
+				if (empty($in) || empty($out)) {
+					// incomplete CICO, skip
+					continue;
+				}
+
+				// 8. Compute hours worked
+				$startTs     = strtotime($in['date']);
+				$endTs       = strtotime($out['date']);
+				$hoursWorked = max(0, ($endTs - $startTs) / 3600);
+				$p = [
+					'staff_id'          => $staff_id,
+					'additional_day'    => $sunday,
+					'time_in'           => date('Y-m-d H:i:s', $startTs),
+					'time_out'          => date('Y-m-d H:i:s', $endTs),
+					'timekeeping_value' => $hoursWorked,
+					'reason'            => 'Overtime',
+					'status'            => 1,
+					'creator'           => $staff_id,
+				];
+				echo '<pre>';
+				print_r($p);
+				echo '</pre>';
+				// 9. Insert overtime record
+				$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', [
+					'staff_id'          => $staff_id,
+					'additional_day'    => $sunday,
+					'time_in'           => date('Y-m-d H:i:s', $startTs),
+					'time_out'          => date('Y-m-d H:i:s', $endTs),
+					'timekeeping_value' => $hoursWorked,
+					'reason'            => 'Overtime',
+					'status'            => 1,
+					'creator'           => $staff_id,
+				]);
+			}
+		}
+
+		// log_message('info', 'Sunday-overtime processing complete from 2025-05-01 to ' . date('Y-m-d'));
+	}
 }
