@@ -17,7 +17,7 @@ $aColumns = [
     'invoice_date',
     'is_recurring_from',
     'subtotal',
-    'tax', 
+    'tax',  
     'total',
     'payment_request_status',
     'payment_status',
@@ -119,7 +119,7 @@ if (isset($vendors)) {
     }
 }
 
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix().'pur_invoices.id as id','(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'pur_invoices.id and rel_type="pur_invoice" ORDER by tag_order ASC) as tags', 'contract_number', 'invoice_number', 'currency'
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix().'pur_invoices.id as id','(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'pur_invoices.id and rel_type="pur_invoice" ORDER by tag_order ASC) as tags', 'contract_number', 'invoice_number', 'currency','discount_total' 
 ]);
 
 $output  = $result['output'];
@@ -173,7 +173,9 @@ foreach ($rResult as $aRow) {
         }elseif($aColumns[$i] == 'invoice_date'){
             $_data = _d($aRow['invoice_date']);
         }elseif($aColumns[$i] == 'subtotal'){
-            $_data = app_format_money($aRow['subtotal'],$base_currency->symbol);
+            $get_totaldiscount = get_discount_pur_invoice($aRow['id']);
+            $subtotal = $aRow['subtotal'] - ($get_totaldiscount + $aRow['discount_total']);
+            $_data = app_format_money($subtotal,$base_currency->symbol);
         }elseif($aColumns[$i] == 'tax'){
             $tax = $this->ci->purchase_model->get_html_tax_pur_invoice($aRow['id']);
             $total_tax = 0;
