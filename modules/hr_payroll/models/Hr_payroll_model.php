@@ -2629,97 +2629,54 @@ order by staff_id, header_oder
 	{
 		$affectedRows = 0;
 
-		$row = [];
-		$row['update'] = [];
-		$row['insert'] = [];
-		$row['delete'] = [];
-		$total = [];
+		// Skip the header row which contains field mappings
+		$dataRows = array_filter($es_detail, function ($row) {
+			return $row['staff_id'] !== 'staff_id';
+		});
 
-		$total['total_amount'] = 0;
+		foreach ($dataRows as $item) {
+			$transformed = [
+				'staff_id' => $item['staff_id'] ?? null,
+				'month' => $item['Month'] ?? null,
+				'rel_type' => $item['Rel type'] ?? null,
+				'standard_workday' => $item['Standard working time of the month (hours)'] ?? 0.00,
+				'actual_workday' => $item['Actual working time of formal contract (hours)'] ?? 0.00,
+				'actual_workday_probation' => $item['Actual working time of probation contract (hours)'] ?? 0.00,
+				'paid_leave' => $item['Paid leave time (hours)'] ?? 0.00,
+				'unpaid_leave' => $item['Unpaid leave time (hours)'] ?? 0.00
+			];
 
-		foreach ($es_detail as $key => $value) {
-			if ($value['id'] != 0) {
-				$row['delete'][] = $value['id'];
-				$row['update'][] = $value;
-			} else {
-				unset($value['id']);
-				$row['insert'][] = $value;
-			}
-		}
+			// Transform day fields (1-31)
+			for ($day = 1; $day <= 31; $day++) {
+				$dayField = 'day_' . $day;
+				$sourceField = null;
 
-		if (count($row['insert']) != 0) {
-
-			$transformedData = [];
-			foreach ($row['insert'] as $item) {
-				$transformed = [
-					'staff_id' => $item['staff_id'] ?? null,
-					'month' => $item['Month'] ?? null,
-					'rel_type' => $item['Rel type'] ?? null,
-					'standard_workday' => $item['Standard working time of the month (hours)'] ?? 0.00,
-					'actual_workday' => $item['Actual working time of formal contract (hours)'] ?? 0.00,
-					'actual_workday_probation' => $item['Actual working time of probation contract (hours)'] ?? 0.00,
-					'paid_leave' => $item['Paid leave time (hours)'] ?? 0.00,
-					'unpaid_leave' => $item['Unpaid leave time (hours)'] ?? 0.00
-				];
-
-				// Map day values (Sunday 1 => day_1, Monday 2 => day_2, etc.)
-				$dayMap = [
-					'Sunday 1' => 'day_1',
-					'Monday 2' => 'day_2',
-					'Tuesday 3' => 'day_3',
-					'Wednesday 4' => 'day_4',
-					'Thursday 5' => 'day_5',
-					'Friday 6' => 'day_6',
-					'Saturday 7' => 'day_7',
-					'Sunday 8' => 'day_8',
-					'Monday 9' => 'day_9',
-					'Tuesday 10' => 'day_10',
-					'Wednesday 11' => 'day_11',
-					'Thursday 12' => 'day_12',
-					'Friday 13' => 'day_13',
-					'Saturday 14' => 'day_14',
-					'Sunday 15' => 'day_15',
-					'Monday 16' => 'day_16',
-					'Tuesday 17' => 'day_17',
-					'Wednesday 18' => 'day_18',
-					'Thursday 19' => 'day_19',
-					'Friday 20' => 'day_20',
-					'Saturday 21' => 'day_21',
-					'Sunday 22' => 'day_22',
-					'Monday 23' => 'day_23',
-					'Tuesday 24' => 'day_24',
-					'Wednesday 25' => 'day_25',
-					'Thursday 26' => 'day_26',
-					'Friday 27' => 'day_27',
-					'Saturday 28' => 'day_28',
-					'Sunday 29' => 'day_29',
-					'Monday 30' => 'day_30',
-					'Tuesday 31' => 'day_31'
-				];
-
-				foreach ($dayMap as $source => $target) {
-					$transformed[$target] = $item[$source] ?? 0.00;
+				// Find the source field for this day
+				foreach ($item as $key => $val) {
+					if (preg_match('/^[A-Za-z]+ ' . $day . '$/', $key)) {
+						$sourceField = $key;
+						break;
+					}
 				}
 
-				$transformedData[] = $transformed;
+				$transformed[$dayField] = $sourceField ? ($item[$sourceField] ?? 0.00) : 0.00;
 			}
-			
-			$affected_rows = $this->db->insert_batch(db_prefix() . 'hrp_employees_timesheets', $transformedData);
-			if ($affected_rows > 0) {
-				$affectedRows++;
-			}
-		}
-		if (count($row['update']) != 0) {
-			$affected_rows = $this->db->update_batch(db_prefix() . 'hrp_employees_timesheets', $row['update'], 'id');
-			if ($affected_rows > 0) {
-				$affectedRows++;
+
+			if (isset($item['id']) && $item['id'] != 0) {
+				// Update existing record
+				$this->db->where('id', $item['id']);
+				if ($this->db->update(db_prefix() . 'hrp_employees_timesheets', $transformed)) {
+					$affectedRows++;
+				}
+			} else {
+				// Insert new record
+				if ($this->db->insert(db_prefix() . 'hrp_employees_timesheets', $transformed)) {
+					$affectedRows++;
+				}
 			}
 		}
 
-		if ($affectedRows > 0) {
-			return true;
-		}
-		return false;
+		return $affectedRows > 0;
 	}
 
 	/**
