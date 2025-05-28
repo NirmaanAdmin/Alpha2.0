@@ -8,6 +8,7 @@
       _l('additional_day'),
       _l('timekeeping_type'),
       _l('timekeeping_value'),
+      _l('Comp-off'),
       _l('approver'),
       _l('status'),       
       _l('options'),

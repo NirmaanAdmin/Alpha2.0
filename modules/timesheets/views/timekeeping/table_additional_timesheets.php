@@ -9,6 +9,7 @@ $aColumns = [
     '(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'staff_departments JOIN ' . db_prefix() . 'departments ON ' . db_prefix() . 'staff_departments.departmentid = ' . db_prefix() . 'departments.departmentid WHERE staffid = creator ORDER by name ASC) as department_name',
     'additional_day',
     'timekeeping_value',
+    'com_off',
     'timekeeping_type',
     '(SELECT GROUP_CONCAT(staffid SEPARATOR ",") FROM ' . db_prefix() . 'timesheets_approval_details WHERE rel_id = ' . db_prefix() . 'timesheets_additional_timesheet.id and rel_type = "additional_timesheets") as approver',
     'status',
@@ -124,7 +125,7 @@ foreach ($rResult as $aRow) {
     // round up to the nearest 0.5
     $rounded = ceil($value * 2) / 2;
     $row[] = $rounded;
-
+    $row[] = (float)$aRow['com_off'];
     $membersOutput = '';
 
     $members       = explode(',', $aRow['approver'] ?? '');
