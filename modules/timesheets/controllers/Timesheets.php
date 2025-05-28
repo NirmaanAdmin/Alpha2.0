@@ -7336,7 +7336,7 @@ class timesheets extends AdminController
 
 		$today = date('Y-m-d');
 		// 1. Only run on Mondays
-		if ((int)date('N', strtotime($today)) !== 1) {
+		if ((int)date('N ', strtotime($today)) !== 1) {
 			log_message('info', "add_overtime skipped: not Monday ({$today})");
 			return;
 		}
