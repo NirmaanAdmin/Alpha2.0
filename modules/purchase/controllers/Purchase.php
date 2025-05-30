@@ -516,6 +516,7 @@ class purchase extends AdminController
         $data['vendors'] = $this->purchase_model->get_vendor();
         $data['departments'] = $this->departments_model->get();
         $data['vendor_contacts'] = $this->purchase_model->get_contacts();
+        $data['projects'] = $this->projects_model->get();
         $this->load->view('purchase_request/manage', $data);
     }
 

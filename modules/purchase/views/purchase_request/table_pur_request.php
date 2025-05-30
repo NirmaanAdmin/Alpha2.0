@@ -6,6 +6,7 @@ $aColumns = [
     'pur_rq_code',
     'pur_rq_name',
     'requester',
+    'total',
     // 'department', 
     'request_date',
     'project',
@@ -31,6 +32,12 @@ if ($this->ci->input->post('from_date') && $this->ci->input->post('from_date') !
 if ($this->ci->input->post('to_date') && $this->ci->input->post('to_date') != '') {
     $to_date = date('Y-m-d', strtotime(str_replace('/', '-', $this->ci->input->post('to_date'))));
     array_push($where, 'AND DATE(request_date) <= "' . $to_date . '"');
+}
+if (
+    $this->ci->input->post('project')
+    && count($this->ci->input->post('project')) > 0
+) {
+    array_push($where, 'AND project IN (' . implode(',', $this->ci->input->post('project')) . ')');
 }
 
 if (
@@ -68,7 +75,7 @@ foreach ($rResult as $aRow) {
     $row = [];
 
     for ($i = 0; $i < count($aColumns); $i++) {
-
+        $base_currency = get_base_currency_pur();
         $_data = $aRow[$aColumns[$i]];
         if ($aColumns[$i] == 'request_date') {
             $_data = _dt($aRow['request_date']);
@@ -77,6 +84,8 @@ foreach ($rResult as $aRow) {
                 'staff-profile-image-small',
             ]) . '</a>';
             $_data .= ' <a href="' . admin_url('staff/profile/' . $aRow['requester']) . '">' . get_staff_full_name($aRow['requester']) . '</a>';
+        } elseif ($aColumns[$i] == 'total') {
+            $_data = app_format_money($aRow['total'], $base_currency->symbol);
         } elseif ($aColumns[$i] == 'department') {
             $_data = $aRow['name'];
         } elseif ($aColumns[$i] == 'status') {
