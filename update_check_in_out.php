@@ -2,9 +2,9 @@
 // update_check_in_out.php
 
 // —— DB CONFIG ——
-$host     = "localhost";
-$username = "root";
-$password = "root";
+$host = "localhost";
+$username = "ncplicni_ncpldatabase";
+$password = "Nirmaan@123";
 $database = "ncplicni_ncpldatabase";
 
 // connect
