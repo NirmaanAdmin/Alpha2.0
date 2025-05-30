@@ -21,7 +21,7 @@ date_default_timezone_set('Asia/Kolkata');
 $conn->begin_transaction();
 
 try {
-    $today = '2025-05-28';
+    $today = date("Y-m-d");
 
     // 1) aggregate per staff: count, min & max datetime
     $sql = "
