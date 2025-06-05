@@ -243,3 +243,14 @@ function app_compile_scripts($group = 'admin')
 {
     return get_instance()->app_scripts->compile($group);
 }
+
+function add_admin_progress_reports_js_assets()
+{
+    $CI = &get_instance();
+    $CI->app_scripts->add(
+        'progress-reports-js',
+        base_url($CI->app_scripts->core_file('assets/js', 'progress_reports.js')) . '?v=' . $CI->app_scripts->core_version(),
+        'admin',
+        ['app-js']
+    );
+}

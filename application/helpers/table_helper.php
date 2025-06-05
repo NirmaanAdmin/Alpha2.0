@@ -52,6 +52,10 @@ hooks()->add_action('admin_init', function () {
     App_table::register(
         App_table::new('forms')->setPrimaryKeyName('formid')->customfieldable('forms')
     );
+    
+    App_table::register(
+        App_table::new('preports')->setPrimaryKeyName('formid')->customfieldable('preports')
+    );
 
     App_table::register(
         $estimatesTable = App_table::new('estimates')->customfieldable('estimate')
