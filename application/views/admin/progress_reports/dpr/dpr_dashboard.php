@@ -148,7 +148,7 @@
           foreach ($total_workforce_values as $label => $data) {
               $hue = ($i * (360 / $count)) % 360;
               $bgColor = "hsl($hue, 70%, 60%)";
-              $type = 'line';
+              $type = 'bar';
 
               echo '{';
               echo "label: '$label',";
