@@ -2459,7 +2459,7 @@ class timesheets extends AdminController
 						}
 
 						$row[] = $total_shift;
-						$row[] = ($total > 0) ? ceil($total * 2) / 2 : 0;
+						$row[] = ($total > 0) ? $this->customRound($total) : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
 						$row[] = ($total3 > 0) ? (float) number_format($total3, 2) : 0;
 						$row[] = ($total7 > 0) ? (float) number_format($total7, 2) : 0;
@@ -2479,7 +2479,20 @@ class timesheets extends AdminController
 			}
 		}
 	}
+	public function customRound($number)
+	{
+		$decimalPart = $number - floor($number); // Get the decimal part (e.g., 0.945)
+		$firstDecimal = (int)($decimalPart * 10) % 10; // First decimal digit (9 for 0.945)
+		$secondDecimal = (int)($decimalPart * 100) % 10; // Second decimal digit (4 for 0.945)
 
+		if ($firstDecimal >= 5) {
+			// If second decimal is 5+, round first decimal up by 0.5 (e.g., 26.945 → 26.5)
+			return floor($number) + 0.5;
+		} else {
+			// Otherwise, round down to the nearest whole number (e.g., 26.445 → 26)
+			return floor($number);
+		}
+	}
 	/*mass delete for multiple feature*/
 	public function timesheets_delete_bulk_action()
 	{
@@ -7514,7 +7527,7 @@ class timesheets extends AdminController
 	// 				'status'            => 1,
 	// 				'creator'           => $staff_id,
 	// 			];
-				
+
 	// 			// 9. Insert overtime record
 	// 			$this->db->insert(db_prefix() . 'timesheets_additional_timesheet', [
 	// 				'staff_id'          => $staff_id,
