@@ -4029,102 +4029,61 @@ class Forms_model extends App_Model
     public function dpr_dashboard()
     {
         $result = array();
-        $sub_type_array = array();
-        $type_array = array();
         $total_workforce_labels = array();
         $total_workforce_values = array();
         $stacked_labor_labels = array();
         $stacked_labor_values = array();
-        $this->db->where('form_type', 'dpr');
-        $dpr = $this->db->get(db_prefix() . 'forms')->result_array();
 
-        if(!empty($dpr)) {
-            foreach ($dpr as $key => $value) {
-                $dpr_table = array();
-                $dpr_table['name'] = date('d-m-Y', strtotime($value['date']));
-                $dpr_table['is_bold'] = false;
-                $this->db->where('form_id', $value['formid']);
-                $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
-                $unique_sub_type = array_values(array_unique(array_column($dpr_form_detail, 'sub_type')));
-                if(!empty($unique_sub_type)) {
-                    foreach ($unique_sub_type as $ukey => $uvalue) {
-                        $sub_type_filtered = array_filter($dpr_form_detail, function($item) use ($uvalue) {
-                            return $item['sub_type'] == $uvalue;
-                        });
-                        $dpr_table[$uvalue] = !empty($sub_type_filtered) ? array_sum(array_column($sub_type_filtered, 'total')) : 0;
-                    }
-                }
+        $this->db->where("form_type", "dpr");
+        $result['forms'] = $this->db->get(db_prefix() . 'forms')->result_array();
 
-                if($key == 0) {
-                    $tbl_title = array();
-                    $tbl_title['name'] = 'Row Labels';
-                    $tbl_title['is_bold'] = true;
-                    if(!empty($unique_sub_type)) {
-                        foreach ($unique_sub_type as $ukey => $uvalue) {
-                            $this->db->where('id', $uvalue);
-                            $progress_report_sub_type = $this->db->get(db_prefix() . 'progress_report_sub_type')->row();
-                            $tbl_title[$uvalue] = $progress_report_sub_type->name;
-                        }
-                        $sub_type_array[] = $tbl_title;
-                    }
-                }
-                $sub_type_array[] = $dpr_table;
-            }
-        }
+        $result['progress_report_sub_type'] = $this->db->get(db_prefix() . 'progress_report_sub_type')->result_array();
 
-        $result['sub_type_array'] = $sub_type_array;
+        $this->db->select(
+            db_prefix() . 'dpr_form_detail.id as id, ' .
+            db_prefix() . 'forms.formid as formid, ' .
+            db_prefix() . 'forms.date as date, ' .
+            db_prefix() . 'dpr_form_detail.sub_type as sub_type, ' .
+            'SUM(' . db_prefix() . 'dpr_form_detail.total) as total, ' .
+            'CONCAT(' . db_prefix() . 'forms.formid, "-", ' . db_prefix() . 'dpr_form_detail.sub_type) as sub_form_key'
+        );
+        $this->db->from(db_prefix() . 'dpr_form_detail');
+        $this->db->join(db_prefix() . 'forms', db_prefix() . 'forms.formid = ' . db_prefix() . 'dpr_form_detail.form_id');
+        $this->db->where("sub_type != ''", NULL, FALSE);
+        $this->db->group_by('sub_form_key');
+        $result['sub_type_array'] = $this->db->get()->result_array();
 
-        if(!empty($dpr)) {
-            foreach ($dpr as $key => $value) {
-                $dpr_table = array();
-                $dpr_table['name'] = date('d-m-Y', strtotime($value['date']));
-                $dpr_table['is_bold'] = false;
-                $this->db->where('form_id', $value['formid']);
-                $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
-                $unique_type = array_values(array_unique(array_column($dpr_form_detail, 'type')));
-                if(!empty($unique_type)) {
-                    foreach ($unique_type as $ukey => $uvalue) {
-                        $type_filtered = array_filter($dpr_form_detail, function($item) use ($uvalue) {
-                            return $item['type'] == $uvalue;
-                        });
-                        $dpr_table[$uvalue] = !empty($type_filtered) ? array_sum(array_column($type_filtered, 'total')) : 0;
-                    }
-                }
+        $result['progress_report_type'] = $this->db->get(db_prefix() . 'progress_report_type')->result_array();
 
-                if($key == 0) {
-                    $tbl_title = array();
-                    $tbl_title['name'] = 'Row Labels';
-                    $tbl_title['is_bold'] = true;
-                    if(!empty($unique_type)) {
-                        foreach ($unique_type as $ukey => $uvalue) {
-                            $this->db->where('id', $uvalue);
-                            $progress_report_type = $this->db->get(db_prefix() . 'progress_report_type')->row();
-                            $tbl_title[$uvalue] = $progress_report_type->name;
-                        }
-                        $type_array[] = $tbl_title;
-                    }
-                }
-                $type_array[] = $dpr_table;
-            }
-        }
+        $this->db->select(
+            db_prefix() . 'dpr_form_detail.id as id, ' .
+            db_prefix() . 'forms.formid as formid, ' .
+            db_prefix() . 'forms.date as date, ' .
+            db_prefix() . 'dpr_form_detail.type as type, ' .
+            'SUM(' . db_prefix() . 'dpr_form_detail.total) as total, ' .
+            'CONCAT(' . db_prefix() . 'forms.formid, "-", ' . db_prefix() . 'dpr_form_detail.type) as type_form_key'
+        );
+        $this->db->from(db_prefix() . 'dpr_form_detail');
+        $this->db->join(db_prefix() . 'forms', db_prefix() . 'forms.formid = ' . db_prefix() . 'dpr_form_detail.form_id');
+        $this->db->where("type != ''", NULL, FALSE);
+        $this->db->group_by('type_form_key');
+        $result['type_array'] = $this->db->get()->result_array();
 
-        $result['type_array'] = $type_array;
-
-        if(!empty($dpr)) {
-            foreach ($dpr as $key => $value) {
+        if (!empty($result['forms']) && !empty($result['progress_report_sub_type']) && !empty($result['sub_type_array'])) {
+            foreach ($result['forms'] as $key => $value) {
+                $formid = $value['formid'];
                 $total_workforce_labels['labels'][] = date('d-m-Y', strtotime($value['date']));
-                $this->db->where('form_id', $value['formid']);
-                $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
-                $unique_sub_type = array_values(array_unique(array_column($dpr_form_detail, 'sub_type')));
-                if(!empty($unique_sub_type)) {
-                    foreach ($unique_sub_type as $ukey => $uvalue) {
-                        $this->db->where('id', $uvalue);
-                        $progress_report_sub_type = $this->db->get(db_prefix() . 'progress_report_sub_type')->row();
-                        $sub_type_filtered = array_filter($dpr_form_detail, function($item) use ($uvalue) {
-                            return $item['sub_type'] == $uvalue;
-                        });
-                        $total_workforce_values[$progress_report_sub_type->name][] = !empty($sub_type_filtered) ? array_sum(array_column($sub_type_filtered, 'total')) : 0;
-                    }
+                
+                foreach ($result['progress_report_sub_type'] as $pkey => $pvalue) {
+                    $sub_type_id = $pvalue['id'];
+                    $sub_type_name = $pvalue['name']; // directly use the name instead of querying DB
+
+                    $sub_type_filtered = array_filter($result['sub_type_array'], function ($item) use ($formid, $sub_type_id) {
+                        return $item['formid'] == $formid && $item['sub_type'] == $sub_type_id;
+                    });
+
+                    $sub_type_filtered = array_values($sub_type_filtered);
+                    $total_workforce_values[$sub_type_name][] = !empty($sub_type_filtered) ? $sub_type_filtered[0]['total'] : 0;
                 }
             }
         }
@@ -4132,21 +4091,21 @@ class Forms_model extends App_Model
         $result['total_workforce_labels'] = $total_workforce_labels;
         $result['total_workforce_values'] = $total_workforce_values;
 
-        if(!empty($dpr)) {
-            foreach ($dpr as $key => $value) {
+        if (!empty($result['forms']) && !empty($result['progress_report_type']) && !empty($result['type_array'])) {
+            foreach ($result['forms'] as $key => $value) {
+                $formid = $value['formid'];
                 $stacked_labor_labels['labels'][] = date('d-m-Y', strtotime($value['date']));
-                $this->db->where('form_id', $value['formid']);
-                $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
-                $unique_type = array_values(array_unique(array_column($dpr_form_detail, 'type')));
-                if(!empty($unique_type)) {
-                    foreach ($unique_type as $ukey => $uvalue) {
-                        $this->db->where('id', $uvalue);
-                        $progress_report_type = $this->db->get(db_prefix() . 'progress_report_type')->row();
-                        $type_filtered = array_filter($dpr_form_detail, function($item) use ($uvalue) {
-                            return $item['type'] == $uvalue;
-                        });
-                        $stacked_labor_values[$progress_report_type->name][] = !empty($type_filtered) ? array_sum(array_column($type_filtered, 'total')) : 0;
-                    }
+                
+                foreach ($result['progress_report_type'] as $pkey => $pvalue) {
+                    $type_id = $pvalue['id'];
+                    $type_name = $pvalue['name']; // directly use the name instead of querying DB
+
+                    $type_filtered = array_filter($result['type_array'], function ($item) use ($formid, $type_id) {
+                        return $item['formid'] == $formid && $item['type'] == $type_id;
+                    });
+
+                    $type_filtered = array_values($type_filtered);
+                    $stacked_labor_values[$type_name][] = !empty($type_filtered) ? $type_filtered[0]['total'] : 0;
                 }
             }
         }

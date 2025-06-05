@@ -413,7 +413,7 @@
                                         <thead>
                                             <tr>
                                                 <th width="50%" align="">Row Labels</th>
-                                                <th width="50%" align="right">Sum of Male</th>
+                                                <th width="50%" align="right">Sum of Machinary</th>
                                             </tr>
                                         </thead>
                                         <tbody>

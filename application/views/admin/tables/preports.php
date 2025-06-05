@@ -63,6 +63,7 @@ return App_table::find('preports')
             '1', // bulk actions
             'formid',
             'subject',
+            'project_id',
             db_prefix() . 'departments.name as department_name',
             'status',
             'priority',
@@ -171,7 +172,9 @@ return App_table::find('preports')
 
                 if ($aColumns[$i] == '1') {
                     $_data = '<div class="checkbox"><input type="checkbox" value="' . $aRow['formid'] . '" data-name="' . $aRow['subject'] . '" data-status="' . $aRow['status'] . '"><label></label></div>';
-                } elseif ($aColumns[$i] == 'lastreply') {
+                }  elseif ($aColumns[$i] == 'project_id') {
+                    $_data = get_project_name_by_id($aRow['project_id']);
+                }  elseif ($aColumns[$i] == 'lastreply') {
                     if ($aRow[$aColumns[$i]] == null) {
                         $_data = _l('form_no_reply_yet');
                     } else {

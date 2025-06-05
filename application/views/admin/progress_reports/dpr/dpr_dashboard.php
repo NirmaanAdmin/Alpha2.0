@@ -14,81 +14,113 @@
           </div>
 
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12">
               <div class="table-responsive s_table">
                 <table class="table items no-mtop" style="border: 1px solid #dee2e6;">
                     <tbody>
+                        <tr style="font-weight: bold; background: #f1f5f9; color: #1e293b;">
+                          <td align="left">Row Labels</td>
+                          <?php 
+                          if (!empty($progress_report_sub_type)) {
+                            foreach ($progress_report_sub_type as $pkey => $pvalue) { ?>
+                              <td align="right">
+                                <?php echo $pvalue['name']; ?>
+                              </td>
+                            <?php }
+                          } ?>
+                        </tr>
                         <?php 
-                        if(!empty($sub_type_array)) {
-                            foreach ($sub_type_array as $key => $value) { 
-                              if(isset($value['name'])) {
-                                $name = $value['name'];
-                                unset($value['name']);
-                              }
-                              if(isset($value['is_bold'])) {
-                                $is_bold = $value['is_bold'];
-                                unset($value['is_bold']);
-                              }
-                              ?>
-                                <tr<?php echo $is_bold ? ' style="font-weight: bold; background: #f1f5f9; color: #1e293b;"' : ''; ?>>
-                                    <td align="left">
-                                        <?php echo $name; ?>
-                                    </td>
-                                    <?php 
-                                    foreach ($value as $vkey => $vvalue) { ?>
-                                      <td align="right">
-                                        <?php echo $vvalue; ?>
-                                      </td>
+                        if (!empty($forms) && !empty($progress_report_sub_type) && !empty($sub_type_array)) {
+                            foreach ($forms as $key => $value) {
+                                $formid = $value['formid'];
+                                ?>
+                                <tr>
+                                    <td align="left"><?php echo date('d-m-Y', strtotime($value['date'])); ?></td>
+                                    <?php
+                                    foreach ($progress_report_sub_type as $pkey => $pvalue) {
+                                        $sub_type_id = $pvalue['id'];
+                                        $sub_type_filtered = array_filter($sub_type_array, function ($item) use ($formid, $sub_type_id) {
+                                            return $item['formid'] == $formid && $item['sub_type'] == $sub_type_id;
+                                        });
+
+                                        $sub_type_filtered = array_values($sub_type_filtered);
+                                        ?>
+                                        <td align="right">
+                                            <?php echo !empty($sub_type_filtered) ? $sub_type_filtered[0]['total'] : 0; ?>
+                                        </td>
                                     <?php } ?>
                                 </tr>
-                            <?php }
-                        } ?>
+                                <?php
+                            }
+                        }
+                        ?>
                     </tbody>
                 </table>
               </div>
-            </div>
-            <div class="col-md-8">
-              <canvas id="totalWorkforceChart" height="120"></canvas>
             </div>
           </div>
 
           <br><br>
 
           <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-12">
               <div class="table-responsive s_table">
                 <table class="table items no-mtop" style="border: 1px solid #dee2e6;">
                     <tbody>
+                        <tr style="font-weight: bold; background: #f1f5f9; color: #1e293b;">
+                          <td align="left">Row Labels</td>
+                          <?php 
+                          if (!empty($progress_report_type)) {
+                            foreach ($progress_report_type as $pkey => $pvalue) { ?>
+                              <td align="right">
+                                <?php echo $pvalue['name']; ?>
+                              </td>
+                            <?php }
+                          } ?>
+                        </tr>
                         <?php 
-                        if(!empty($type_array)) {
-                            foreach ($type_array as $key => $value) { 
-                              if(isset($value['name'])) {
-                                $name = $value['name'];
-                                unset($value['name']);
-                              }
-                              if(isset($value['is_bold'])) {
-                                $is_bold = $value['is_bold'];
-                                unset($value['is_bold']);
-                              }
-                              ?>
-                                <tr<?php echo $is_bold ? ' style="font-weight: bold; background: #f1f5f9; color: #1e293b;"' : ''; ?>>
-                                    <td align="left">
-                                        <?php echo $name; ?>
-                                    </td>
-                                    <?php 
-                                    foreach ($value as $vkey => $vvalue) { ?>
-                                      <td align="right">
-                                        <?php echo $vvalue; ?>
-                                      </td>
+                        if (!empty($forms) && !empty($progress_report_type) && !empty($type_array)) {
+                            foreach ($forms as $key => $value) {
+                                $formid = $value['formid'];
+                                ?>
+                                <tr>
+                                    <td align="left"><?php echo date('d-m-Y', strtotime($value['date'])); ?></td>
+                                    <?php
+                                    foreach ($progress_report_type as $pkey => $pvalue) {
+                                        $type_id = $pvalue['id'];
+                                        $type_filtered = array_filter($type_array, function ($item) use ($formid, $type_id) {
+                                            return $item['formid'] == $formid && $item['type'] == $type_id;
+                                        });
+
+                                        $type_filtered = array_values($type_filtered);
+                                        ?>
+                                        <td align="right">
+                                            <?php echo !empty($type_filtered) ? $type_filtered[0]['total'] : 0; ?>
+                                        </td>
                                     <?php } ?>
                                 </tr>
-                            <?php }
-                        } ?>
+                                <?php
+                            }
+                        }
+                        ?>
                     </tbody>
                 </table>
               </div>
             </div>
-            <div class="col-md-7">
+          </div>
+
+          <br><br>
+
+          <div class="row">
+            <div class="col-md-12">
+                <canvas id="totalWorkforceChart" height="120"></canvas>
+            </div>
+          </div>
+
+          <br><br>
+
+          <div class="row">
+            <div class="col-md-12">
               <canvas id="stackedLaborChart" height="130"></canvas>
             </div>
           </div>
@@ -108,31 +140,27 @@
   const chart = new Chart(totalWorkforceChart, {
       type: 'bar',
       data: {
-          labels: <?= json_encode($total_workforce_labels['labels']); ?>,
-          datasets: [
-            <?php
-            $i = 0;
-            $count = count($total_workforce_values);
-            foreach ($total_workforce_values as $label => $data) {
-                $isUnskilled = strtolower($label) === 'unskilled';
-                $background = $isUnskilled ? '#888' : ($i === 0 ? 'rgba(54, 162, 235, 0.7)' : 'rgba(255, 159, 64, 0.7)');
-                $border = $isUnskilled ? '#888' : ($i === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 159, 64, 1)');
-                $type = $isUnskilled ? 'line' : 'bar';
+        labels: <?= json_encode($total_workforce_labels['labels']); ?>,
+        datasets: [
+          <?php
+          $i = 0;
+          $count = count($total_workforce_values);
+          foreach ($total_workforce_values as $label => $data) {
+              $hue = ($i * (360 / $count)) % 360;
+              $bgColor = "hsl($hue, 70%, 60%)";
+              $type = 'line';
 
-                echo '{';
-                echo "label: '$label',";
-                echo 'data: ' . json_encode($data) . ',';
-                echo "type: '$type',";
-                echo "backgroundColor: '$background',";
-                echo "borderColor: '$border',";
-                echo 'borderWidth: 1,';
-                if ($isUnskilled) {
-                    echo "fill: false, tension: 0.3, yAxisID: 'y'";
-                }
-                echo '}';
-                if (++$i < $count) echo ',';
-            }
-            ?>
+              echo '{';
+              echo "label: '$label',";
+              echo 'data: ' . json_encode($data) . ',';
+              echo "type: '$type',";
+              echo "backgroundColor: '$bgColor',";
+              echo "borderColor: '$bgColor',";
+              echo 'borderWidth: 1';
+              echo '}';
+              if (++$i < $count) echo ',';
+          }
+          ?>
         ]
       },
       options: {

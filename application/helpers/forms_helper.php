@@ -662,6 +662,7 @@ function AdminReportsTableStructure($name = '', $bulk_action = false)
 
     $table .= '<th class="toggleable" id="th-number">' . _l('the_number_sign') . '</th>';
     $table .= '<th class="toggleable" id="th-subject">' . _l('form_dt_subject') . '</th>';
+    $table .= '<th class="toggleable" id="th-project">' . _l('project') . '</th>';
     $table .= '<th class="toggleable" id="th-department">' . _l('form_dt_department') . '</th>';
     $table .= '<th class="toggleable" id="th-status">' . _l('form_dt_status') . '</th>';
     $table .= '<th class="toggleable" id="th-priority">' . _l('form_dt_priority') . '</th>';
