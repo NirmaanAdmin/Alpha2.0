@@ -2385,7 +2385,7 @@ class timesheets extends AdminController
 										$total_shift++;
 									}
 									if (($list_attendance != '') && ($shift_hour > 0)) {
-										$list_tks = explode(';', $list_attendance);
+										$list_tks = explode(';', $list_attendance);	
 										foreach ($list_tks as $key_tk => $tk) {
 											$split_val = explode(':', trim($tk));
 											if (strtolower($split_val[0]) == 'w') {
@@ -2457,7 +2457,7 @@ class timesheets extends AdminController
 
 							$index++;
 						}
-
+						
 						$row[] = $total_shift;
 						$row[] = ($total > 0) ? $this->customRound($total) : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
@@ -2487,7 +2487,7 @@ class timesheets extends AdminController
 
 		if ($firstDecimal >= 5) {
 			// If second decimal is 5+, round first decimal up by 0.5 (e.g., 26.945 → 26.5)
-			return floor($number) + 0.5;
+			return floor($number);
 		} else {
 			// Otherwise, round down to the nearest whole number (e.g., 26.445 → 26)
 			return floor($number);
