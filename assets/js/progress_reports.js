@@ -268,6 +268,7 @@ $(function () {
 
   $("#new_form_form").submit(function () {
     $("#project_id").prop("disabled", false);
+    // $('#loader-container').removeClass('hide');
     return true;
   });
 
@@ -458,4 +459,5 @@ function validate_new_form_form() {
       }
     );
   }, 10);
+  
 }
