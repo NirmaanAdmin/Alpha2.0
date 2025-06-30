@@ -65,9 +65,9 @@ return App_table::find('preports')
             'subject',
             'project_id',
             db_prefix() . 'departments.name as department_name',
-            'status',
+            // 'status',
             'priority',
-            'lastreply',
+            // 'lastreply',
             db_prefix() . 'forms.date',
             '(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'forms.formid and rel_type="form" ORDER by tag_order ASC) as tags',
             '2'

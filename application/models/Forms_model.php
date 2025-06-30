@@ -1751,7 +1751,7 @@ class Forms_model extends App_Model
         if ($data['duedate'] != '') {
             $data['duedate'] = to_sql_date($data['duedate']);
         }
-        
+
         if ($formBeforeUpdate->form_type == "dpr") {
             $dpr_form = array();
             $dpr_form['client_id'] = $data['client_id'];
@@ -1777,6 +1777,7 @@ class Forms_model extends App_Model
             unset($data['total']);
             unset($data['machinery']);
             unset($data['total_machinery']);
+            unset($data['isedit']);
             $new_order = [];
             if (isset($data['newitems'])) {
 
@@ -1968,7 +1969,7 @@ class Forms_model extends App_Model
                 unset($data['items']);
             }
         }
-       
+
         $this->db->where('formid', $data['formid']);
         $this->db->update(db_prefix() . 'forms', $data);
         if ($this->db->affected_rows() > 0) {
@@ -2552,7 +2553,7 @@ class Forms_model extends App_Model
                 }
             }
         } elseif ($formBeforeUpdate->form_type == "cosc") {
-           
+
             if (isset($cosc_form)) {
                 if (!empty($cosc_form)) {
                     $this->db->where('form_id', $data['formid']);
@@ -3281,8 +3282,8 @@ class Forms_model extends App_Model
         $row .= '<td class="progress_report_sub_type">' . get_progress_report_sub_type_listing($name_sub_type, $sub_type) . '</td>';
         $row .= '<td class="work_execute">' . render_input($name_work_execute, '', $work_execute) . '</td>';
         $row .= '<td class="material_consumption">' . render_input($name_material_consumption, '', $material_consumption) . '</td>';
-        $row .= '<td class="male">' . render_input($name_male, '', $male, 'nubmer') . '</td>';
-        $row .= '<td class="female">' . render_input($name_female, '', $female, 'nubmer') . '</td>';
+        $row .= '<td class="male">' . render_input($name_male, '', $male, 'nubmer', ['onblur' => 'dpr_calculate_total();', 'onchange' => 'dpr_calculate_total();']) . '</td>';
+        $row .= '<td class="female">' . render_input($name_female, '', $female, 'nubmer', ['onblur' => 'dpr_calculate_total();', 'onchange' => 'dpr_calculate_total();']) . '</td>';
         $row .= '<td class="total">' . render_input($name_total, '', $total, 'number', ['readonly' => 'readonly']) . '</td>';
         $row .= '<td class="machinery">' . get_progress_report_machinary_listing($name_machinery, $machinery) . '</td>';
         $row .= '<td class="total_machinery">' . render_input($name_total_machinery, '', $total_machinery, 'nubmer') . '</td>';
@@ -3793,18 +3794,19 @@ class Forms_model extends App_Model
         redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function get_form_listing() {
+    public function get_form_listing()
+    {
         $this->db->select('fc.id AS category_id, fc.name AS category_name, fo.form_id, fo.name AS form_name');
         $this->db->from('tblform_categories fc');
         $this->db->join('tblform_options fo', 'fc.id = fo.category_id', 'left');
         $this->db->order_by('fc.sort_order, fo.sort_order'); // Add sort_order fields if needed
-        
+
         $query = $this->db->get();
         $result = array();
-    
+
         foreach ($query->result_array() as $row) {
             $category_id = $row['category_id'];
-            
+
             if (!isset($result[$category_id])) {
                 $result[$category_id] = array(
                     'id' => $category_id,
@@ -3812,17 +3814,18 @@ class Forms_model extends App_Model
                     'options' => array()
                 );
             }
-            
+
             $result[$category_id]['options'][] = array(
                 'id' => $row['form_id'],
                 'name' => $row['form_name']
             );
         }
-    
+
         return array_values($result);
     }
-    public function get_form_items($form_type) {
-        
+    public function get_form_items($form_type)
+    {
+
         $this->db->select('id, name');
         $this->db->where('form_type', $form_type);
         $this->db->order_by('sort_order', 'asc');
@@ -3835,27 +3838,27 @@ class Forms_model extends App_Model
         $this->db->select('*');
         $this->db->join(db_prefix() . 'form_options', db_prefix() . 'form_options.form_id = ' . db_prefix() . 'forms.form_type', 'inner');
         $this->db->where('formid', $id);
-        $query = $this->db->get(db_prefix().'forms');
+        $query = $this->db->get(db_prefix() . 'forms');
         return $query->row();
     }
 
     public function get_progress_report_type()
     {
-        $this->db->order_by('id', 'ASC'); 
+        $this->db->order_by('id', 'ASC');
         $query = $this->db->get(db_prefix() . 'progress_report_type');
         return $query->result_array();
     }
 
     public function get_progress_report_sub_type()
     {
-        $this->db->order_by('id', 'ASC'); 
+        $this->db->order_by('id', 'ASC');
         $query = $this->db->get(db_prefix() . 'progress_report_sub_type');
         return $query->result_array();
     }
 
     public function get_progress_report_machinary()
     {
-        $this->db->order_by('id', 'ASC'); 
+        $this->db->order_by('id', 'ASC');
         $query = $this->db->get(db_prefix() . 'progress_report_machinary');
         return $query->result_array();
     }
@@ -3955,16 +3958,16 @@ class Forms_model extends App_Model
         $result = array();
         $dpr_form_detail = $this->get_dpr_form_detail($id);
 
-        if(!empty($dpr_form_detail)) {
+        if (!empty($dpr_form_detail)) {
             $unique_sub_types = array_values(array_unique(array_column($dpr_form_detail, 'sub_type')));
-            if(!empty($unique_sub_types)) {
+            if (!empty($unique_sub_types)) {
                 foreach ($unique_sub_types as $key => $value) {
                     $sub_type_array = array();
                     $this->db->where('id', $value);
                     $progress_report_sub_type = $this->db->get(db_prefix() . 'progress_report_sub_type')->row();
                     $sub_type_array['name'] = $progress_report_sub_type->name;
 
-                    $sub_type_filtered = array_filter($dpr_form_detail, function($item) use ($value) {
+                    $sub_type_filtered = array_filter($dpr_form_detail, function ($item) use ($value) {
                         return $item['sub_type'] == $value;
                     });
                     $sub_type_array['male'] = !empty($sub_type_filtered) ? array_sum(array_column($sub_type_filtered, 'male')) : 0;
@@ -3975,14 +3978,14 @@ class Forms_model extends App_Model
                     $result[] = $sub_type_array;
 
                     $unique_type = array_values(array_unique(array_column($sub_type_filtered, 'type')));
-                    if(!empty($unique_type)) {
+                    if (!empty($unique_type)) {
                         foreach ($unique_type as $ukey => $uvalue) {
                             $type_array = array();
                             $this->db->where('id', $uvalue);
                             $progress_report_type = $this->db->get(db_prefix() . 'progress_report_type')->row();
                             $type_array['name'] = $progress_report_type->name;
 
-                            $type_filtered = array_filter($sub_type_filtered, function($item) use ($value, $uvalue) {
+                            $type_filtered = array_filter($sub_type_filtered, function ($item) use ($value, $uvalue) {
                                 return $item['sub_type'] == $value && $item['type'] == $uvalue;
                             });
                             $type_array['male'] = !empty($type_filtered) ? array_sum(array_column($type_filtered, 'male')) : 0;
@@ -4005,16 +4008,16 @@ class Forms_model extends App_Model
         $result = array();
         $dpr_form_detail = $this->get_dpr_form_detail($id);
 
-        if(!empty($dpr_form_detail)) {
+        if (!empty($dpr_form_detail)) {
             $unique_machinery = array_values(array_unique(array_column($dpr_form_detail, 'machinery')));
-            if(!empty($unique_machinery)) {
+            if (!empty($unique_machinery)) {
                 $unique_machinery = array_values(array_filter($unique_machinery));
                 foreach ($unique_machinery as $key => $value) {
                     $machinery_array = array();
                     $this->db->where('id', $value);
                     $progress_report_machinary = $this->db->get(db_prefix() . 'progress_report_machinary')->row();
                     $machinery_array['name'] = $progress_report_machinary->name;
-                    $machinery_filtered = array_filter($dpr_form_detail, function($item) use ($value) {
+                    $machinery_filtered = array_filter($dpr_form_detail, function ($item) use ($value) {
                         return $item['machinery'] == $value;
                     });
                     $machinery_array['total'] = !empty($machinery_filtered) ? array_sum(array_column($machinery_filtered, 'total_machinery')) : 0;
@@ -4096,16 +4099,16 @@ class Forms_model extends App_Model
         }
 
         // 6. Convert values to Chart.js compatible datasets
-        $total_workforce_datasets = array_map(function($label) use ($total_workforce_values) {
+        $total_workforce_datasets = array_map(function ($label) use ($total_workforce_values) {
             return ['label' => $label, 'data' => array_values($total_workforce_values[$label])];
         }, array_keys($total_workforce_values));
 
-        $stacked_labor_datasets = array_map(function($label) use ($stacked_labor_values) {
+        $stacked_labor_datasets = array_map(function ($label) use ($stacked_labor_values) {
             return ['label' => $label, 'data' => array_values($stacked_labor_values[$label])];
         }, array_keys($stacked_labor_values));
 
         // 7. Build HTML tables
-        $preport_sub_type_html = '<div class="table-responsive s_table"><table class="table items no-mtop" style="border: 1px solid #dee2e6;"><tbody>';
+        $preport_sub_type_html = '<div class="table-responsive s_table "><table  class="table items no-mtop preportSubTypeTable" style="border: 1px solid #dee2e6;"><tbody>';
         $preport_sub_type_html .= '<tr style="font-weight: bold; background: #f1f5f9; color: #1e293b;"><td align="left">Row Labels</td>';
         foreach ($progress_report_sub_type as $sub) {
             $preport_sub_type_html .= '<td align="right">' . $sub['name'] . '</td>';

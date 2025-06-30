@@ -651,7 +651,7 @@ function get_progress_report_machinary_listing($name_machinery, $machinery)
  * @param boolean $bulk_action include checkboxes on the left side for bulk actions
  */
 function AdminReportsTableStructure($name = '', $bulk_action = false)
-{
+{ 
     $table = '<table class="table customizable-table number-index-' . ($bulk_action ? '2' : '1') . ' dt-table-loading ' . ($name == '' ? 'preports-table' : $name) . ' table-forms" id="forms" data-last-order-identifier="forms" data-default-order="' . get_table_last_order('forms') . '">';
     $table .= '<thead>';
     $table .= '<tr>';
@@ -664,9 +664,9 @@ function AdminReportsTableStructure($name = '', $bulk_action = false)
     $table .= '<th class="toggleable" id="th-subject">' . _l('form_dt_subject') . '</th>';
     $table .= '<th class="toggleable" id="th-project">' . _l('project') . '</th>';
     $table .= '<th class="toggleable" id="th-department">' . _l('form_dt_department') . '</th>';
-    $table .= '<th class="toggleable" id="th-status">' . _l('form_dt_status') . '</th>';
+    // $table .= '<th class="toggleable" id="th-status">' . _l('form_dt_status') . '</th>';
     $table .= '<th class="toggleable" id="th-priority">' . _l('form_dt_priority') . '</th>';
-    $table .= '<th class="toggleable" id="th-last-reply">' . _l('form_dt_last_reply') . '</th>';
+    // $table .= '<th class="toggleable" id="th-last-reply">' . _l('form_dt_last_reply') . '</th>';
     $table .= '<th class="toggleable report_created_column" id="th-created">' . _l('form_date_created') . '</th>';
     $table .= '<th class="toggleable" id="th-tags">' . _l('tags') . '</th>';
     $table .= '<th class="toggleable ticket_options" id="th-options">' . _l('options') . '</th>';

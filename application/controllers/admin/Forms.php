@@ -811,6 +811,7 @@ class Forms extends AdminController
         
         if ($form_type == "dpr") {
             $dpr_row_template = $this->forms_model->create_dpr_row_template();
+            $data['isedit'] = false;
             if ($form_id != 0) {
                 $dpr_form = $this->forms_model->get_dpr_form($form_id);
                 $dpr_form_detail = $this->forms_model->get_dpr_form_detail($form_id);
@@ -840,6 +841,7 @@ class Forms extends AdminController
                     }
                 }
                 $data['dpr_form'] = $dpr_form;
+                $data['isedit'] = true;
             }
             $data['dpr_row_template'] = $dpr_row_template;
             $this->load->view('admin/forms/form_design/dpr', $data);
@@ -1203,6 +1205,7 @@ class Forms extends AdminController
 
     public function update_dpr_changes()
     {
+
         if ($this->input->post()) {
             $this->session->mark_as_flash('active_tab');
             $this->session->mark_as_flash('active_tab_settings');

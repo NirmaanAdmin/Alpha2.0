@@ -533,9 +533,9 @@
                                             <?php } ?>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <!-- <div class="col-md-6">
                                                 <?php echo render_input('merge_form_ids', 'merge_form_ids_field_label', '', 'text', $form->merged_form_id === null ? ['placeholder' => _l('merge_form_ids_field_placeholder')] : ['disabled' => true]); ?>
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-6">
                                                 <div class="form-group mbot20">
                                                     <label for="tags" class="control-label"><i class="fa fa-tag"

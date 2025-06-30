@@ -86,10 +86,10 @@
                 <h4 class="modal-title"><?php echo _l('bulk_actions'); ?></h4>
             </div>
             <div class="modal-body">
-                <div class="checkbox checkbox-primary merge_forms_checkbox">
+                <!-- <div class="checkbox checkbox-primary merge_forms_checkbox">
                     <input type="checkbox" name="merge_forms" id="merge_forms">
                     <label for="merge_forms"><?php echo _l('merge_forms'); ?></label>
-                </div>
+                </div> -->
                 <?php if (can_staff_delete_form()) { ?>
                 <div class="checkbox checkbox-danger mass_delete_checkbox">
                     <input type="checkbox" name="mass_delete" id="mass_delete">
@@ -98,7 +98,7 @@
                 <hr class="mass_delete_separator" />
                 <?php } ?>
                 <div id="bulk_change">
-                    <?php echo render_select('move_to_status_forms_bulk', $statuses, ['formstatusid', 'name'], 'form_single_change_status'); ?>
+                    <!-- <?php echo render_select('move_to_status_forms_bulk', $statuses, ['formstatusid', 'name'], 'form_single_change_status'); ?> -->
                     <?php echo render_select('move_to_department_forms_bulk', $departments, ['departmentid', 'name'], 'department'); ?>
                     <?php echo render_select('move_to_priority_forms_bulk', $priorities, ['priorityid', 'name'], 'form_priority'); ?>
                     <div class="form-group">
@@ -107,7 +107,7 @@
                             data-role="tagsinput">
                     </div>
                     <?php if (get_option('services') == 1) { ?>
-                    <?php echo render_select('move_to_service_forms_bulk', $services, ['serviceid', 'name'], 'service'); ?>
+                    <!-- <?php echo render_select('move_to_service_forms_bulk', $services, ['serviceid', 'name'], 'service'); ?> -->
                     <?php } ?>
                 </div>
                 <div id="merge_forms_wrapper">
