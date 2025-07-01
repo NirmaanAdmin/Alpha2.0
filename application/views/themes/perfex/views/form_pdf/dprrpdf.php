@@ -107,10 +107,12 @@ if (!empty($form_rows_info)) {
 $formrowsinfo .= '</tbody>';
 $formrowsinfo .= '</table>';
 
+if ($form_data->message != '') {
+    //add note to pdf
+    $formrowsinfo .= '<br/><br/>';
+    $formrowsinfo .= '<h2>Note:</h2>';
+    $formrowsinfo .= '<p>' . $form_data->message . '</p>';
+}
 
-//add note to pdf
-$formrowsinfo .= '<br/><br/>';
-$formrowsinfo .= '<h2>Note:</h2>';
-$formrowsinfo .= '<p>' . $form_data->message. '</p>';
 
 $pdf->writeHTML($formrowsinfo, true, false, false, false, '');
