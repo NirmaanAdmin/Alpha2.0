@@ -320,3 +320,8 @@ function create_form_pdf($form_data)
     $pdf_file = ucfirst($form_data->form_type);
     return app_pdf($form_data->form_type, LIBSPATH . 'pdf/'.$pdf_file.'_pdf', $form_data);
 }
+
+function create_dpr_form_pdf($form_data)
+{
+    return app_pdf('Dprr', LIBSPATH . 'pdf/Dprr_pdf', $form_data);
+}

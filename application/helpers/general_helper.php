@@ -1037,16 +1037,29 @@ function check_emp_leave_balance($staff_id)
 
 function get_staff_department_name($department)
 {
-    if(!empty($department)) {
+    if (!empty($department)) {
         $CI = &get_instance();
         $CI->db->select('name');
         $CI->db->from('tbldepartments');
         $CI->db->where('departmentid', $department);
         $query = $CI->db->get();
         $result = $query->row();
-        if(!empty($result)) {
+        if (!empty($result)) {
             return $result->name;
         }
-    } 
+    }
     return '';
+}
+
+function get_priority_name($priority)
+{
+    if ($priority == 1) {
+        return "Low";
+    } elseif ($priority == 2) {
+        return "Medium";
+    } elseif ($priority == 3) {
+        return "High";
+    } else {
+        return null; // or handle invalid input as needed
+    }
 }
