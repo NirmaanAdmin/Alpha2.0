@@ -1431,7 +1431,7 @@ class Forms extends AdminController
             if ($this->input->get('print')) {
                 $type = 'I';
             }
-            $pdf->Output('DPR'.date('d-m').'pdf', $type);
+            $pdf->Output('DPR'.date('d-m').'.pdf', $type);
         } else {
             echo "PDF have not created yet.";
         }
