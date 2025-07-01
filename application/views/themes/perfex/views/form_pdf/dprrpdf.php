@@ -64,18 +64,17 @@ $formrowsinfo .= '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding
 $formrowsinfo .= '<tbody>';
 $formrowsinfo .= '
 <tr style="font-size:20px;">
-    <td colspan="15" align="center"><b>ACTIVITY WITH LOCATION & OUTPUT</b></td>
+    <td colspan="11" align="center"><b>ACTIVITY WITH LOCATION & OUTPUT</b></td>
 </tr>
 <tr style="font-size:11px;">
     <td rowspan="2" width="20%;" align="center"><b>Location</b></td>
     <td rowspan="2" width="11%;" align="center"><b>Agency</b></td>
     <td rowspan="2" width="10%;" align="center"><b>Type</b></td>
-    <td rowspan="2" width="8%;" align="center"><b>Sub Type</b></td> <!-- New Sub Type column -->
+    <td rowspan="2" width="8%;" align="center"><b>Sub Type</b></td> <!-- Sub Type column -->
     <td colspan="2" width="20%;" align="center"><b>Work Progress</b></td>
     <td colspan="3" width="15%;" align="center"><b>Manpower</b></td>
     <td rowspan="2" width="8%;" align="center"><b>Machinery</b></td>
-    <td rowspan="2" width="8%;" align="center"><b>Total Machinery</b></td> <!-- New Total Machinery column -->
-    
+    <td rowspan="2" width="8%;" align="center"><b>Total Machinery</b></td> <!-- Total Machinery column -->
 </tr>
 <tr style="font-size:11px;">
     <td width="10%;" align="center"><b>Work Execute (smt/Rmt/Cmt)</b></td>
@@ -94,19 +93,20 @@ if (!empty($form_rows_info)) {
                 <td align="left">' . get_vendor_company_name($value['agency']) . '</td>
                 <td align="left">' . get_progress_report_type_name($value['type']) . '</td>
                 <td align="left">' . get_progress_report_sub_type_name($value['sub_type']) . '</td> 
-                <td align="left">' . $value['work_execute']. '</td>
-                <td align="left">' . $value['material_consumption']. '</td>
-                <td align="left">' . $value['machinery'] . '</td>
-                <td align="left">' . $value['total_machinery'] . '</td> 
+                <td align="left">' . $value['work_execute'] . '</td>
+                <td align="left">' . $value['material_consumption'] . '</td>
                 <td align="right">' . $value['male'] . '</td>
                 <td align="right">' . $value['female'] . '</td>
                 <td align="right">' . $value['total'] . '</td>
+                <td align="left">' . get_progress_report_machinary_name($value['machinery']) . '</td>
+                <td align="left">' . $value['total_machinery'] . '</td> 
             </tr>';
     }
 }
 
 $formrowsinfo .= '</tbody>';
 $formrowsinfo .= '</table>';
+
 
 //add note to pdf
 $formrowsinfo .= '<br/><br/>';
