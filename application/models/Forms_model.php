@@ -4134,7 +4134,7 @@ class Forms_model extends App_Model
         $preport_sub_type_html .= '</tbody></table></div>';
 
         // Type Table
-        $preport_type_html = '<div class="table-responsive s_table"><table class="table items no-mtop" style="border: 1px solid #dee2e6;"><tbody>';
+        $preport_type_html = '<div class="table-responsive s_table"><table class="table items no-mtop preportTypeTable" style="border: 1px solid #dee2e6;"><tbody>';
         $preport_type_html .= '<tr style="font-weight: bold; background: #f1f5f9; color: #1e293b;"><td align="left">Row Labels</td>';
         foreach ($progress_report_type as $type) {
             $preport_type_html .= '<td align="right">' . $type['name'] . '</td>';

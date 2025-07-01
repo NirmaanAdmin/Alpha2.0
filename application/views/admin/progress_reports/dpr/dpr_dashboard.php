@@ -93,7 +93,10 @@
           <br><br>
 
           <div class="row">
-            <div class="col-md-12">
+            <span style="padding: 0px; margin-bottom: 12px;">
+              <button id="export-csv" class="btn btn-primary pull-right">Export to CSV</button>
+            </span>
+            <div class="col-md-12" style="margin-top: 10px;">
               <div class="preport_sub_type_html">
               </div>
             </div>
@@ -102,7 +105,10 @@
           <br><br>
 
           <div class="row">
-            <div class="col-md-12">
+            <span style="padding: 0px; margin-bottom: 12px;">
+              <button id="export-csv-new" class="btn btn-primary pull-right">Export to CSV</button>
+            </span>
+            <div class="col-md-12" style="margin-top: 10px;">
               <div class="preport_type_html">
               </div>
             </div>
@@ -124,6 +130,107 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+  document.getElementById('export-csv').addEventListener('click', function() {
+    try {
+      // Select the table
+      const table = document.querySelector('.preportSubTypeTable');
+      if (!table) {
+        throw new Error('Table with class "items-preview" not found');
+      }
+
+      const rows = Array.from(table.querySelectorAll('tr'));
+
+      // Initialize CSV content with UTF-8 BOM
+      let csvContent = '\uFEFF';
+
+      // Loop through each row
+      rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        const rowContent = cells.map(cell => {
+          // Escape quotes by doubling them and wrap in quotes
+          const text = cell.textContent.trim().replace(/"/g, '""');
+          return `"${text}"`;
+        }).join(',');
+        csvContent += rowContent + '\r\n'; // Using \r\n for Windows compatibility
+      });
+
+      // Create a Blob and downloadable link
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'workforce_by_category.csv';
+      link.style.display = 'none';
+
+      // Add link to DOM and trigger click
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Release the object URL
+      }, 100);
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      alert('An error occurred while exporting to CSV. Please check the console for details.');
+    }
+  });
+
+  document.getElementById('export-csv-new').addEventListener('click', function() {
+    try {
+      // Select the table
+      const table = document.querySelector('.preportTypeTable');
+      if (!table) {
+        throw new Error('Table with class "items-preview" not found');
+      }
+
+      const rows = Array.from(table.querySelectorAll('tr'));
+
+      // Initialize CSV content with UTF-8 BOM
+      let csvContent = '\uFEFF';
+
+      // Loop through each row
+      rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        const rowContent = cells.map(cell => {
+          // Escape quotes by doubling them and wrap in quotes
+          const text = cell.textContent.trim().replace(/"/g, '""');
+          return `"${text}"`;
+        }).join(',');
+        csvContent += rowContent + '\r\n'; // Using \r\n for Windows compatibility
+      });
+
+      // Create a Blob and downloadable link
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'total_workforce.csv';
+      link.style.display = 'none';
+
+      // Add link to DOM and trigger click
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Release the object URL
+      }, 100);
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      alert('An error occurred while exporting to CSV. Please check the console for details.');
+    }
+  });
   $('select[name="projects"]').on('change', function() {
     get_dpr_dashboard();
   });
