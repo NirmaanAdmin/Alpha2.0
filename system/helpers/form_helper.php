@@ -1053,3 +1053,22 @@ if ( ! function_exists('_get_validation_object'))
 		return $return;
 	}
 }
+
+function get_projects($id = null)
+{
+    $CI = &get_instance();
+
+
+    // If an ID is provided, get the specific record
+    if ($id !== null) {
+        $CI->db->where('id', $id);
+        $record = $CI->db->get(db_prefix() . 'projects')->row();
+
+        // Return the 'name' property if the record exists, otherwise return null
+        return $record ? $record->name : null;
+    } else {
+        // No ID provided, return all matching records as an array
+        $records = $CI->db->get(db_prefix() . 'projects')->result_array();
+        return $records;
+    }
+}

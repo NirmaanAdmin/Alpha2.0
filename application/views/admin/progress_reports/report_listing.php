@@ -3,77 +3,77 @@
 <div id="wrapper">
     <div class="content">
         <div id="vueApp">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="_buttons tw-mb-2 sm:tw-mb-4">
-                    <a href="<?php echo admin_url('forms/add_dpr'); ?>"
-                        class="btn btn-primary pull-left display-block mright5">
-                        <i class="fa-regular fa-plus tw-mr-1"></i>
-                        <?php 
-                        if($module == "dpr") {
-                            echo _l('daily_progress_report'); 
-                        } else if($module == "wpr") {
-                            echo _l('weekly_progress_report'); 
-                        } else if($module == "mpr") {
-                            echo _l('monthly_progress_report'); 
-                        } else {
-                            echo _l('new_form');
-                        }
-                        ?>
-                    </a>
-
-                    <?php if($module == "dpr") { ?>
-                        <a href="<?php echo admin_url('forms/dpr_dashboard'); ?>" class="btn btn-primary">
-                            <?php echo _l('dashboard_string'); ?>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="_buttons tw-mb-2 sm:tw-mb-4">
+                        <a href="<?php echo admin_url('forms/add_dpr'); ?>"
+                            class="btn btn-primary pull-left display-block mright5">
+                            <i class="fa-regular fa-plus tw-mr-1"></i>
+                            <?php
+                            if ($module == "dpr") {
+                                echo _l('daily_progress_report');
+                            } else if ($module == "wpr") {
+                                echo _l('weekly_progress_report');
+                            } else if ($module == "mpr") {
+                                echo _l('monthly_progress_report');
+                            } else {
+                                echo _l('new_form');
+                            }
+                            ?>
                         </a>
-                    <?php } ?>
 
-                    <div class="tw-inline pull-right">
+                        <?php if ($module == "dpr") { ?>
+                            <a href="<?php echo admin_url('forms/dpr_dashboard'); ?>" class="btn btn-primary">
+                                <?php echo _l('dashboard_string'); ?>
+                            </a>
+                        <?php } ?>
+
+                        <div class="tw-inline pull-right">
                             <app-filters
                                 id="<?php echo $table->id(); ?>"
                                 view="<?php echo $table->viewName(); ?>"
-                                :rules="extra.formsRules || <?php echo app\services\utilities\Js::from($chosen_form_status ? $table->findRule('status')->setValue([(int) $chosen_form_status]) : []); ?>"
+                                :rules="[]"
                                 :saved-filters="<?php echo $table->filtersJs(); ?>"
                                 :available-rules="<?php echo $table->rulesJs(); ?>">
                             </app-filters>
-                    </div>
-                </div>
-                <div class="panel_s">
-                    <div class="panel-body">
-                        <div class="weekly-form-opening no-shadow tw-mb-10" style="display:none;">
-                            <h4 class="tw-font-semibold tw-mb-8 tw-flex tw-items-center tw-text-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor"
-                                    class="tw-w-5 tw-h-5 tw-mr-1.5 tw-text-neutral-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-                                </svg>
-
-                                <?php echo _l('home_weekend_form_opening_statistics'); ?>
-                            </h4>
-                            <div class="relative" style="max-height:350px;">
-                                <canvas class="chart" id="weekly-form-openings-chart" height="350"></canvas>
-                            </div>
                         </div>
+                    </div>
+                    <div class="panel_s">
+                        <div class="panel-body">
+                            <div class="weekly-form-opening no-shadow tw-mb-10" style="display:none;">
+                                <h4 class="tw-font-semibold tw-mb-8 tw-flex tw-items-center tw-text-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor"
+                                        class="tw-w-5 tw-h-5 tw-mr-1.5 tw-text-neutral-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                                    </svg>
 
-                        <?php hooks()->do_action('before_render_forms_list_table'); ?>
-                        <?php $this->load->view('admin/forms/summary', [
-                            'hrefAttrs'=> function($status) use ($table) {
-                                return '@click.prevent="extra.formsRules = '.app\services\utilities\Js::from($table->findRule('status')->setValue([(int) $status['formstatusid']])).'"';
-                            }
-                        ]); ?>
-                        <hr class="hr-panel-separator" />
-                        <a href="#" data-toggle="modal" data-target="#forms_bulk_actions"
-                            class="bulk-actions-btn table-btn hide"
-                            data-table=".table-forms"><?php echo _l('bulk_actions'); ?></a>
-                        <div class="clearfix"></div>
-                        <div class="panel-table-full">
-                            <?php echo AdminReportsTableStructure('', true); ?>
+                                    <?php echo _l('home_weekend_form_opening_statistics'); ?>
+                                </h4>
+                                <div class="relative" style="max-height:350px;">
+                                    <canvas class="chart" id="weekly-form-openings-chart" height="350"></canvas>
+                                </div>
+                            </div>
+
+                            <?php hooks()->do_action('before_render_forms_list_table'); ?>
+                            <?php $this->load->view('admin/forms/summary', [
+                                'hrefAttrs' => function ($status) use ($table) {
+                                    return '@click.prevent="extra.formsRules = ' . app\services\utilities\Js::from($table->findRule('status')->setValue([(int) $status['formstatusid']])) . '"';
+                                }
+                            ]); ?>
+                            <hr class="hr-panel-separator" />
+                            <a href="#" data-toggle="modal" data-target="#forms_bulk_actions"
+                                class="bulk-actions-btn table-btn hide"
+                                data-table=".table-forms"><?php echo _l('bulk_actions'); ?></a>
+                            <div class="clearfix"></div>
+                            <div class="panel-table-full">
+                                <?php echo AdminReportsTableStructure('', true); ?>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </div>
 </div>
@@ -91,11 +91,11 @@
                     <label for="merge_forms"><?php echo _l('merge_forms'); ?></label>
                 </div> -->
                 <?php if (can_staff_delete_form()) { ?>
-                <div class="checkbox checkbox-danger mass_delete_checkbox">
-                    <input type="checkbox" name="mass_delete" id="mass_delete">
-                    <label for="mass_delete"><?php echo _l('mass_delete'); ?></label>
-                </div>
-                <hr class="mass_delete_separator" />
+                    <div class="checkbox checkbox-danger mass_delete_checkbox">
+                        <input type="checkbox" name="mass_delete" id="mass_delete">
+                        <label for="mass_delete"><?php echo _l('mass_delete'); ?></label>
+                    </div>
+                    <hr class="mass_delete_separator" />
                 <?php } ?>
                 <div id="bulk_change">
                     <!-- <?php echo render_select('move_to_status_forms_bulk', $statuses, ['formstatusid', 'name'], 'form_single_change_status'); ?> -->
@@ -107,7 +107,7 @@
                             data-role="tagsinput">
                     </div>
                     <?php if (get_option('services') == 1) { ?>
-                    <!-- <?php echo render_select('move_to_service_forms_bulk', $services, ['serviceid', 'name'], 'service'); ?> -->
+                        <!-- <?php echo render_select('move_to_service_forms_bulk', $services, ['serviceid', 'name'], 'service'); ?> -->
                     <?php } ?>
                 </div>
                 <div id="merge_forms_wrapper">
@@ -129,8 +129,8 @@
                             data-width="100%" data-live-search="true"
                             data-none-selected-text="<?php echo _l('dropdown_non_selected_tex') ?>" required>
                             <?php foreach ($statuses as $status) { ?>
-                            <option value="<?php echo e($status['formstatusid']); ?>"><?php echo e($status['name']); ?>
-                            </option>
+                                <option value="<?php echo e($status['formstatusid']); ?>"><?php echo e($status['name']); ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
@@ -146,33 +146,33 @@
 </div><!-- /.modal -->
 <?php init_tail(); ?>
 <script>
-var chart;
-var chart_data = <?php echo $weekly_forms_opening_statistics; ?>;
+    var chart;
+    var chart_data = <?php echo $weekly_forms_opening_statistics; ?>;
 
-function init_forms_weekly_chart() {
-    if (typeof(chart) !== 'undefined') {
-        chart.destroy();
-    }
-    // Weekly form openings statistics
-    chart = new Chart($('#weekly-form-openings-chart'), {
-        type: 'line',
-        data: chart_data,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            legend: {
-                display: false,
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                    }
-                }]
-            }
+    function init_forms_weekly_chart() {
+        if (typeof(chart) !== 'undefined') {
+            chart.destroy();
         }
-    });
-}
+        // Weekly form openings statistics
+        chart = new Chart($('#weekly-form-openings-chart'), {
+            type: 'line',
+            data: chart_data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }]
+                }
+            }
+        });
+    }
 </script>
 </body>
 
