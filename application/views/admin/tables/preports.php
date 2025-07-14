@@ -186,10 +186,8 @@ return App_table::find('preports')
                     $form_pdf = '';
                     $form_pdf .= '<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-regular fa-file-pdf"></i><span class="caret"></span></a>';
                     $form_pdf .= '<ul class="dropdown-menu dropdown-menu-right">';
-                    $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I') . '">' . _l('view_pdf') . '</a></li>';
-                    $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I') . '" target="_blank">' . _l('view_pdf_in_new_window') . '</a></li>';
-                    $form_pdf .= '<li><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid']) . '">' . _l('download') . '</a></li>';
-                    $form_pdf .= '<li><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?print=true') . '" target="_blank">' . _l('print') . '</a></li>';
+                    $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I&staff_dpr=true') . '" target="_blank">' . _l('Staff DPR') . '</a></li>';
+                     $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I&staff_dpr=false') . '" target="_blank">' . _l('Client DPR') . '</a></li>';                   
                     $form_pdf .= '</ul>';
                     $_data = $form_pdf;
                 } elseif (strpos($aColumns[$i], 'date_picker_') !== false) {

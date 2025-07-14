@@ -4031,45 +4031,107 @@ class Forms_model extends App_Model
 
     public function get_dpr_dashboard($data)
     {
-        $projects = isset($data['projects']) ? $data['projects'] : null;
-
         $total_workforce_labels = [];
         $total_workforce_values = [];
         $stacked_labor_labels = [];
         $stacked_labor_values = [];
+        // pull inputs
+        $projects   = $data['projects']   ?? null;
+        $start_date = $data['start_date'] ?? null;
+        $end_date   = $data['end_date']   ?? null;
 
-        // 1. Fetch distinct form dates
-        $this->db->select('DATE(date) as date');
-        $this->db->from(db_prefix() . 'forms');
-        $this->db->where('form_type', 'dpr');
-        if (!empty($projects)) {
-            $this->db->where('project_id', $projects);
+        // normalize dates to Y-m-d
+        if ($start_date) {
+            $start_date = date('Y-m-d', strtotime($start_date));
         }
-        $this->db->group_by('DATE(date)');
-        $this->db->order_by('date', 'ASC');
+        if ($end_date) {
+            $end_date   = date('Y-m-d', strtotime($end_date));
+        }
+
+        // 1. distinct form dates
+        $this->db->select('DATE(date) AS date')
+            ->from(db_prefix() . 'forms');
+        $this->db->where('form_type', 'dpr');
+
+        if ($projects !== null) {
+            if (is_array($projects)) {
+                $this->db->where_in('project_id', $projects);
+            } else {
+                $this->db->where('project_id', $projects);
+            }
+        }
+
+        if ($start_date) {
+            $this->db->where('DATE(date) >=', $start_date);
+        }
+        if ($end_date) {
+            $this->db->where('DATE(date) <=', $end_date);
+        }
+
+        $this->db->group_by('date')
+            ->order_by('date', 'ASC');
         $forms = $this->db->get()->result_array();
 
-        // 2. Fetch sub_type totals grouped by date and sub_type
-        $this->db->select('DATE(' . db_prefix() . 'forms.date) as date, sub_type, SUM(' . db_prefix() . 'dpr_form_detail.total) as total');
-        $this->db->from(db_prefix() . 'dpr_form_detail');
-        $this->db->join(db_prefix() . 'forms', db_prefix() . 'forms.formid = ' . db_prefix() . 'dpr_form_detail.form_id');
-        $this->db->where("sub_type != ''", NULL, FALSE);
-        if (!empty($projects)) {
-            $this->db->where(db_prefix() . 'forms.project_id', $projects);
+
+        // 2. sub_type totals
+        $this->db->select([
+            'DATE(f.date) AS date',
+            'd.sub_type',
+            'SUM(d.total) AS total'
+        ])
+            ->from(db_prefix() . 'dpr_form_detail d')
+            ->join(db_prefix() . 'forms f', 'f.formid = d.form_id')
+            ->where("d.sub_type != ''", null, false);
+
+        if ($projects !== null) {
+            if (is_array($projects)) {
+                $this->db->where_in('f.project_id', $projects);
+            } else {
+                $this->db->where('f.project_id', $projects);
+            }
         }
-        $this->db->group_by(['DATE(' . db_prefix() . 'forms.date)', 'sub_type']);
+
+        if ($start_date) {
+            $this->db->where('DATE(f.date) >=', $start_date);
+        }
+        if ($end_date) {
+            $this->db->where('DATE(f.date) <=', $end_date);
+        }
+
+        $this->db->group_by(['date', 'd.sub_type'])
+            ->order_by('date', 'ASC');
         $sub_type_array = $this->db->get()->result_array();
 
-        // 3. Fetch type totals grouped by date and type
-        $this->db->select('DATE(' . db_prefix() . 'forms.date) as date, type, SUM(' . db_prefix() . 'dpr_form_detail.total) as total');
-        $this->db->from(db_prefix() . 'dpr_form_detail');
-        $this->db->join(db_prefix() . 'forms', db_prefix() . 'forms.formid = ' . db_prefix() . 'dpr_form_detail.form_id');
-        $this->db->where("type != ''", NULL, FALSE);
-        if (!empty($projects)) {
-            $this->db->where(db_prefix() . 'forms.project_id', $projects);
+
+        // 3. type totals
+        $this->db->select([
+            'DATE(f.date) AS date',
+            'd.type',
+            'SUM(d.total) AS total'
+        ])
+            ->from(db_prefix() . 'dpr_form_detail d')
+            ->join(db_prefix() . 'forms f', 'f.formid = d.form_id')
+            ->where("d.type != ''", null, false);
+
+        if ($projects !== null) {
+            if (is_array($projects)) {
+                $this->db->where_in('f.project_id', $projects);
+            } else {
+                $this->db->where('f.project_id', $projects);
+            }
         }
-        $this->db->group_by(['DATE(' . db_prefix() . 'forms.date)', 'type']);
+
+        if ($start_date) {
+            $this->db->where('DATE(f.date) >=', $start_date);
+        }
+        if ($end_date) {
+            $this->db->where('DATE(f.date) <=', $end_date);
+        }
+
+        $this->db->group_by(['date', 'd.type'])
+            ->order_by('date', 'ASC');
         $type_array = $this->db->get()->result_array();
+
 
         // 4. Reference lists
         $progress_report_sub_type = $this->db->get(db_prefix() . 'progress_report_sub_type')->result_array();
@@ -4197,5 +4259,4 @@ class Forms_model extends App_Model
         $query = $this->db->get(db_prefix() . 'forms');
         return $query->row();
     }
-
 }

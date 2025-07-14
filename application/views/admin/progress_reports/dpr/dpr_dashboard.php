@@ -57,6 +57,21 @@
                 echo render_select('projects', $projects, array('id', 'name'), 'projects', $default_project);
                 ?>
               </div>
+
+              <div class="col-md-2 pull-right" style="padding-right: 0px;">
+                <?php
+                $default_end_date = date('d-m-Y'); // Today's date
+                $end_date_value = isset($end_date) ? $end_date : $default_end_date;
+                echo render_date_input('end_date', 'End Date', $end_date_value);
+                ?>
+              </div>
+              <div class="col-md-2 pull-right" style="padding-right: 0px;">
+                <?php
+                $default_start_date = date('01-m-Y'); // First day of current month
+                $start_date_value = isset($start_date) ? $start_date : $default_start_date;
+                echo render_date_input('start_date', 'Start Date', $start_date_value);
+                ?>
+              </div>
             </div>
           </div>
 
@@ -235,12 +250,22 @@
     get_dpr_dashboard();
   });
 
+  $('input[name="start_date"]').on('change', function() {
+    get_dpr_dashboard();
+  });
+
+  $('input[name="end_date"]').on('change', function() {
+    get_dpr_dashboard();
+  });
+
   get_dpr_dashboard();
 
   function get_dpr_dashboard() {
     "use strict";
     var data = {
       projects: $('select[name="projects"]').val(),
+      start_date: $('input[name="start_date"]').val(),
+      end_date: $('input[name="end_date"]').val()
     };
     $.post(admin_url + 'forms/get_dpr_dashboard', data).done(function(res) {
       var response = JSON.parse(res);

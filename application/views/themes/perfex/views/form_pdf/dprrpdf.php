@@ -58,7 +58,12 @@ $formbasicinfo .= '</tbody>';
 $formbasicinfo .= '</table>';
 
 $pdf->writeHTML($formbasicinfo, true, false, false, false, '');
-
+$widthloc = '';
+if ($form_data->staff_dpr == 'true') {
+    $widthloc = '20%';
+}else{
+    $widthloc = '31%';
+}
 $formrowsinfo = '';
 $formrowsinfo .= '<table width="100%" bgcolor="#fff" cellspacing="0" cellpadding="5" border="1">';
 $formrowsinfo .= '<tbody>';
@@ -67,9 +72,12 @@ $formrowsinfo .= '
     <td colspan="11" align="center"><b>ACTIVITY WITH LOCATION & OUTPUT</b></td>
 </tr>
 <tr style="font-size:11px;">
-    <td rowspan="2" width="20%;" align="center"><b>Location</b></td>
-    <td rowspan="2" width="11%;" align="center"><b>Agency</b></td>
-    <td rowspan="2" width="10%;" align="center"><b>Type</b></td>
+    <td rowspan="2" width="' . $widthloc . '" align="center"><b>Location</b></td>';
+if ($form_data->staff_dpr == 'true') {
+    $formrowsinfo .= '<td rowspan="2" width="11%;" align="center"><b>Agency</b></td>';
+}
+
+$formrowsinfo .= '<td rowspan="2" width="10%;" align="center"><b>Type</b></td>
     <td rowspan="2" width="8%;" align="center"><b>Sub Type</b></td> <!-- Sub Type column -->
     <td colspan="2" width="20%;" align="center"><b>Work Progress</b></td>
     <td colspan="3" width="15%;" align="center"><b>Manpower</b></td>
@@ -89,9 +97,11 @@ if (!empty($form_rows_info)) {
     foreach ($form_rows_info as $key => $value) {
         $formrowsinfo .= '
             <tr style="font-size:11px;">
-                <td align="left">' . $value['location'] . '</td>
-                <td align="left">' . get_vendor_company_name($value['agency']) . '</td>
-                <td align="left">' . get_progress_report_type_name($value['type']) . '</td>
+                <td align="left">' . $value['location'] . '</td>';
+        if ($form_data->staff_dpr == 'true') {
+            $formrowsinfo .= '<td align="left">' . get_vendor_company_name($value['agency']) . '</td>';
+        }
+        $formrowsinfo .= '<td align="left">' . get_progress_report_type_name($value['type']) . '</td>
                 <td align="left">' . get_progress_report_sub_type_name($value['sub_type']) . '</td> 
                 <td align="left">' . $value['work_execute'] . '</td>
                 <td align="left">' . $value['material_consumption'] . '</td>

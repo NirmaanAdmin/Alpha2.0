@@ -247,10 +247,19 @@ class timesheets extends AdminController
 			if ($data['check_latch_timesheet'] == false) {
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $month, $month_year);
 				$data['staff_row_tk'] = $result['staff_row_tk'];
+				// Remove the first element (Admin N360)
+				unset($data['staff_row_tk'][0]);
+
+				// Optional: Reset array keys (if needed)
+				$data['staff_row_tk'] = array_values($data['staff_row_tk']);
 				$data['cell_background'] = $result['cell_background'];
+				// Remove the first element (Admin N360)
+				unset($data['cell_background'][0]);
+
+				// Optional: Reset array keys (if needed)
+				$data['cell_background'] = array_values($data['cell_background']);
 			}
 		}
-
 		$data_lack = [];
 		$data['data_lack'] = $data_lack;
 		$data['set_col_tk'] = json_encode($data['set_col_tk']);
@@ -2385,7 +2394,7 @@ class timesheets extends AdminController
 										$total_shift++;
 									}
 									if (($list_attendance != '') && ($shift_hour > 0)) {
-										$list_tks = explode(';', $list_attendance);	
+										$list_tks = explode(';', $list_attendance);
 										foreach ($list_tks as $key_tk => $tk) {
 											$split_val = explode(':', trim($tk));
 											if (strtolower($split_val[0]) == 'w') {
@@ -2457,7 +2466,7 @@ class timesheets extends AdminController
 
 							$index++;
 						}
-						
+
 						$row[] = $total_shift;
 						$row[] = ($total > 0) ? $this->customRound($total) : 0;
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
