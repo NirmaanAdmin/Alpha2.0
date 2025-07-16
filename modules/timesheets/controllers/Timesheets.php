@@ -246,7 +246,7 @@ class timesheets extends AdminController
 		} else {
 			if ($data['check_latch_timesheet'] == false) {
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $month, $month_year);
-				// $data['staff_row_tk'] = $result['staff_row_tk'];
+				$data['staff_row_tk'] = $result['staff_row_tk'];
 				// // Remove the first element (Admin N360)
 				// unset($data['staff_row_tk'][0]);
 
