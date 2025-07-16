@@ -1063,3 +1063,44 @@ function get_priority_name($priority)
         return null; // or handle invalid input as needed
     }
 }
+
+function get_module_filter($module_name, $filter_name) 
+{
+    $CI = &get_instance();
+    $CI->db->select('*');
+    $CI->db->from(db_prefix() . 'module_filter');
+    $CI->db->where('module_name', $module_name);
+    $CI->db->where('filter_name', $filter_name);
+    $CI->db->where('staff_id', get_staff_user_id());
+    $row = $CI->db->get()->row();
+    return $row;
+}
+
+function update_module_filter($module_name, $filter_name, $filter_value)
+{
+    $CI = &get_instance();
+    $CI->db->select('*');
+    $CI->db->from(db_prefix() . 'module_filter');
+    $CI->db->where('module_name', $module_name);
+    $CI->db->where('filter_name', $filter_name);
+    $CI->db->where('staff_id', get_staff_user_id());
+    $row = $CI->db->get()->row();
+    if(!empty($row)) {
+        $CI->db->where('module_name', $module_name);
+        $CI->db->where('filter_name', $filter_name);
+        $CI->db->where('staff_id', get_staff_user_id());
+        $CI->db->update(db_prefix() . 'module_filter', [
+            'filter_value' => $filter_value,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    } else {
+        $data = array();
+        $data['module_name'] = $module_name;
+        $data['staff_id'] = get_staff_user_id();
+        $data['filter_name'] = $filter_name;
+        $data['filter_value'] = $filter_value;
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $CI->db->insert(db_prefix() . 'module_filter', $data);
+    }
+    return true;
+}

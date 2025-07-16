@@ -8,47 +8,21 @@ $this->ci->load->model('departments_model');
 $this->ci->load->model('staff_model'); // Added missing staff_model load
 
 $rules = [
-    App_table_filter::new('subject', 'TextRule')->label(_l('form_dt_subject')),
-    App_table_filter::new('department', 'SelectRule')->label(_l('form_dt_department'))->options(function ($ci) {
-        return collect($ci->departments_model->get())->map(fn($dep) => [
-            'value' => $dep['departmentid'],
-            'label' => $dep['name']
-        ])->all();
-    })->isVisible(fn() => is_admin()),
-    App_table_filter::new('my_forms', 'BooleanRule')->label(_l('my_forms_assigned'))->raw(function ($value) {
-        return $value == "1" ? 'assigned = ' . get_staff_user_id() : 'assigned != ' . get_staff_user_id();
-    }),
+    App_table_filter::new('project_id', 'SelectRule')
+        ->label(_l('projects'))
+        ->withEmptyOperators()
+        ->emptyOperatorValue(0)
+        ->options(function ($ci) {
+            $projects = get_projects();
+            return collect($projects)->map(fn($p) => [
+                'value' => $p['id'],
+                'label' => $p['name']
+            ])->all();
+        })
 ];
 
-$rules[] = App_table_filter::new('assigned', 'SelectRule')->label(_l('form_assigned'))
-    ->withEmptyOperators()
-    ->emptyOperatorValue(0)
-    ->isVisible(fn() => is_admin())
-    ->options(function ($ci) {
-        $staff = $ci->staff_model->get('', ['active' => 1]);
-        return collect($staff)->map(function ($staff) {
-            return [
-                'value' => $staff['staffid'],
-                'label' => $staff['firstname'] . ' ' . $staff['lastname']
-            ];
-        })->all();
-    });
-
-$rules[] = App_table_filter::new('project_id', 'SelectRule')->label(_l('projects'))
-    ->withEmptyOperators()
-    ->emptyOperatorValue(0)
-    ->options(function ($ci) {
-        $project = get_projects();
-        return collect($project)->map(function ($project) {
-            return [
-                'value' => $project['id'],
-                'label' => $project['name']
-            ];
-        })->all();
-    });
-
 return App_table::find('preports')
-    ->outputUsing(function ($params) use ($statuses) {
+    ->outputUsing(function ($params) {
         extract($params);
 
         $aColumns = [
@@ -87,30 +61,12 @@ return App_table::find('preports')
 
         $where = [];
 
-        // Apply filters from rules
         if ($filtersWhere = $this->getWhereFromRules()) {
             $where[] = $filtersWhere;
         }
-        if ($project_id = $this->ci->input->post('project_id')) {
-            array_push($where, 'AND '. db_prefix() . 'forms.project_id = ' . $this->ci->db->escape_str($project_id));
-        }
-        // Department access for non-admins
-        if (!is_admin() && get_option('staff_access_only_assigned_departments') == 1) {
-            $staff_departments_ids = $this->ci->departments_model->get_staff_departments(get_staff_user_id(), true);
-            $departments_ids = [];
-
-            if (count($staff_departments_ids) == 0) {
-                $departments = $this->ci->departments_model->get();
-                foreach ($departments as $department) {
-                    array_push($departments_ids, $department['departmentid']);
-                }
-            } else {
-                $departments_ids = $staff_departments_ids;
-            }
-
-            if (count($departments_ids) > 0) {
-                $where[] = 'AND department IN (SELECT departmentid FROM ' . db_prefix() . 'staff_departments WHERE departmentid IN (' . implode(',', $departments_ids) . ') AND staffid="' . get_staff_user_id() . '")';
-            }
+        // Apply project_id filter if provided
+        if (isset($params['project_id']) && $params['project_id'] !== '') {
+            $where[] = 'AND ' . db_prefix() . 'forms.project_id = ' . $this->ci->db->escape_str($params['project_id']);
         }
 
         // Module filter
@@ -187,7 +143,7 @@ return App_table::find('preports')
                     $form_pdf .= '<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-regular fa-file-pdf"></i><span class="caret"></span></a>';
                     $form_pdf .= '<ul class="dropdown-menu dropdown-menu-right">';
                     $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I&staff_dpr=true') . '" target="_blank">' . _l('Staff DPR') . '</a></li>';
-                     $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I&staff_dpr=false') . '" target="_blank">' . _l('Client DPR') . '</a></li>';                   
+                    $form_pdf .= '<li class="hidden-xs"><a href="' . admin_url('forms/form_dpr_pdf/' . $aRow['formid'] . '?output_type=I&staff_dpr=false') . '" target="_blank">' . _l('Client DPR') . '</a></li>';
                     $form_pdf .= '</ul>';
                     $_data = $form_pdf;
                 } elseif (strpos($aColumns[$i], 'date_picker_') !== false) {

@@ -14,6 +14,7 @@ class Forms extends AdminController
             redirect(admin_url());
         }
         $this->load->model('forms_model');
+        $this->load->model('projects_model');
     }
 
     public function index($status = '', $userid = '')
@@ -967,30 +968,7 @@ class Forms extends AdminController
         if (!is_numeric($status)) {
             $status = '';
         }
-
-        $data['table'] = App_table::find('preports');
-
-        if ($this->input->is_ajax_request()) {
-            if (!$this->input->post('via_form')) {
-                $tableParams = [
-                    'status' => $status,
-                    'userid' => $userid,
-                ];
-            } else {
-                // request for othes forms when single form is opened
-                $tableParams = [
-                    'userid'        => $this->input->post('via_form_userid'),
-                    'via_form' => $this->input->post('via_form'),
-                ];
-
-                if ($tableParams['userid'] == 0) {
-                    unset($tableParams['userid']);
-                    $tableParams['by_email'] = $this->input->post('via_form_email');
-                }
-            }
-            $tableParams['module'] = $module;
-            $data['table']->output($tableParams);
-        }
+        $data['projects'] = $this->projects_model->get();
 
         $data['chosen_form_status']              = $status;
         $data['weekly_forms_opening_statistics'] = json_encode($this->forms_model->get_weekly_forms_opening_statistics());
@@ -1008,7 +986,12 @@ class Forms extends AdminController
         $data['module'] = $module;
         $this->load->view('admin/progress_reports/report_listing', $data);
     }
-
+    public function table_drp_details()
+    {
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('drp_table_new');
+        }
+    }
     public function find_dpr_design($form_id = 0)
     {
         $dpr_row_template = $this->forms_model->create_dpr_row_template();
