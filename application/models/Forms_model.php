@@ -4259,4 +4259,26 @@ class Forms_model extends App_Model
         $query = $this->db->get(db_prefix() . 'forms');
         return $query->row();
     }
+
+    public function lock_dpr($data)
+    {
+        if (!empty($data)) {
+            $this->db->where('formid', $data['formid']);
+            $this->db->update(db_prefix() . 'forms', [
+                'locked' => 1,
+            ]);
+            return true;
+        }
+    }
+
+    public function unlock_dpr($data)
+    {
+        if (!empty($data)) {
+            $this->db->where('formid', $data['formid']);
+            $this->db->update(db_prefix() . 'forms', [
+                'locked' => 0,
+            ]);
+            return true;
+        }
+    }
 }

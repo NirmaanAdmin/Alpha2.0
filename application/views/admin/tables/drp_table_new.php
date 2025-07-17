@@ -79,6 +79,7 @@ $additionalSelect = [
     'assigned',
     db_prefix() . 'clients.company',
     'department',
+    db_prefix() . 'forms.locked as locked',
 ];
 
 // Fix for big queries
@@ -113,24 +114,51 @@ foreach ($rResult as $aRow) {
     $subject = e($aRow['subject']);
     $url = admin_url('forms/view_edit_dpr/' . $aRow['formid']);
     $subjectRow = '<a href="' . $url . '?tab=settings" class="valign">' . $subject . '</a>';
-    
+
     // Add assigned staff image if exists
     if ($aRow['assigned'] != 0) {
         $subjectRow .= '<a href="' . admin_url('profile/' . $aRow['assigned']) . '" data-toggle="tooltip" title="' . e(get_staff_full_name($aRow['assigned'])) . '" class="pull-left mright5">' . staff_profile_image($aRow['assigned'], [
             'staff-profile-image-xs',
         ]) . '</a>';
     }
-    
-    // Row options
-    $subjectRow .= '<div class="row-options">';
-    $subjectRow .= '<a href="' . $url . '?tab=settings">' . _l('view') . '</a>';
-    $subjectRow .= ' | <a href="' . $url . '?tab=settings">' . _l('edit') . '</a>';
-    if (can_staff_delete_form()) {
-        $subjectRow .= ' | <a href="' . admin_url('forms/delete/' . $aRow['formid']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+
+    if ($aRow['locked'] == 0) {
+        // Unlocked form - regular users can access
+        $url = admin_url('forms/view_edit_dpr/' . $aRow['formid']);
+        $subject = '<a href="' . $url . '?tab=settings" class="valign">' . $subject . '</a>';
+
+        $subject .= '<div class="row-options">';
+        $subject .= '<a href="' . $url . '?tab=settings">' . _l('view') . '</a>';
+
+        // All users can edit unlocked forms
+        $subject .= ' | <a href="' . $url . '?tab=settings">' . _l('edit') . '</a>';
+
+        if (can_staff_delete_form()) {
+            $subject .= ' | <a href="' . admin_url('forms/delete/' . $aRow['formid']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+        }
+        $subject .= '</div>';
+    } elseif ($aRow['locked'] == 1 && is_admin()) {
+        // Locked form - only admin can access
+        $url = admin_url('forms/view_edit_dpr/' . $aRow['formid']);
+        $subject = '<a href="' . $url . '?tab=settings" class="valign">' . $subject . '</a>';
+
+        $subject .= '<div class="row-options">';
+        $subject .= '<a href="' . $url . '?tab=settings">' . _l('view') . '</a>';
+
+        // Only admin can edit locked forms
+        $subject .= ' | <a href="' . $url . '?tab=settings">' . _l('edit') . '</a>';
+
+        if (can_staff_delete_form()) {
+            $subject .= ' | <a href="' . admin_url('forms/delete/' . $aRow['formid']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+        }
+        $subject .= '</div>';
+    } else {
+        // Locked form for non-admin users - view only
+        
+        $subject = $subject;
     }
-    $subjectRow .= '</div>';
-    
-    $row[] = $subjectRow;
+
+    $row[] = $subject;
 
     // Project
     $row[] = get_project_name_by_id($aRow['project_id']);

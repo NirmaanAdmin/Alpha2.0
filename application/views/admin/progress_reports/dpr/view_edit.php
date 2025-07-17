@@ -385,8 +385,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php 
-                                            if(!empty($daily_labor_report)) {
+                                            <?php
+                                            if (!empty($daily_labor_report)) {
                                                 foreach ($daily_labor_report as $key => $value) { ?>
                                                     <tr<?php echo $value['is_bold'] ? ' style="font-weight: bold;"' : ''; ?>>
                                                         <td align="left">
@@ -401,7 +401,7 @@
                                                         <td align="right">
                                                             <?php echo $value['total']; ?>
                                                         </td>
-                                                    </tr>
+                                                        </tr>
                                                 <?php }
                                             } ?>
                                         </tbody>
@@ -417,8 +417,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php 
-                                            if(!empty($labor_report_machinery)) {
+                                            <?php
+                                            if (!empty($labor_report_machinery)) {
                                                 foreach ($labor_report_machinery as $key => $value) { ?>
                                                     <tr>
                                                         <td align="left">
@@ -428,7 +428,7 @@
                                                             <?php echo $value['total']; ?>
                                                         </td>
                                                     </tr>
-                                                <?php }
+                                            <?php }
                                             } ?>
                                         </tbody>
                                     </table>
@@ -561,6 +561,16 @@
                                     <a href="#" class="btn btn-primary save_dpr_changes">
                                         <?php echo _l('submit'); ?>
                                     </a>
+
+                                    <?php if ($form->locked == 0): ?>
+                                        <a href="javascript:void(0);" class="btn btn-primary lock_dpr" onclick="lock_dpr()">
+                                            <?php echo _l('Lock'); ?>
+                                        </a>
+                                    <?php elseif ($form->locked == 1 && is_admin()): ?>
+                                        <a href="javascript:void(0);" class="btn btn-primary unlock_dpr" onclick="unlock_dpr()">
+                                            <?php echo _l('Unlock DPR'); ?>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <?php hooks()->do_action('after_admin_single_form_tab_menu_last_content', $form); ?>
@@ -952,6 +962,68 @@
             var project_name = $('#project_id option:selected').text();
             $('.view_project_name').html(project_name);
             $('.selectpicker').selectpicker('refresh');
+        });
+    }
+
+    function lock_dpr() {
+        var formData = new FormData();
+        if (typeof csrfData !== "undefined") {
+            formData.append(csrfData["token_name"], csrfData["hash"]);
+        }
+        formData.append("formid", $('input[name="formid"]').val());
+        $.ajax({
+            url: admin_url + "forms/lock_dpr",
+            type: "POST",
+            data: formData,
+            processData: false, // Prevent jQuery from automatically processing the data
+            contentType: false, // Prevent jQuery from setting the Content-Type header
+            success: function(response) {
+                response = JSON.parse(response);
+                if (response.success === true) {
+                    if (typeof response.department_reassigned !== "undefined") {
+                        window.location.href = admin_url + "progress_report_listing/dpr";
+                    } else {
+                        window.location.href = admin_url + "forms/progress_report_listing/dpr";
+                    }
+                } else if (typeof response.message !== "undefined") {
+                    alert_float("warning", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                alert_float("danger", "An error occurred while processing your request.");
+            },
+        });
+    }
+
+    function unlock_dpr() {
+        var formData = new FormData();
+        if (typeof csrfData !== "undefined") {
+            formData.append(csrfData["token_name"], csrfData["hash"]);
+        }
+        formData.append("formid", $('input[name="formid"]').val());
+        $.ajax({
+            url: admin_url + "forms/unlock_dpr",
+            type: "POST",
+            data: formData,
+            processData: false, // Prevent jQuery from automatically processing the data
+            contentType: false, // Prevent jQuery from setting the Content-Type header
+            success: function(response) {
+                response = JSON.parse(response);
+                if (response.success === true) {
+                    if (typeof response.department_reassigned !== "undefined") {
+                        window.location.href = admin_url + "progress_report_listing/dpr";
+                    } else {
+                        window.location.href = admin_url + "forms/progress_report_listing/dpr";
+                    }
+                } else if (typeof response.message !== "undefined") {
+                    alert_float("warning", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                alert_float("danger", "An error occurred while processing your request.");
+            },
         });
     }
 </script>
