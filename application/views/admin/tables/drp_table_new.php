@@ -117,7 +117,7 @@ foreach ($rResult as $aRow) {
 
     // Add assigned staff image if exists
     if ($aRow['assigned'] != 0) {
-        $subjectRow .= '<a href="' . admin_url('profile/' . $aRow['assigned']) . '" data-toggle="tooltip" title="' . e(get_staff_full_name($aRow['assigned'])) . '" class="pull-left mright5">' . staff_profile_image($aRow['assigned'], [
+        $subject .= '<a href="' . admin_url('profile/' . $aRow['assigned']) . '" data-toggle="tooltip" title="' . e(get_staff_full_name($aRow['assigned'])) . '" class="pull-left mright5">' . staff_profile_image($aRow['assigned'], [
             'staff-profile-image-xs',
         ]) . '</a>';
     }
