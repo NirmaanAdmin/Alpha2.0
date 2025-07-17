@@ -1122,16 +1122,16 @@ class Forms extends AdminController
             blank_page(_l('form_not_found'));
         }
 
-        if (get_option('staff_access_only_assigned_departments') == 1) {
-            if (!is_admin()) {
-                $this->load->model('departments_model');
-                $staff_departments = $this->departments_model->get_staff_departments(get_staff_user_id(), true);
-                if (!in_array($data['form']->department, $staff_departments)) {
-                    set_alert('danger', _l('form_access_by_department_denied'));
-                    redirect(admin_url('access_denied'));
-                }
-            }
-        }
+        // if (get_option('staff_access_only_assigned_departments') == 1) {
+        //     if (!is_admin()) {
+        //         $this->load->model('departments_model');
+        //         $staff_departments = $this->departments_model->get_staff_departments(get_staff_user_id(), true);
+        //         if (!in_array($data['form']->department, $staff_departments)) {
+        //             set_alert('danger', _l('form_access_by_department_denied'));
+        //             redirect(admin_url('access_denied'));
+        //         }
+        //     }
+        // }
 
         if ($this->input->post()) {
             $returnToFormList = false;
