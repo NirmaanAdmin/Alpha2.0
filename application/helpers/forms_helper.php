@@ -668,6 +668,7 @@ function AdminReportsTableStructure($name = '', $bulk_action = false)
     $table .= '<th class="toggleable" id="th-priority">' . _l('form_dt_priority') . '</th>';
     // $table .= '<th class="toggleable" id="th-last-reply">' . _l('form_dt_last_reply') . '</th>';
     $table .= '<th class="toggleable report_created_column" id="th-created">' . _l('form_date_created') . '</th>';
+    $table .= '<th class="toggleable" id="th-locked">' . _l('Locked?') . '</th>';
     $table .= '<th class="toggleable" id="th-tags">' . _l('tags') . '</th>';
     $table .= '<th class="toggleable ticket_options" id="th-options">' . _l('options') . '</th>';
     $custom_fields = get_table_custom_fields('forms');

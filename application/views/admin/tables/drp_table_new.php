@@ -172,6 +172,15 @@ foreach ($rResult as $aRow) {
     // Date
     $row[] = date('d M, Y H:i A', strtotime($aRow['date']));
 
+    //locked 
+    $locked_val = '';
+    if($aRow['locked']  == 1){
+        $locked_val = 'Yes';
+    }elseif ($aRow['locked']  == 0) {
+        $locked_val = 'NO';
+    }
+    $row[] = $locked_val;
+
     // Tags
     $row[] = render_tags($aRow['tags']);
 
