@@ -175,9 +175,9 @@ foreach ($rResult as $aRow) {
     //locked 
     $locked_val = '';
     if($aRow['locked']  == 1){
-        $locked_val = 'Yes';
+        $locked_val = '<span class="label label-default">' . _l('Yes') . '</span>';
     }elseif ($aRow['locked']  == 0) {
-        $locked_val = 'NO';
+        $locked_val = '<span class="label label-default">' . _l('No') . '</span>';
     }
     $row[] = $locked_val;
 
