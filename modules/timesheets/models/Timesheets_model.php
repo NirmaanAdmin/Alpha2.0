@@ -8780,98 +8780,32 @@ class timesheets_model extends app_model
 	 * @param  string $to_date    
 	 * @return array          
 	 */
-	// public function list_cell_color_checkin_out($staffid, $list_date, $from_date, $to_date)
-	// {
-	// 	$list_color = [];
-
-	// 	$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '"')->result_array();
-
-	// 	$has_check_in = [];
-	// 	$has_check_out = [];
-	// 	foreach ($check_in_out as $value) {
-	// 		if ($value['type_check'] == 1 && !isset($has_check_in[$value['date']])) {
-	// 			$has_check_in[$value['date']] = 1;
-	// 		}
-
-	// 		if ($value['type_check'] == 2 && !isset($has_check_out[$value['date']])) {
-	// 			$has_check_out[$value['date']] = 1;
-	// 		}
-	// 	}
-
-	// 	foreach ($list_date as $date) {
-	// 		$color = '#fff';
-
-	// 		if (isset($has_check_in[$date])) {
-	// 			$color = '#f8e3d3';
-
-	// 			if (isset($has_check_out[$date])) {
-	// 				$color = '#dff0d8';
-	// 			}
-	// 		}
-
-	// 		$list_color[$date] = $color;
-	// 	}
-
-	// 	return $list_color;
-	// }
-
 	public function list_cell_color_checkin_out($staffid, $list_date, $from_date, $to_date)
 	{
 		$list_color = [];
 
-		// Get all check-in/out records for the period
-		$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check, date as full_date FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '" ORDER BY date ASC')->result_array();
-
-		// Get shift data for all dates at once for better performance
-		$shift_data = [];
-		foreach ($list_date as $date) {
-			$shift_data[$date] = $this->get_shift_work_staff_by_date(75, $date);
-		}
+		$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '"')->result_array();;
 
 		$has_check_in = [];
 		$has_check_out = [];
-		$late_check_ins = []; // To track dates with late check-ins
-
 		foreach ($check_in_out as $value) {
-			$date = $value['date'];
-
-			if ($value['type_check'] == 1 && !isset($has_check_in[$date])) {
-				$has_check_in[$date] = $value['full_date']; // Store the full datetime
-
-				// Check if check-in is late
-				if (isset($shift_data[$date])) {
-					foreach ($shift_data[$date] as $shift) {
-						$shift_type = $this->get_shift_type($shift);
-						if ($shift_type) {
-							$shift_start_time = strtotime($date . ' ' . $shift_type->time_start_work);
-							$check_in_time = strtotime($value['full_date']);
-
-							// If check-in is more than 5 minutes after shift start
-							if ($check_in_time > ($shift_start_time + 900)) { // 300 seconds = 5 minutes
-								$late_check_ins[$date] = true;
-							}
-						}
-					}
-				}
+			if ($value['type_check'] == 1 && !isset($has_check_in[$value['date']])) {
+				$has_check_in[$value['date']] = 1;
 			}
 
-			if ($value['type_check'] == 2 && !isset($has_check_out[$date])) {
-				$has_check_out[$date] = 1;
+			if ($value['type_check'] == 2 && !isset($has_check_out[$value['date']])) {
+				$has_check_out[$value['date']] = 1;
 			}
 		}
 
 		foreach ($list_date as $date) {
-			$color = '#fff'; // Default color (no check-in)
+			$color = '#fff';
 
 			if (isset($has_check_in[$date])) {
-				if (isset($late_check_ins[$date])) {
-					$color = '#f3d1d1ff'; // Red color for late check-in
-				} else {
-					$color = '#f8e3d3'; // Normal check-in color (orange)
+				$color = '#f8e3d3';
 
-					if (isset($has_check_out[$date])) {
-						$color = '#dff0d8'; // Check-in and check-out color (green)
-					}
+				if (isset($has_check_out[$date])) {
+					$color = '#dff0d8';
 				}
 			}
 
