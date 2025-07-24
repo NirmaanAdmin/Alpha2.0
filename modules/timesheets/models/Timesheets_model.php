@@ -8825,9 +8825,8 @@ class timesheets_model extends app_model
 		// Get shift data for all dates at once for better performance
 		$shift_data = [];
 		foreach ($list_date as $date) {
-			$shift_data[$date] = $this->get_shift_work_staff_by_date(75, $date);
+			$shift_data[$date] = $this->get_shift_work_staff_by_date($staffid, $date);
 		}
-
 		$has_check_in = [];
 		$has_check_out = [];
 		$late_check_ins = []; // To track dates with late check-ins
