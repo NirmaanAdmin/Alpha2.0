@@ -1,11 +1,25 @@
 <?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
-
+$logo = '';
+$company_logo = get_option('company_logo_dark');
+if (!empty($company_logo)) {
+    $logo = '<img src="' . base_url('uploads/company/' . $company_logo) . '" width="230" height="100">';
+}
 $organization_info = '';
 $organization_info = '<div style="color:#424242;">';
+$organization_info .= '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+$organization_info .= '<tr>';
+$organization_info .= '<td width="60%" style="vertical-align:top;">';
 $organization_info .= format_organization_info();
-$organization_info .= '</div><br/><br/>';
+$organization_info .= '</td>';
+$organization_info .= '<td width="40%" style="text-align:center; vertical-align:top;">';
+$organization_info .= $logo;
+$organization_info .= '</td>';
+$organization_info .= '</tr>';
+$organization_info .= '</table>';
+$organization_info .= '</div>';
+
 $pdf->writeHTML($organization_info, true, false, false, false, '');
 
 $formbasicinfo = '';
@@ -61,7 +75,7 @@ $pdf->writeHTML($formbasicinfo, true, false, false, false, '');
 $widthloc = '';
 if ($form_data->staff_dpr == 'true') {
     $widthloc = '20%';
-}else{
+} else {
     $widthloc = '31%';
 }
 $formrowsinfo = '';
@@ -117,7 +131,7 @@ if (!empty($form_rows_info)) {
 $formrowsinfo .= '</tbody>';
 $formrowsinfo .= '</table>';
 
-if ($form_data->message != '') {
+if ($form_data->message != '' && $form_data->staff_dpr == 'true') {
     //add note to pdf
     $formrowsinfo .= '<br/><br/>';
     $formrowsinfo .= '<h2>Note:</h2>';

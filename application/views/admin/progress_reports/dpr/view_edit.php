@@ -518,7 +518,7 @@
                                             <div class="col-md-6">
                                                 <?php
                                                 $value = (isset($form) ? _d($form->duedate) : '');
-                                                echo render_date_input('duedate', 'task_add_edit_due_date', $value);
+                                                echo render_date_input('duedate', 'DPR Date', $value);
                                                 ?>
                                             </div>
                                             <?php if (get_option('services') == 1) { ?>

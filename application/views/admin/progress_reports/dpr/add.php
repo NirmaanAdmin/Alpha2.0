@@ -91,7 +91,7 @@
                                     <div class="col-md-6">
                                         <?php
                                         $value = '';
-                                        echo render_date_input('duedate', 'Date', $value, array('required' => 'true'));
+                                        echo render_date_input('duedate', 'DPR Date', $value, array('required' => 'true'));
                                         ?>
                                     </div>
 
