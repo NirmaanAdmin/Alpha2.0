@@ -38,7 +38,7 @@ $formbasicinfo .= '
 <tr style="font-size:13px;">
     <td width="20%;" align="left"><b>' . _l('project') . '</b></td>
     <td width="40%;" align="left">' . get_project_name_by_id($form_data->project_id) . '</td>
-    <td width="20%;" align="left"><b>Due Date</b></td>
+    <td width="20%;" align="left"><b>DPR Date</b></td>
     <td width="20%;" align="left">' . date('d M, Y', strtotime($form_data->duedate)) . '</td>
 </tr>
 <tr style="font-size:13px;">
@@ -48,7 +48,7 @@ $formbasicinfo .= '
     <td width="20%;" align="left">' . get_priority_name($form_data->priority) . '</td>
 </tr>
 <tr style="font-size:13px;">
-    <td width="20%;" align="left"><b>DPR Date</b></td>
+    <td width="20%;" align="left"><b>Submission Date</b></td>
     <td width="40%;" align="left">' . date('d M, Y', strtotime($form_data->date)) . '</td>
     <td width="20%;" align="left"><b>Client</b></td>
     <td width="20%;" align="left">' . get_company_name($form_basic_info->client_id) . '</td>
