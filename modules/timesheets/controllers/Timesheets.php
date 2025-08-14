@@ -246,18 +246,24 @@ class timesheets extends AdminController
 		} else {
 			if ($data['check_latch_timesheet'] == false) {
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $month, $month_year);
+
 				$data['staff_row_tk'] = $result['staff_row_tk'];
-				// Remove the first element (Admin N360)
-				unset($data['staff_row_tk'][0]);
+				if ($result['staff_row_tk'][0]['Staff'] == 'Admin N360') {
+					// Remove the first element (Admin N360)
+					unset($data['staff_row_tk'][0]);
+					// Optional: Reset array keys (if needed)
+					$data['staff_row_tk'] = array_values($data['staff_row_tk']);
+				}
 
-				// Optional: Reset array keys (if needed)
-				$data['staff_row_tk'] = array_values($data['staff_row_tk']);
+
+
 				$data['cell_background'] = $result['cell_background'];
-				// Remove the first element (Admin N360)
-				unset($data['cell_background'][0]);
-
-				// // Optional: Reset array keys (if needed)
-				$data['cell_background'] = array_values($data['cell_background']);
+				if ($result['staff_row_tk'][0]['Staff'] == 'Admin N360') {
+					// Remove the first element (Admin N360)
+					unset($data['cell_background'][0]);
+					// // Optional: Reset array keys (if needed)
+					$data['cell_background'] = array_values($data['cell_background']);
+				}
 			}
 		}
 		$data_lack = [];
