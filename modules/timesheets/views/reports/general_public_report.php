@@ -7,21 +7,17 @@
             <th><?php echo _l('first_name'); ?></th>
             <th><?php echo _l('last_name'); ?></th>
             <th><?php echo _l('total_shift_days'); ?></th>
-            <th><?php echo _l('number_of_working_days'); ?></th>
+            <th><?php echo _l('Present days'); ?></th>
+            <th><?php echo _l('Total'); ?></th>
             <th><?php echo _l('annual_leave'); ?></th>
             <th><?php echo _l('private_work_without_pay'); ?></th>
             <th><?php echo _l('B_value'); ?></th>
             <th><?php echo _l('SI_value'); ?></th>
-            <th><?php echo _l('M_value'); ?></th>
-
-            <th><?php echo _l('U_value'); ?></th>
+            <th><?php echo _l('Casual Leave'); ?></th>
             <th><?php echo _l('HO_value'); ?></th>
-            <th><?php echo _l('early'); ?></th>
             <th><?php echo _l('late'); ?></th>
-            <th><?php echo _l('ME_value'); ?></th>
-            <!-- <th><?php echo _l('ts_total_working_hours'); ?></th> -->
          </tr>
-      </thead>
+      </thead> 
       <tbody></tbody>
       <tfoot>
          <td></td>
@@ -37,9 +33,6 @@
          <td></td>
          <td></td>
          <td></td>
-         <td></td>
-         <td></td>
-         <!-- <td></td> -->
       </tfoot>
    </table>
 </div>

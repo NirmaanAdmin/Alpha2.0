@@ -2330,8 +2330,6 @@ class timesheets extends AdminController
 					'staffid',
 					'staffid',
 					'staffid',
-					'staffid',
-					'staffid',
 				];
 				$query = '';
 				if (isset($role_filter)) {
@@ -2397,6 +2395,8 @@ class timesheets extends AdminController
 						$total12 = 0;
 						$total13 = 0;
 						$total14 = 0;
+						$total15 = 0;
+						$total16 = 0;
 						$data_row_attendance = [];
 						$data_working_hour = [];
 						$index = 0;
@@ -2415,7 +2415,11 @@ class timesheets extends AdminController
 											$split_val = explode(':', trim($tk));
 											if (strtolower($split_val[0]) == 'w') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
-													$cal = $split_val[1] / $shift_hour;
+													// $cal = $split_val[1] / $shift_hour;
+													if($split_val[1] > 0){
+														$cal = 1;
+													}
+													
 													$total += $cal;
 													$data_working_hour[] = $this->timesheets_model->calculate_working_hour($split_val[1]);
 												}
@@ -2442,26 +2446,15 @@ class timesheets extends AdminController
 													$total8 += $cal;
 												}
 											}
-											if (strtolower($split_val[0]) == 'm') {
+											if (strtolower($split_val[0]) == 'cl') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
-													$total9 += $cal;
+													$total16 += $cal;
 												}
 											}
-											if (strtolower($split_val[0]) == 'u') {
-												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
-													$cal = $split_val[1] / $shift_hour;
-													$total10 += $cal;
-												}
-											}
+
 											if (strtolower($split_val[0]) == 'ho') {
 												$total11 += 1;
-											}
-											if (strtolower($split_val[0]) == 'e') {
-												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
-													$cal = $split_val[1] / $shift_hour;
-													$total12 += $cal;
-												}
 											}
 											if (strtolower($split_val[0]) == 'l') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
@@ -2469,12 +2462,7 @@ class timesheets extends AdminController
 													$total13 += $cal;
 												}
 											}
-											if (strtolower($split_val[0]) == 'me') {
-												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
-													$cal = $split_val[1] / $shift_hour;
-													$total14 += $cal;
-												}
-											}
+											
 										}
 									}
 								}
@@ -2485,16 +2473,14 @@ class timesheets extends AdminController
 
 						$row[] = $total_shift;
 						$row[] = ($total > 0) ? $this->customRound($total) : 0;
+						$row[] = (float) number_format(($total + $total8 + $total16 + $total7 + $total11), 2);
 						$row[] = ($total2 > 0) ? (float) number_format($total2, 2) : 0;
 						$row[] = ($total3 > 0) ? (float) number_format($total3, 2) : 0;
 						$row[] = ($total7 > 0) ? (float) number_format($total7, 2) : 0;
 						$row[] = ($total8 > 0) ? (float) number_format($total8, 2) : 0;
-						$row[] = ($total9 > 0) ? (float) number_format($total9, 2) : 0;
-						$row[] = ($total10 > 0) ? (float) number_format($total10, 2) : 0;
+						$row[] = ($total16 > 0) ? (float) number_format($total16, 2) : 0;
 						$row[] = ($total11 > 0) ? (float) number_format($total11, 2) : 0;
-						$row[] = ($total12 > 0) ? (float) number_format($total12, 2) : 0;
 						$row[] = ($total13 > 0) ? (float) number_format($total13, 2) : 0;
-						$row[] = ($total14 > 0) ? (float) number_format($total14, 2) : 0;
 						// $row[] = (count($data_working_hour) > 0) ? $this->timesheets_model->calculate_total_working_hour($data_working_hour) : '';
 						$output['aaData'][] = $row;
 					}
