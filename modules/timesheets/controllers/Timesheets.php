@@ -2404,66 +2404,144 @@ class timesheets extends AdminController
 						foreach ($data_timesheet['staff_row_tk'] as $attendance_row) {
 							if ($attendance_row[$index_hr_code] == $aRow['staffid']) {
 
+								// foreach ($data_timesheet['staff_row_tk_detailt'][$index] as $date => $list_attendance) {
+								// 	$shift_hour = $this->timesheets_model->get_hour_shift_staff($aRow['staffid'], $date);
+								// 	if ($shift_hour > 0) {
+								// 		$total_shift++;
+								// 	}
+								// 	if (($list_attendance != '') && ($shift_hour > 0)) {
+								// 		$list_tks = explode(';', $list_attendance);
+								// 		foreach ($list_tks as $key_tk => $tk) {
+								// 			$split_val = explode(':', trim($tk));
+								// 			if (strtolower($split_val[0]) == 'w') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					// $cal = $split_val[1] / $shift_hour;
+								// 					if($split_val[1] > 0){
+								// 						$cal = 1;
+								// 					}
+
+								// 					$total += $cal;
+								// 					$data_working_hour[] = $this->timesheets_model->calculate_working_hour($split_val[1]);
+								// 				}
+								// 			}
+								// 			if (strtolower($split_val[0]) == 'al') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					$cal = $split_val[1] / $shift_hour;
+								// 					$total2 += $cal;
+								// 				}
+								// 			}
+
+								// 			if (strtolower($split_val[0]) == 'p') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					$cal = $split_val[1] / $shift_hour;
+								// 					$total3 += $cal;
+								// 				}
+								// 			}
+								// 			if (strtolower($split_val[0]) == 'b') {
+								// 				$total7 += 1;
+								// 			}
+								// 			if (strtolower($split_val[0]) == 'si') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					$cal = $split_val[1] / $shift_hour;
+								// 					$total8 += $cal;
+								// 				}
+								// 			}
+								// 			if (strtolower($split_val[0]) == 'cl') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					$cal = $split_val[1] / $shift_hour;
+								// 					$total16 += $cal;
+								// 				}
+								// 			}
+
+								// 			if (strtolower($split_val[0]) == 'ho') {
+								// 				$total11 += 1;
+								// 			}
+								// 			if (strtolower($split_val[0]) == 'l') {
+								// 				if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
+								// 					$cal = $split_val[1] / $shift_hour;
+								// 					$total13 += $cal;
+								// 				}
+								// 			}
+
+								// 		}
+								// 	}
+								// }
 								foreach ($data_timesheet['staff_row_tk_detailt'][$index] as $date => $list_attendance) {
 									$shift_hour = $this->timesheets_model->get_hour_shift_staff($aRow['staffid'], $date);
-									if ($shift_hour > 0) {
-										$total_shift++;
-									}
+
+									// look up the background color for this staff+date
+									$bgMap   = $data_timesheet['cell_background'][$index] ?? [];
+									$dateKey = date('D d', strtotime($date)); // matches how get_attendance_manual keys it
+									$bgColor = isset($bgMap[$dateKey]) ? strtolower(trim($bgMap[$dateKey])) : '';
+
+									$lateFromToken = false;
+
 									if (($list_attendance != '') && ($shift_hour > 0)) {
 										$list_tks = explode(';', $list_attendance);
-										foreach ($list_tks as $key_tk => $tk) {
+										foreach ($list_tks as $tk) {
 											$split_val = explode(':', trim($tk));
-											if (strtolower($split_val[0]) == 'w') {
+											$code = strtolower($split_val[0] ?? '');
+
+											if ($code == 'w') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
-													// $cal = $split_val[1] / $shift_hour;
-													if($split_val[1] > 0){
+													if ($split_val[1] > 0) {
 														$cal = 1;
+														$total += $cal;
+														$data_working_hour[] = $this->timesheets_model->calculate_working_hour($split_val[1]);
 													}
-													
-													$total += $cal;
-													$data_working_hour[] = $this->timesheets_model->calculate_working_hour($split_val[1]);
 												}
 											}
-											if (strtolower($split_val[0]) == 'al') {
+
+											if ($code == 'al') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
 													$total2 += $cal;
 												}
 											}
 
-											if (strtolower($split_val[0]) == 'p') {
+											if ($code == 'p') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
 													$total3 += $cal;
 												}
 											}
-											if (strtolower($split_val[0]) == 'b') {
+
+											if ($code == 'b') {
 												$total7 += 1;
 											}
-											if (strtolower($split_val[0]) == 'si') {
+
+											if ($code == 'si') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
 													$total8 += $cal;
 												}
 											}
-											if (strtolower($split_val[0]) == 'cl') {
+
+											if ($code == 'cl') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
 													$total16 += $cal;
 												}
 											}
 
-											if (strtolower($split_val[0]) == 'ho') {
+											if ($code == 'ho') {
 												$total11 += 1;
 											}
-											if (strtolower($split_val[0]) == 'l') {
+
+											// LATE from token
+											if ($code == 'l') {
 												if (isset($split_val[1]) && is_numeric($split_val[1]) && $shift_hour > 0) {
 													$cal = $split_val[1] / $shift_hour;
 													$total13 += $cal;
 												}
+												$lateFromToken = true;
 											}
-											
 										}
+									}
+
+									// Fallback: mark late from background color when no 'L' token was counted
+									if (!$lateFromToken && $bgColor === '#f3d1d1ff') {
+										$total13 += 1; // count one late day
 									}
 								}
 							}
