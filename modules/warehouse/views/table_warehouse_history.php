@@ -2,151 +2,127 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-
+// Define columns for the data table
 $aColumns = [
-    db_prefix().'goods_transaction_detail.id',
-    'goods_receipt_id',
+    db_prefix() . 'goods_transaction_detail.id',
+     db_prefix() . 'goods_transaction_detail.goods_receipt_id',
     'commodity_id',
-    db_prefix().'goods_transaction_detail.warehouse_id',
-    db_prefix().'goods_transaction_detail.date_add',
+    db_prefix() . 'goods_transaction_detail.warehouse_id',
+    db_prefix() . 'goods_transaction_detail.date_add',
     'old_quantity',
     'quantity',
     'lot_number',
-    db_prefix().'goods_transaction_detail.expiry_date',
-    db_prefix().'goods_transaction_detail.serial_number',
+    db_prefix() . 'goods_transaction_detail.expiry_date',
+    db_prefix() . 'goods_transaction_detail.serial_number',
     'note',
-    db_prefix().'goods_transaction_detail.status',
-    ];
-$sIndexColumn = 'id';
-$sTable       = db_prefix().'goods_transaction_detail';
-
-
-
-$where = [];
-
-
-$warehouse_ft = $this->ci->input->post('warehouse_ft');
-$commodity_ft = $this->ci->input->post('commodity_ft'); 
-$status_ft = $this->ci->input->post('status_ft'); 
-
-
-$join =[
-  'LEFT JOIN '.db_prefix().'goods_receipt ON '.db_prefix().'goods_receipt.id = '.db_prefix().'goods_transaction_detail.goods_receipt_id AND  '.db_prefix().'goods_transaction_detail.status = 1',
-  'LEFT JOIN '.db_prefix().'goods_delivery ON '.db_prefix().'goods_delivery.id = '.db_prefix().'goods_transaction_detail.goods_receipt_id AND  '.db_prefix().'goods_transaction_detail.status = 2',
-  'LEFT JOIN '.db_prefix().'wh_loss_adjustment ON '.db_prefix().'wh_loss_adjustment.id = '.db_prefix().'goods_transaction_detail.goods_receipt_id AND  '.db_prefix().'goods_transaction_detail.status = 3',
-  'LEFT JOIN '.db_prefix().'internal_delivery_note ON '.db_prefix().'internal_delivery_note.id = '.db_prefix().'goods_transaction_detail.goods_receipt_id AND  '.db_prefix().'goods_transaction_detail.status = 4'
+    db_prefix() . 'goods_transaction_detail.status',
 ];
 
+$sIndexColumn = 'id';
+$sTable       = db_prefix() . 'goods_transaction_detail';
 
+// Initialize where clause and joins
+$where = [];
+$join = [
+    'LEFT JOIN ' . db_prefix() . 'goods_receipt ON ' . db_prefix() . 'goods_receipt.id = ' . db_prefix() . 'goods_transaction_detail.goods_receipt_id AND ' . db_prefix() . 'goods_transaction_detail.status = 1',
+    'LEFT JOIN ' . db_prefix() . 'goods_delivery ON ' . db_prefix() . 'goods_delivery.id = ' . db_prefix() . 'goods_transaction_detail.goods_receipt_id AND ' . db_prefix() . 'goods_transaction_detail.status = 2',
+    'LEFT JOIN ' . db_prefix() . 'wh_loss_adjustment ON ' . db_prefix() . 'wh_loss_adjustment.id = ' . db_prefix() . 'goods_transaction_detail.goods_receipt_id AND ' . db_prefix() . 'goods_transaction_detail.status = 3',
+    'LEFT JOIN ' . db_prefix() . 'internal_delivery_note ON ' . db_prefix() . 'internal_delivery_note.id = ' . db_prefix() . 'goods_transaction_detail.goods_receipt_id AND ' . db_prefix() . 'goods_transaction_detail.status = 4',
+];
 
-if(isset($warehouse_ft)){
+// Filters
+$warehouse_ft = $this->ci->input->post('warehouse_ft');
+$commodity_ft = $this->ci->input->post('commodity_ft');
+$status_ft = $this->ci->input->post('status_ft');
+$start_date = to_sql_date($this->ci->input->post('validity_start_date'));
+$end_date = to_sql_date($this->ci->input->post('validity_end_date'));
 
-    $where_warehouse_ft = '';
+// Warehouse Filter
+if (!empty($warehouse_ft)) {
+    $warehouse_conditions = [];
     foreach ($warehouse_ft as $warehouse_id) {
-        if($warehouse_id != '')
-        {
-
-            if ($where_warehouse_ft == '') {
-              $where_warehouse_ft .= ' AND (find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.warehouse_id) or find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.from_stock_name) or find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.to_stock_name) ';
-
-            } else {
-              $where_warehouse_ft .= ' or find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.warehouse_id) or find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.from_stock_name) or find_in_set('.$warehouse_id.', '.db_prefix().'goods_transaction_detail.to_stock_name) ';
-
-            }
-
+        if (!empty($warehouse_id)) {
+            $warehouse_conditions[] = 'FIND_IN_SET(' . $warehouse_id . ', ' . db_prefix() . 'goods_transaction_detail.warehouse_id)';
+            $warehouse_conditions[] = 'FIND_IN_SET(' . $warehouse_id . ', ' . db_prefix() . 'goods_transaction_detail.from_stock_name)';
+            $warehouse_conditions[] = 'FIND_IN_SET(' . $warehouse_id . ', ' . db_prefix() . 'goods_transaction_detail.to_stock_name)';
         }
     }
-    if($where_warehouse_ft != '')
-    {
-        $where_warehouse_ft .= ')';
-
-        array_push($where, $where_warehouse_ft);
+    if (!empty($warehouse_conditions)) {
+        $where[] = 'AND (' . implode(' OR ', $warehouse_conditions) . ')';
     }
 }
 
-
-    if(isset($commodity_ft)){
-        if(!is_array($commodity_ft)){
-            $where_commodity_ft = ' AND tblgoods_transaction_detail.commodity_id = "'.$commodity_ft.'"';
-            array_push($where, $where_commodity_ft);
-            
-        }else{
-
-            $where_commodity_ft = '';
-            foreach ($commodity_ft as $commodity_id) {
-                if($commodity_id != '')
-                {
-                    if($where_commodity_ft == ''){
-                        $where_commodity_ft .= ' AND (tblgoods_transaction_detail.commodity_id = "'.$commodity_id.'"';
-                    }else{
-                        $where_commodity_ft .= ' or tblgoods_transaction_detail.commodity_id = "'.$commodity_id.'"';
-                    }
-                }
-            }
-            if($where_commodity_ft != '')
-            {
-                $where_commodity_ft .= ')';
-
-                array_push($where, $where_commodity_ft);
-            }
+// Commodity Filter
+if (!empty($commodity_ft)) {
+    if (is_array($commodity_ft)) {
+        $commodity_conditions = array_map(function ($commodity_id) {
+            return db_prefix() . 'goods_transaction_detail.commodity_id = "' . $commodity_id . '"';
+        }, array_filter($commodity_ft));
+        if (!empty($commodity_conditions)) {
+            $where[] = 'AND (' . implode(' OR ', $commodity_conditions) . ')';
         }
-
-    }
-
-if(isset($status_ft)){
-
-    $where_status_ft = '';
-    foreach ($status_ft as $status_id) {
-        if($status_id != '')
-        {
-            if($where_status_ft == ''){
-                $where_status_ft .= ' AND (tblgoods_transaction_detail.status = "'.$status_id.'"';
-            }else{
-                $where_status_ft .= ' or tblgoods_transaction_detail.status = "'.$status_id.'"';
-            }
-        }
-    }
-    if($where_status_ft != '')
-    {
-        $where_status_ft .= ')';
-
-        array_push($where, $where_status_ft);
+    } else {
+        $where[] = 'AND ' . db_prefix() . 'goods_transaction_detail.commodity_id = "' . $commodity_ft . '"';
     }
 }
 
-if($this->ci->input->post('validity_start_date')){
-        $start_date = to_sql_date($this->ci->input->post('validity_start_date'));
+// Status Filter
+if (!empty($status_ft)) {
+    $status_conditions = array_map(function ($status_id) {
+        return db_prefix() . 'goods_transaction_detail.status = "' . $status_id . '"';
+    }, array_filter($status_ft));
+    if (!empty($status_conditions)) {
+        $where[] = 'AND (' . implode(' OR ', $status_conditions) . ')';
     }
+}
 
-    if($this->ci->input->post('validity_end_date')){
-        $end_date = to_sql_date($this->ci->input->post('validity_end_date'));
+// Date Filters
+if (!empty($start_date) || !empty($end_date)) {
+    $date_conditions = [];
+    $columns = [
+        db_prefix() . 'goods_receipt.date_add',
+        db_prefix() . 'goods_delivery.date_add',
+        db_prefix() . 'internal_delivery_note.date_add',
+        db_prefix() . 'wh_loss_adjustment.date_create',
+    ];
+
+    foreach ($columns as $column) {
+        if (!empty($start_date) && !empty($end_date)) {
+            $date_conditions[] = 'DATE_FORMAT(' . $column . ', "%Y-%m-%d") BETWEEN "' . $start_date . '" AND "' . $end_date . '"';
+        } elseif (!empty($start_date)) {
+            $date_conditions[] = 'DATE_FORMAT(' . $column . ', "%Y-%m-%d") >= "' . $start_date . '"';
+        } elseif (!empty($end_date)) {
+            $date_conditions[] = 'DATE_FORMAT(' . $column . ', "%Y-%m-%d") <= "' . $end_date . '"';
+        }
     }
-
-    if(isset($start_date) && isset($end_date)){
-
-
-        array_push($where, ' AND ( (date_format('.db_prefix().'goods_receipt.date_add,"%Y-%m-%d") BETWEEN "'.$start_date.'" AND "'.$end_date.'") OR (date_format('.db_prefix().'goods_delivery.date_add,"%Y-%m-%d") BETWEEN "'.$start_date.'" AND "'.$end_date.'") OR (date_format('.db_prefix().'internal_delivery_note.date_add,"%Y-%m-%d") BETWEEN "'.$start_date.'" AND "'.$end_date.'") OR (date_format('.db_prefix().'wh_loss_adjustment.date_create,"%Y-%m-%d") BETWEEN "'.$start_date.'" AND "'.$end_date.'") )');
-
-
-
-    }elseif(isset($start_date) && !isset($end_date)){
-
-        array_push($where, ' AND ( (date_format('.db_prefix().'goods_receipt.date_add,"%Y-%m-%d") >= "'.$start_date.'" ) OR (date_format('.db_prefix().'goods_delivery.date_add,"%Y-%m-%d") >= "'.$start_date.'") OR (date_format('.db_prefix().'internal_delivery_note.date_add,"%Y-%m-%d") >= "'.$start_date.'") OR (date_format('.db_prefix().'wh_loss_adjustment.date_create,"%Y-%m-%d") >= "'.$start_date.'"))');
-
-
-    }elseif(!isset($start_date) && isset($end_date)){
-
-        array_push($where, ' AND ( (date_format('.db_prefix().'goods_receipt.date_add,"%Y-%m-%d") <= "'.$end_date.'" ) OR (date_format('.db_prefix().'goods_delivery.date_add,"%Y-%m-%d") <= "'.$end_date.'") OR (date_format('.db_prefix().'internal_delivery_note.date_add,"%Y-%m-%d") <= "'.$end_date.'") OR (date_format('.db_prefix().'wh_loss_adjustment.date_create,"%Y-%m-%d") <= "'.$end_date.'"))');
-
+    if (!empty($date_conditions)) {
+        $where[] = 'AND (' . implode(' OR ', $date_conditions) . ')';
     }
+}
 
-
-
-$result  = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix().'goods_transaction_detail.id',db_prefix().'goods_transaction_detail.old_quantity',db_prefix().'goods_transaction_detail.from_stock_name',db_prefix().'goods_transaction_detail.to_stock_name',db_prefix().'goods_receipt.date_add as 1_date_add',db_prefix().'goods_delivery.date_add as 2_date_add',db_prefix().'internal_delivery_note.date_add as 4_date_add',db_prefix().'wh_loss_adjustment.date_create as 3_date_add', db_prefix().'goods_transaction_detail.date_add as opening_stock_date_add']);
-
+// Initialize DataTables
+$result = data_tables_init(
+    $aColumns,
+    $sIndexColumn,
+    $sTable,
+    $join,
+    $where,
+    [
+        db_prefix() . 'goods_transaction_detail.id',
+        db_prefix() . 'goods_transaction_detail.old_quantity',
+        db_prefix() . 'goods_transaction_detail.from_stock_name',
+        db_prefix() . 'goods_transaction_detail.to_stock_name',
+        db_prefix() . 'goods_receipt.date_add as receipt_date_add',
+        db_prefix() . 'goods_delivery.date_add as delivery_date_add',
+        db_prefix() . 'internal_delivery_note.date_add as internal_delivery_date_add',
+        db_prefix() . 'wh_loss_adjustment.date_create as loss_adjustment_date_add',
+        db_prefix() . 'goods_transaction_detail.date_add as opening_stock_date_add',
+    ]
+);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
+
 
 
 
