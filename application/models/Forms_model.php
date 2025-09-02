@@ -4133,10 +4133,10 @@ class Forms_model extends App_Model
         $type_array = $this->db->get()->result_array();
 
 
+
         // 4. Reference lists
         $progress_report_sub_type = $this->db->get(db_prefix() . 'progress_report_sub_type')->result_array();
         $progress_report_type = $this->db->get(db_prefix() . 'progress_report_type')->result_array();
-
         // 5. Process each unique form date
         foreach ($forms as $form) {
             $date = $form['date'];
@@ -4234,22 +4234,53 @@ class Forms_model extends App_Model
         $preport_type_html .= '</tr>';
 
         if (!empty($forms)) {
-            foreach ($forms as $form) {
-                $date = $form['date'];
-                $preport_type_html .= '<tr><td>' . $date . '</td>';
+            // Group all entries by date
+            $grouped_by_date = [];
+            foreach ($type_array as $item) {
+                $grouped_by_date[$item['date']][] = $item;
+            }
+
+            // Get unique dates from forms
+            $unique_dates = array_unique(array_column($forms, 'date'));
+
+            foreach ($unique_dates as $date) {
+                $date_entries = $grouped_by_date[$date] ?? [];
+
+                // Group entries by type for this date
+                $type_groups = [];
                 foreach ($progress_report_type as $type) {
-                    $match = array_values(array_filter($type_array, function ($x) use ($date, $type) {
+                    $type_groups[$type['id']] = array_values(array_filter($date_entries, function ($x) use ($date, $type) {
                         return $x['date'] == $date && $x['type'] == $type['id'];
                     }));
-                    $total = !empty($match) ? $match[0]['total'] : 0;
-                    $preport_type_html .= '<td align="right">' . $total . '</td>';
                 }
-                $preport_type_html .= '</tr>';
+
+                // Find maximum number of entries for any type on this date
+                $max_entries = 0;
+                foreach ($type_groups as $entries) {
+                    $max_entries = max($max_entries, count($entries));
+                }
+
+                // Create rows for this date
+                for ($row = 0; $row < $max_entries; $row++) {
+                    $preport_type_html .= '<tr>';
+
+                    // Show date in EVERY row for this date
+                    $preport_type_html .= '<td>' . $date . '</td>';
+
+                    foreach ($progress_report_type as $type) {
+                        $entries = $type_groups[$type['id']];
+                        $total = isset($entries[$row]) ? $entries[$row]['total'] : '0';
+                        $preport_type_html .= '<td align="right">' . $total . '</td>';
+                    }
+
+                    $preport_type_html .= '</tr>';
+                }
             }
         } else {
             $preport_type_html .= '<tr><td colspan="' . (count($progress_report_type) + 1) . '" align="center">No records found</td></tr>';
         }
         $preport_type_html .= '</tbody></table></div>';
+
 
         // Final response
         return [
