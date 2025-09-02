@@ -4170,7 +4170,7 @@ class Forms_model extends App_Model
         }, array_keys($stacked_labor_values));
 
         // 7. Build HTML tables
-        $preport_sub_type_html = '<div class="table-responsive s_table "><table  class="table items no-mtop preportSubTypeTable" style="border: 1px solid #dee2e6;"><tbody>';
+        $preport_sub_type_html = '<div class="table-responsive s_table "><table class="table items no-mtop preportSubTypeTable" style="border: 1px solid #dee2e6;"><tbody>';
         $preport_sub_type_html .= '<tr style="font-weight: bold; background: #f1f5f9; color: #1e293b;"><td align="left">Row Labels</td>';
         foreach ($progress_report_sub_type as $sub) {
             $preport_sub_type_html .= '<td align="right">' . $sub['name'] . '</td>';
@@ -4178,17 +4178,47 @@ class Forms_model extends App_Model
         $preport_sub_type_html .= '</tr>';
 
         if (!empty($forms)) {
-            foreach ($forms as $form) {
-                $date = $form['date'];
-                $preport_sub_type_html .= '<tr><td>' . $date . '</td>';
+            // Group all entries by date
+            $grouped_by_date = [];
+            foreach ($sub_type_array as $item) {
+                $grouped_by_date[$item['date']][] = $item;
+            }
+
+            // Get unique dates from forms to avoid duplicates
+            $unique_dates = array_unique(array_column($forms, 'date'));
+
+            foreach ($unique_dates as $date) {
+                $date_entries = $grouped_by_date[$date] ?? [];
+
+                // Get all entries for this date grouped by sub_type
+                $sub_type_groups = [];
                 foreach ($progress_report_sub_type as $sub) {
-                    $match = array_values(array_filter($sub_type_array, function ($x) use ($date, $sub) {
+                    $sub_type_groups[$sub['id']] = array_values(array_filter($date_entries, function ($x) use ($date, $sub) {
                         return $x['date'] == $date && $x['sub_type'] == $sub['id'];
                     }));
-                    $total = !empty($match) ? $match[0]['total'] : 0;
-                    $preport_sub_type_html .= '<td align="right">' . $total . '</td>';
                 }
-                $preport_sub_type_html .= '</tr>';
+
+                // Find maximum number of entries for any sub_type on this date
+                $max_entries = 0;
+                foreach ($sub_type_groups as $entries) {
+                    $max_entries = max($max_entries, count($entries));
+                }
+
+                // Create rows for this date
+                for ($row = 0; $row < $max_entries; $row++) {
+                    $preport_sub_type_html .= '<tr>';
+
+                    // Show date in EVERY row for this date
+                    $preport_sub_type_html .= '<td>' . $date . '</td>';
+
+                    foreach ($progress_report_sub_type as $sub) {
+                        $entries = $sub_type_groups[$sub['id']];
+                        $total = isset($entries[$row]) ? $entries[$row]['total'] : '0';
+                        $preport_sub_type_html .= '<td align="right">' . $total . '</td>';
+                    }
+
+                    $preport_sub_type_html .= '</tr>';
+                }
             }
         } else {
             $preport_sub_type_html .= '<tr><td colspan="' . (count($progress_report_sub_type) + 1) . '" align="center">No records found</td></tr>';
