@@ -10902,6 +10902,13 @@ class Warehouse_model extends App_Model
 			}
 		}
 
+		//approval if not approval setting
+		if (isset($id)) {
+			if ($data['approval'] == 1) {
+				$this->update_approve_request($id, 4, 1);
+			}
+		}
+
 		if ($affectedRows > 0) {
 
 
