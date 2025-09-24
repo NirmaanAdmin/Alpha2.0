@@ -12202,7 +12202,9 @@ class Warehouse_model extends App_Model
 			$this->db->where('expiry_date', $expiry_date);
 		}
 
-		return $this->db->get(db_prefix() . 'inventory_manage')->row();
+		$this->db->select('*, SUM(inventory_number) as inventory_number', false);
+    	$this->db->from(db_prefix() . 'inventory_manage');
+    	return $this->db->get()->row();
 	}
 
 
