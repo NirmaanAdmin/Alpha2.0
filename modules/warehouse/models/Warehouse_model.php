@@ -6484,6 +6484,10 @@ class Warehouse_model extends App_Model
 					'inventory_number' => $d['updates_number'],
 				]);
 				if ($this->db->affected_rows() > 0) {
+					$this->db->where('warehouse_id', $loss_adjustment->warehouses);
+		            $this->db->where('commodity_id', $d['items']);
+		            $this->db->where('id !=', $inventory_value->id);
+		            $this->db->delete(db_prefix() . 'inventory_manage');
 					$affected_rows++;
 				}
 
