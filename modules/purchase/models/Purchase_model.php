@@ -14353,4 +14353,42 @@ class Purchase_model extends App_Model
 
         return true;
     }
+
+    public function get_all_pur_request_payments($pur_request)
+    {
+        $this->db->where('pur_request', $pur_request);
+        $this->db->order_by('daterecorded', 'desc');
+        return $this->db->get(db_prefix() . 'pur_request_payment')->result_array();
+    }
+
+    public function delete_pur_request_payment($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'pur_request_payment');
+        if ($this->db->affected_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function add_pur_request_payment($pur_request, $data)
+    {
+        $data['date'] = to_sql_date($data['date']);
+        $data['daterecorded'] = date('Y-m-d H:i:s');
+        $data['pur_request'] = $pur_request;
+        $data['approval_status'] = 2;
+        $data['requester'] = get_staff_user_id();
+        $this->db->insert(db_prefix() . 'pur_request_payment', $data);
+        return true;
+    }
+
+    public function get_pur_request_payment($id = '')
+    {
+        if ($id != '') {
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'pur_request_payment')->row();
+        } else {
+            return $this->db->get(db_prefix() . 'pur_request_payment')->result_array();
+        }
+    }
 }

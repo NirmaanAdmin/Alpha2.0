@@ -3274,3 +3274,34 @@ function get_discount_pur_invoice($invoice_id)
 
     return (float) $row->total_discount;
 }
+
+function pur_request_left_to_pay($pur_request)
+{
+    $CI = &get_instance();
+    $CI->db->where('id', $pur_request);
+    $pr = $CI->db->get(db_prefix() . 'pur_request')->row();
+    $CI->db->where('pur_request', $pur_request);
+    $pur_request_payment = $CI->db->get(db_prefix() . 'pur_request_payment')->result_array();
+    $paid = 0;
+    foreach ($pur_request_payment as $payment) {
+        if ($payment['approval_status'] == 2) {
+            $paid += $payment['amount'];
+        }
+    }
+    if ($pr) {
+        return $pr->total - $paid;
+    }
+    return 0;
+}
+
+function get_pur_rq_code($id)
+{
+    $CI = &get_instance();
+    $CI->db->where('id', $id);
+    $pr = $CI->db->get(db_prefix() . 'pur_request')->row();
+    if ($pr) {
+        return $pr->pur_rq_code;
+    } else {
+        return '';
+    }
+}

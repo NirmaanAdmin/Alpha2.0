@@ -43,6 +43,12 @@
                       </a>
                     </li>
 
+                    <li role="presentation">
+                     <a href="#payment_record" aria-controls="payment_record" role="tab" data-toggle="tab">
+                     <?php echo _l('payment_record'); ?>
+                     </a>
+                    </li>
+
                     <li role="presentation" class="<?php if ($this->input->get('tab') == 'attachment') {
                                                       echo 'active';
                                                     } ?> ">
@@ -443,6 +449,45 @@
 
                 </div>
 
+                <div role="tabpanel" class="tab-pane" id="payment_record">
+                  <div class="col-md-6 pad_div_0" >
+                   <h4 class="font-medium mbot15 bold text-success"><?php echo _l('payment_for_pur_request').' '.$pur_request->pur_rq_code; ?></h4>
+                  </div>
+                  <div class="col-md-6 padr_div_0">
+                    <?php if(pur_request_left_to_pay($pur_request->id) > 0){ ?>                 
+                      <a href="#" onclick="add_payment(<?php echo pur_html_entity_decode($pur_request->id); ?>); return false;" class="btn btn-success pull-right"><i class="fa fa-plus"></i><?php echo ' '._l('payment'); ?></a>
+                    <?php } ?>
+                  </div>
+                  <div class="clearfix"></div>
+                  <table class="table">
+                    <thead>
+                      <th><?php echo _l('payments_table_amount_heading'); ?></th>
+                      <th><?php echo _l('payments_table_mode_heading'); ?></th>
+                      <th><?php echo _l('payment_transaction_id'); ?></th>
+                      <th><?php echo _l('payments_table_date_heading'); ?></th>
+                      <th><?php echo _l('options'); ?></th>
+                    </thead>
+                    <tbody>
+                      <?php foreach($payment as $pay) { ?>
+                        <tr>
+                          <td><?php echo app_format_money($pay['amount'],$base_currency->symbol); ?></td>
+                          <td><?php echo get_payment_mode_by_id($pay['paymentmode']); ?></td>
+                          <td><?php echo pur_html_entity_decode($pay['transactionid']); ?></td>
+                          <td><?php echo _d($pay['date']); ?></td>
+                          <td> 
+                            <?php if(is_admin()){ ?>
+                              <a href="<?php echo admin_url('purchase/view_pur_request_payment/'.$pay['id']); ?>" target="_blank" class="btn btn-default btn-icon" data-toggle="tooltip" data-placement="top" title="<?php echo _l('view'); ?>" ><i class="fa fa-eye "></i></a>
+                            <?php } ?>
+                            <?php if(is_admin()){ ?>
+                            <a href="<?php echo admin_url('purchase/delete_pur_request_payment/'.$pay['id'].'/'.$pur_request->id); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a>
+                            <?php } ?>
+                          </td>
+                        </tr>
+                      <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+
                 <div role="tabpanel" class="tab-pane  <?php if ($this->input->get('tab') == 'attachment') {
                                                         echo 'active';
                                                       } ?>" id="attachment">
@@ -681,6 +726,37 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<div class="modal fade" id="pur_request_payment_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog dialog_30" >
+    <?php echo form_open(admin_url('purchase/add_pur_request_payment/'.$pur_request->id),array('id'=>'pur_request_payment_form')); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+            <span class="add-title"><?php echo _l('new_payment'); ?></span>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+              <p style="font-size: 14px; font-weight: bold;"><?php echo _l('purchase_request'); ?>: <?php echo pur_html_entity_decode($pur_request->pur_rq_code); ?></p>
+              <?php echo render_input('amount','amount', pur_request_left_to_pay($pur_request->id),'number', array('max' => pur_request_left_to_pay($pur_request->id))); ?>
+              <?php echo render_date_input('date','payment_edit_date'); ?>
+              <?php echo render_select('paymentmode',$payment_modes,array('id','name'),'payment_mode'); ?>
+              <?php echo render_input('transactionid','payment_transaction_id'); ?>
+              <?php echo render_textarea('note','note','',array('rows'=>7)); ?>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+          <button type="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
 
 <?php init_tail(); ?>
 </body>

@@ -632,6 +632,7 @@ class purchase extends AdminController
 
     	$this->load->model('departments_model');
         $this->load->model('currencies_model');
+        $this->load->model('payment_modes_model');
 
         $send_mail_approve = $this->session->userdata("send_mail_approve");
         if((isset($send_mail_approve)) && $send_mail_approve != ''){
@@ -682,6 +683,10 @@ class purchase extends AdminController
         $data['pur_request_attachments'] = $this->purchase_model->get_purchase_request_attachments($id);
         $data['check_approval_setting'] = $this->purchase_model->check_approval_setting($data['pur_request']->project,'pur_request',0);
         $data['attachments'] = $this->purchase_model->get_purchase_attachments('pur_request', $id);
+        $data['payment'] = $this->purchase_model->get_all_pur_request_payments($id);
+        $data['payment_modes'] = $this->payment_modes_model->get('', [
+            'expenses_only !=' => 1,
+        ]);
 
         $this->load->view('purchase_request/view_pur_request', $data);
 
@@ -8758,4 +8763,40 @@ class purchase extends AdminController
         return true;
     }
 
+    public function delete_pur_request_payment($id, $pur_request)
+    {
+        if (!$id) {
+            redirect(admin_url('purchase/view_pur_request/'.$pur_request));
+        }
+        $response = $this->purchase_model->delete_pur_request_payment($id);
+        if ($response == true) {
+            set_alert('success', _l('deleted', _l('payment')));
+        } else {
+            set_alert('warning', _l('problem_deleting', _l('payment')));
+        }
+        redirect(admin_url('purchase/view_pur_request/'.$pur_request));
+    }
+
+    public function add_pur_request_payment($pur_request)
+    {
+        if ($this->input->post()) {
+            $data = $this->input->post();
+            $message = '';
+            $success = $this->purchase_model->add_pur_request_payment($pur_request, $data);
+            if ($success) {
+                $message = _l('added_successfully', _l('payment'));
+            }
+            set_alert('success', $message);
+            redirect(admin_url('purchase/view_pur_request/'.$pur_request));
+        }
+    }
+
+    public function view_pur_request_payment($id)
+    {
+        $this->load->model('currencies_model');
+        $data['pur_request_payment'] = $this->purchase_model->get_pur_request_payment($id);
+        $data['title'] = _l('payment_for').' '.get_pur_rq_code($data['pur_request_payment']->pur_request);
+        $data['base_currency'] = $this->currencies_model->get_base_currency();
+        $this->load->view('purchase_request/view_pur_request_payment',$data);
+    }
 }

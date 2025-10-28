@@ -289,4 +289,10 @@ function delete_purrequest_attachment(id) {
         });
     }
   }
+
+function add_payment(id){
+  "use strict"; 
+  appValidateForm($('#pur_request_payment_form'),{amount:'required', date:'required'});
+  $('#pur_request_payment_modal').modal('show');
+}
 </script>
