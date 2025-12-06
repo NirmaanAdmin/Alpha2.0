@@ -62,7 +62,7 @@ $formbasicinfo .= '
 <tr style="font-size:13px;">
     <td width="20%;" align="left"><b>Weather</b></td>
     <td width="10%;" align="left">' . $form_basic_info->weather . '</td>
-    <td width="20%;" align="left"><b>Work Stop?</b></td>
+    <td width="20%;" align="left"><b>Work Stop</b></td>
     <td width="10%;" align="left">' . $form_basic_info->work_stop . '</td>
     <td width="20%;" align="left"><b>Contractor</b></td>
     <td width="20%;" align="left">' . $form_basic_info->contractor . '</td>
