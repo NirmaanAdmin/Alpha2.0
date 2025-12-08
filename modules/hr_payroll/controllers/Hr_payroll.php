@@ -2111,7 +2111,7 @@ class hr_payroll extends AdminController
 							if ($flag == 0 && $flag2 == 0) {
 
 								$rd = array_combine($column_key, $data[$row]);
-								$rd['id'] = isset($rd['id']) ? $rd['id'] : 0;
+								$rd['id'] = isset($rd['ID']) ? $rd['ID'] : 0;
 								unset($rd['employee_number']);
 								unset($rd['employee_name']);
 								unset($rd['department_name']);
@@ -2126,7 +2126,7 @@ class hr_payroll extends AdminController
 
 						//insert batch
 						if (count($arr_insert) > 0) {
-							$this->hr_payroll_model->import_attendance_data($arr_insert);
+							$this->hr_payroll_model->import_attendance_data($arr_insert); 
 						}
 
 						$total_rows = $total_rows;
