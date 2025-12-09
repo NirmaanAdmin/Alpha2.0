@@ -8986,10 +8986,10 @@ class timesheets_model extends app_model
 				if (isset($late_check_ins[$date])) {
 					// Use different colors based on work location for late check-ins
 					if ($work_location == 1) {
-						$color = '#ffb366'; // Orange color for late check-in at site
+						$color = '#ffcccc'; // Orange color for late check-in at site
 					} else {
 						if ($is_female) {
-							$color = '#f3d1d1ff'; // Red color for late check-in (female)
+							$color = '#ffcccc'; // Red color for late check-in (female)
 						} else {
 							$color = '#ffcccc'; // Light red for male late check-in
 						}
