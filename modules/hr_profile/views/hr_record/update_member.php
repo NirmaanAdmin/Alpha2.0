@@ -364,8 +364,25 @@
 
                   <div class="row">
                      <div class="col-md-6">
-                        <?php if (get_option('disable_language') == 0) {
-                        ?>
+                        <div class="form-group">
+                           <label for="work_at"><?php echo _l('Employee Stationed At?'); ?></label>
+                           <select class="selectpicker" data-none-selected-text="<?php echo _l('hr_not_required'); ?>" data-width="100%" name="work_at" id="work_at">
+                              <option value="" <?php if (isset($member) && empty($member->work_at)) {
+                                                   echo 'selected';
+                                                } ?>></option>
+                              <option value="1" <?php if (isset($member) && $member->work_at == '1') {
+                                                      echo 'selected';
+                                                   } ?>>Site</option>
+                              <option value="2" <?php if (isset($member) && $member->work_at == '2') {
+                                                      echo 'selected';
+                                                   } ?>>Office</option>
+                           </select>
+                        </div>
+                     </div>
+
+                     <?php if (get_option('disable_language') == 0) {
+                     ?>
+                        <div class="col-md-6">
                            <div class="form-group">
                               <label for="default_language" class="control-label"><?php echo _l('localization_default_language'); ?></label>
                               <select name="default_language" data-live-search="true" id="default_language" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
@@ -382,8 +399,9 @@
                                  <?php } ?>
                               </select>
                            </div>
-                        <?php } ?>
-                     </div>
+                        </div>
+                     <?php } ?>
+
 
                      <div class="col-md-6">
                         <div class="form-group">
