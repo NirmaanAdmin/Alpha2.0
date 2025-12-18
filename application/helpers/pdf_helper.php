@@ -325,3 +325,9 @@ function create_dpr_form_pdf($form_data)
 {
     return app_pdf('Dprr', LIBSPATH . 'pdf/Dprr_pdf', $form_data);
 }
+
+
+function create_invoice_form_pdf($invoice_data)
+{
+    return app_pdf('Invoiceform', LIBSPATH . 'pdf/Invoiceform_pdf', $invoice_data);
+}

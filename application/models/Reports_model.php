@@ -358,14 +358,14 @@ class Reports_model extends App_Model
                 $custom_date_select = '(' . db_prefix() . 'invoicepaymentrecords.date BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
             } elseif ($months_report == 'this_year') {
                 $custom_date_select = '(' . db_prefix() . 'invoicepaymentrecords.date BETWEEN "' .
-                date('Y-m-d', strtotime(date('Y-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date('Y-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
             } elseif ($months_report == 'last_year') {
                 $custom_date_select = '(' . db_prefix() . 'invoicepaymentrecords.date BETWEEN "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
             } elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
                 $to_date   = to_sql_date($this->input->post('report_to'));
@@ -626,5 +626,111 @@ class Reports_model extends App_Model
         }
 
         return $refunds_amount;
+    }
+    private function distinct_taxes($rel_type)
+    {
+        return $this->db->query('SELECT DISTINCT taxname,taxrate FROM ' . db_prefix() . "item_tax WHERE rel_type='" . $rel_type . "' ORDER BY taxname ASC")->result_array();
+    }
+    public function get_invoice_data($filters = [])
+    {
+        $this->load->model('currencies_model');
+        $this->load->model('invoices_model');
+
+        $invoice_taxes = $this->distinct_taxes('invoice');
+        $totalTaxesColumns = count($invoice_taxes);
+
+        $select = [
+            db_prefix() . 'invoices.id',
+            'number',
+            get_sql_select_client_company(),
+            'YEAR(date) as year',
+            'date',
+            'duedate',
+            'subtotal',
+            'total',
+            'total_tax',
+            'discount_total',
+            'adjustment',
+            '(SELECT COALESCE(SUM(amount),0) FROM ' . db_prefix() . 'credits WHERE ' . db_prefix() . 'credits.invoice_id=' . db_prefix() . 'invoices.id) as credits_applied',
+            '(SELECT total - (SELECT COALESCE(SUM(amount),0) FROM ' . db_prefix() . 'invoicepaymentrecords WHERE invoiceid = ' . db_prefix() . 'invoices.id) - (SELECT COALESCE(SUM(amount),0) FROM ' . db_prefix() . 'credits WHERE ' . db_prefix() . 'credits.invoice_id=' . db_prefix() . 'invoices.id)) as amount_open',
+            'status',
+            'userid',
+            'clientid',
+            'discount_percent',
+            'deleted_customer_name',
+            'currency',
+        ];
+
+        // Add tax columns
+        $invoiceTaxesSelect = array_reverse($invoice_taxes);
+        foreach ($invoiceTaxesSelect as $key => $tax) {
+            array_splice($select, 8, 0, '(
+        SELECT CASE
+        WHEN discount_percent != 0 AND discount_type = "before_tax" THEN ROUND(SUM((qty*rate/100*' . db_prefix() . 'item_tax.taxrate) - (qty*rate/100*' . db_prefix() . 'item_tax.taxrate * discount_percent/100)),' . get_decimal_places() . ')
+        WHEN discount_total != 0 AND discount_type = "before_tax" THEN ROUND(SUM((qty*rate/100*' . db_prefix() . 'item_tax.taxrate) - (qty*rate/100*' . db_prefix() . 'item_tax.taxrate * (discount_total/subtotal*100) / 100)),' . get_decimal_places() . ')
+        ELSE ROUND(SUM(qty*rate/100*' . db_prefix() . 'item_tax.taxrate),' . get_decimal_places() . ')
+        END
+        FROM ' . db_prefix() . 'itemable
+        INNER JOIN ' . db_prefix() . 'item_tax ON ' . db_prefix() . 'item_tax.itemid=' . db_prefix() . 'itemable.id
+        WHERE ' . db_prefix() . 'itemable.rel_type="invoice" AND taxname="' . $tax['taxname'] . '" AND taxrate="' . $tax['taxrate'] . '" AND ' . db_prefix() . 'itemable.rel_id=' . db_prefix() . 'invoices.id) as total_tax_single_' . $key);
+        }
+
+        // Build the query
+        $this->db->select(implode(', ', $select));
+        $this->db->from(db_prefix() . 'invoices');
+        $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'invoices.clientid', 'left');
+
+        // Start with base where condition (without AND)
+        $this->db->where(db_prefix() . 'invoices.status !=', 5);
+
+        // Apply filters
+        if (isset($filters['date_from']) && isset($filters['date_to'])) {
+            $date_from = $filters['date_from'];
+            $date_to = $filters['date_to'];
+            $this->db->where('date >=', $date_from);
+            $this->db->where('date <=', $date_to);
+        }
+
+        if (isset($filters['sale_agent_invoices']) && !empty($filters['sale_agent_invoices'])) {
+            $agents = $filters['sale_agent_invoices'];
+            if (is_array($agents)) {
+                $this->db->where_in('sale_agent', $agents);
+            } else {
+                $this->db->where('sale_agent', $agents);
+            }
+        }
+
+        if (isset($filters['report_currency']) && $filters['report_currency']) {
+            $by_currency = $filters['report_currency'];
+            // Update the amount_open calculation for specific currency
+            $amount_open_query = '(SELECT total - (SELECT COALESCE(SUM(amount),0) FROM ' . db_prefix() . 'invoicepaymentrecords WHERE invoiceid = ' . db_prefix() . 'invoices.id AND currency = ' . $by_currency . ') - (SELECT COALESCE(SUM(amount),0) FROM ' . db_prefix() . 'credits WHERE ' . db_prefix() . 'credits.invoice_id=' . db_prefix() . 'invoices.id AND currency = ' . $by_currency . '))';
+
+            // Find and replace the amount_open in select
+            foreach ($select as $key => $value) {
+                if (strpos($value, 'as amount_open') !== false) {
+                    $select[$key] = $amount_open_query . ' as amount_open';
+                    break;
+                }
+            }
+            $this->db->select(implode(', ', $select)); // Re-select with updated amount_open
+            $this->db->where('currency', $by_currency);
+        }
+
+        if (isset($filters['invoice_status']) && !empty($filters['invoice_status'])) {
+            $statuses = $filters['invoice_status'];
+            if (is_array($statuses)) {
+                $this->db->where_in('status', $statuses);
+            } else {
+                $this->db->where('status', $statuses);
+            }
+        }
+
+        // Get results
+        $query = $this->db->get();
+
+        // For debugging, you can see the query:
+        // echo $this->db->last_query(); die();
+
+        return $query->result_array();
     }
 }

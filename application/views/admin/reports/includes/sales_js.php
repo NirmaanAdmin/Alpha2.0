@@ -319,6 +319,7 @@
        [2, 'desc'],
        [0, 'desc']
        ]).column(2).visible(false, false).columns.adjust();
+       $('.buttons-collection').hide();
    }
 
    function credit_notes_report(){

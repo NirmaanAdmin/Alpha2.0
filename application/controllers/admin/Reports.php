@@ -638,14 +638,14 @@ class Reports extends AdminController
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
             } elseif ($months_report == 'this_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                date('Y-m-d', strtotime(date('Y-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date('Y-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
             } elseif ($months_report == 'last_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
             } elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
                 $to_date   = to_sql_date($this->input->post('report_to'));
@@ -669,18 +669,18 @@ class Reports extends AdminController
 
             if ($v && strpos($v->version, '5.7') !== false) {
                 $aColumns = [
-                        'ANY_VALUE(description) as description',
-                        'ANY_VALUE((SUM(' . db_prefix() . 'itemable.qty))) as quantity_sold',
-                        'ANY_VALUE(SUM(rate*qty)) as rate',
-                        'ANY_VALUE(AVG(rate*qty)) as avg_price',
-                    ];
+                    'ANY_VALUE(description) as description',
+                    'ANY_VALUE((SUM(' . db_prefix() . 'itemable.qty))) as quantity_sold',
+                    'ANY_VALUE(SUM(rate*qty)) as rate',
+                    'ANY_VALUE(AVG(rate*qty)) as avg_price',
+                ];
             } else {
                 $aColumns = [
-                        'description as description',
-                        '(SUM(' . db_prefix() . 'itemable.qty)) as quantity_sold',
-                        'SUM(rate*qty) as rate',
-                        'AVG(rate*qty) as avg_price',
-                    ];
+                    'description as description',
+                    '(SUM(' . db_prefix() . 'itemable.qty)) as quantity_sold',
+                    'SUM(rate*qty) as rate',
+                    'AVG(rate*qty) as avg_price',
+                ];
             }
 
             $sIndexColumn = 'id';
@@ -1099,6 +1099,24 @@ class Reports extends AdminController
         }
     }
 
+    public function invoices_report_pdf()
+    {
+        $invoice_data = $this->reports_model->get_invoice_data([]);
+        if (!empty($invoice_data)) {
+            $pdf = create_invoice_form_pdf($invoice_data);
+            $type = 'I';
+            if ($this->input->get('output_type')) {
+                $type = $this->input->get('output_type');
+            }
+            if ($this->input->get('print')) {
+                $type = 'I';
+            }
+            $pdf->Output('invoices_report.pdf', $type);
+        } else {
+            echo "PDF have not created yet.";
+        }
+    }
+
     public function expenses($type = 'simple_report')
     {
         $this->load->model('currencies_model');
@@ -1110,7 +1128,7 @@ class Reports extends AdminController
             $this->load->model('expenses_model');
             $data['categories'] = $this->expenses_model->get_category();
             $data['years']      = $this->expenses_model->get_expenses_years();
-            
+
             $data['table'] = App_table::find('expenses_detailed_report');
 
             $this->load->model('payment_modes_model');
@@ -1118,8 +1136,8 @@ class Reports extends AdminController
 
             if ($this->input->is_ajax_request()) {
                 $data['table']->output([
-                    'base_currency'=>$data['base_currency'],
-                    'currencies'=>$data['currencies'],
+                    'base_currency' => $data['base_currency'],
+                    'currencies' => $data['currencies'],
                 ]);
             }
 
