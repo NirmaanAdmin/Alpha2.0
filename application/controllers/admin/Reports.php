@@ -1104,7 +1104,7 @@ class Reports extends AdminController
         $invoice_data = $this->reports_model->get_invoice_data([]);
         if (!empty($invoice_data)) {
             $pdf = create_invoice_form_pdf($invoice_data);
-            $type = 'I';
+            $type = 'D';
             if ($this->input->get('output_type')) {
                 $type = $this->input->get('output_type');
             }
