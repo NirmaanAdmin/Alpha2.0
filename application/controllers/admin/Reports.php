@@ -1116,6 +1116,123 @@ class Reports extends AdminController
             echo "PDF have not created yet.";
         }
     }
+    public function invoices_report_excel()
+    {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="Invoices_Report_Export.csv"');
+
+        $output = fopen('php://output', 'w');
+
+        $invoice_data = $this->reports_model->get_invoice_data([]);
+
+        if (empty($invoice_data)) {
+            fputcsv($output, ['No invoices found']);
+            fclose($output);
+            exit;
+        }
+
+        /**
+         * -----------------------------------------
+         * Detect dynamic tax columns (same as PDF)
+         * -----------------------------------------
+         */
+        $tax_columns = [];
+        foreach ($invoice_data[0] as $key => $value) {
+            if (strpos($key, 'total_tax_single_') === 0) {
+                $tax_columns[] = $key;
+            }
+        }
+
+        /**
+         * -----------------------------------------
+         * CSV Headers (same order as PDF table)
+         * -----------------------------------------
+         */
+        $headers = [
+            'Invoice #',
+            'Client',
+            'Invoice Date',
+            'Due Date',
+            'Subtotal',
+            'Total',
+            'Total Tax',
+        ];
+
+        foreach ($tax_columns as $tax_column) {
+            $name = str_replace('total_tax_single_', 'Tax ', $tax_column);
+            $name = str_replace('_', ' ', $name);
+            $headers[] = ucwords($name);
+        }
+
+        $headers[] = 'Discount';
+        $headers[] = 'Adjustment';
+        $headers[] = 'Credits Applied';
+        $headers[] = 'Amount Open';
+        $headers[] = 'Status';
+
+        fputcsv($output, $headers);
+
+        /**
+         * -----------------------------------------
+         * Data Rows
+         * -----------------------------------------
+         */
+        foreach ($invoice_data as $invoice) {
+
+            // Status text mapping (same as PDF)
+            switch ($invoice['status']) {
+                case 1:
+                    $status = 'Unpaid';
+                    break;
+                case 2:
+                    $status = 'Paid';
+                    break;
+                case 3:
+                    $status = 'Partially Paid';
+                    break;
+                case 4:
+                    $status = 'Overdue';
+                    break;
+                case 5:
+                    $status = 'Cancelled';
+                    break;
+                case 6:
+                    $status = 'Draft';
+                    break;
+                default:
+                    $status = 'Unknown';
+            }
+
+            $row = [
+                format_invoice_number($invoice['id']),
+                !empty($invoice['deleted_customer_name'])
+                    ? $invoice['deleted_customer_name']
+                    : ($invoice['company'] ?? 'N/A'),
+                _d($invoice['date']),
+                _d($invoice['duedate']),
+                app_format_money($invoice['subtotal'], ''),
+                app_format_money($invoice['total'], ''),
+                app_format_money($invoice['total_tax'], ''),
+            ];
+
+            // Dynamic tax values
+            foreach ($tax_columns as $tax_column) {
+                $row[] = app_format_money($invoice[$tax_column] ?? 0, '');
+            }
+
+            $row[] = app_format_money($invoice['discount_total'], '');
+            $row[] = app_format_money($invoice['adjustment'], '');
+            $row[] = app_format_money($invoice['credits_applied'], '');
+            $row[] = app_format_money($invoice['amount_open'], '');
+            $row[] = $status;
+
+            fputcsv($output, $row);
+        }
+
+        fclose($output);
+        exit;
+    }
+
 
     public function expenses($type = 'simple_report')
     {
