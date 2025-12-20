@@ -714,5 +714,6 @@ $lang['import_variation_product_description7']   = 'How to generate a list of pr
 $lang['import_variation_product_description8']   = 'If your excel file has many lines of data, we recommend you split the file into smaller files (maybe <200 lines per file) to ensure the file is successfully imported into the system.';
 $lang['wh_barcode_filter']   = 'Filter by barcode';
 $lang['wh_unit_name']   = 'Unit Name';
+$lang['can_be_assest']  = 'Can be Asset';
 
 

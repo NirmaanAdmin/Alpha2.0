@@ -2469,7 +2469,7 @@ class Warehouse_model extends App_Model
 		$data_update = [];
 
 		switch ($rel_type) {
-				//case 1: stock_import
+			//case 1: stock_import
 			case '1':
 				$data_update['approval'] = $status;
 				$this->db->where('id', $rel_id);
@@ -3157,7 +3157,7 @@ class Warehouse_model extends App_Model
 		// <td class="text_left"><b>' . _l('total_money') . '</b></td>
 		// <td class="text_right">' . $base_currency->symbol . app_format_money((float) $goods_receipt->total_money, '') . '</td>
 		// </tr>
-		
+
 		// </tbody>
 		// </table>
 		// <br><br><br>
@@ -3245,7 +3245,7 @@ class Warehouse_model extends App_Model
 		$additional_data = $data['rel_type'];
 		$object_type = $data['rel_type'];
 		switch ($data['rel_type']) {
-				// case '1 : stock_import':
+			// case '1 : stock_import':
 			case '1':
 				$type = _l('stock_import');
 				$staff_addedfrom = $this->get_goods_receipt($data['rel_id'])->addedfrom;
@@ -4080,7 +4080,7 @@ class Warehouse_model extends App_Model
 			// <td class="text_left"><b>' . _l('total_money') . '</b></td>
 			// <td class="text_right">......................................</td>
 			// </tr>
-			
+
 			// </tbody>
 			// </table>
 			// <br><br><br>
@@ -5334,10 +5334,35 @@ class Warehouse_model extends App_Model
 
 		/*add data tblinventory*/
 		if ($insert_id) {
+			$this->load->model('fixed_equipment/fixed_equipment_model');
+
+			$date = date('Y-m-d');
+
+			$data_asset = [
+				'assets_name' => trim($data['description']),
+				'status' => 1,
+				'asset_location' => (int)$data['warehouse_id'],
+				'unit_price' => $data['rate'],
+				'serial' => ['N00'],
+				'date_buy' => $date,
+			];
+			try {
+				$asset_id = $this->fixed_equipment_model->add_asset($data_asset);
+				if (!$asset_id) {
+					log_message('error', 'Failed to create asset');
+					return false;
+				}
+				return $asset_id; // or handle success
+			} catch (Exception $e) {
+				log_message('error', 'Asset creation error: ' . $e->getMessage());
+				return false;
+			}
+			die;
+
 			$next_number = get_item_option('next_item_number');
-			$new_number = $next_number + 1;		
+			$new_number = $next_number + 1;
 			$this->db->where('option_name', 'next_item_number');
-            $this->db->update(db_prefix() . 'item_option',['option_val' =>  $new_number]);	
+			$this->db->update(db_prefix() . 'item_option', ['option_val' =>  $new_number]);
 			$data_inventory_min['commodity_id'] = $insert_id;
 			$data_inventory_min['commodity_code'] = $data['commodity_code'];
 			$data_inventory_min['commodity_name'] = $data['description'];
@@ -6485,9 +6510,9 @@ class Warehouse_model extends App_Model
 				]);
 				if ($this->db->affected_rows() > 0) {
 					$this->db->where('warehouse_id', $loss_adjustment->warehouses);
-		            $this->db->where('commodity_id', $d['items']);
-		            $this->db->where('id !=', $inventory_value->id);
-		            $this->db->delete(db_prefix() . 'inventory_manage');
+					$this->db->where('commodity_id', $d['items']);
+					$this->db->where('id !=', $inventory_value->id);
+					$this->db->delete(db_prefix() . 'inventory_manage');
 					$affected_rows++;
 				}
 
@@ -10630,7 +10655,7 @@ class Warehouse_model extends App_Model
 		unset($data['into_money']);
 		unset($data['serial_number']);
 
-		if(isset($data['save_as_draft'])) {
+		if (isset($data['save_as_draft'])) {
 			unset($data['save_as_draft']);
 			$data['approval'] = 0;
 		} else {
@@ -10838,7 +10863,7 @@ class Warehouse_model extends App_Model
 		unset($data['into_money']);
 		unset($data['serial_number']);
 
-		if(isset($data['save_as_draft'])) {
+		if (isset($data['save_as_draft'])) {
 			unset($data['save_as_draft']);
 			$data['approval'] = 0;
 		} else {
@@ -12207,8 +12232,8 @@ class Warehouse_model extends App_Model
 		}
 
 		$this->db->select('*, SUM(inventory_number) as inventory_number', false);
-    	$this->db->from(db_prefix() . 'inventory_manage');
-    	return $this->db->get()->row();
+		$this->db->from(db_prefix() . 'inventory_manage');
+		return $this->db->get()->row();
 	}
 
 

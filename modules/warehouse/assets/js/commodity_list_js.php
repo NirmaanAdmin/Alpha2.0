@@ -575,6 +575,11 @@ warehouse_type_value = warehouse_type;
     }else{
       data.can_be_inventory = null;
     }  
+    if($('input[id="can_be_assest"]').is(":checked")){
+      data.can_be_assest = 'can_be_assest';
+    }else{
+      data.can_be_assest = null;
+    }  
 
     /*update*/
     var check_id = $('#commodity_item_id').html();
@@ -871,6 +876,11 @@ warehouse_type_value = warehouse_type;
     }else{
       $('#commodity_list-add-edit input[id="can_be_inventory"]').prop("checked", false);
     }
+    if($(invoker).data('can_be_assest') == 'can_be_assest'){
+      $('#commodity_list-add-edit input[id="can_be_assest"]').prop('checked', true);
+    }else{
+      $('#commodity_list-add-edit input[id="can_be_assest"]').prop("checked", false);
+    }
 
     tinyMCE.activeEditor.setContent("");
 
@@ -1067,7 +1077,7 @@ warehouse_type_value = warehouse_type;
     $('#commodity_list-add-edit input[id="can_be_purchased"]').prop('checked', true);
     $('#commodity_list-add-edit input[id="can_be_manufacturing"]').prop('checked', true);
     $('#commodity_list-add-edit input[id="can_be_inventory"]').prop('checked', true);
-
+    $('#commodity_list-add-edit input[id="can_be_assest"]').prop('checked', true);
     $('#tags_value').find('ul li.tagit-choice').remove();
     $('.submit_btn').removeAttr('disabled');
     /*init tags input*/
