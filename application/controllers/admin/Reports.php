@@ -1099,21 +1099,60 @@ class Reports extends AdminController
         }
     }
 
+    // public function invoices_report_pdf()
+    // {
+    //     $invoice_data = $this->reports_model->get_invoice_data([]);
+    //     if (!empty($invoice_data)) {
+    //         $pdf = create_invoice_form_pdf($invoice_data);
+    //         $type = 'D';
+    //         if ($this->input->get('output_type')) {
+    //             $type = $this->input->get('output_type');
+    //         }
+    //         if ($this->input->get('print')) {
+    //             $type = 'I';
+    //         }
+    //         $pdf->Output('invoices_report.pdf', $type);
+    //     } else {
+    //         echo "PDF have not created yet.";
+    //     }
+    // }
+
     public function invoices_report_pdf()
     {
-        $invoice_data = $this->reports_model->get_invoice_data([]);
+        // Get filter values from POST data
+        $filters = [];
+        if ($this->input->post('month')) {
+            $filters['month'] = $this->input->post('month');
+        }
+
+        if ($this->input->post('status')) {
+            $filters['invoice_status'] = $this->input->post('status');
+        }
+
+        if ($this->input->post('agent')) {
+            $filters['sale_agent'] = $this->input->post('agent');
+        }
+
+        if($this->input->post('from_date') && is_array($this->input->post('to_date'))) {
+            $filters['from_date'] = $this->input->post('from_date');
+            $filters['to_date'] = $this->input->post('to_date');
+        }
+       
+        // Pass filters to your model
+        $invoice_data = $this->reports_model->get_invoice_data($filters);
         if (!empty($invoice_data)) {
             $pdf = create_invoice_form_pdf($invoice_data);
-            $type = 'D';
-            if ($this->input->get('output_type')) {
-                $type = $this->input->get('output_type');
-            }
-            if ($this->input->get('print')) {
+            $type = 'D'; // Download by default
+
+            // Check if it's a print request
+            if ($this->input->get('print') || ($this->input->post('export_type') && $this->input->post('export_type') == 'print')) {
                 $type = 'I';
             }
-            $pdf->Output('invoices_report.pdf', $type);
+
+            $filename = 'Invoices Report.pdf';
+            $pdf->Output($filename, $type);
         } else {
-            echo "PDF have not created yet.";
+            echo "No data found for the selected filters.";
         }
     }
     public function invoices_report_excel()

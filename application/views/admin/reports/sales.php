@@ -154,23 +154,23 @@
             </div>
             <div class="tw-flex-1 tw-max-w-md">
                 <?php if (isset($currencies)) { ?>
-                <div id="currency" class="form-group hide">
-                    <label for="currency"><i class="fa-regular fa-circle-question" data-toggle="tooltip"
-                            title="<?php echo _l('report_sales_base_currency_select_explanation'); ?>"></i>
-                        <?php echo _l('currency'); ?></label><br />
-                    <select class="selectpicker" name="currency" data-width="100%"
-                        data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                        <?php foreach ($currencies as $currency) {
-    $selected = '';
-    if ($currency['isdefault'] == 1) {
-        $selected = 'selected';
-    } ?>
-                        <option value="<?php echo e($currency['id']); ?>" <?php echo e($selected); ?>>
-                            <?php echo e($currency['name']); ?></option>
-                        <?php
-} ?>
-                    </select>
-                </div>
+                    <div id="currency" class="form-group hide">
+                        <label for="currency"><i class="fa-regular fa-circle-question" data-toggle="tooltip"
+                                title="<?php echo _l('report_sales_base_currency_select_explanation'); ?>"></i>
+                            <?php echo _l('currency'); ?></label><br />
+                        <select class="selectpicker" name="currency" data-width="100%"
+                            data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                            <?php foreach ($currencies as $currency) {
+                                $selected = '';
+                                if ($currency['isdefault'] == 1) {
+                                    $selected = 'selected';
+                                } ?>
+                                <option value="<?php echo e($currency['id']); ?>" <?php echo e($selected); ?>>
+                                    <?php echo e($currency['name']); ?></option>
+                            <?php
+                            } ?>
+                        </select>
+                    </div>
                 <?php } ?>
                 <div id="income-years" class="hide mbot15">
                     <label for="payments_years"><?php echo _l('year'); ?></label><br />
@@ -178,11 +178,11 @@
                         onchange="total_income_bar_report();"
                         data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                         <?php foreach ($payments_years as $year) { ?>
-                        <option value="<?php echo e($year['year']); ?>" <?php if ($year['year'] == date('Y')) {
-        echo 'selected';
-    } ?>>
-                            <?php echo e($year['year']); ?>
-                        </option>
+                            <option value="<?php echo e($year['year']); ?>" <?php if ($year['year'] == date('Y')) {
+                                                                                echo 'selected';
+                                                                            } ?>>
+                                <?php echo e($year['year']); ?>
+                            </option>
                         <?php } ?>
                     </select>
                 </div>
@@ -236,10 +236,10 @@
             </div>
         </div>
         <?php if (total_rows(db_prefix() . 'invoices', ['status' => 5]) > 0) { ?>
-        <p class="text-danger tw-my-3">
-            <i class="fa-solid fa-circle-exclamation tw-mr-1" aria-hidden="true"></i>
-            <?php echo _l('sales_report_cancelled_invoices_not_included'); ?>
-        </p>
+            <p class="text-danger tw-my-3">
+                <i class="fa-solid fa-circle-exclamation tw-mr-1" aria-hidden="true"></i>
+                <?php echo _l('sales_report_cancelled_invoices_not_included'); ?>
+            </p>
         <?php } ?>
         <div class="row">
             <div class="col-md-12 hide" id="report">
@@ -269,3 +269,56 @@
 </body>
 
 </html>
+<script>
+    function exportInvoicesReport() {
+        // Get values from select elements
+        const month = document.querySelector('select[name="months-report"]').value;
+        const status = document.querySelector('select[name="invoice_status"]').value;
+        const agent = document.querySelector('select[name="sale_agent_invoices"]').value;
+        if(month == 'custom'){
+            const from_date = document.getElementById('report-from').value;
+            const to_date =  document.getElementById('report-to').value;
+        }
+        // Create form data
+        const formData = new FormData();
+        formData.append('month', month);
+        formData.append('status', status);
+        formData.append('agent', agent);
+        if(month == 'custom'){
+            formData.append('from_date', from_date);
+            formData.append('to_date', to_date);
+        }
+        formData.append(csrfData['token_name'], csrfData['hash']);
+
+        $.ajax({
+            url: '<?php echo admin_url("reports/invoices_report_pdf"); ?>',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhrFields: {
+                responseType: 'blob' // Important for PDF
+            },
+            success: function(data, status, xhr) {
+                // Get the PDF blob
+                const blob = new Blob([data], {
+                    type: 'application/pdf'
+                });
+
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'invoices_report.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('Error generating PDF');
+            }
+        });
+    }
+</script>

@@ -40,7 +40,7 @@
          <i class="fa fa-download"></i> <?php echo _l('Export'); ?> <span class="caret"></span>
       </button>
       <div class="dropdown-menu" style="padding: 10px;min-width: 94px;">
-         <a class="dropdown-item export-btn" href="<?php echo admin_url('reports/invoices_report_pdf'); ?>" data-type="pdf">
+         <a class="dropdown-item export-btn" href="javascript:void(0)" onclick="exportInvoicesReport()" data-type="pdf">
             <i class="fa fa-file-pdf text-danger"></i> PDF
          </a><br>
          <a class="dropdown-item export-btn" href="<?php echo admin_url('reports/invoices_report_excel'); ?>" data-type="excel">
