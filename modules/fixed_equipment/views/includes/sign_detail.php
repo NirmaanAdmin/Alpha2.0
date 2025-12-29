@@ -97,20 +97,19 @@
                         <?php
                         $item_list_id = explode(',', $sign_documents->checkin_out_id);
 
-
                         foreach ($item_list_id as $key => $item_id) {
                            $data_check_in_out = $this->fixed_equipment_model->get_checkin_out_data($item_id);
                            $get_from_location = $this->fixed_equipment_model->get_from_location($item_id);
                            $get_to_location = $this->fixed_equipment_model->get_to_location($item_id);
-
+                           
                         
-                           $from_location = '';
+                           $from_location = ''; 
 
                            if (!empty($get_from_location)) {
                               if (!empty($get_from_location->location_name)) {
                                  $from_location = $get_from_location->location_name;
                               } elseif (!empty($get_from_location->staff_name)) {
-                                 $from_location = $get_from_location->staff_name;
+                                 $from_location = $get_from_location->staff_name .' '. $get_from_location->staff_last_name;
                               } elseif (!empty($get_from_location->project_name)) {
                                  $from_location = $get_from_location->project_name;
                               } elseif (!empty($get_from_location->asset_name)) {
@@ -149,7 +148,7 @@
                         <?php }
                            }
                         }
-                      
+                        
 
                         ?>
 

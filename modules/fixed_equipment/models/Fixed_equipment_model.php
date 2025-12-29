@@ -738,7 +738,7 @@ class fixed_equipment_model extends app_model
 					$this->db->insert(db_prefix() . 'fe_assets', $data_add);
 					$insert_id = $this->db->insert_id();
 					if ($insert_id) {
-						$this->add_log(get_staff_user_id(), 'create_new', $insert_id, '', '', '', null, '');
+						$this->add_log(get_staff_user_id(), 'create_new', $insert_id, '', '', 'user', get_staff_user_id(), '');
 						if (isset($data['customfield'])) {
 							foreach ($data['customfield'] as $customfield_id => $field_value) {
 								$value = (is_array($field_value) ? json_encode($field_value) : $field_value);
@@ -893,7 +893,7 @@ class fixed_equipment_model extends app_model
 									$change = _l('fe_status') . ': ' . $status_name1 . ' &#10145; ' . $status_name2;
 								}
 							}
-							$this->add_log(get_staff_user_id(), 'update', $data_saved_assets->id, '', $change, '', null, '');
+							$this->add_log(get_staff_user_id(), 'update', $data_saved_assets->id, '', $change, 'user', get_staff_user_id(), '');
 							$affectedRows++;
 
 							hooks()->do_action('after_fe_asset_updated', $data_saved_assets->id);
@@ -946,7 +946,7 @@ class fixed_equipment_model extends app_model
 						$this->db->insert(db_prefix() . 'fe_assets', $data_add);
 						$insert_id = $this->db->insert_id();
 						if ($insert_id) {
-							$this->add_log(get_staff_user_id(), 'create_new', $insert_id, '', '', '', null, '');
+							$this->add_log(get_staff_user_id(), 'create_new', $insert_id, '', '', 'user', get_staff_user_id(), '');
 							if (isset($data['customfield'])) {
 								foreach ($data['customfield'] as $customfield_id => $field_value) {
 									$value = (is_array($field_value) ? json_encode($field_value) : $field_value);
@@ -2949,7 +2949,8 @@ class fixed_equipment_model extends app_model
 				db_prefix() . 'fe_locations.location_name AS location_name',
 				db_prefix() . 'staff.firstname AS staff_name',
 				db_prefix() . 'projects.name AS project_name',
-				db_prefix() . 'fe_assets.assets_name AS asset_name'
+				db_prefix() . 'fe_assets.assets_name AS asset_name',
+				db_prefix() . 'staff.lastname AS staff_last_name',
 			]);
 
 			// Join fe_log_assets first to get the location change reference
