@@ -533,7 +533,7 @@ class purchase extends AdminController
         $this->load->model('currencies_model');
     	if($id == ''){
     		
-    		if($this->input->post()){
+    		if($this->input->post()){ 
     			$add_data = $this->input->post();
     			$id = $this->purchase_model->add_pur_request($add_data);
     			if($id){
