@@ -43,18 +43,22 @@
                 </select>
               </div>
             </div>
-            <?php render_datatable(array(
-              _l('pur_rq_code'),
-              _l('pur_rq_name'),
-              _l('requester'),
-              _('PR Total'),
-              // _l('department'),
-              _l('request_date'),
-              _l('project'),
-              _l('status'),
-              // _l('po_no'),
-              _l('options'),
-            ), 'table_pur_request'); ?>
+            <table class="table table-striped table-table_pur_request" id="table_pur_request">
+              <thead>
+                <tr>
+                  <th><?php echo _l('pur_rq_code'); ?></th>
+                  <th><?php echo _l('pur_rq_name'); ?></th>
+                  <th><?php echo _l('requester'); ?></th>
+                  <th><?php echo _l('PR Total'); ?></th>
+                  <th><?php echo _l('request_date'); ?></th>
+                  <th><?php echo _l('project'); ?></th>
+                  <th><?php echo _l('status'); ?></th>
+                  <th><?php echo _l('options'); ?></th>
+                </tr>
+              </thead>
+              <tbody>
+                
+              </tbody>
 
           </div>
         </div>
