@@ -46,6 +46,19 @@
                   <?php } ?>
                 </select>
               </div>
+              <div class="col-md-3 form-group">
+                <?php
+                echo render_select('requester[]', $requester, array('staffid', 'full_name'), '', [], array('data-width' => '100%', 'data-none-selected-text' => _l('requester'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false); ?>
+              </div>
+              <div class="col-md-3 form-group">
+                <?php
+                $statuses = [
+                  1 => ['id' => '1', 'name' => _l('draft')],
+                  2 => ['id' => '2', 'name' => _l('purchase_approved')],
+                  3 => ['id' => '3', 'name' => _l('purchase_reject')],
+                ];
+                echo render_select('status[]', $statuses, array('id', 'name'), '', [], array('data-width' => '100%', 'data-none-selected-text' => _l('approval_status'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false); ?>
+              </div>
             </div>
             <table class="table table-striped table-table_pur_request" id="table_pur_request">
               <thead>

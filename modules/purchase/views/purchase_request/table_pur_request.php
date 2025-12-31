@@ -47,6 +47,20 @@ if (
     array_push($where, 'AND department IN (' . implode(',', $this->ci->input->post('department')) . ')');
 }
 
+if (
+    $this->ci->input->post('requester')
+    && count($this->ci->input->post('requester')) > 0
+) {
+    array_push($where, 'AND requester IN (' . implode(',', $this->ci->input->post('requester')) . ')');
+}
+
+if (
+    $this->ci->input->post('status')
+    && count($this->ci->input->post('status')) > 0
+) {
+    array_push($where, 'AND status IN (' . implode(',', $this->ci->input->post('status')) . ')');
+}
+
 if (isset($project)) {
     array_push($where, ' AND ' . db_prefix() . 'pur_request.project = ' . $project);
 }
