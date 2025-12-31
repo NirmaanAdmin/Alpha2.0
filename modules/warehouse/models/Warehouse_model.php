@@ -5350,14 +5350,10 @@ class Warehouse_model extends App_Model
 				$asset_id = $this->fixed_equipment_model->add_asset($data_asset);
 				if (!$asset_id) {
 					log_message('error', 'Failed to create asset');
-					return false;
 				}
-				return $asset_id; // or handle success
 			} catch (Exception $e) {
 				log_message('error', 'Asset creation error: ' . $e->getMessage());
-				return false;
 			}
-			die;
 
 			$next_number = get_item_option('next_item_number');
 			$new_number = $next_number + 1;
