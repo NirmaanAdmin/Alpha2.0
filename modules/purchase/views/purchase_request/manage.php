@@ -20,19 +20,23 @@
                   </a>
                 <?php } ?>
               </div>
-              <div class="col-md-2">
+            </div>
+
+            <div class="row">
+              <hr>
+              <div class="col-md-3">
                 <select name="department_filter[]" id="department_filter" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('department'); ?>">
                   <?php foreach ($departments as $s) { ?>
                     <option value="<?php echo pur_html_entity_decode($s['departmentid']); ?>" <?php if (isset($pur_request) && $s['departmentid'] == $pur_request->department) {
-                                                                                                echo 'selected';
-                                                                                              } ?>><?php echo pur_html_entity_decode($s['name']); ?></option>
+                      echo 'selected';
+                    } ?>><?php echo pur_html_entity_decode($s['name']); ?></option>
                   <?php } ?>
                 </select>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <?php echo render_date_input('from_date', '', '', array('placeholder' => _l('from_date'))); ?>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <?php echo render_date_input('to_date', '', '', array('placeholder' => _l('to_date'))); ?>
               </div>
               <div class="col-md-3 form-group">
@@ -56,10 +60,7 @@
                   <th><?php echo _l('options'); ?></th>
                 </tr>
               </thead>
-              <tbody>
-                
-              </tbody>
-
+              <tbody></tbody>
           </div>
         </div>
       </div>
@@ -125,22 +126,18 @@
       <div class="modal-body">
         <div id="additional_share"></div>
         <div class="row">
-
           <div class="col-md-12 form-group">
             <label for="send_to_vendors"><?php echo _l('pur_send_to_vendors'); ?></label>
             <select name="send_to_vendors[]" id="send_to_vendors" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
 
               <?php foreach ($vendors as $s) { ?>
                 <option value="<?php echo pur_html_entity_decode($s['userid']); ?>" <?php if (isset($pur_request) && in_array($s['userid'], $vendors_arr)) {
-                                                                                      echo 'selected';
-                                                                                    } ?>><?php echo pur_html_entity_decode($s['company']); ?></option>
+                  echo 'selected';
+                } ?>><?php echo pur_html_entity_decode($s['company']); ?></option>
               <?php } ?>
 
             </select>
           </div>
-
-
-
         </div>
       </div>
       <div class="modal-footer">
