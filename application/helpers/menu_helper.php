@@ -143,6 +143,14 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
+    $CI->app_menu->add_sidebar_menu_item('module_activity_log', [
+        'name'     => _l('activity_log'),
+        'href'     => admin_url('purchase/activity_log'),
+        'icon'     => 'fa-solid fa-wave-square',
+        'position' => 31,
+        'badge'    => [],
+    ]);
+
     $CI->app_menu->add_sidebar_menu_item('tasks', [
         'name'     => _l('als_tasks'),
         'href'     => admin_url('tasks'),

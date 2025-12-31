@@ -3305,3 +3305,15 @@ function get_pur_rq_code($id)
         return '';
     }
 }
+
+function get_last_action_full_name($userid = '')
+{
+    $CI = &get_instance();
+    if(!empty($userid)) {
+        $CI->db->where('staffid', $userid);
+        $staff = $CI->db->select('firstname,lastname')->from(db_prefix() . 'staff')->get()->row();
+        return $staff ? $staff->firstname . ' ' . $staff->lastname : '';
+    } else {
+        return '';
+    }
+}
