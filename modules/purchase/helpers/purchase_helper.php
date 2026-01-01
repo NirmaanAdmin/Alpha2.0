@@ -3336,6 +3336,22 @@ function get_pur_send_to_vendors_list($vendors)
     return '';
 }
 
+function get_multiple_staff_names($userids = '')
+{
+    $CI = &get_instance();
+    if (!empty($userids)) {
+        if (!is_array($userids)) {
+            $userids = explode(',', $userids);
+        }
+        $CI->db->select("GROUP_CONCAT(CONCAT(firstname, ' ', lastname) SEPARATOR ', ') AS full_names");
+        $CI->db->from(db_prefix() . 'staff');
+        $CI->db->where_in('staffid', $userids);
+        $row = $CI->db->get()->row();
+        return $row ? $row->full_names : '';
+    }
+    return '';
+}
+
 function add_pr_activity_log($id, $is_create = true)
 {
     $CI = &get_instance();
@@ -3661,6 +3677,133 @@ function add_order_status_activity_log($id)
                 ]);
             }
         }
+    }
+    return true;
+}
+
+function add_pur_app_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_approval_setting = $CI->db->get(db_prefix() . 'pur_approval_setting')->row();
+        if(!empty($pur_approval_setting)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $project_name = get_project_name_by_id($pur_approval_setting->project_id);
+            $subject = $pur_approval_setting->name;
+            if($pur_approval_setting->related == 'pur_request') {
+                $related = _l('pur_request');
+            } else if($pur_approval_setting->related == 'pur_quotation') {
+                $related = _l('pur_quotation');
+            } else if($pur_approval_setting->related == 'pur_order') {
+                $related = _l('pur_order');
+            } else if($pur_approval_setting->related == 'payment_request') {
+                $related = _l('payment_request');
+            } else {
+                $related = '';
+            }
+            $approver = get_multiple_staff_names($pur_approval_setting->approver);
+            if(!empty($related)) {
+                $description = "The purchase approval setting <b>".$subject."</b> has been successfully ".$is_create_value." under project <b>".$project_name."</b>, related to <b>".$related."</b>, and assigned to approver <b>".$approver."</b>.";
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => 'pur_app',
+                    'rel_id' => NULL,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_all_pur_app_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    if (empty($id)) {
+        return false;
+    }
+    $pur_approval_setting = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'pur_approval_setting')
+        ->row();
+    if (!$pur_approval_setting) {
+        return false;
+    }
+    $old_data = (array)$pur_approval_setting;
+    if (isset($old_data['approver'])) {
+        $approverArray = is_array($old_data['approver']) ? $old_data['approver'] : explode(',', $old_data['approver']);
+        $approverArray = array_map('trim', $approverArray);
+        $approverArray = array_filter($approverArray, fn($v) => $v !== '');
+        sort($approverArray, SORT_NUMERIC);
+        $old_data['approver'] = implode(',', $approverArray);
+    }
+    if (isset($new_data['approver']) && is_array($new_data['approver'])) {
+        $approverArray = array_map('trim', $new_data['approver']);
+        $approverArray = array_filter($approverArray, fn($v) => $v !== '');
+        sort($approverArray, SORT_NUMERIC);
+        $new_data['approver'] = implode(',', $approverArray);
+    }
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'project_id' => _l('project'),
+        'name' => _l('subject'),
+        'related' => _l('task_single_related'),
+        'approver' => _l('approver'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'project_id') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'related') {
+            $opts = [
+                'pur_request' => _l('pur_request'),
+                'pur_quotation' => _l('pur_quotation'),
+                'pur_order' => _l('pur_order'),
+                'payment_request' => _l('payment_request'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'approver') {
+            $old_value = !empty($old_value) ? get_multiple_staff_names($old_value) : '';
+            $new_value = !empty($new_value) ? get_multiple_staff_names($new_value) : '';
+        }
+        $old_value = !empty($old_value) ? $old_value : 'None';
+        $new_value = !empty($new_value) ? $new_value : 'None';
+        $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in purchase approval setting <b>".$pur_approval_setting->name."</b>.";
+        $CI->db->insert(db_prefix() . 'module_activity_log', [
+            'module_name' => 'pur_app',
+            'rel_id' => NULL,
+            'description' => $description,
+            'date' => date('Y-m-d H:i:s'),
+            'staffid' => get_staff_user_id()
+        ]);
     }
     return true;
 }
