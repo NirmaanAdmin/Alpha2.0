@@ -3317,3 +3317,350 @@ function get_last_action_full_name($userid = '')
         return '';
     }
 }
+
+function get_pur_send_to_vendors_list($vendors)
+{
+    if (!empty($vendors)) {
+        $vendors = explode(',', $vendors);
+        $CI = &get_instance();
+        $CI->db->select('company');
+        $CI->db->from(db_prefix() . 'pur_vendor');
+        $CI->db->where_in('userid', $vendors);
+        $result = $CI->db->get()->result_array();
+        if (!empty($result)) {
+            $result = array_column($result, 'company');
+            $result = implode(', ', $result);
+            return $result;
+        }
+    }
+    return '';
+}
+
+function add_pr_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+        if(!empty($pur_request)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Purchase request <b>".$pur_request->pur_rq_code."</b> has been ".$is_create_value.".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'pr',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_pr_attachment_activity_log($id, $file_name, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+        if(!empty($pur_request)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            $description = "Attachment <b>".$file_name."</b> has been ".$is_create_value." for purchase request <b>".$pur_request->pur_rq_code."</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'pr',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function update_all_pr_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('departments_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    if (empty($id)) {
+        return false;
+    }
+    $pur_request = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'pur_request')
+        ->row();
+    if (!$pur_request) {
+        return false;
+    }
+    $old_data = (array)$pur_request;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'pur_rq_name' => _l('pur_rq_name'),
+        'project' => _l('project'),
+        'sale_estimate' => _l('sale_estimate'),
+        'type' => _l('type'),
+        'department' => _l('department'),
+        'sale_invoice' => _l('sale_invoice'),
+        'requester' => _l('requester'),
+        'send_to_vendors' => _l('pur_send_to_vendors'),
+        'rq_description' => _l('rq_description'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'project') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'sale_estimate') {
+            $old_value = !empty($old_value) ? format_estimate_number($old_value) : '';
+            $new_value = !empty($new_value) ? format_estimate_number($new_value) : '';
+        }
+        if ($field === 'type') {
+            $opts = [
+                'capex' => _l('capex'),
+                'opex' => _l('opex'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'department') {
+            $departments_list = $CI->departments_model->get();
+            $opts = array_column($departments_list, 'name', 'departmentid');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'sale_invoice') {
+            $old_value = !empty($old_value) ? format_invoice_number($old_value) : '';
+            $new_value = !empty($new_value) ? format_invoice_number($new_value) : '';
+        }
+        if ($field === 'requester') {
+            $staff_list = $CI->staff_model->get('', ['active' => 1]);
+            $opts = array_combine(
+                array_column($staff_list, 'staffid'),
+                array_map(fn($a) => $a['firstname'] . ' ' . $a['lastname'], $staff_list)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'send_to_vendors') {
+            $old_value = !empty($old_value) ? get_pur_send_to_vendors_list($old_value) : '';
+            $new_value = !empty($new_value) ? get_pur_send_to_vendors_list($new_value) : '';
+        }
+        update_pr_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_pr_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+        if(!empty($pur_request)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "".$field." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in purchase request <b>".$pur_request->pur_rq_code."</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'pr',
+                'rel_id' => $pur_request->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_order_item_activity_log($id, $rel_type, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $module_name = '';
+        $rel_id = '';
+        $description = '';
+        $is_create_value = $is_create ? 'added' : 'removed';
+        if($rel_type == 'pur_request') {
+            $CI->db->where('prd_id', $id);
+            $pur_request_detail = $CI->db->get(db_prefix() . 'pur_request_detail')->row();
+            if(!empty($pur_request_detail)) {
+                $CI->db->where('id', $pur_request_detail->pur_request);
+                $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+                if(!empty($pur_request_detail->item_text)) {
+                    $description = "Item <b>".$pur_request_detail->item_text."</b> has been ".$is_create_value." for purchase request <b>".$pur_request->pur_rq_code."</b>.";
+                    $module_name = 'pr';
+                    $rel_id = $pur_request->id;
+                }
+            }
+        }
+        if(!empty($description)) {
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => $module_name,
+                'rel_id' => $rel_id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function update_order_item_activity_log($new_data, $rel_type)
+{
+    $CI = &get_instance();
+    $CI->load->model('currencies_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    $old_data = array();
+    if($rel_type == 'pur_request') {
+        $pur_request_detail = $CI->db->where('prd_id', $new_data['id'])
+            ->get(db_prefix() . 'pur_request_detail')
+            ->row();
+        if (!$pur_request_detail) {
+            return false;
+        }
+        $old_data = (array) $pur_request_detail;
+    }
+    if (isset($old_data['tax_name'])) {
+        $names = is_array($old_data['tax_name']) ? $old_data['tax_name'] : explode('|', $old_data['tax_name']);
+        $old_data['tax_select'] = implode(',', $names);
+    }
+    if (isset($new_data['unit_name'])) {
+        unset($new_data['unit_name']);
+    }
+    if (isset($new_data['tax_select']) && is_array($new_data['tax_select'])) {
+        $new_data['tax_select'] = implode(',', array_map(fn($v) => strtok($v, '|'), $new_data['tax_select']));
+    }
+    if (isset($new_data['item_description'])) {
+        $new_data['description'] = $new_data['item_description'];
+        unset($new_data['item_description']);
+    }
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'item_text' => _l('Item'),
+        'description' => _l('description'),
+        'quantity' => _l('purchase_quantity'),
+        'unit_id' => _l('pur_unit'),
+        'unit_price' => _l('unit_price'),
+        'into_money' => _l('subtotal'),
+        'tax_select' => _l('debit_note_table_tax_heading'),
+        'tax_value' => _l('tax_value'),
+        'total' => _l('debit_note_total'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'unit_id') {
+            $old_value = !empty($old_value) ? pur_get_unit_name($old_value) : '';
+            $new_value = !empty($new_value) ? pur_get_unit_name($new_value) : '';
+        }
+        if ($field === 'unit_price' || $field === 'total' || $field === 'tax_value' || $field === 'into_money') {
+            $old_value = app_format_money($old_value, $base_currency->symbol);
+            $new_value = app_format_money($new_value, $base_currency->symbol);
+        }
+        $module_name = '';
+        $rel_id = '';
+        $description = '';
+        if($rel_type == 'pur_request') {
+            $CI->db->where('id', $old_data['pur_request']);
+            $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+            $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$pur_request_detail->item_text."</b> in purchase request <b>".$pur_request->pur_rq_code."</b>.";
+            $module_name = 'pr';
+            $rel_id = $pur_request->id;
+        }
+        if(!empty($description)) {
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => $module_name,
+                'rel_id' => $rel_id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_order_status_activity_log($id)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_approval_details = $CI->db->get(db_prefix() . 'pur_approval_details')->row();
+        if(!empty($pur_approval_details)) {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
+            if($pur_approval_details->rel_type == 'pur_request') {
+                $CI->db->where('id', $pur_approval_details->rel_id);
+                $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
+                if(empty($pur_approval_details->approve)) {
+                    $description = "An approval request has been created for purchase request <b>".$pur_request->pur_rq_code."</b> by <b>".get_last_action_full_name($pur_approval_details->sender)."</b>.";
+                } else if($pur_approval_details->approve == 2) {
+                    $description = "Purchase request <b>".$pur_request->pur_rq_code."</b> has been approved by <b>".get_last_action_full_name($pur_approval_details->staff_approve)."</b>.";
+                } else if($pur_approval_details->approve == 3) {
+                    $description = "Purchase request <b>".$pur_request->pur_rq_code."</b> has been rejected by <b>".get_last_action_full_name($pur_approval_details->staff_approve)."</b>.";
+                }
+                $module_name = 'pr';
+                $rel_id = $pur_request->id;
+            }
+            if(!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}

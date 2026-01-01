@@ -1276,7 +1276,7 @@ class Purchase_model extends App_Model
                     $this->db->insert(db_prefix() . 'pur_request_detail', $dt_data);
                 }
             }
-
+            add_pr_activity_log($insert_id, true);
             return $insert_id;
         }
         return false;
@@ -1350,7 +1350,7 @@ class Purchase_model extends App_Model
         }
 
 
-
+        update_all_pr_fields_activity_log($id, $data);
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_request', $data);
         $this->save_purchase_files('pur_request', $id);
@@ -1405,7 +1405,9 @@ class Purchase_model extends App_Model
                     }
                 }
 
-                $_new_detail_id = $this->db->insert(db_prefix() . 'pur_request_detail', $dt_data);
+                $this->db->insert(db_prefix() . 'pur_request_detail', $dt_data);
+                $_new_detail_id = $this->db->insert_id();
+                add_order_item_activity_log($_new_detail_id, 'pur_request', true);
                 if ($_new_detail_id) {
                     $affectedRows++;
                 }
@@ -1414,6 +1416,7 @@ class Purchase_model extends App_Model
 
         if (count($update_purchase_request) > 0) {
             foreach ($update_purchase_request as $_key => $rqd) {
+                update_order_item_activity_log($rqd, 'pur_request');
                 $dt_data = [];
                 $dt_data['pur_request'] = $id;
                 $dt_data['item_code'] = $rqd['item_code'];
@@ -1469,6 +1472,7 @@ class Purchase_model extends App_Model
 
         if (count($remove_purchase_request) > 0) {
             foreach ($remove_purchase_request as $remove_id) {
+                add_order_item_activity_log($remove_id, 'pur_request', false);
                 $this->db->where('prd_id', $remove_id);
                 if ($this->db->delete(db_prefix() . 'pur_request_detail')) {
                     $affectedRows++;
@@ -1492,6 +1496,7 @@ class Purchase_model extends App_Model
      */
     public function delete_pur_request($id)
     {
+        add_pr_activity_log($id, false);
         $affectedRows = 0;
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'pur_request');
@@ -1570,8 +1575,11 @@ class Purchase_model extends App_Model
                 $row['date_send'] = date('Y-m-d H:i:s');
                 $row['rel_id'] = $id;
                 $row['rel_type'] = 'pur_request';
+                $row['staff_approve'] = get_staff_user_id();
                 $row['approve_by_admin'] = 1;
                 $this->db->insert('tblpur_approval_details', $row);
+                $pur_approval_details_id = $this->db->insert_id();
+                add_order_status_activity_log($pur_approval_details_id);
             }
             return true;
         }
@@ -1590,8 +1598,11 @@ class Purchase_model extends App_Model
                 $row['date_send'] = date('Y-m-d H:i:s');
                 $row['rel_id'] = $id;
                 $row['rel_type'] = 'pur_request';
+                $row['staff_approve'] = get_staff_user_id();
                 $row['rejected_by_admin'] = 1;
                 $this->db->insert('tblpur_approval_details', $row);
+                $pur_approval_details_id = $this->db->insert_id();
+                add_order_status_activity_log($pur_approval_details_id);
             }
             return true;
         }
@@ -3212,6 +3223,8 @@ class Purchase_model extends App_Model
                 $row['rel_type'] = $data['rel_type'];
                 $row['sender'] = $sender;
                 $this->db->insert('tblpur_approval_details', $row);
+                $pur_approval_details_id = $this->db->insert_id();
+                add_order_status_activity_log($pur_approval_details_id);
             }
         }
 
@@ -3678,6 +3691,7 @@ class Purchase_model extends App_Model
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_approval_details', $data);
         if ($this->db->affected_rows() > 0) {
+            add_order_status_activity_log($id);
             return true;
         }
         return false;
@@ -14253,6 +14267,9 @@ class Purchase_model extends App_Model
                 $data['file_name'] = $file['file_name'];
                 $data['filetype']  = $file['filetype'];
                 $this->db->insert(db_prefix() . 'purchase_files', $data);
+                if($related == 'pur_request') {
+                    add_pr_attachment_activity_log($id, $file['file_name'], true);
+                }
             }
         }
         return true;
@@ -14287,6 +14304,9 @@ class Purchase_model extends App_Model
             $other_attachments = list_files(get_upload_path_by_type('purchase') . $attachment->rel_type . '/' . $attachment->rel_id);
             if (count($other_attachments) == 0) {
                 delete_dir(get_upload_path_by_type('purchase') . $attachment->rel_type . '/' . $attachment->rel_id);
+            }
+            if($attachment->rel_type == 'pur_request') {
+                add_pr_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
         }
 
