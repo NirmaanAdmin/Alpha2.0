@@ -1323,6 +1323,8 @@ class Warehouse_model extends App_Model
 			hooks()->do_action('after_wh_goods_receipt_added', $insert_id);
 		}
 
+		add_stock_received_activity_log($insert_id, true);
+
 		return $insert_id > 0 ? $insert_id : false;
 	}
 
@@ -2452,6 +2454,7 @@ class Warehouse_model extends App_Model
 		$this->db->where('id', $id);
 		$this->db->update(db_prefix() . 'wh_approval_details', $data);
 		if ($this->db->affected_rows() > 0) {
+			add_inventory_approval_status_activity_log($id);
 			return true;
 		}
 		return false;
@@ -7118,6 +7121,7 @@ class Warehouse_model extends App_Model
 
 		$affected_rows = 0;
 
+		add_stock_received_activity_log($id, false);
 		$this->db->where('goods_receipt_id', $id);
 		$this->db->delete(db_prefix() . 'goods_receipt_detail');
 		if ($this->db->affected_rows() > 0) {

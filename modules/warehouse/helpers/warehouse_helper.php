@@ -2098,3 +2098,61 @@ function get_item_option($name)
 function item_html_entity_decode($str){
     return html_entity_decode($str ?? '');
 }
+
+function add_stock_received_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $goods_receipt = $CI->db->get(db_prefix() . 'goods_receipt')->row();
+        if(!empty($goods_receipt)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Stock import <b>".$goods_receipt->goods_receipt_code."</b> has been ".$is_create_value.".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'stckrec',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_inventory_approval_status_activity_log($id)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $wh_approval_details = $CI->db->get(db_prefix() . 'wh_approval_details')->row();
+        if(!empty($wh_approval_details)) {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
+            if($wh_approval_details->rel_type == 1) {
+                $CI->db->where('id', $wh_approval_details->rel_id);
+                $goods_receipt = $CI->db->get(db_prefix() . 'goods_receipt')->row();
+                if(empty($wh_approval_details->approve)) {
+                    $description = "An approval request has been created for stock import <b>".$goods_receipt->goods_receipt_code."</b> by <b>".get_last_action_full_name($wh_approval_details->sender)."</b>.";
+                } else if($wh_approval_details->approve == 1) {
+                    $description = "Stock import <b>".$goods_receipt->goods_receipt_code."</b> has been approved by <b>".get_last_action_full_name($wh_approval_details->staff_approve)."</b>.";
+                } else if($wh_approval_details->approve == -1) {
+                    $description = "Stock import <b>".$goods_receipt->goods_receipt_code."</b> has been rejected by <b>".get_last_action_full_name($wh_approval_details->staff_approve)."</b>.";
+                }
+                $module_name = 'stckrec';
+                $rel_id = $goods_receipt->id;
+            }
+            if(!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
