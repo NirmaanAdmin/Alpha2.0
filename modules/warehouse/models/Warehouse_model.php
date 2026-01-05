@@ -1323,7 +1323,7 @@ class Warehouse_model extends App_Model
 			hooks()->do_action('after_wh_goods_receipt_added', $insert_id);
 		}
 
-		add_stock_received_activity_log($insert_id, true);
+		add_goods_receipt_activity_log($insert_id, true);
 
 		return $insert_id > 0 ? $insert_id : false;
 	}
@@ -7121,7 +7121,7 @@ class Warehouse_model extends App_Model
 
 		$affected_rows = 0;
 
-		add_stock_received_activity_log($id, false);
+		add_goods_receipt_activity_log($id, false);
 		$this->db->where('goods_receipt_id', $id);
 		$this->db->delete(db_prefix() . 'goods_receipt_detail');
 		if ($this->db->affected_rows() > 0) {
@@ -7650,6 +7650,7 @@ class Warehouse_model extends App_Model
 
 		$results = 0;
 
+		update_all_goods_receipt_fields_activity_log($goods_receipt_id, $data);
 		$this->db->where('id', $goods_receipt_id);
 		$this->db->update(db_prefix() . 'goods_receipt', $data);
 		if ($this->db->affected_rows() > 0) {
@@ -7704,6 +7705,7 @@ class Warehouse_model extends App_Model
 			unset($inventory_receipt['order']);
 			unset($inventory_receipt['tax_select']);
 
+			update_goods_receipt_item_activity_log($inventory_receipt);
 			$this->db->where('id', $inventory_receipt['id']);
 			if ($this->db->update(db_prefix() . 'goods_receipt_detail', $inventory_receipt)) {
 				$results++;
@@ -7712,6 +7714,7 @@ class Warehouse_model extends App_Model
 
 		// delete receipt note
 		foreach ($remove_inventory_receipts as $receipt_detail_id) {
+			add_goods_receipt_item_activity_log($receipt_detail_id, false);
 			$this->db->where('id', $receipt_detail_id);
 			if ($this->db->delete(db_prefix() . 'goods_receipt_detail')) {
 				$results++;
@@ -7768,7 +7771,9 @@ class Warehouse_model extends App_Model
 			unset($inventory_receipt['tax_select']);
 
 			$this->db->insert(db_prefix() . 'goods_receipt_detail', $inventory_receipt);
-			if ($this->db->insert_id()) {
+			$goods_receipt_detail_id = $this->db->insert_id();
+			add_goods_receipt_item_activity_log($goods_receipt_detail_id, true);
+			if ($goods_receipt_detail_id) {
 				$results++;
 			}
 		}

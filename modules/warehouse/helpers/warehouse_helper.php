@@ -2099,7 +2099,7 @@ function item_html_entity_decode($str){
     return html_entity_decode($str ?? '');
 }
 
-function add_stock_received_activity_log($id, $is_create = true)
+function add_goods_receipt_activity_log($id, $is_create = true)
 {
     $CI = &get_instance();
     if(!empty($id)) {
@@ -2153,6 +2153,221 @@ function add_inventory_approval_status_activity_log($id)
                 ]);
             }
         }
+    }
+    return true;
+}
+
+function update_all_goods_receipt_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('departments_model');
+    if (empty($id)) {
+        return false;
+    }
+    $goods_receipt = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'goods_receipt')
+        ->row();
+    if (!$goods_receipt) {
+        return false;
+    }
+    $old_data = (array)$goods_receipt;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'date_c' => _l('accounting_date'),
+        'date_add' => _l('day_vouchers'),
+        'pr_order_id' => _l('reference_purchase_order'),
+        'supplier_code' => _l('supplier_name'),
+        'buyer_id' => _l('Buyer'),
+        'project' => _l('project'),
+        'type' => _l('type_label'),
+        'department' => _l('department'),
+        'requester' => _l('requester'),
+        'deliver_name' => _l('deliver_name'),
+        'warehouse_id' => _l('warehouse_name'),
+        'expiry_date' => _l('expiry_date'),
+        'invoice_no' => _l('invoice_no'),
+        'description' => _l('note'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'pr_order_id') {
+            $old_value = !empty($old_value) ? get_pur_order_name($old_value) : '';
+            $new_value = !empty($new_value) ? get_pur_order_name($new_value) : '';
+        }
+        if ($field === 'supplier_code') {
+            $old_value = !empty($old_value) ? get_vendor_company_name($old_value) : '';
+            $new_value = !empty($new_value) ? get_vendor_company_name($new_value) : '';
+        }
+        if ($field === 'buyer_id' || $field === 'requester') {
+            $staff_list = $CI->staff_model->get('', ['active' => 1]);
+            $opts = array_combine(
+                array_column($staff_list, 'staffid'),
+                array_map(fn($a) => $a['firstname'] . ' ' . $a['lastname'], $staff_list)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'project') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'type') {
+            $opts = [
+                'capex' => _l('capex'),
+                'opex' => _l('opex'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'department') {
+            $departments_list = $CI->departments_model->get();
+            $opts = array_column($departments_list, 'name', 'departmentid');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'warehouse_id') {
+            $oldWarehouse = !empty($old_value) ? get_warehouse_name($old_value) : null;
+            $newWarehouse = !empty($new_value) ? get_warehouse_name($new_value) : null;
+            $old_value = $oldWarehouse ? $oldWarehouse->warehouse_name : '';
+            $new_value = $newWarehouse ? $newWarehouse->warehouse_name : '';
+        }
+        update_goods_receipt_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_goods_receipt_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $goods_receipt = $CI->db->get(db_prefix() . 'goods_receipt')->row();
+        if(!empty($goods_receipt)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "".$field." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in stock import <b>".$goods_receipt->goods_receipt_code."</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'stckrec',
+                'rel_id' => $goods_receipt->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_goods_receipt_item_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $is_create_value = $is_create ? 'added' : 'removed';
+        $CI->db->where('id', $id);
+        $goods_receipt_detail = $CI->db->get(db_prefix() . 'goods_receipt_detail')->row();
+        if(!empty($goods_receipt_detail)) {
+            $CI->db->where('id', $goods_receipt_detail->goods_receipt_id);
+            $goods_receipt = $CI->db->get(db_prefix() . 'goods_receipt')->row();
+            if(!empty($goods_receipt_detail->commodity_name)) {
+                $description = "Item <b>".$goods_receipt_detail->commodity_name."</b> has been ".$is_create_value." for stock import <b>".$goods_receipt->goods_receipt_code."</b>.";
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => 'stckrec',
+                    'rel_id' => $goods_receipt->id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_goods_receipt_item_activity_log($new_data)
+{
+    $CI = &get_instance();
+    $old_data = array();
+    $goods_receipt_detail = $CI->db->where('id', $new_data['id'])
+        ->get(db_prefix() . 'goods_receipt_detail')
+        ->row();
+    if (!$goods_receipt_detail) {
+        return false;
+    }
+    $old_data = (array) $goods_receipt_detail;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'commodity_name' => _l('Item'),
+        'description' => _l('description'),
+        'warehouse_id' => _l('warehouse_name'),
+        'quantities' => _l('quantity'),
+        'lot_number' => _l('lot_number'),
+        'date_manufacture' => _l('date_manufacture'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'warehouse_id') {
+            $oldWarehouse = !empty($old_value) ? get_warehouse_name($old_value) : null;
+            $newWarehouse = !empty($new_value) ? get_warehouse_name($new_value) : null;
+            $old_value = $oldWarehouse ? $oldWarehouse->warehouse_name : '';
+            $new_value = $newWarehouse ? $newWarehouse->warehouse_name : '';
+        }
+        $CI->db->where('id', $old_data['goods_receipt_id']);
+        $goods_receipt = $CI->db->get(db_prefix() . 'goods_receipt')->row();
+        $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$goods_receipt_detail->commodity_name."</b> in stock import <b>".$goods_receipt->goods_receipt_code."</b>.";
+        $CI->db->insert(db_prefix() . 'module_activity_log', [
+            'module_name' => 'stckrec',
+            'rel_id' => $goods_receipt->id,
+            'description' => $description,
+            'date' => date('Y-m-d H:i:s'),
+            'staffid' => get_staff_user_id()
+        ]);
     }
     return true;
 }
