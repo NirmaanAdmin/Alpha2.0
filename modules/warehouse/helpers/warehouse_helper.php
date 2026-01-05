@@ -2371,3 +2371,134 @@ function update_goods_receipt_item_activity_log($new_data)
     }
     return true;
 }
+
+function add_inv_app_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $wh_approval_setting = $CI->db->get(db_prefix() . 'wh_approval_setting')->row();
+        if(!empty($wh_approval_setting)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $project_name = get_project_name_by_id($wh_approval_setting->project_id);
+            $subject = $wh_approval_setting->name;
+            if($wh_approval_setting->related == 1) {
+                $related = _l('stock_import');
+            } else if($wh_approval_setting->related == 2) {
+                $related = _l('stock_export');
+            } else if($wh_approval_setting->related == 3) {
+                $related = _l('loss_adjustment');
+            } else if($wh_approval_setting->related == 4) {
+                $related = _l('internal_delivery_note');
+            } else if($wh_approval_setting->related == 5) {
+                $related = _l('wh_packing_list');
+            } else if($wh_approval_setting->related == 6) {
+                $related = _l('inventory_receipt_inventory_delivery_returns_goods');
+            } else {
+                $related = '';
+            }
+            $approver = get_multiple_staff_names($wh_approval_setting->approver);
+            if(!empty($related)) {
+                $description = "The inventory approval setting <b>".$subject."</b> has been successfully ".$is_create_value." under project <b>".$project_name."</b>, related to <b>".$related."</b>, and assigned to approver <b>".$approver."</b>.";
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => 'inv_app',
+                    'rel_id' => NULL,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_all_inv_app_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    if (empty($id)) {
+        return false;
+    }
+    $wh_approval_setting = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'wh_approval_setting')
+        ->row();
+    if (!$wh_approval_setting) {
+        return false;
+    }
+    $old_data = (array)$wh_approval_setting;
+    if (isset($old_data['approver'])) {
+        $approverArray = is_array($old_data['approver']) ? $old_data['approver'] : explode(',', $old_data['approver']);
+        $approverArray = array_map('trim', $approverArray);
+        $approverArray = array_filter($approverArray, fn($v) => $v !== '');
+        sort($approverArray, SORT_NUMERIC);
+        $old_data['approver'] = implode(',', $approverArray);
+    }
+    if (isset($new_data['approver']) && is_array($new_data['approver'])) {
+        $approverArray = array_map('trim', $new_data['approver']);
+        $approverArray = array_filter($approverArray, fn($v) => $v !== '');
+        sort($approverArray, SORT_NUMERIC);
+        $new_data['approver'] = implode(',', $approverArray);
+    }
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'project_id' => _l('project'),
+        'name' => _l('subject'),
+        'related' => _l('task_single_related'),
+        'approver' => _l('approver'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'project_id') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'related') {
+            $opts = [
+                '1' => _l('stock_import'),
+                '2' => _l('stock_export'),
+                '3' => _l('loss_adjustment'),
+                '4' => _l('internal_delivery_note'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'approver') {
+            $old_value = !empty($old_value) ? get_multiple_staff_names($old_value) : '';
+            $new_value = !empty($new_value) ? get_multiple_staff_names($new_value) : '';
+        }
+        $old_value = !empty($old_value) ? $old_value : 'None';
+        $new_value = !empty($new_value) ? $new_value : 'None';
+        $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in inventory approval setting <b>".$wh_approval_setting->name."</b>.";
+        $CI->db->insert(db_prefix() . 'module_activity_log', [
+            'module_name' => 'inv_app',
+            'rel_id' => NULL,
+            'description' => $description,
+            'date' => date('Y-m-d H:i:s'),
+            'staffid' => get_staff_user_id()
+        ]);
+    }
+    return true;
+}

@@ -2104,6 +2104,7 @@ class Warehouse_model extends App_Model
 		$this->db->insert(db_prefix() . 'wh_approval_setting', $data);
 		$insert_id = $this->db->insert_id();
 		if ($insert_id) {
+			add_inv_app_activity_log($insert_id, true);
 			return true;
 		}
 		return false;
@@ -2138,6 +2139,7 @@ class Warehouse_model extends App_Model
 			$data['approver'] = NULL;
 		}
 
+		update_all_inv_app_fields_activity_log($id, $data);
 		$this->db->where('id', $id);
 		$this->db->update(db_prefix() . 'wh_approval_setting', $data);
 
@@ -2155,6 +2157,7 @@ class Warehouse_model extends App_Model
 	public function delete_approval_setting($id)
 	{
 		if (is_numeric($id)) {
+			add_inv_app_activity_log($id, false);
 			$this->db->where('id', $id);
 			$this->db->delete(db_prefix() . 'wh_approval_setting');
 
