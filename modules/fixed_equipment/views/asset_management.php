@@ -45,20 +45,23 @@
 
 
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-2">
             <?php echo render_select('model_filter', $models, array('id', 'model_name'), 'fe_model'); ?>
           </div>
 
-          <div class="col-md-3">
+          <div class="col-md-2">
             <?php echo render_select('status_filter', $status_labels, array('id', 'name'), 'fe_status'); ?>
           </div>
 
-          <div class="col-md-3">
+          <div class="col-md-2">
             <?php echo render_select('supplier_filter', $suppliers, array('id', 'supplier_name'), 'fe_supplier'); ?>
           </div>
 
           <div class="col-md-3">
             <?php echo render_select('location_filter', $locations, array('id', 'location_name'), 'fe_default_location'); ?>
+          </div>
+          <div class="col-md-3">
+            <?php echo render_select('location_filter_2', $locations, array('id', 'location_name'), 'Location'); ?>
           </div>
         </div>
 

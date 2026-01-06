@@ -1725,6 +1725,301 @@ class fixed_equipment extends AdminController
 	 * status_labels table
 	 * @return json 
 	 */
+	// public function all_asset_table()
+	// { 
+	// 	if ($this->input->is_ajax_request()) {
+	// 		if ($this->input->post()) {
+
+	// 			$model = $this->input->post("model");
+	// 			$status = $this->input->post("status");
+	// 			$supplier = $this->input->post("supplier");
+	// 			$location = $this->input->post("location");
+	// 			$location2 = $this->input->post("location_new");
+
+	// 			$this->load->model('currencies_model');
+	// 			$base_currency = $this->currencies_model->get_base_currency();
+	// 			$currency_name = '';
+	// 			if (isset($base_currency)) {
+	// 				$currency_name = $base_currency->name;
+	// 			}
+	// 			$select = [
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				'assets_name',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				'series',
+	// 				'model_name',
+	// 				db_prefix() . 'fe_assets.model_no',
+	// 				db_prefix() . 'fe_categories.category_name',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_asset_manufacturers.name',
+
+	// 				db_prefix() . 'fe_suppliers.supplier_name',
+
+	// 				'date_buy',
+	// 				'unit_price',
+	// 				'order_number',
+	// 				'warranty_period',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				'description',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+
+	// 				db_prefix() . 'fe_assets.date_creator',
+	// 				'updated_at',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id',
+	// 				db_prefix() . 'fe_assets.id'
+	// 			];
+
+	// 			$where        = [];
+	// 			$aColumns     = $select;
+	// 			$sIndexColumn = 'id';
+	// 			$sTable       = db_prefix() . 'fe_assets';
+	// 			$join         = [
+	// 				'LEFT JOIN ' . db_prefix() . 'fe_models ON ' . db_prefix() . 'fe_models.id = ' . db_prefix() . 'fe_assets.model_id',
+	// 				'LEFT JOIN ' . db_prefix() . 'fe_categories ON ' . db_prefix() . 'fe_categories.id = ' . db_prefix() . 'fe_models.category',
+	// 				'LEFT JOIN ' . db_prefix() . 'fe_asset_manufacturers ON ' . db_prefix() . 'fe_asset_manufacturers.id = ' . db_prefix() . 'fe_models.manufacturer',
+	// 				'LEFT JOIN ' . db_prefix() . 'fe_suppliers ON ' . db_prefix() . 'fe_suppliers.id = ' . db_prefix() . 'fe_assets.supplier_id',
+	// 				'LEFT JOIN ' . db_prefix() . 'fe_locations ON ' . db_prefix() . 'fe_locations.id = ' . db_prefix() . 'fe_assets.asset_location'
+	// 			];
+	// 			array_push($where, 'AND ' . db_prefix() . 'fe_assets.type = "asset"');
+	// 			array_push($where, 'AND active = 1');
+
+	// 			if ($model != '') {
+	// 				array_push($where, 'AND ' . db_prefix() . 'fe_assets.model_id = ' . $model);
+	// 			}
+	// 			if ($status != '') {
+	// 				array_push($where, 'AND status = ' . $status);
+	// 			}
+	// 			if ($supplier != '') {
+	// 				array_push($where, 'AND supplier_id = ' . $supplier);
+	// 			}
+	// 			if ($location != '') {
+	// 				array_push($where, 'AND asset_location = ' . $location);
+	// 			}
+
+	// 			if (!is_admin() && has_permission('fixed_equipment_assets', '', 'view_own')) {
+	// 				array_push($where, 'AND requestable = 1');
+	// 			}
+	// 			$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
+	// 				db_prefix() . 'fe_assets.id',
+	// 				'assets_code',
+	// 				'assets_name',
+	// 				'series',
+	// 				'for_sell',
+	// 				'for_rent',
+	// 				'asset_group',
+	// 				'asset_location',
+	// 				'model_id',
+	// 				'date_buy',
+	// 				'warranty_period',
+	// 				'unit_price',
+	// 				db_prefix() . 'fe_assets.depreciation',
+	// 				db_prefix() . 'fe_categories.category_name',
+	// 				'supplier_id',
+	// 				'order_number',
+	// 				'description',
+	// 				'requestable',
+	// 				'qr_code',
+	// 				db_prefix() . 'fe_assets.date_creator',
+	// 				'updated_at',
+	// 				'checkin_out',
+	// 				'checkin_out_id',
+	// 				db_prefix() . 'fe_models.model_name',
+	// 				db_prefix() . 'fe_models.model_no',
+	// 				'status'
+	// 			]);
+
+
+	// 			$output  = $result['output'];
+	// 			$rResult = $result['rResult'];
+	// 			foreach ($rResult as $aRow) {
+	// 				$row = [];
+	// 				$row[] = '<input type="checkbox" class="individual" data-id="' . $aRow['id'] . '" onchange="checked_add(this); return false;"/>';
+	// 				$status = '';
+	// 				$status_name = '';
+	// 				if (is_numeric($aRow['status']) && $aRow['status'] > 0) {
+	// 					$data_status = $this->fixed_equipment_model->get_status_labels($aRow['status']);
+	// 					if ($data_status) {
+	// 						$status = $data_status->status_type;
+	// 						if ($aRow['checkin_out'] == 2 && $status == 'deployable') {
+	// 							$status = 'deployed';
+	// 						}
+	// 						$status_name = '<div class="row text-nowrap mleft5 mright5"><span style="color:' . $data_status->chart_color . '">' . $data_status->name . '</span><span class="mleft10 label label-primary">' . _l('fe_' . $status) . '</span></div>';
+	// 					}
+	// 				}
+	// 				$button = '';
+	// 				if (is_admin() || has_permission('fixed_equipment_assets', '', 'create')) {
+	// 					if ($aRow['for_sell'] == 0 && $aRow['for_rent'] == 0) {
+	// 						if ($aRow['checkin_out'] == 2) {
+	// 							$button = '<a class="btn btn-primary" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_in(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkin') . '</a>';
+	// 						} else {
+	// 							if ($status == 'deployable') {
+	// 								$button = '<a class="btn btn-danger" data-asset_name="' . $aRow['assets_name'] . '" data-serial="' . $aRow['series'] . '" data-model="' . $aRow['model_name'] . '" onclick="check_out(this, ' . $aRow[db_prefix() . 'fe_assets.id'] . ')" >' . _l('fe_checkout') . '</a>';
+	// 							}
+	// 						}
+	// 					} else {
+	// 						$button = fe_get_html_option_button($aRow['for_sell'], $aRow['for_rent']);
+	// 					}
+	// 				}
+	// 				$row[] = $button;
+	// 				$row[] = $aRow['id'];
+
+	// 				$_data = '';
+	// 				$_data .= '<div class="row-options text-nowrap">';
+	// 				$_data .= '<a href="' . admin_url('fixed_equipment/detail_asset/' . $aRow[db_prefix() . 'fe_assets.id'] . '?tab=details') . '">' . _l('fe_view') . '</a>';
+	// 				$_data .= ' | <a target="_blank" href="' . admin_url('fixed_equipment/print_qrcode_pdf/' . $aRow[db_prefix() . 'fe_assets.id'] . '?output_type=I') . '" class="text-warning">' . _l('fe_print_qrcode') . '</a>';
+	// 				if (is_admin() || has_permission('fixed_equipment_assets', '', 'edit')) {
+	// 					$_data .= ' | <a href="javascript:void(0)" onclick="edit(' . $aRow[db_prefix() . 'fe_assets.id'] . '); return false;" class="text-danger">' . _l('fe_edit') . '</a>';
+	// 				}
+	// 				if (is_admin() || has_permission('fixed_equipment_assets', '', 'delete')) {
+	// 					$_data .= ' | <a href="' . admin_url('fixed_equipment/delete_assets/' . $aRow[db_prefix() . 'fe_assets.id'] . '') . '" class="text-danger _delete">' . _l('fe_delete') . '</a>';
+	// 				}
+	// 				$_data .= '</div>';
+
+	// 				$row[] = '<span class="text-nowrap">' . $aRow['assets_name'] . '</span>' . $_data;
+
+	// 				$row[] = '<img class="img img-responsive staff-profile-image-small pull-left" src="' . $this->fixed_equipment_model->get_image_items($aRow['model_id'], 'models') . '">';
+
+	// 				$row[] = $aRow['series'];
+
+	// 				$category_id = 0;
+	// 				$manufacturer_id = 0;
+	// 				if (is_numeric($aRow['model_id']) > 0) {
+	// 					$data_model = $this->fixed_equipment_model->get_models($aRow['model_id']);
+	// 					if ($data_model) {
+	// 						$category_id = $data_model->category;
+	// 						$manufacturer_id = $data_model->manufacturer;
+	// 					}
+	// 				}
+	// 				$row[] = '<span class="text-nowrap">' . $aRow['model_name'] . '</span>';
+	// 				$row[] = $aRow['model_no'];
+
+	// 				$category_name = '';
+	// 				if (is_numeric($category_id) && $category_id > 0) {
+	// 					$data_cat = $this->fixed_equipment_model->get_categories($category_id);
+	// 					if ($data_cat) {
+	// 						$category_name = '<span class="text-nowrap">' . $data_cat->category_name . '</span>';
+	// 					}
+	// 				}
+	// 				$row[] = $category_name;
+
+
+	// 				$row[] = $status_name;
+
+
+
+	// 				$data_location_info = $this->fixed_equipment_model->get_asset_location_info($aRow[db_prefix() . 'fe_assets.id']);
+	// 				$checkout_to = '';
+	// 				$current_location = '';
+
+	// 				if ($data_location_info->checkout_to != '') {
+	// 					$icon_checkout_to = '';
+	// 					if ($data_location_info->checkout_type == 'location') {
+	// 						$icon_checkout_to = '<i class="fa fa-map-marker"></i>';
+	// 						$checkout_to = '<a href="' . admin_url('fixed_equipment/detail_locations/' . $data_location_info->to_id) . '?re=assets" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_location') . ': ' . $data_location_info->checkout_to . '</a>';
+	// 						$current_location = '';
+	// 					} elseif ($data_location_info->checkout_type == 'user') {
+	// 						$head = '';
+	// 						$tail = '';
+	// 						if (fe_get_status_modules('hr_profile')) {
+	// 							$head = '<a href="' . admin_url('hr_profile/member/' . $data_location_info->to_id . '/profile') . '" target="_blank">';
+	// 							$tail = '</a>';
+	// 						}
+	// 						$icon_checkout_to = '<i class="fa fa-user"></i>';
+	// 						$checkout_to = $head . '<span class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_staff') . ': ' . $data_location_info->checkout_to . '</span>' . $tail;
+	// 						$current_location = '';
+	// 					} elseif ($data_location_info->checkout_type == 'customer') {
+	// 						$icon_checkout_to = '<i class="fa fa-user"></i>';
+	// 						$checkout_to = '<a href="' . admin_url('clients/client/' . $data_location_info->to_id) . '" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_customer') . ': ' . $data_location_info->checkout_to . '</a>';
+	// 						$current_location = '';
+	// 					} elseif ($data_location_info->checkout_type == 'asset') {
+	// 						$icon_checkout_to = '<i class="fa fa-barcode"></i>';
+	// 						$checkout_to = '<a href="' . admin_url('fixed_equipment/detail_asset/' . $data_location_info->to_id . '?tab=details') . '" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_asset') . ': ' . $data_location_info->checkout_to . '</a>';
+	// 						$current_location = '';
+	// 					} elseif ($data_location_info->checkout_type == 'project') {
+	// 						$icon_checkout_to = '<i class="fa-solid fa-chart-gantt"></i>';
+	// 						$checkout_to = '<a href="' . admin_url('projects/view/' . $data_location_info->to_id) . '" class="text-nowrap">' . $icon_checkout_to . ' ' . _l('fe_project') . ': ' . $data_location_info->checkout_to . '</a>';
+	// 						$current_location = '';
+	// 					}
+	// 				}
+	// 				$row[] = $checkout_to;
+	// 				$row[] = '<span class="text-nowrap">' . $data_location_info->curent_location . '</span>';
+	// 				$row[] = '<span class="text-nowrap">' . $data_location_info->default_location . '</span>';
+	// 				$manufacturer_name = '';
+	// 				if (is_numeric($manufacturer_id) && $manufacturer_id > 0) {
+	// 					$data_manufacturer = $this->fixed_equipment_model->get_asset_manufacturers($manufacturer_id);
+	// 					if ($data_manufacturer) {
+	// 						$manufacturer_name = $data_manufacturer->name;
+	// 					}
+	// 				}
+	// 				$row[] = $manufacturer_name;
+
+	// 				$supplier_name = '';
+	// 				if (is_numeric($aRow['supplier_id'])) {
+	// 					$data_supplier = $this->fixed_equipment_model->get_suppliers($aRow['supplier_id']);
+	// 					if ($data_supplier) {
+	// 						$supplier_name = '<span class="text-nowrap">' . $data_supplier->supplier_name . '</span>';
+	// 					}
+	// 				}
+	// 				$row[] = $supplier_name;
+
+	// 				$row[] = $aRow['date_buy'] != '' ? _d($aRow['date_buy']) : '';
+	// 				$row[] = $aRow['unit_price'] != '' ? app_format_money($aRow['unit_price'], $currency_name) : '';
+	// 				$row[] = $aRow['order_number'];
+	// 				$row[] = (($aRow['warranty_period'] != '' && $aRow['warranty_period'] != 0) ? $aRow['warranty_period'] . ' ' . _l('months') : '');
+	// 				$row[] = (($aRow['warranty_period'] != '' && $aRow['warranty_period'] != 0) ? _d(get_expired_date($aRow['date_buy'], $aRow['warranty_period'])) : '');
+	// 				$row[] = '<span class="text-nowrap">' . $aRow['description'] . '</span>';
+	// 				$row[] = $this->fixed_equipment_model->count_log_detail($aRow[db_prefix() . 'fe_assets.id'], 'checkout', 0);
+	// 				$row[] = $this->fixed_equipment_model->count_log_detail($aRow[db_prefix() . 'fe_assets.id'], 'checkin');
+	// 				$row[] = $this->fixed_equipment_model->count_log_detail($aRow[db_prefix() . 'fe_assets.id'], 'checkout', 1, 1);
+	// 				$row[] = '<span class="text-nowrap">' . _dt($aRow['date_creator']) . '</span>';
+	// 				$row[] = '<span class="text-nowrap">' . _dt($aRow['updated_at']) . '</span>';
+	// 				$checkout_date = '';
+	// 				$expected_checkin_date = '';
+	// 				if ($aRow['checkin_out'] == 2) {
+	// 					if (is_numeric($aRow['checkin_out_id']) && $aRow['checkin_out_id'] > 0) {
+	// 						$data_checkout = $this->fixed_equipment_model->get_checkin_out_data($aRow['checkin_out_id']);
+	// 						if ($data_checkout) {
+	// 							$expected_checkin_date = (($data_checkout->expected_checkin_date != '' || $data_checkout->expected_checkin_date != null) ? _d($data_checkout->expected_checkin_date) : '');
+	// 							$checkout_date = (($data_checkout->checkin_date != '' || $data_checkout->checkin_date != null) ? _d($data_checkout->checkin_date) : _d(date('Y-m-d'), $data_checkout->date_creator));
+	// 						}
+	// 					}
+	// 				}
+
+	// 				$row[] = '<span class="text-nowrap">' . $checkout_date . '</span>';
+	// 				$row[] = '<span class="text-nowrap">' . $expected_checkin_date . '</span>';
+	// 				$last_audit = '';
+	// 				$next_audit = '';
+	// 				$data_audit = $this->fixed_equipment_model->get_2_audit_info_asset($aRow['id']);
+	// 				if ($data_audit) {
+	// 					if (isset($data_audit[0]) && isset($data_audit[1])) {
+	// 						$next_audit = _d(date('Y-m-d', strtotime($data_audit[0]['audit_date'])));
+	// 						$last_audit = _d(date('Y-m-d', strtotime($data_audit[1]['audit_date'])));
+	// 					}
+	// 					if (isset($data_audit[0]) && !isset($data_audit[1])) {
+	// 						$next_audit = _d(date('Y-m-d', strtotime($data_audit[0]['audit_date'])));
+	// 					}
+	// 				}
+	// 				$row[] = '<span class="text-nowrap">' . $last_audit . '</span>';
+	// 				$row[] = '<span class="text-nowrap">' . $next_audit . '</span>';
+
+
+	// 				$output['aaData'][] = $row;
+	// 			}
+
+	// 			echo json_encode($output);
+	// 			die();
+	// 		}
+	// 	}
+	// }
+
 	public function all_asset_table()
 	{
 		if ($this->input->is_ajax_request()) {
@@ -1734,6 +2029,7 @@ class fixed_equipment extends AdminController
 				$status = $this->input->post("status");
 				$supplier = $this->input->post("supplier");
 				$location = $this->input->post("location");
+				$location2 = $this->input->post("location_new");
 
 				$this->load->model('currencies_model');
 				$base_currency = $this->currencies_model->get_base_currency();
@@ -1773,7 +2069,11 @@ class fixed_equipment extends AdminController
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
-					db_prefix() . 'fe_assets.id'
+					db_prefix() . 'fe_assets.id',
+
+					// Added location names
+					'current_loc.location_name as current_location_name',
+					'default_loc.location_name as default_location_name'
 				];
 
 				$where        = [];
@@ -1784,7 +2084,13 @@ class fixed_equipment extends AdminController
 					'LEFT JOIN ' . db_prefix() . 'fe_models ON ' . db_prefix() . 'fe_models.id = ' . db_prefix() . 'fe_assets.model_id',
 					'LEFT JOIN ' . db_prefix() . 'fe_categories ON ' . db_prefix() . 'fe_categories.id = ' . db_prefix() . 'fe_models.category',
 					'LEFT JOIN ' . db_prefix() . 'fe_asset_manufacturers ON ' . db_prefix() . 'fe_asset_manufacturers.id = ' . db_prefix() . 'fe_models.manufacturer',
-					'LEFT JOIN ' . db_prefix() . 'fe_suppliers ON ' . db_prefix() . 'fe_suppliers.id = ' . db_prefix() . 'fe_assets.supplier_id'
+					'LEFT JOIN ' . db_prefix() . 'fe_suppliers ON ' . db_prefix() . 'fe_suppliers.id = ' . db_prefix() . 'fe_assets.supplier_id',
+
+					// Join for current location (from location_id)
+					'LEFT JOIN ' . db_prefix() . 'fe_locations AS current_loc ON current_loc.id = ' . db_prefix() . 'fe_assets.location_id',
+
+					// Join for default location (from asset_location)
+					'LEFT JOIN ' . db_prefix() . 'fe_locations AS default_loc ON default_loc.id = ' . db_prefix() . 'fe_assets.asset_location'
 				];
 				array_push($where, 'AND ' . db_prefix() . 'fe_assets.type = "asset"');
 				array_push($where, 'AND active = 1');
@@ -1801,6 +2107,10 @@ class fixed_equipment extends AdminController
 				if ($location != '') {
 					array_push($where, 'AND asset_location = ' . $location);
 				}
+				if ($location2 != '') {
+				// Changed to check against location ID, not name
+				array_push($where, 'AND (' . db_prefix() . 'fe_assets.location_id = ' . $this->db->escape($location2) . ')');
+			}
 
 				if (!is_admin() && has_permission('fixed_equipment_assets', '', 'view_own')) {
 					array_push($where, 'AND requestable = 1');
@@ -1831,7 +2141,11 @@ class fixed_equipment extends AdminController
 					'checkin_out_id',
 					db_prefix() . 'fe_models.model_name',
 					db_prefix() . 'fe_models.model_no',
-					'status'
+					'status',
+
+					// Added for location filtering
+					'current_loc.location_name as current_location_name',
+					'default_loc.location_name as default_location_name'
 				]);
 
 
@@ -2017,8 +2331,6 @@ class fixed_equipment extends AdminController
 			}
 		}
 	}
-
-
 	/**
 	 * delete assets
 	 */
@@ -12872,7 +13184,7 @@ class fixed_equipment extends AdminController
 	{
 		if ($this->input->post()) {
 			$data             = $this->input->post();
-			
+
 			$result = $this->fixed_equipment_model->bulk_checkout_assets($data);
 			if ($result > 0) {
 				if ($data['type'] == 'checkout') {
