@@ -638,10 +638,9 @@
                                                 class="mright5"><i class="fa fa-print"></i></a>
                                         <?php } ?>
                                         <?php if (can_staff_edit_form_message()) { ?>
-                                            <a href="#"
-                                                class="tw-text-neutral-500 hover:tw-text-neutral-700 active:tw-text-neutral-600"
-                                                onclick="edit_form_message(<?php echo e($form->formid); ?>,'form'); return false;"><i
-                                                    class="fa-regular fa-pen-to-square"></i></a>
+                                            <?php if ($form->locked == 0): ?>
+                                                <a href="#" class="tw-text-neutral-500 hover:tw-text-neutral-700 active:tw-text-neutral-600" onclick="edit_form_message(<?php echo e($form->formid); ?>,'form'); return false;"><i class="fa-regular fa-pen-to-square"></i></a>
+                                            <?php endif; ?>
                                         <?php } ?>
                                     </div>
                                 </div>
