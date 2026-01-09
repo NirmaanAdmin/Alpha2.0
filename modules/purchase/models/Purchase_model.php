@@ -3156,6 +3156,11 @@ class Purchase_model extends App_Model
         $this->db->select('*');
         $this->db->where('rel_id', $rel_id);
         $this->db->where('rel_type', $rel_type);
+        $this->db->order_by(
+            '(' . db_prefix() . 'pur_approval_details.staffid = 11)',
+            'ASC',
+            false
+        );
         return $this->db->get(db_prefix() . 'pur_approval_details')->result_array();
     }
 
