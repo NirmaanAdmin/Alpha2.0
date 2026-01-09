@@ -282,7 +282,7 @@ class Forms extends AdminController
                 $this->db->where('formid', $data['id']);
                 $this->db->update(db_prefix() . 'forms', [
                     'message' => $data['data'],
-                ]);
+                ]); 
             }
             if ($this->db->affected_rows() > 0) {
                 set_alert('success', _l('form_message_updated_successfully'));
@@ -1058,7 +1058,7 @@ class Forms extends AdminController
 
             $data['message'] = html_purify($this->input->post('message', false));
             $id              = $this->forms_model->add($data, get_staff_user_id());
-            if ($id) {
+            if ($id) { 
                 set_alert('success', _l('dpr_added_successfully', $id));
                 redirect(admin_url('forms/progress_report_setting/dpr'));
             }

@@ -1054,6 +1054,7 @@ class Forms_model extends App_Model
         // die;
         $this->db->insert(db_prefix() . 'forms', $data);
         $formid = $this->db->insert_id();
+        add_drp_activity_log($formid, true);
         if ($formid) {
             if ($data['form_type'] == "dpr") {
                 if (isset($dpr_form)) {
@@ -1620,6 +1621,7 @@ class Forms_model extends App_Model
         $affectedRows = 0;
         hooks()->do_action('before_form_deleted', $formid);
         // final delete form
+        add_drp_activity_log($formid, false);
         $this->db->where('formid', $formid);
         $this->db->delete(db_prefix() . 'forms');
         if ($this->db->affected_rows() > 0) {
@@ -1969,10 +1971,15 @@ class Forms_model extends App_Model
                 unset($data['items']);
             }
         }
+        $old_form = $this->db
+            ->where('formid', $data['formid'])
+            ->get(db_prefix() . 'forms')
+            ->row_array();
 
         $this->db->where('formid', $data['formid']);
         $this->db->update(db_prefix() . 'forms', $data);
         if ($this->db->affected_rows() > 0) {
+            update_forms_activity_log($data['formid'], $old_form, $data);
             hooks()->do_action(
                 'form_settings_updated',
                 [
@@ -1985,71 +1992,107 @@ class Forms_model extends App_Model
         }
 
         if ($formBeforeUpdate->form_type == "dpr") {
-            if (isset($dpr_form)) {
-                if (!empty($dpr_form)) {
-                    $this->db->where('form_id', $data['formid']);
-                    $this->db->update(db_prefix() . $formBeforeUpdate->form_type . '_form', $dpr_form);
-                    if ($this->db->affected_rows() > 0) {
+
+            /* === MAIN FORM UPDATE === */
+            if (!empty($dpr_form)) {
+                
+                $old_dpr_form = $this->db
+                    ->where('form_id', $data['formid'])
+                    ->get(db_prefix() . 'dpr_form')
+                    ->row_array();
+                $this->db->where('form_id', $data['formid']);
+                $this->db->update(db_prefix() . 'dpr_form', $dpr_form);
+
+                if ($this->db->affected_rows() > 0) {
+                    $affectedRows++;
+
+                    update_dpr_form_activity_log(
+                        $data['formid'],
+                        $old_dpr_form,
+                        $dpr_form
+                    );
+                }
+            }
+
+            /* === ADD DETAILS === */
+            if (!empty($new_order)) {
+                foreach ($new_order as $value) {
+                    $dt_data = [
+                        'form_id' => $data['formid'],
+                        'location' => $value['location'],
+                        'agency' => $value['agency'],
+                        'type' => $value['type'],
+                        'sub_type' => $value['sub_type'],
+                        'work_execute' => $value['work_execute'],
+                        'material_consumption' => $value['material_consumption'],
+                        'male' => $value['male'],
+                        'female' => $value['female'],
+                        'total' => $value['total'],
+                        'machinery' => $value['machinery'],
+                        'total_machinery' => $value['total_machinery'],
+                    ];
+
+                    $this->db->insert(db_prefix() . 'dpr_form_detail', $dt_data);
+
+                    if ($this->db->insert_id()) {
                         $affectedRows++;
+                        dpr_detail_added_log($data['formid'], $dt_data);
                     }
                 }
             }
 
-            if (isset($new_order)) {
-                if (!empty($new_order)) {
-                    foreach ($new_order as $key => $value) {
-                        $dt_data = [];
-                        $dt_data['form_id'] = $data['formid'];
-                        $dt_data['location'] = $value['location'];
-                        $dt_data['agency'] = $value['agency'];
-                        $dt_data['type'] = $value['type'];
-                        $dt_data['sub_type'] = $value['sub_type'];
-                        $dt_data['work_execute'] = $value['work_execute'];
-                        $dt_data['material_consumption'] = $value['material_consumption'];
-                        $dt_data['male'] = $value['male'];
-                        $dt_data['female'] = $value['female'];
-                        $dt_data['total'] = $value['total'];
-                        $dt_data['machinery'] = $value['machinery'];
-                        $dt_data['total_machinery'] = $value['total_machinery'];
-                        $this->db->insert(db_prefix() . $formBeforeUpdate->form_type . '_form_detail', $dt_data);
-                        $new_insert_id = $this->db->insert_id();
-                        if ($new_insert_id) {
-                            $affectedRows++;
-                        }
+            /* === UPDATE DETAILS === */
+            if (!empty($update_order)) {
+                foreach ($update_order as $value) {
+
+                    $old_row = $this->db
+                        ->where('id', $value['id'])
+                        ->get(db_prefix() . 'dpr_form_detail')
+                        ->row_array();
+
+                    if (empty($old_row)) {
+                        continue;
                     }
+
+                    $dt_data = [
+                        'location'             => $value['location'],
+                        'agency'               => $value['agency'],
+                        'type'                 => $value['type'],
+                        'sub_type'             => $value['sub_type'],
+                        'work_execute'         => $value['work_execute'],
+                        'material_consumption' => $value['material_consumption'],
+                        'male'                 => $value['male'],
+                        'female'               => $value['female'],
+                        'total'                => $value['total'],
+                        'machinery'            => $value['machinery'],
+                        'total_machinery'      => $value['total_machinery'],
+                    ];
+
+                    $this->db->where('id', $value['id']);
+                    $this->db->update(db_prefix() . 'dpr_form_detail', $dt_data);
+
+                    $affectedRows += $this->db->affected_rows();
+
+                    update_dpr_detail_activity_log(
+                        $old_row['form_id'],
+                        $old_row,
+                        $dt_data
+                    );
                 }
             }
 
-            if (isset($update_order)) {
-                if (!empty($update_order)) {
-                    foreach ($update_order as $key => $value) {
-                        $dt_data = [];
-                        $dt_data['form_id'] = $data['formid'];
-                        $dt_data['location'] = $value['location'];
-                        $dt_data['agency'] = $value['agency'];
-                        $dt_data['type'] = $value['type'];
-                        $dt_data['sub_type'] = $value['sub_type'];
-                        $dt_data['work_execute'] = $value['work_execute'];
-                        $dt_data['material_consumption'] = $value['material_consumption'];
-                        $dt_data['male'] = $value['male'];
-                        $dt_data['female'] = $value['female'];
-                        $dt_data['total'] = $value['total'];
-                        $dt_data['machinery'] = $value['machinery'];
-                        $dt_data['total_machinery'] = $value['total_machinery'];
-                        $this->db->where('id', $value['id']);
-                        $this->db->update(db_prefix() . $formBeforeUpdate->form_type . '_form_detail', $dt_data);
-                        if ($this->db->affected_rows() > 0) {
-                            $affectedRows++;
-                        }
-                    }
-                }
-            }
+            /* === REMOVE DETAILS === */
+            if (!empty($remove_order)) {
+                foreach ($remove_order as $id) {
+                    $row = $this->db->where('id', $id)
+                        ->get(db_prefix() . 'dpr_form_detail')
+                        ->row_array();
 
-            if (isset($remove_order)) {
-                if (!empty($remove_order)) {
-                    foreach ($remove_order as $key => $value) {
-                        $this->db->where('id', $value);
-                        if ($this->db->delete(db_prefix() . $formBeforeUpdate->form_type . '_form_detail')) {
+                    if (!empty($row)) {
+                        dpr_detail_removed_log($row['form_id'], $row);
+
+                        $this->db->where('id', $id);
+                        if ($this->db->delete(db_prefix() . 'dpr_form_detail')) {
                             $affectedRows++;
                         }
                     }

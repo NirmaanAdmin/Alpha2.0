@@ -613,11 +613,11 @@ function get_material_consumption_unit($name_material_consumption_unit, $materia
 
 function get_pur_unit($unit_id)
 {
-    if(!empty($unit_id)) {
+    if (!empty($unit_id)) {
         $CI = &get_instance();
         $CI->db->where('unit_id', $unit_id);
         $pur_unit = $CI->db->get(db_prefix() . 'pur_unit')->row();
-        if(!empty($pur_unit)) {
+        if (!empty($pur_unit)) {
             return $pur_unit->unit_name;
         }
     }
@@ -651,7 +651,7 @@ function get_progress_report_machinary_listing($name_machinery, $machinery)
  * @param boolean $bulk_action include checkboxes on the left side for bulk actions
  */
 function AdminReportsTableStructure($name = '', $bulk_action = false)
-{ 
+{
     $table = '<table class="table customizable-table number-index-' . ($bulk_action ? '2' : '1') . ' dt-table-loading ' . ($name == '' ? 'preports-table' : $name) . ' table-forms" id="forms" data-last-order-identifier="forms" data-default-order="' . get_table_last_order('forms') . '">';
     $table .= '<thead>';
     $table .= '<tr>';
@@ -718,4 +718,402 @@ function get_progress_report_machinary_name($machinery)
     $CI->db->select('name');
     $result = $CI->db->get(db_prefix() . 'progress_report_machinary')->result_array();
     return !empty($result) ? $result[0]['name'] : '';
+}
+
+
+function add_drp_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('formid', $id);
+        $drp_data = $CI->db->get(db_prefix() . 'forms')->row();
+        if (!empty($drp_data)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "<b>#" . $id . "DRP-" . date('d M, Y', strtotime($drp_data->date)) . '-' . get_project_name_by_id($drp_data->project_id) . "</b> has been " . $is_create_value . ".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'forms',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+
+function normalize_activity_value($value)
+{
+    $value = trim((string)$value);
+
+    if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+        return '';
+    }
+
+    if ($value === '0000-00-00') {
+        return '';
+    }
+
+    if (is_numeric($value)) {
+        $num = (float)$value;
+        return ($num == 0.0) ? '' : $num;
+    }
+
+    return strtolower($value);
+}
+function dpr_activity_log($form_id, $details_html)
+{
+    $CI = &get_instance();
+
+    if (empty($form_id)) {
+        return false;
+    }
+
+    $CI->db->where('formid', $form_id);
+    $drp_data = $CI->db->get(db_prefix() . 'forms')->row();
+
+    if (empty($drp_data)) {
+        return false;
+    }
+
+    $header = "<b>#{$form_id} DRP-" .
+        date('d M, Y', strtotime($drp_data->date)) .
+        "-" . get_project_name_by_id($drp_data->project_id) .
+        "</b> has been updated.";
+
+    $description = $header . "<br>" . $details_html;
+
+    $CI->db->insert(db_prefix() . 'module_activity_log', [
+        'module_name' => 'forms',
+        'rel_id'      => $form_id,
+        'description' => $description,
+        'date'        => date('Y-m-d H:i:s'),
+        'staffid'     => get_staff_user_id(),
+    ]);
+
+    return true;
+}
+function update_dpr_form_activity_log($form_id, $old_data, $new_data)
+{
+    if (empty($old_data) || empty($new_data)) {
+        return false;
+    }
+
+    $norm_old = array_map('normalize_activity_value', $old_data);
+    $norm_new = array_map('normalize_activity_value', $new_data);
+
+    $changes = array_diff_assoc($norm_new, $norm_old);
+
+    if (empty($changes)) {
+        return true;
+    }
+
+    $field_map = [
+        'client_id'  => 'Client',
+        'pmc'        => 'PMC',
+        'weather'    => 'Weather',
+        'consultant' => 'Consultant',
+        'contractor' => 'Contractor',
+        'work_stop'  => 'Work Stoppage',
+    ];
+
+    /* Value maps */
+    $workStopMap = [
+        'Y' => 'Yes',
+        'N' => 'No',
+    ];
+
+    $weatherMap = [
+        'Clear'   => 'Clear',
+        'Cloudy' => 'Cloudy',
+        'Rain'   => 'Rain',
+    ];
+
+    $html = "<b>DPR Detail Updated</b><ul>";
+
+    foreach ($changes as $field => $v) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+
+        $old_val = $old_data[$field] ?? 'None';
+        $new_val = $new_data[$field] ?? 'None';
+
+        /* Field-specific transformations */
+        if ($field === 'client_id') {
+            $old_val = $old_val ? get_company_by_userid($old_val) : 'None';
+            $new_val = $new_val ? get_company_by_userid($new_val) : 'None';
+        }
+
+        if ($field === 'work_stop') {
+            $old_val = $workStopMap[$old_val] ?? 'None';
+            $new_val = $workStopMap[$new_val] ?? 'None';
+        }
+
+        if ($field === 'weather') {
+            $old_val = $weatherMap[$old_val] ?? $old_val;
+            $new_val = $weatherMap[$new_val] ?? $new_val;
+        }
+
+        $html .= "<li><b>{$field_map[$field]}</b>: {$old_val} → {$new_val}</li>";
+    }
+
+    $html .= "</ul>";
+
+    dpr_activity_log($form_id, $html);
+    return true;
+}
+
+
+
+function update_dpr_detail_activity_log($form_id, $old_data, $new_data)
+{
+    if (empty($old_data) || empty($new_data)) {
+        return false;
+    }
+
+    $norm_old = array_map('normalize_activity_value', $old_data);
+    $norm_new = array_map('normalize_activity_value', $new_data);
+
+    $changes = array_diff_assoc($norm_new, $norm_old);
+
+    if (empty($changes)) {
+        return true;
+    }
+
+    $field_map = [
+        'location'             => 'Location',
+        'agency'               => 'Agency',
+        'type'                 => 'Type',
+        'sub_type'             => 'Sub Type',
+        'work_execute'         => 'Work Executed',
+        'material_consumption' => 'Material Consumption',
+        'male'                 => 'Male',
+        'female'               => 'Female',
+        'total'                => 'Total Manpower',
+        'machinery'            => 'Machinery',
+        'total_machinery'      => 'Total Machinery',
+    ];
+
+    $html = "<b>DPR Detail Updated</b><ul>";
+
+    foreach ($changes as $field => $v) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+
+        $old_val = $old_data[$field] ?? 'None';
+        $new_val = $new_data[$field] ?? 'None';
+
+        if ($field == 'agency') {
+            $old_val = get_agency_by_userid($old_val);
+            $new_val = get_agency_by_userid($new_val);
+        }
+
+        if ($field == 'type') {
+            $old_val = get_progress_report_type_listing_byid($old_val);
+            $new_val = get_progress_report_type_listing_byid($new_val);
+        }
+
+        if ($field == 'sub_type') {
+            $old_val = get_progress_report_sub_type_listing_byid($old_val);
+            $new_val = get_progress_report_sub_type_listing_byid($new_val);
+        }
+
+        if ($field == 'machinery') {
+            $old_val = get_progress_report_machinery_listing_byid($old_val);
+            $new_val = get_progress_report_machinery_listing_byid($new_val);
+        }
+
+
+        $html .= "<li><b>{$field_map[$field]}</b>: {$old_val} → {$new_val}</li>";
+    }
+
+    $html .= "</ul>";
+
+    dpr_activity_log($form_id, $html);
+    return true;
+}
+
+function dpr_detail_added_log($form_id, $row)
+{
+    $html = "<b>DPR New Detail Added</b><ul>";
+
+    foreach ($row as $key => $value) {
+        if ($key == 'form_id') continue;
+        $html .= "<li><b>{$key}</b>: {$value}</li>";
+    }
+
+    $html .= "</ul>";
+
+    dpr_activity_log($form_id, $html);
+}
+function dpr_detail_removed_log($form_id, $row)
+{
+    $html = "<b>DPR Detail Removed</b><ul>";
+
+    foreach ($row as $key => $value) {
+        if ($key == 'form_id' || $key == 'id') continue;
+        $html .= "<li><b>{$key}</b>: {$value}</li>";
+    }
+
+    $html .= "</ul>";
+
+    dpr_activity_log($form_id, $html);
+}
+
+function update_forms_activity_log($form_id, $old_data, $new_data)
+{
+    if (empty($old_data) || empty($new_data)) {
+        return false;
+    }
+
+    $norm_old = array_map('normalize_activity_value', $old_data);
+    $norm_new = array_map('normalize_activity_value', $new_data);
+
+    $changes = array_diff_assoc($norm_new, $norm_old);
+
+    if (empty($changes)) {
+        return true;
+    }
+
+    $field_map = [
+        'subject'    => 'Subject',
+        'project_id' => 'Project',
+        'department' => 'Department',
+        'assigned'   => 'Assigned To',
+        'priority'   => 'Priority',
+        'duedate'    => 'Due Date',
+        'service'    => 'Service',
+    ];
+
+    $html = "<b>DPR Updated</b><ul>";
+
+    foreach ($changes as $field => $v) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+
+        $old_val = $old_data[$field] ?? 'None';
+        $new_val = $new_data[$field] ?? 'None';
+
+        // Human readable conversions
+        if ($field === 'project_id') {
+            $old_val = $old_val ? get_project_name_by_id($old_val) : 'None';
+            $new_val = $new_val ? get_project_name_by_id($new_val) : 'None';
+        }
+
+        if ($field === 'assigned') {
+            $old_val = $old_val ? get_staff_full_name($old_val) : 'None';
+            $new_val = $new_val ? get_staff_full_name($new_val) : 'None';
+        }
+
+        if ($field === 'priority') {
+            $map = [1 => 'Low', 2 => 'Medium', 3 => 'High'];
+            $old_val = $map[$old_val] ?? $old_val;
+            $new_val = $map[$new_val] ?? $new_val;
+        }
+
+        $html .= "<li><b>{$field_map[$field]}</b>: {$old_val} → {$new_val}</li>";
+    }
+
+    $html .= "</ul>";
+
+    dpr_activity_log($form_id, $html);
+    return true;
+}
+
+function get_department_name_new($departmentid)
+{
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $department = $CI->db->query('SELECT ' . db_prefix() . 'departments.name FROM ' . db_prefix() . 'departments WHERE departmentid = ' . $departmentid)->row();
+
+    if ($department) {
+        return $department->name;
+    }
+    return '';
+}
+function get_company_by_userid($userid)
+{
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $CI->db->select('company');
+    $CI->db->from(db_prefix() . 'clients');
+    $CI->db->where('userid', $userid);
+    $query = $CI->db->get();
+
+    if ($query->num_rows() > 0) {
+        return $query->row()->company;
+    }
+    return '';
+}
+
+function get_agency_by_userid($userid)
+{
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $CI->db->select('company');
+    $CI->db->from(db_prefix() . 'pur_vendor');
+    $CI->db->where('userid', $userid);
+    $query = $CI->db->get();
+
+    if ($query->num_rows() > 0) {
+        return $query->row()->company;
+    }
+    return '';
+}
+
+function get_progress_report_type_listing_byid($type)
+{
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $CI->db->select('name');
+    $CI->db->from(db_prefix() . 'progress_report_type');
+    $CI->db->where('id', $type);
+    $query = $CI->db->get();
+
+    if ($query->num_rows() > 0) {
+        return $query->row()->name;
+    }
+    return '';
+}
+
+function get_progress_report_sub_type_listing_byid($sub_type)
+{
+
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $CI->db->select('name');
+    $CI->db->from(db_prefix() . 'progress_report_sub_type');
+    $CI->db->where('id', $sub_type);
+    $query = $CI->db->get();
+
+    if ($query->num_rows() > 0) {
+        return $query->row()->name;
+    }
+    return '';
+}
+
+function get_progress_report_machinery_listing_byid($machinery)
+{
+
+    $CI = &get_instance();
+    $CI->load->database();
+
+    $CI->db->select('name');
+    $CI->db->from(db_prefix() . 'progress_report_machinary');
+    $CI->db->where('id', $machinery);
+    $query = $CI->db->get();
+
+    if ($query->num_rows() > 0) {
+        return $query->row()->name;
+    }
+    return '';
 }
