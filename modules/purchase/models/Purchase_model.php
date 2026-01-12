@@ -3130,12 +3130,14 @@ class Purchase_model extends App_Model
         $approve_status = $this->db->get(db_prefix() . 'pur_approval_details')->result_array();
         if (count($approve_status) > 0) {
             foreach ($approve_status as $value) {
-                if ($value['approve'] == -1) {
-                    return 'reject';
-                }
-                if ($value['approve'] == 0) {
-                    $value['staffid'] = explode(', ', $value['staffid']);
-                    return $value;
+                if ($value['staffid'] == get_staff_user_id()) {
+                    if ($value['approve'] == -1) {
+                        return 'reject';
+                    }
+                    if ($value['approve'] == 0) {
+                        $value['staffid'] = explode(', ', $value['staffid']);
+                        return $value;
+                    }
                 }
             }
             return true;
@@ -3600,6 +3602,23 @@ class Purchase_model extends App_Model
      */
     public function update_approve_request($rel_id, $rel_type, $status)
     {
+        $summary = $this->db->query("
+            SELECT 
+                SUM(approve = 2) AS approved_count,
+                SUM(approve = 3) AS rejected_count,
+                COUNT(*) AS total_count
+            FROM " . db_prefix() . "pur_approval_details
+            WHERE rel_id = ? AND rel_type = ?
+        ", [$rel_id, $rel_type])->row();
+        if (!$summary || $summary->total_count == 0) {
+            return false;
+        }
+        $all_approved = ((int)$summary->approved_count === (int)$summary->total_count);
+        $all_rejected = ((int)$summary->rejected_count === (int)$summary->total_count);
+        if (!($all_approved || $all_rejected)) {
+            return false;
+        }
+        
         $data_update = [];
 
         switch ($rel_type) {
