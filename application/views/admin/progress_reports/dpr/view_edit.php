@@ -822,30 +822,28 @@
     ]
 ); ?>
 
-<?php if (can_staff_edit_form_message()) { ?>
-    <!-- Edit Form Messsage Modal -->
-    <div class="modal fade" id="form-message" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <?php echo form_open(admin_url('forms/edit_message')); ?>
-            <div class="modal-content">
-                <div id="edit-form-message-additional"></div>
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel"><?php echo _l('form_message_edit'); ?></h4>
-                </div>
-                <div class="modal-body">
-                    <?php echo render_textarea('data', '', '', [], [], '', 'tinymce-form-edit'); ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                    <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
-                </div>
+<!-- Edit Form Messsage Modal -->
+<div class="modal fade" id="form-message" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <?php echo form_open(admin_url('forms/edit_message')); ?>
+        <div class="modal-content">
+            <div id="edit-form-message-additional"></div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><?php echo _l('form_message_edit'); ?></h4>
             </div>
-            <?php echo form_close(); ?>
+            <div class="modal-body">
+                <?php echo render_textarea('data', '', '', [], [], '', 'tinymce-form-edit'); ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
         </div>
+        <?php echo form_close(); ?>
     </div>
-<?php } ?>
+</div>
 <script>
     var _form_message;
 </script>
