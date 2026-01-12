@@ -408,7 +408,7 @@
                     <div class="pull-right">
                       <?php
                       if ($check_appr && $check_appr != false) {
-                        if ($pur_request->status == 1 && ($check_approve_status == false || $check_approve_status == 'reject')) { ?>
+                        if ($pur_request->status == 1 && empty($list_approve_status)) { ?>
                           <a data-toggle="tooltip" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-success lead-top-btn lead-view" data-placement="top" href="#" onclick="send_request_approve(<?php echo pur_html_entity_decode($pur_request->id); ?>); return false;"><?php echo _l('send_request_approve_pur'); ?></a>
                         <?php }
                       }
