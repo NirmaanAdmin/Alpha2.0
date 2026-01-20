@@ -1681,7 +1681,7 @@ class fixed_equipment extends AdminController
 		$data['custom_field_lists'] = get_custom_fields('fixed_equipment');
 		$data['field_sets'] = $this->fixed_equipment_model->get_field_set();
 		// $data['models'] = $this->fixed_equipment_model->get_models('');
-
+ 
 		$this->load->view('asset_management', $data);
 	}
 
@@ -2050,6 +2050,7 @@ class fixed_equipment extends AdminController
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
+					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_asset_manufacturers.name',
 
 					db_prefix() . 'fe_suppliers.supplier_name',
@@ -2262,6 +2263,16 @@ class fixed_equipment extends AdminController
 						}
 					}
 					$row[] = $checkout_to;
+					$checkin = '';
+					$get_checkin_info = $this->fixed_equipment_model->get_checkin_option($aRow[db_prefix() . 'fe_assets.id']);
+					if ($get_checkin_info->type == 'checkin') {
+						$checkin = get_staff_full_name($get_checkin_info->staff_id);
+					}else{
+						$checkin = '';
+					}
+					
+				
+					$row[] = $checkin;
 					$row[] = '<span class="text-nowrap">' . $data_location_info->curent_location . '</span>';
 					$row[] = '<span class="text-nowrap">' . $data_location_info->default_location . '</span>';
 					$manufacturer_name = '';

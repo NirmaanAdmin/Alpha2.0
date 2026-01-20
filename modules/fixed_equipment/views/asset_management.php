@@ -98,6 +98,7 @@
               _l('fe_category'),
               _l('fe_status'),
               _l('fe_checkout_to'),
+              _l('Check In'),
               _l('fe_location'),
               _l('fe_default_location'),
               _l('fe_manufacturer'),
@@ -147,6 +148,7 @@
               <th><?php echo  _l('fe_category'); ?></th>
               <th><?php echo  _l('fe_status'); ?></th>
               <th><?php echo  _l('fe_checkout_to'); ?></th>
+              <th><?php echo  _l('Check In'); ?></th>
               <th><?php echo  _l('fe_location'); ?></th>
               <th><?php echo  _l('fe_default_location'); ?></th>
               <th><?php echo  _l('fe_manufacturer'); ?></th>
@@ -332,7 +334,7 @@
       </div>
       <?php echo form_close(); ?>
     </div>
-  </div>
+  </div> 
 </div>
 
 <div class="modal fade" id="check_in" tabindex="-1" role="dialog">
@@ -368,6 +370,13 @@
             <?php echo render_select('location_id', $locations, array('id', 'location_name'), 'fe_locations'); ?>
           </div>
         </div>
+        <div class="row">
+          <div class="col-md-12">
+           <?php echo render_select('staff_id', $staffs, array('staffid', array('firstname', 'lastname')), 'fe_staff'); ?>
+          </div>
+        </div>
+
+        
         <div class="row">
           <div class="col-md-12">
             <?php echo render_date_input('checkin_date', 'fe_checkin_date'); ?>

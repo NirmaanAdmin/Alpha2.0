@@ -1138,6 +1138,7 @@ class fixed_equipment_model extends app_model
 
 		if ($data['type'] == 'checkin') {
 			$data['check_status'] = 1;
+			$data['staff_id'] = $data['staff_id'];
 		} else {
 			if ($data['checkout_to'] == 'asset') {
 				$data['staff_id'] = $this->get_manager_asset($data['asset_id']);
@@ -1150,7 +1151,7 @@ class fixed_equipment_model extends app_model
 		} else {
 			$data['item_type'] = 'asset';
 		}
-		
+
 		$this->db->insert(db_prefix() . 'fe_checkin_assets', $data);
 		$insert_id = $this->db->insert_id();
 		if ($insert_id) {
@@ -1262,8 +1263,8 @@ class fixed_equipment_model extends app_model
 							$to_id = $data['project_id'];
 							break;
 					}
-					$this->db->where('id', $insert_id);
-					$this->db->update(db_prefix() . 'fe_checkin_assets', ['staff_id' => $data_checkout->staff_id]);
+					// $this->db->where('id', $insert_id);
+					// $this->db->update(db_prefix() . 'fe_checkin_assets', ['staff_id' => $data_checkout->staff_id]);
 				}
 				// Add log checkin
 				$this->add_log(get_staff_user_id(), $data['type'], $data['item_id'], '', '', $to, $to_id, $data['notes'], $consumable_quantity);
@@ -12850,7 +12851,7 @@ class fixed_equipment_model extends app_model
 		} else {
 			$data['item_type'] = 'asset';
 		}
-		
+
 		$item_ids = $data['item_ids'];
 		unset($data['item_ids']);
 		if (!is_array($item_ids)) {
@@ -12874,7 +12875,7 @@ class fixed_equipment_model extends app_model
 			$data['asset_name'] = $asset_name[$key];
 			$this->db->insert(db_prefix() . 'fe_checkin_assets', $data);
 			$insert_id = $this->db->insert_id();
-			
+
 			if ($insert_id) {
 				//Get checkout id to update status after checkin
 				$checkin_out_id = '';
@@ -12993,11 +12994,21 @@ class fixed_equipment_model extends app_model
 				$insert_id1[] = $insert_id;
 			}
 		}
-		
+
 		if (!empty($insert_id1)) {
 			return 1;
 		} else {
 			return 0;
 		}
+	}
+
+	public function get_checkin_option($assest_id)
+	{
+		$this->db->where('item_id', $assest_id);
+		$this->db->where('type', 'checkin'); // Add this to filter only checkin types
+		$this->db->order_by('id', 'DESC'); // Order by date_creator in descending order
+		$this->db->limit(1); // Limit to 1 result (the latest)
+
+		return $this->db->get(db_prefix() . 'fe_checkin_assets')->row(); // Use row() instead of result() to get single object
 	}
 }
