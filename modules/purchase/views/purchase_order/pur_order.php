@@ -474,7 +474,7 @@
             <tbody>
               <tr id="subtotal">
                 <td><span class="bold"><?php echo _l('subtotal'); ?> :</span>
-                  <!-- <?php echo form_hidden('total_mn', ''); ?> -->
+                  <?php echo form_hidden('total_mn', ''); ?>
                 </td>
                 <td class="wh-subtotal">
                 </td>
