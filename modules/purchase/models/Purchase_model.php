@@ -1139,7 +1139,7 @@ class Purchase_model extends App_Model
     public function add_pur_request($data)
     {
         $data['request_date'] = date('Y-m-d H:i:s');
-        $check_appr = $this->check_approval_setting($data['project'], 'pur_request', 0);
+        $check_appr = $this->check_approval_setting($data['project'], 'pur_request', 0, get_staff_user_id(), $data['requester']);
         $data['status'] = ($check_appr == true) ? 2 : 1;
         // $check_appr = $this->get_approve_setting('pur_request');
         // $data['status'] = 1;
@@ -14092,7 +14092,7 @@ class Purchase_model extends App_Model
         return $response;
     }
 
-    public function check_approval_setting($project, $related, $response = 0, $user_id = 1)
+    public function check_approval_setting($project, $related, $response = 0, $user_id = 1, $creator_id = '')
     {
         $user_id = !empty(get_staff_user_id()) ? get_staff_user_id() : $user_id;
         $check_status = false;
@@ -14125,9 +14125,15 @@ class Purchase_model extends App_Model
             return $intersect;
         } else {
             if (!empty($intersect)) {
-                $intersect = array_filter($intersect, function ($var) use ($user_id) {
-                    return ($var['id'] == $user_id);
-                });
+                if(empty($creator_id)) {
+                    $intersect = array_filter($intersect, function ($var) use ($user_id) {
+                        return ($var['id'] == $user_id);
+                    });
+                } else {
+                    $intersect = array_filter($intersect, function ($var) use ($user_id, $creator_id) {
+                        return ($var['id'] == $user_id && $user_id != $creator_id);
+                    });
+                }
                 if (!empty($intersect)) {
                     $check_status = true;
                 }
