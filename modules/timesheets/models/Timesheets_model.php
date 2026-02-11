@@ -6906,67 +6906,7 @@ class timesheets_model extends app_model
 					$list_dtts[$day] = $val;
 				}
 			}
-			// foreach ($list_date as $key => $value) {
-			// 	$date_s = date('D d', strtotime($value));
-			// 	$max_hour = isset($list_hour_shift[$value]) ? $list_hour_shift[$value] : 0;
-			// 	$check_holiday = isset($list_date[date('m-d', strtotime($value))]) ? $list_date[date('m-d', strtotime($value))] : false;
-			// 	$result_lack = '';
-			// 	if ($max_hour > 0) {
-			// 		if (!$check_holiday) {
-			// 			$ts_lack = '';
-			// 			if (isset($list_dtts[$date_s])) {
-			// 				$ts_lack = $list_dtts[$date_s] . '; ';
-			// 			}
-			// 			$total_lack = $ts_lack;
-			// 			if ($total_lack) {
-			// 				$total_lack = rtrim($total_lack, '; ');
-			// 			}
-			// 			$result_lack = $this->merge_ts($total_lack, $max_hour, $type_valid);
-			// 		} else {
-			// 			if ($check_holiday == 'holiday') {
-			// 				$result_lack = "HO";
-			// 			}
-			// 			if ($check_holiday == 'event_break') {
-			// 				$result_lack = "EB";
-			// 			}
-			// 			if ($check_holiday == 'unexpected_break') {
-			// 				$result_lack = "UB";
-			// 			}
-			// 		}
-			// 	} else {
-			// 		// $result_lack = 'NS'; 
-			// 		if (!$check_holiday) {
-
-			// 			$ts_lack = '';
-			// 			if (isset($list_dtts[$date_s])) {
-			// 				$ts_lack = $list_dtts[$date_s] . '; ';
-			// 			}
-			// 			$total_lack = $ts_lack;
-			// 			if ($total_lack) {
-			// 				$total_lack = rtrim($total_lack, '; ');
-			// 			}
-
-			// 			$result_lack = $this->merge_ts($total_lack, $max_hour, $type_valid);
-			// 			if (empty($result_lack)) {
-			// 				$result_lack = 'NS';
-			// 			}
-			// 		} else {
-			// 			if ($check_holiday == 'holiday') {
-			// 				$result_lack = "HO";
-			// 			}
-			// 			if ($check_holiday == 'event_break') {
-			// 				$result_lack = "EB";
-			// 			}
-			// 			if ($check_holiday == 'unexpected_break') {
-			// 				$result_lack = "UB";
-			// 			}
-			// 		}
-			// 	}
-			// 	$dt_ts[$date_s] = $result_lack;
-			// 	$dt_ts_detail[$value] = $result_lack;
-
-			// 	$dt_cell_bg[$date_s] = $list_color[$value];
-			// }
+			
 			foreach ($list_date as $key => $value) {
 				$date_s = date('D d', strtotime($value));
 				$date_md = date('m-d', strtotime($value));
@@ -8801,7 +8741,7 @@ class timesheets_model extends app_model
 		$list_hour_shift = [];
 		foreach ($list_date as $date) {
 			$result = 0;
-			$data_shift_list = $this->get_shift_work_staff_by_date(75, $date);
+			$data_shift_list = $this->get_shift_work_staff_by_date($staff_id, $date);
 
 			foreach ($data_shift_list as $ss) {
 				$data_shift_type = $this->get_shift_type($ss);
