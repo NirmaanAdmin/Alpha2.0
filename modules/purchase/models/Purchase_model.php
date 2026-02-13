@@ -3239,21 +3239,21 @@ class Purchase_model extends App_Model
         }
 
         // Send an email to approver
-        if ($data['rel_type'] == 'pur_request' || $data['rel_type'] == 'pur_order' || $data['rel_type'] == 'pur_quotation') {
-            $cron_email = array();
-            $cron_email_options = array();
-            $cron_email['type'] = "purchase";
-            $cron_email_options['rel_type'] = $data['rel_type'];
-            $cron_email_options['rel_name'] = $rel_name;
-            $cron_email_options['insert_id'] = $data['rel_id'];
-            $cron_email_options['user_id'] = get_staff_user_id();
-            $cron_email_options['status'] = $p_status;
-            $cron_email_options['approver'] = 'yes';
-            $cron_email_options['project'] = $project;
-            $cron_email_options['requester'] = $data['addedfrom'];
-            $cron_email['options'] = json_encode($cron_email_options, true);
-            $this->db->insert(db_prefix() . 'cron_email', $cron_email);
-        }
+        // if ($data['rel_type'] == 'pur_request' || $data['rel_type'] == 'pur_order' || $data['rel_type'] == 'pur_quotation') {
+        //     $cron_email = array();
+        //     $cron_email_options = array();
+        //     $cron_email['type'] = "purchase";
+        //     $cron_email_options['rel_type'] = $data['rel_type'];
+        //     $cron_email_options['rel_name'] = $rel_name;
+        //     $cron_email_options['insert_id'] = $data['rel_id'];
+        //     $cron_email_options['user_id'] = get_staff_user_id();
+        //     $cron_email_options['status'] = $p_status;
+        //     $cron_email_options['approver'] = 'yes';
+        //     $cron_email_options['project'] = $project;
+        //     $cron_email_options['requester'] = $data['addedfrom'];
+        //     $cron_email['options'] = json_encode($cron_email_options, true);
+        //     $this->db->insert(db_prefix() . 'cron_email', $cron_email);
+        // }
 
         // foreach ($data_new as $value) {
         //     $row = [];
@@ -14166,6 +14166,18 @@ class Purchase_model extends App_Model
         // $approver_list = array_values($approver_list);
 
         if (!empty($approver_list)) {
+            if ($rel_name == 'purchase_request') {
+                $defaultApprovers = [3, 4, 8, 11];
+                $existingIds = array_column($approver_list, 'id');
+                foreach ($defaultApprovers as $aid) {
+                    if (!in_array($aid, $existingIds)) {
+                        $approver_list[] = [
+                            'id' => $aid,
+                            'action' => 'approve'
+                        ];
+                    }
+                }
+            }
             $approver_list = array_column($approver_list, 'id');
             $this->db->select('staffid as id, email, firstname, lastname');
             $this->db->where_in('staffid', $approver_list);
