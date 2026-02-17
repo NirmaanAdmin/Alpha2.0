@@ -14166,18 +14166,6 @@ class Purchase_model extends App_Model
         // $approver_list = array_values($approver_list);
 
         if (!empty($approver_list)) {
-            if ($rel_name == 'purchase_request') {
-                $defaultApprovers = [3, 4, 8, 11];
-                $existingIds = array_column($approver_list, 'id');
-                foreach ($defaultApprovers as $aid) {
-                    if (!in_array($aid, $existingIds)) {
-                        $approver_list[] = [
-                            'id' => $aid,
-                            'action' => 'approve'
-                        ];
-                    }
-                }
-            }
             $approver_list = array_column($approver_list, 'id');
             $this->db->select('staffid as id, email, firstname, lastname');
             $this->db->where_in('staffid', $approver_list);
