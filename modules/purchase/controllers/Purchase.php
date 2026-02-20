@@ -8700,6 +8700,13 @@ class purchase extends AdminController
         $cron_emails = $this->purchase_model->check_cron_emails();
         if(!empty($cron_emails)) {
             foreach ($cron_emails as $key => $value) {
+                // Mark as processing FIRST
+                $this->db->where('id', $value['id']);
+                $this->db->update('tblcron_email', ['processing' => 1]);
+                // Re-check affected rows (important)
+                if ($this->db->affected_rows() == 0) {
+                    continue; // another cron already took it
+                }
                 if($value['type'] == "purchase" && !empty($value['options'])) {
                     $options = json_decode($value['options'], true);
                     $rel_name = $options['rel_name'];

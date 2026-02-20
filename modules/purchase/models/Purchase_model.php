@@ -14350,6 +14350,7 @@ class Purchase_model extends App_Model
 
     public function check_cron_emails()
     {
+        $this->db->where('processing', 0);
         return $this->db->get(db_prefix() . 'cron_email')->result_array();
     }
 
