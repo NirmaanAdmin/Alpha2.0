@@ -3602,7 +3602,7 @@ class Purchase_model extends App_Model
      */
     public function update_approve_request($rel_id, $rel_type, $status)
     {
-        if(get_staff_user_id() != 11) {
+        if(get_staff_user_id() != 11 && $status != 3) {
             $summary = $this->db->query("
                 SELECT 
                     SUM(approve = 2) AS approved_count,
