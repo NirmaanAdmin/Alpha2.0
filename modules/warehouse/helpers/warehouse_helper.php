@@ -2212,8 +2212,8 @@ function update_all_goods_receipt_fields_activity_log($id, $new_data)
         if (!isset($field_map[$field])) {
             continue;
         }
-        $old_value = $old_data[$field] ?? '';
-        $new_value = $new_data[$field] ?? '';
+        $old_value = $old_data[$field] ?? 'None';
+        $new_value = $new_data[$field] ?? 'None';
         if ($field === 'pr_order_id') {
             $old_value = !empty($old_value) ? get_pur_order_name($old_value) : '';
             $new_value = !empty($new_value) ? get_pur_order_name($new_value) : '';
@@ -2350,8 +2350,8 @@ function update_goods_receipt_item_activity_log($new_data)
         if (!isset($field_map[$field])) {
             continue;
         }
-        $old_value = $old_data[$field] ?? '';
-        $new_value = $new_data[$field] ?? '';
+        $old_value = $old_data[$field] ?? 'None';
+        $new_value = $new_data[$field] ?? 'None';
         if ($field === 'warehouse_id') {
             $oldWarehouse = !empty($old_value) ? get_warehouse_name($old_value) : null;
             $newWarehouse = !empty($new_value) ? get_warehouse_name($new_value) : null;
@@ -2469,8 +2469,8 @@ function update_all_inv_app_fields_activity_log($id, $new_data)
         if (!isset($field_map[$field])) {
             continue;
         }
-        $old_value = $old_data[$field] ?? '';
-        $new_value = $new_data[$field] ?? '';
+        $old_value = $old_data[$field] ?? 'None';
+        $new_value = $new_data[$field] ?? 'None';
         if ($field === 'project_id') {
             $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
             $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
