@@ -34,6 +34,9 @@ $module_name = 'module_activity_log'; ?>
                            if (isset($_GET['module']) && $_GET['module'] == 'stckrec') {
                               $module_name_filter_val = $_GET['module'];
                            }
+                           if (isset($_GET['module']) && $_GET['module'] == 'stckiss') {
+                              $module_name_filter_val = $_GET['module'];
+                           }
                            if (isset($_GET['module']) && $_GET['module'] == 'inv_app') {
                               $module_name_filter_val = $_GET['module'];
                            }
@@ -44,6 +47,7 @@ $module_name = 'module_activity_log'; ?>
                               ['id' => 'pr', 'name' => _l('purchase_request')],
                               ['id' => 'pur_app', 'name' => _l('Purchase approval')],
                               ['id' => 'stckrec', 'name' => _l('stock_import')],
+                              ['id' => 'stckiss', 'name' => _l('stock_export')],
                               ['id' => 'inv_app', 'name' => _l('Inventory approval')],
                               ['id' => 'forms', 'name' => _l('Progress Report')],
                            ];

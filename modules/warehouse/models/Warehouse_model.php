@@ -3566,6 +3566,8 @@ class Warehouse_model extends App_Model
 			hooks()->do_action('after_wh_goods_delivery_added', $insert_id);
 		}
 
+		add_goods_delivery_activity_log($insert_id, true);
+
 		return $insert_id > 0 ? $insert_id : false;
 	}
 
@@ -7157,6 +7159,7 @@ class Warehouse_model extends App_Model
 
 		$affected_rows = 0;
 
+		add_goods_delivery_activity_log($id, false);
 		$this->db->where('goods_delivery_id', $id);
 		$this->db->delete(db_prefix() . 'goods_delivery_detail');
 		if ($this->db->affected_rows() > 0) {
@@ -7390,6 +7393,7 @@ class Warehouse_model extends App_Model
 		$goods_delivery_id = $data['id'];
 		unset($data['id']);
 
+		update_all_goods_delivery_fields_activity_log($goods_delivery_id, $data);
 		$this->db->where('id', $goods_delivery_id);
 		$this->db->update(db_prefix() . 'goods_delivery', $data);
 		if ($this->db->affected_rows() > 0) {
@@ -7436,7 +7440,7 @@ class Warehouse_model extends App_Model
 				unset($goods_delivery['without_checking_warehouse']);
 			}
 
-
+			update_goods_delivery_item_activity_log($goods_delivery);
 			$this->db->where('id', $goods_delivery['id']);
 			if ($this->db->update(db_prefix() . 'goods_delivery_detail', $goods_delivery)) {
 				$results++;
@@ -7445,6 +7449,7 @@ class Warehouse_model extends App_Model
 
 		// delete receipt note
 		foreach ($remove_goods_deliveries as $goods_deliver_id) {
+			add_goods_delivery_item_activity_log($goods_deliver_id, false);
 			$this->db->where('id', $goods_deliver_id);
 			if ($this->db->delete(db_prefix() . 'goods_delivery_detail')) {
 				$results++;
@@ -7496,7 +7501,9 @@ class Warehouse_model extends App_Model
 			}
 
 			$this->db->insert(db_prefix() . 'goods_delivery_detail', $goods_delivery);
-			if ($this->db->insert_id()) {
+			$goods_delivery_detail_id = $this->db->insert_id();
+			add_goods_delivery_item_activity_log($goods_delivery_detail_id, true);
+			if ($goods_delivery_detail_id) {
 				$results++;
 			}
 		}

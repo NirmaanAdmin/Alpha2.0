@@ -2143,6 +2143,19 @@ function add_inventory_approval_status_activity_log($id)
                 $module_name = 'stckrec';
                 $rel_id = $goods_receipt->id;
             }
+            if($wh_approval_details->rel_type == 2) {
+                $CI->db->where('id', $wh_approval_details->rel_id);
+                $goods_delivery = $CI->db->get(db_prefix() . 'goods_delivery')->row();
+                if(empty($wh_approval_details->approve)) {
+                    $description = "An approval request has been created for stock export <b>".$goods_delivery->goods_delivery_code."</b> by <b>".get_last_action_full_name($wh_approval_details->sender)."</b>.";
+                } else if($wh_approval_details->approve == 1) {
+                    $description = "Stock export <b>".$goods_delivery->goods_delivery_code."</b> has been approved by <b>".get_last_action_full_name($wh_approval_details->staff_approve)."</b>.";
+                } else if($wh_approval_details->approve == -1) {
+                    $description = "Stock export <b>".$goods_delivery->goods_delivery_code."</b> has been rejected by <b>".get_last_action_full_name($wh_approval_details->staff_approve)."</b>.";
+                }
+                $module_name = 'stckiss';
+                $rel_id = $goods_delivery->id;
+            }
             if(!empty($description)) {
                 $CI->db->insert(db_prefix() . 'module_activity_log', [
                     'module_name' => $module_name,
@@ -2495,6 +2508,251 @@ function update_all_inv_app_fields_activity_log($id, $new_data)
         $CI->db->insert(db_prefix() . 'module_activity_log', [
             'module_name' => 'inv_app',
             'rel_id' => NULL,
+            'description' => $description,
+            'date' => date('Y-m-d H:i:s'),
+            'staffid' => get_staff_user_id()
+        ]);
+    }
+    return true;
+}
+
+function add_goods_delivery_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $goods_delivery = $CI->db->get(db_prefix() . 'goods_delivery')->row();
+        if(!empty($goods_delivery)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Stock export <b>".$goods_delivery->goods_delivery_code."</b> has been ".$is_create_value.".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'stckiss',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function update_all_goods_delivery_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('departments_model');
+    if (empty($id)) {
+        return false;
+    }
+    $goods_delivery = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'goods_delivery')
+        ->row();
+    if (!$goods_delivery) {
+        return false;
+    }
+    $old_data = (array)$goods_delivery;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'date_c' => _l('accounting_date'),
+        'date_add' => _l('day_vouchers'),
+        'goods_receipt_id' => _l('stock_import'),
+        'customer_code' => _l('customer_name'),
+        'to_' => _l('receiver'),
+        'address' => _l('address'),
+        'project' => _l('project'),
+        'type' => _l('type_label'),
+        'department' => _l('department'),
+        'requester' => _l('requester'),
+        'staff_id' => _l('salesman'),
+        'invoice_no' => _l('invoice_no'),
+        'description' => _l('note_'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? 'None';
+        $new_value = $new_data[$field] ?? 'None';
+        if ($field === 'goods_receipt_id') {
+            if (!empty($old_value)) {
+                $old_record = get_goods_receipt_code($old_value);
+                if ($old_record && isset($old_record->goods_receipt_code)) {
+                    $old_value = $old_record->goods_receipt_code;
+                } else {
+                    $old_value = 'None';
+                }
+            } else {
+                $old_value = 'None';
+            }
+            if (!empty($new_value)) {
+                $new_record = get_goods_receipt_code($new_value);
+                if ($new_record && isset($new_record->goods_receipt_code)) {
+                    $new_value = $new_record->goods_receipt_code;
+                } else {
+                    $new_value = 'None';
+                }
+            } else {
+                $new_value = 'None';
+            }
+        }
+        if ($field === 'customer_code') {
+            $old_value = !empty($old_value) ? get_company_name($old_value) : '';
+            $new_value = !empty($new_value) ? get_company_name($new_value) : '';
+        }
+        if ($field === 'project') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'type') {
+            $opts = [
+                'capex' => _l('capex'),
+                'opex' => _l('opex'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'department') {
+            $departments_list = $CI->departments_model->get();
+            $opts = array_column($departments_list, 'name', 'departmentid');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'requester' || $field === 'staff_id') {
+            $staff_list = $CI->staff_model->get('', ['active' => 1]);
+            $opts = array_combine(
+                array_column($staff_list, 'staffid'),
+                array_map(fn($a) => $a['firstname'] . ' ' . $a['lastname'], $staff_list)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        update_goods_delivery_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_goods_delivery_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $goods_delivery = $CI->db->get(db_prefix() . 'goods_delivery')->row();
+        if(!empty($goods_delivery)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "".$field." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in stock export <b>".$goods_delivery->goods_delivery_code."</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'stckiss',
+                'rel_id' => $goods_delivery->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_goods_delivery_item_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $is_create_value = $is_create ? 'added' : 'removed';
+        $CI->db->where('id', $id);
+        $goods_delivery_detail = $CI->db->get(db_prefix() . 'goods_delivery_detail')->row();
+        if(!empty($goods_delivery_detail)) {
+            $CI->db->where('id', $goods_delivery_detail->goods_delivery_id);
+            $goods_delivery = $CI->db->get(db_prefix() . 'goods_delivery')->row();
+            if(!empty($goods_delivery_detail->commodity_name)) {
+                $description = "Item <b>".$goods_delivery_detail->commodity_name."</b> has been ".$is_create_value." for stock export <b>".$goods_delivery->goods_delivery_code."</b>.";
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => 'stckiss',
+                    'rel_id' => $goods_delivery->id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_goods_delivery_item_activity_log($new_data)
+{
+    $CI = &get_instance();
+    $old_data = array();
+    $goods_delivery_detail = $CI->db->where('id', $new_data['id'])
+        ->get(db_prefix() . 'goods_delivery_detail')
+        ->row();
+    if (!$goods_delivery_detail) {
+        return false;
+    }
+    $old_data = (array) $goods_delivery_detail;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'commodity_name' => _l('Item'),
+        'warehouse_id' => _l('warehouse_name'),
+        'quantities' => _l('quantity'),
+        'lot_number' => _l('lot_number'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? 'None';
+        $new_value = $new_data[$field] ?? 'None';
+        if ($field === 'warehouse_id') {
+            $oldWarehouse = !empty($old_value) ? get_warehouse_name($old_value) : null;
+            $newWarehouse = !empty($new_value) ? get_warehouse_name($new_value) : null;
+            $old_value = $oldWarehouse ? $oldWarehouse->warehouse_name : '';
+            $new_value = $newWarehouse ? $newWarehouse->warehouse_name : '';
+        }
+        $CI->db->where('id', $old_data['goods_delivery_id']);
+        $goods_delivery = $CI->db->get(db_prefix() . 'goods_delivery')->row();
+        $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$goods_delivery_detail->commodity_name."</b> in stock export <b>".$goods_delivery->goods_delivery_code."</b>.";
+        $CI->db->insert(db_prefix() . 'module_activity_log', [
+            'module_name' => 'stckiss',
+            'rel_id' => $goods_delivery->id,
             'description' => $description,
             'date' => date('Y-m-d H:i:s'),
             'staffid' => get_staff_user_id()
