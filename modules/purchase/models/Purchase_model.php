@@ -2287,6 +2287,7 @@ class Purchase_model extends App_Model
      */
     public function change_status_pur_order($status, $id)
     {
+        update_order_approval_status_activity_log($id, $status, 'pur_order');
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_orders', ['approve_status' => $status]);
         if ($this->db->affected_rows() > 0) {
@@ -2570,6 +2571,7 @@ class Purchase_model extends App_Model
             $this->db->where('id', $insert_id);
             $this->db->update(db_prefix() . 'pur_orders', $total);
 
+            add_po_activity_log($insert_id, true);
             // warehouse module hook after purchase order add
             hooks()->do_action('after_purchase_order_add', $insert_id);
 
@@ -2828,7 +2830,7 @@ class Purchase_model extends App_Model
      */
     public function delete_pur_order($id)
     {
-
+        add_po_activity_log($id, false);
         hooks()->do_action('before_pur_order_deleted', $id);
 
         $affectedRows = 0;
@@ -6693,6 +6695,8 @@ class Purchase_model extends App_Model
 
             hooks()->do_action('after_payment_pur_invoice_added', $insert_id);
 
+            add_pur_order_payment_activity_log($insert_id, true);
+
             return $insert_id;
         }
         return false;
@@ -7551,6 +7555,7 @@ class Purchase_model extends App_Model
         $data['content'] = nl2br($data['content']);
         $this->db->insert(db_prefix() . 'pur_comments', $data);
         $insert_id = $this->db->insert_id();
+        add_order_comments_activity_log($insert_id, true);
 
         if ($insert_id) {
 
@@ -7571,6 +7576,10 @@ class Purchase_model extends App_Model
     public function edit_comment($data, $id)
     {
         $this->db->where('id', $id);
+        $pur_comments = $this->db->get(db_prefix() . 'pur_comments')->row();
+        update_order_comments_activity_log($id, $pur_comments->content, $data['content']);
+
+        $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_comments', [
             'content' => nl2br($data['content']),
         ]);
@@ -7589,6 +7598,8 @@ class Purchase_model extends App_Model
      */
     public function remove_comment($id)
     {
+        add_order_comments_activity_log($id, false);
+        $this->db->where('id', $id);
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'pur_comments');
         if ($this->db->affected_rows() > 0) {
@@ -14317,6 +14328,9 @@ class Purchase_model extends App_Model
                 if($related == 'pur_request') {
                     add_pr_attachment_activity_log($id, $file['file_name'], true);
                 }
+                if($related == 'pur_order') {
+                    add_po_attachment_activity_log($id, $file['file_name'], true);
+                }
             }
         }
         return true;
@@ -14354,6 +14368,9 @@ class Purchase_model extends App_Model
             }
             if($attachment->rel_type == 'pur_request') {
                 add_pr_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
+            }
+            if($attachment->rel_type == 'pur_order') {
+                add_po_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
         }
 

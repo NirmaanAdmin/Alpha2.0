@@ -3651,9 +3651,6 @@ function add_order_status_activity_log($id)
         $CI->db->where('id', $id);
         $pur_approval_details = $CI->db->get(db_prefix() . 'pur_approval_details')->row();
         if(!empty($pur_approval_details)) {
-            $module_name = '';
-            $rel_id = '';
-            $description = '';
             if($pur_approval_details->rel_type == 'pur_request') {
                 $CI->db->where('id', $pur_approval_details->rel_id);
                 $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
@@ -3666,6 +3663,22 @@ function add_order_status_activity_log($id)
                 }
                 $module_name = 'pr';
                 $rel_id = $pur_request->id;
+            } else if ($pur_approval_details->rel_type == 'pur_order') {
+                $CI->db->where('id', $pur_approval_details->rel_id);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                if (empty($pur_approval_details->approve)) {
+                    $description = "An approval request has been created for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b> by <b>" . get_last_action_full_name($pur_approval_details->sender) . "</b>.";
+                } else if ($pur_approval_details->approve == 2) {
+                    $description = "Purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b> has been approved by <b>" . get_last_action_full_name($pur_approval_details->staff_approve) . "</b>.";
+                } else if ($pur_approval_details->approve == 3) {
+                    $description = "Purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b> has been rejected by <b>" . get_last_action_full_name($pur_approval_details->staff_approve) . "</b>.";
+                }
+                $module_name = 'po';
+                $rel_id = $pur_orders->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
             }
             if(!empty($description)) {
                 $CI->db->insert(db_prefix() . 'module_activity_log', [
@@ -3804,6 +3817,260 @@ function update_all_pur_app_fields_activity_log($id, $new_data)
             'date' => date('Y-m-d H:i:s'),
             'staffid' => get_staff_user_id()
         ]);
+    }
+    return true;
+}
+
+function add_po_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+        if (!empty($pur_orders)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b> has been ".$is_create_value.".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'po',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_po_attachment_activity_log($id, $file_name, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+        if (!empty($pur_orders)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            $description = "Attachment <b>" . $file_name . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'po',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_order_notes_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $notes = $CI->db->get(db_prefix() . 'notes')->row();
+        if (!empty($notes)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            if ($notes->rel_type == 'purchase_order') {
+                $CI->db->where('id', $notes->rel_id);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                $module_name = 'po';
+                $rel_id = $pur_orders->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if (!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_order_notes_activity_log($id, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $notes = $CI->db->get(db_prefix() . 'notes')->row();
+        if (!empty($notes)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            if ($notes->rel_type == 'purchase_order') {
+                $CI->db->where('id', $notes->rel_id);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                $module_name = 'po';
+                $rel_id = $pur_orders->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if (!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function add_order_comments_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_comments = $CI->db->get(db_prefix() . 'pur_comments')->row();
+        if (!empty($pur_comments)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            if ($pur_comments->rel_type == 'pur_order') {
+                $CI->db->where('id', $pur_comments->rel_id);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                $description = "Discuss <b>" . $pur_comments->content . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                $module_name = 'po';
+                $rel_id = $pur_orders->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if (!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_order_comments_activity_log($id, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_comments = $CI->db->get(db_prefix() . 'pur_comments')->row();
+        if (!empty($pur_comments)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            if ($pur_comments->rel_type == 'pur_order') {
+                $CI->db->where('id', $pur_comments->rel_id);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                $description = "Discuss field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                $module_name = 'po';
+                $rel_id = $pur_orders->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if (!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_order_approval_status_activity_log($id, $to_status, $rel_type)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        if ($to_status == 1) {
+            $to_status_name = _l('purchase_draft');
+        } else if ($to_status == 2) {
+            $to_status_name = _l('purchase_approved');
+        } else if ($to_status == 3) {
+            $to_status_name = _l('pur_rejected');
+        } else {
+            $to_status_name = _l('purchase_draft');
+        }
+        if ($rel_type == 'pur_order') {
+            $CI->db->where('id', $id);
+            $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+            $from_status = $pur_orders->approve_status;
+            if ($from_status == 1) {
+                $from_status_name = _l('purchase_draft');
+            } else if ($from_status == 2) {
+                $from_status_name = _l('purchase_approved');
+            } else if ($from_status == 3) {
+                $from_status_name = _l('pur_rejected');
+            } else {
+                $from_status_name = _l('purchase_draft');
+            }
+            $description = "An approval status is updated from <b>" . $from_status_name . "</b> to <b>" . $to_status_name . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+            $module_name = 'po';
+            $rel_id = $pur_orders->id;
+        } else {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
+        }
+        if (!empty($description)) {
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => $module_name,
+                'rel_id' => $rel_id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_pur_order_payment_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    $CI->load->model('currencies_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    if(!empty($id)) {
+        $is_create_value = $is_create ? 'added' : 'removed';
+        $CI->db->where('id', $id);
+        $pur_invoice_payment = $CI->db->get(db_prefix() . 'pur_invoice_payment')->row();
+        if(!empty($pur_invoice_payment->pur_invoice)) {
+            $CI->db->where('id', $pur_invoice_payment->pur_invoice);
+            $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+            if(!empty($pur_invoices->pur_order)) {
+                $CI->db->where('id', $pur_invoices->pur_order);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                if(!empty($pur_orders)) {
+                    $description = "Payment <b>".app_format_money($pur_invoice_payment->amount, $base_currency->symbol)."</b> has been ".$is_create_value." in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                    $CI->db->insert(db_prefix() . 'module_activity_log', [
+                        'module_name' => 'po',
+                        'rel_id' => $pur_orders->id,
+                        'description' => $description,
+                        'date' => date('Y-m-d H:i:s'),
+                        'staffid' => get_staff_user_id()
+                    ]);
+                }
+            }
+        }
     }
     return true;
 }
