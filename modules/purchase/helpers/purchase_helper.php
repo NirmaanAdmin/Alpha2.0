@@ -3517,9 +3517,6 @@ function add_order_item_activity_log($id, $rel_type, $is_create = true)
 {
     $CI = &get_instance();
     if(!empty($id)) {
-        $module_name = '';
-        $rel_id = '';
-        $description = '';
         $is_create_value = $is_create ? 'added' : 'removed';
         if($rel_type == 'pur_request') {
             $CI->db->where('prd_id', $id);
@@ -3533,6 +3530,24 @@ function add_order_item_activity_log($id, $rel_type, $is_create = true)
                     $rel_id = $pur_request->id;
                 }
             }
+        } else if ($rel_type == 'pur_order') {
+            $CI->db->where('id', $id);
+            $pur_order_detail = $CI->db->get(db_prefix() . 'pur_order_detail')->row();
+            if (!empty($pur_order_detail)) {
+                $CI->db->where('id', $pur_order_detail->pur_order);
+                $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+                $CI->db->where('id', $pur_order_detail->item_code);
+                $items = $CI->db->get(db_prefix() . 'items')->row();
+                if (!empty($items)) {
+                    $description = "Item <b>" . $items->commodity_code . " " . $items->description . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+                    $module_name = 'po';
+                    $rel_id = $pur_orders->id;
+                }
+            }
+        } else {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
         }
         if(!empty($description)) {
             $CI->db->insert(db_prefix() . 'module_activity_log', [
@@ -3561,6 +3576,15 @@ function update_order_item_activity_log($new_data, $rel_type)
             return false;
         }
         $old_data = (array) $pur_request_detail;
+    }
+    if ($rel_type == 'pur_order') {
+        $pur_order_detail = $CI->db->where('id', $new_data['id'])
+            ->get(db_prefix() . 'pur_order_detail')
+            ->row();
+        if (!$pur_order_detail) {
+            return false;
+        }
+        $old_data = (array) $pur_order_detail;
     }
     if (isset($old_data['tax_name'])) {
         $names = is_array($old_data['tax_name']) ? $old_data['tax_name'] : explode('|', $old_data['tax_name']);
@@ -3607,6 +3631,20 @@ function update_order_item_activity_log($new_data, $rel_type)
         'tax_value' => _l('tax_value'),
         'total' => _l('debit_note_total'),
     ];
+    if ($rel_type == 'pur_order') {
+        $field_map = [
+            'item_name' => _l('Item'),
+            'description' => _l('item_description'),
+            'quantity' => _l('quantity'),
+            'unit_id' => _l('pur_unit'),
+            'unit_price' => _l('unit_price'),
+            'tax_select' => _l('invoice_table_tax_heading'),
+            'tax_value' => _l('tax_value'),
+            'total' => _l('pur_subtotal_after_tax'),
+            'discount_money' => _l('Discount'),
+            'total_money' => _l('total'),
+        ];
+    }
     foreach ($changes as $field => $dummy) {
         if (!isset($field_map[$field])) {
             continue;
@@ -3617,19 +3655,26 @@ function update_order_item_activity_log($new_data, $rel_type)
             $old_value = !empty($old_value) ? pur_get_unit_name($old_value) : '';
             $new_value = !empty($new_value) ? pur_get_unit_name($new_value) : '';
         }
-        if ($field === 'unit_price' || $field === 'total' || $field === 'tax_value' || $field === 'into_money') {
+        if ($field === 'unit_price' || $field === 'total' || $field === 'tax_value' || $field === 'into_money' || $field === 'discount_money' || $field === 'total_money') {
             $old_value = app_format_money($old_value, $base_currency->symbol);
             $new_value = app_format_money($new_value, $base_currency->symbol);
         }
-        $module_name = '';
-        $rel_id = '';
-        $description = '';
         if($rel_type == 'pur_request') {
             $CI->db->where('id', $old_data['pur_request']);
             $pur_request = $CI->db->get(db_prefix() . 'pur_request')->row();
             $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$pur_request_detail->item_text."</b> in purchase request <b>".$pur_request->pur_rq_code."</b>.";
             $module_name = 'pr';
             $rel_id = $pur_request->id;
+        } else if($rel_type == 'pur_order') {
+            $CI->db->where('id', $old_data['pur_order']);
+            $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+            $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$pur_order_detail->item_name."</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+            $module_name = 'po';
+            $rel_id = $pur_orders->id;
+        } else {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
         }
         if(!empty($description)) {
             $CI->db->insert(db_prefix() . 'module_activity_log', [
@@ -4070,6 +4115,180 @@ function add_pur_order_payment_activity_log($id, $is_create = true)
                     ]);
                 }
             }
+        }
+    }
+    return true;
+}
+
+function update_all_po_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('currencies_model');
+    $CI->load->model('purchase_model');
+    $CI->load->model('staff_model');
+    $CI->load->model('departments_model');
+    $CI->load->model('invoices_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    if (empty($id)) {
+        return false;
+    }
+    $pur_orders = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'pur_orders')
+        ->row();
+    if (!$pur_orders) {
+        return false;
+    }
+    $old_data = (array)$pur_orders;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'pur_order_name' => _l('pur_order_description'),
+        'delivery_person' => _l('delivery_person'),
+        'vendor' => _l('vendor'),
+        'pur_request' => _l('pur_request'),
+        'order_date' => _l('order_date'),
+        'buyer' => _l('buyer'),
+        'department' => _l('department'),
+        'clients' => _l('clients'),
+        'sale_invoice' => _l('sale_invoice'),
+        'project' => _l('project'),
+        'type' => _l('type'),
+        'days_owed' => _l('days_owed'),
+        'delivery_date' => _l('delivery_date'),
+        'discount_type' => _l('discount_type'),
+        'shipping_address' => _l('pur_company_address'),
+        'shipping_zip' => _l('pur_company_zipcode'),
+        'shipping_city' => _l('pur_company_city'),
+        'shipping_state' => _l('pur_company_state'),
+        'shipping_country_text' => _l('pur_company_country_text'),
+        'shipping_country' => _l('pur_company_country_code'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'delivery_person' || $field === 'buyer') {
+            $staff_list = $CI->staff_model->get('', ['active' => 1]);
+            $opts = array_combine(
+                array_column($staff_list, 'staffid'),
+                array_map(fn($a) => $a['firstname'] . ' ' . $a['lastname'], $staff_list)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'vendor') {
+            $vendor_list = $CI->purchase_model->get_vendor();
+            $opts = array_column($vendor_list, 'company', 'userid');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'pur_request') {
+            $pur_request = $CI->purchase_model->get_pur_request_by_status(2);
+            $opts = array_combine(
+                array_column($pur_request, 'id'),
+                array_map(fn($a) => $a['pur_rq_code'] . ' - ' . $a['pur_rq_name'], $pur_request)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'department') {
+            $departments_list = $CI->departments_model->get();
+            $opts = array_column($departments_list, 'name', 'departmentid');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'clients') {
+            $format_clients = function ($value) {
+                if (empty($value)) {
+                    return '';
+                }
+                if (!is_array($value)) {
+                    $value = explode(',', $value);
+                }
+                $names = [];
+                foreach ($value as $client_id) {
+                    $client_id = trim($client_id);
+                    if (!empty($client_id)) {
+                        $names[] = get_company_name($client_id);
+                    }
+                }
+                return implode(', ', $names);
+            };
+            $old_value = $format_clients($old_value);
+            $new_value = $format_clients($new_value);
+        }
+        if ($field === 'sale_invoice') {
+            $old_value = !empty($old_value) ? format_invoice_number($old_value) : '';
+            $new_value = !empty($new_value) ? format_invoice_number($new_value) : '';
+        }
+        if ($field === 'project') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'type') {
+            $opts = [
+                'capex' => _l('capex'),
+                'opex' => _l('opex'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'discount_type') {
+            $opts = [
+                'before_tax' => _l('discount_type_before_tax'),
+                'after_tax' => _l('discount_type_after_tax'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'shipping_country') {
+            $countries = get_all_countries();
+            $opts = array_column($countries, 'short_name', 'country_id');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        update_po_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_po_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_orders = $CI->db->get(db_prefix() . 'pur_orders')->row();
+        if (!empty($pur_orders)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "" . $field . " field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'po',
+                'rel_id' => $pur_orders->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
         }
     }
     return true;

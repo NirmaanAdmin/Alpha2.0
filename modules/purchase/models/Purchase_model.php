@@ -2691,6 +2691,7 @@ class Purchase_model extends App_Model
             unset($data['custom_fields']);
         }
 
+        update_all_po_fields_activity_log($id, $data);
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_orders', $data);
         $this->save_purchase_files('pur_order', $id);
@@ -2738,6 +2739,7 @@ class Purchase_model extends App_Model
 
                 $this->db->insert(db_prefix() . 'pur_order_detail', $dt_data);
                 $new_quote_insert_id = $this->db->insert_id();
+                add_order_item_activity_log($new_quote_insert_id, 'pur_order', true);
                 if ($new_quote_insert_id) {
                     $affectedRows++;
                 }
@@ -2746,6 +2748,7 @@ class Purchase_model extends App_Model
 
         if (count($update_order) > 0) {
             foreach ($update_order as $_key => $rqd) {
+                update_order_item_activity_log($rqd, 'pur_order');
                 $dt_data = [];
                 $dt_data['pur_order'] = $id;
                 $dt_data['item_code'] = $rqd['item_code'];
@@ -2790,6 +2793,7 @@ class Purchase_model extends App_Model
 
         if (count($remove_order) > 0) {
             foreach ($remove_order as $remove_id) {
+                add_order_item_activity_log($remove_id, 'pur_order', false);
                 $this->db->where('id', $remove_id);
                 if ($this->db->delete(db_prefix() . 'pur_order_detail')) {
                     $affectedRows++;
