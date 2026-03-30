@@ -6338,6 +6338,7 @@ class Purchase_model extends App_Model
 
             $this->db->where('id', $insert_id);
             $this->db->update(db_prefix() . 'pur_invoices', $total);
+            add_pur_invoice_activity_log($insert_id, true);
 
             hooks()->do_action('after_pur_invoice_added', $insert_id);
 
@@ -6592,6 +6593,7 @@ class Purchase_model extends App_Model
      */
     public function delete_pur_invoice($id)
     {
+        add_pur_invoice_activity_log($id, false);
         $this->db->where('rel_type', 'pur_invoice');
         $this->db->where('rel_id', $id);
         $this->db->delete(db_prefix() . 'taggables');
@@ -6858,6 +6860,7 @@ class Purchase_model extends App_Model
                     // okey only index.html so we can delete the folder also
                     delete_dir(PURCHASE_MODULE_UPLOAD_FOLDER . '/pur_invoice/' . $attachment->rel_id);
                 }
+                add_pur_invoice_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
         }
 

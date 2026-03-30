@@ -1607,6 +1607,7 @@ function handle_pur_invoice_file($id)
                     ];
 
                     $CI->misc_model->add_attachment_to_database($id, $type, $attachment);
+                    add_pur_invoice_attachment_activity_log($id, $filename, true);
                     $totalUploaded++;
                 }
             }
@@ -3922,6 +3923,12 @@ function add_order_notes_activity_log($id, $is_create = true)
                 $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
                 $module_name = 'po';
                 $rel_id = $pur_orders->id;
+            } else if ($notes->rel_type == 'pur_invoice') {
+                $CI->db->where('id', $notes->rel_id);
+                $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+                $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
+                $module_name = 'pur_invoice';
+                $rel_id = $pur_invoices->id;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -3956,6 +3963,12 @@ function update_order_notes_activity_log($id, $old_value, $new_value)
                 $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
                 $module_name = 'po';
                 $rel_id = $pur_orders->id;
+            } else if ($notes->rel_type == 'pur_invoice') {
+                $CI->db->where('id', $notes->rel_id);
+                $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+                $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
+                $module_name = 'pur_invoice';
+                $rel_id = $pur_invoices->id;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -3989,6 +4002,12 @@ function add_order_comments_activity_log($id, $is_create = true)
                 $description = "Discuss <b>" . $pur_comments->content . "</b> has been " . $is_create_value . " for purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
                 $module_name = 'po';
                 $rel_id = $pur_orders->id;
+            } else if ($pur_comments->rel_type == 'pur_invoice') {
+                $CI->db->where('id', $pur_comments->rel_id);
+                $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+                $description = "Discuss <b>" . $pur_comments->content . "</b> has been " . $is_create_value . " for purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
+                $module_name = 'pur_invoice';
+                $rel_id = $pur_invoices->id;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -4023,6 +4042,12 @@ function update_order_comments_activity_log($id, $old_value, $new_value)
                 $description = "Discuss field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase order <b>" . $pur_orders->pur_order_number . " - " . $pur_orders->pur_order_name . "</b>.";
                 $module_name = 'po';
                 $rel_id = $pur_orders->id;
+            } else if ($pur_comments->rel_type == 'pur_invoice') {
+                $CI->db->where('id', $pur_comments->rel_id);
+                $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+                $description = "Discuss field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
+                $module_name = 'pur_invoice';
+                $rel_id = $pur_invoices->id;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -4285,6 +4310,48 @@ function update_po_activity_log($id, $field, $old_value, $new_value)
             $CI->db->insert(db_prefix() . 'module_activity_log', [
                 'module_name' => 'po',
                 'rel_id' => $pur_orders->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_pur_invoice_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+        if (!empty($pur_invoices)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Purchase invoice <b>" . $pur_invoices->invoice_number . "</b> has been ".$is_create_value.".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'pur_invoice',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_pur_invoice_attachment_activity_log($id, $file_name, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $pur_invoices = $CI->db->get(db_prefix() . 'pur_invoices')->row();
+        if (!empty($pur_invoices)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            $description = "Attachment <b>" . $file_name . "</b> has been " . $is_create_value . " for purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'pur_invoice',
+                'rel_id' => $id,
                 'description' => $description,
                 'date' => date('Y-m-d H:i:s'),
                 'staffid' => get_staff_user_id()
