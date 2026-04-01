@@ -6484,6 +6484,7 @@ class Purchase_model extends App_Model
 
                 $this->db->insert(db_prefix() . 'pur_invoice_details', $dt_data);
                 $new_quote_insert_id = $this->db->insert_id();
+                add_order_item_activity_log($new_quote_insert_id, 'pur_invoice', true);
                 if ($new_quote_insert_id) {
                     $affectedRows++;
                 }
@@ -6492,6 +6493,7 @@ class Purchase_model extends App_Model
 
         if (count($update_order) > 0) {
             foreach ($update_order as $_key => $rqd) {
+                update_order_item_activity_log($rqd, 'pur_invoice');
                 $dt_data = [];
                 $dt_data['pur_invoice'] = $id;
                 $dt_data['item_code'] = $rqd['item_code'];
@@ -6536,6 +6538,7 @@ class Purchase_model extends App_Model
 
         if (count($remove_order) > 0) {
             foreach ($remove_order as $remove_id) {
+                add_order_item_activity_log($remove_id, 'pur_invoice', false);
                 $this->db->where('id', $remove_id);
                 if ($this->db->delete(db_prefix() . 'pur_invoice_details')) {
                     $affectedRows++;
@@ -6543,6 +6546,7 @@ class Purchase_model extends App_Model
             }
         }
 
+        update_all_pur_invoice_fields_activity_log($id, $data);
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_invoices', $data);
 
@@ -6702,6 +6706,7 @@ class Purchase_model extends App_Model
             hooks()->do_action('after_payment_pur_invoice_added', $insert_id);
 
             add_pur_order_payment_activity_log($insert_id, true);
+            add_pur_invoice_payment_activity_log($insert_id, true);
 
             return $insert_id;
         }
@@ -6717,6 +6722,7 @@ class Purchase_model extends App_Model
      */
     public function delete_payment_pur_invoice($id)
     {
+        add_pur_invoice_payment_activity_log($id, false);
         $payment = $this->get_payment_pur_invoice($id);
 
         $this->db->where('id', $id);
