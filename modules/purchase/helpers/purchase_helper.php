@@ -745,6 +745,7 @@ function handle_pur_vendor_attachments_upload($id, $customer_upload = false)
                     }
 
                     $CI->misc_model->add_attachment_to_database($id, 'pur_vendor', $attachment);
+                    add_vendor_attachment_activity_log($id, $filename, true);
                     $totalUploaded++;
                 }
             }
@@ -3958,6 +3959,12 @@ function add_order_notes_activity_log($id, $is_create = true)
                 $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
                 $module_name = 'pur_invoice';
                 $rel_id = $pur_invoices->id;
+            } else if ($notes->rel_type == 'pur_vendor') {
+                $CI->db->where('userid', $notes->rel_id);
+                $pur_vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+                $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for vendor <b>" . $pur_vendor->company . "</b>.";
+                $module_name = 'ven';
+                $rel_id = $pur_vendor->userid;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -3998,6 +4005,12 @@ function update_order_notes_activity_log($id, $old_value, $new_value)
                 $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in purchase invoice <b>" . $pur_invoices->invoice_number . "</b>.";
                 $module_name = 'pur_invoice';
                 $rel_id = $pur_invoices->id;
+            } else if ($notes->rel_type == 'pur_vendor') {
+                $CI->db->where('userid', $notes->rel_id);
+                $pur_vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+                $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in vendor <b>" . $pur_vendor->company . "</b>.";
+                $module_name = 'ven';
+                $rel_id = $pur_vendor->userid;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -4516,6 +4529,276 @@ function update_pur_invoice_activity_log($id, $field, $old_value, $new_value)
             $CI->db->insert(db_prefix() . 'module_activity_log', [
                 'module_name' => 'pur_invoice',
                 'rel_id' => $pur_invoices->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_vendor_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('userid', $id);
+        $pur_vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+        if (!empty($pur_vendor)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Vendor <b>" . $pur_vendor->company . "</b> has been " . $is_create_value . ".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'ven',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_vendor_contact_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->select(
+            db_prefix() . 'pur_contacts.firstname,' .
+                db_prefix() . 'pur_contacts.lastname,' .
+                db_prefix() . 'pur_contacts.userid,' .
+                db_prefix() . 'pur_vendor.company'
+        );
+        $CI->db->from(db_prefix() . 'pur_contacts');
+        $CI->db->join(db_prefix() . 'pur_vendor', db_prefix() . 'pur_vendor.userid = ' . db_prefix() . 'pur_contacts.userid', 'left');
+        $CI->db->where(db_prefix() . 'pur_contacts.id', $id);
+        $CI->db->group_by(db_prefix() . 'pur_contacts.id');
+        $pur_contacts = $CI->db->get()->row();
+        if (!empty($pur_contacts)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Vendor contact <b>" . $pur_contacts->firstname . " " . $pur_contacts->lastname . " (" . $pur_contacts->company . ")</b> has been " . $is_create_value . ".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'ven',
+                'rel_id' => $pur_contacts->userid,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function update_all_vendor_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    if (empty($id)) {
+        return false;
+    }
+    $pur_vendor = $CI->db->where('userid', $id)
+        ->get(db_prefix() . 'pur_vendor')
+        ->row();
+    if (!$pur_vendor) {
+        return false;
+    }
+    $old_data = (array)$pur_vendor;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'vendor_code' => _l('vendor_code'),
+        'company' => _l('client_company'),
+        'balance' => _l('Balance'),
+        'balance_as_of' => _l('as of'),
+        'vat' => _l('vendor_vat'),
+        'phonenumber' => _l('client_phonenumber'),
+        'website' => _l('client_website'),
+        'category' => _l('vendor_category'),
+        'address' => _l('client_address'),
+        'city' => _l('client_city'),
+        'state' => _l('client_state'),
+        'zip' => _l('client_postal_code'),
+        'country' => _l('clients_country'),
+        'bank_detail' => _l('bank_detail'),
+        'payment_terms' => _l('payment_terms'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'category') {
+            if (!empty($old_value)) {
+                $old_value_query = $CI->db->select('category_name')
+                    ->where_in('id', explode(",", $old_value))
+                    ->from(db_prefix() . 'pur_vendor_cate')
+                    ->get()
+                    ->result_array();
+                $old_value = !empty($old_value_query) ? implode(', ', array_column($old_value_query, 'category_name')) : '';
+            }
+            if (!empty($new_value)) {
+                $new_value_query = $CI->db->select('category_name')
+                    ->where_in('id', explode(",", $new_value))
+                    ->from(db_prefix() . 'pur_vendor_cate')
+                    ->get()
+                    ->result_array();
+                $new_value = !empty($new_value_query) ? implode(', ', array_column($new_value_query, 'category_name')) : '';
+            }
+        }
+        if ($field === 'country') {
+            $countries = get_all_countries();
+            $opts = array_column($countries, 'short_name', 'country_id');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        update_vendor_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_vendor_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('userid', $id);
+        $pur_vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+        if (!empty($pur_vendor)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "" . $field . " field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in vendor <b>" . $pur_vendor->company . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'ven',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function update_all_vendor_contact_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    if (empty($id)) {
+        return false;
+    }
+    $pur_contacts = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'pur_contacts')
+        ->row();
+    if (!$pur_contacts) {
+        return false;
+    }
+    $old_data = (array)$pur_contacts;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'firstname' => _l('client_firstname'),
+        'lastname' => _l('client_lastname'),
+        'title' => _l('contact_position'),
+        'email' => _l('client_email'),
+        'phonenumber' => _l('client_phonenumber'),
+        'direction' => _l('document_direction'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'direction') {
+            $opts = [
+                'ltr' => _l('LTR'),
+                'rtl' => _l('RTL'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        update_vendor_contact_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_vendor_contact_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->select(
+            db_prefix() . 'pur_contacts.firstname,' .
+                db_prefix() . 'pur_contacts.lastname,' .
+                db_prefix() . 'pur_contacts.userid,' .
+                db_prefix() . 'pur_vendor.company'
+        );
+        $CI->db->from(db_prefix() . 'pur_contacts');
+        $CI->db->join(db_prefix() . 'pur_vendor', db_prefix() . 'pur_vendor.userid = ' . db_prefix() . 'pur_contacts.userid', 'left');
+        $CI->db->where(db_prefix() . 'pur_contacts.id', $id);
+        $CI->db->group_by(db_prefix() . 'pur_contacts.id');
+        $pur_contacts = $CI->db->get()->row();
+        if (!empty($pur_contacts)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "" . $field . " field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in vendor contact <b>" . $pur_contacts->firstname . " " . $pur_contacts->lastname . " (" . $pur_contacts->company . ")</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'ven',
+                'rel_id' => $pur_contacts->userid,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_vendor_attachment_activity_log($id, $file_name, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('userid', $id);
+        $pur_vendor = $CI->db->get(db_prefix() . 'pur_vendor')->row();
+        if (!empty($pur_vendor)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            $description = "Attachment <b>" . $file_name . "</b> has been " . $is_create_value . " for vendor <b>" . $pur_vendor->company . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'ven',
+                'rel_id' => $id,
                 'description' => $description,
                 'date' => date('Y-m-d H:i:s'),
                 'staffid' => get_staff_user_id()

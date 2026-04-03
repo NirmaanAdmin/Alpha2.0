@@ -206,6 +206,7 @@ class Purchase_model extends App_Model
                 'id'            => $userid,
                 'data'          => $data,
             ]);
+            add_vendor_activity_log($userid, true);
         }
 
         if ($userid) {
@@ -299,6 +300,7 @@ class Purchase_model extends App_Model
 
         $data = hooks()->apply_filters('before_pur_vendor_updated', $data, $id);
 
+        update_all_vendor_fields_activity_log($id, $data);
         $this->db->where('userid', $id);
         $this->db->update(db_prefix() . 'pur_vendor', $data);
 
@@ -430,6 +432,7 @@ class Purchase_model extends App_Model
      */
     public function delete_vendor($id)
     {
+        add_vendor_activity_log($id, false);
         $affectedRows = 0;
 
         hooks()->do_action('before_client_deleted', $id);
@@ -546,6 +549,8 @@ class Purchase_model extends App_Model
                 $this->send_contact_welcome_mail($data, $password_before_hash, $contact_id);
             }
 
+            add_vendor_contact_activity_log($contact_id, true);
+
             return $contact_id;
         }
 
@@ -617,6 +622,7 @@ class Purchase_model extends App_Model
             unset($data['is_primary']);
         }
 
+        update_all_vendor_contact_fields_activity_log($id, $data);
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_contacts', $data);
 
@@ -648,6 +654,7 @@ class Purchase_model extends App_Model
      */
     public function delete_contact($id)
     {
+        add_vendor_contact_activity_log($id, false);
         hooks()->do_action('before_delete_contact', $id);
 
         $this->db->where('id', $id);
@@ -5357,6 +5364,7 @@ class Purchase_model extends App_Model
                     // okey only index.html so we can delete the folder also
                     delete_dir(PURCHASE_MODULE_UPLOAD_FOLDER . '/pur_vendor/' . $attachment->rel_id);
                 }
+                add_vendor_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
         }
 
