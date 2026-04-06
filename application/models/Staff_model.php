@@ -86,7 +86,7 @@ class Staff_model extends App_Model
         $this->db->update('filters', [
             'staff_id' => $transfer_data_to,
         ]);
-        
+
         $this->db->where('staffid', $id);
         $this->db->update(db_prefix() . 'project_files', [
             'staffid' => $transfer_data_to,
@@ -502,8 +502,8 @@ class Staff_model extends App_Model
                     'userid'         => $staffid,
                 ]);
             }
-            if(isset($project_assign)) {
-                if(!empty($project_assign)) {
+            if (isset($project_assign)) {
+                if (!empty($project_assign)) {
                     foreach ($project_assign as $key => $value) {
                         $member = array();
                         $member['project_id'] = $value;
@@ -768,19 +768,24 @@ class Staff_model extends App_Model
 
     /**
      * Change staff status / active / inactive
-     * @param  mixed $id     staff id
+     * @param  mixed $id     staff id 
      * @param  mixed $status status(0/1)
      */
     public function change_staff_status($id, $status)
     {
         $status = hooks()->apply_filters('before_staff_status_change', $status, $id);
 
+        // Set status_work based on status
+        $status_work = ($status == 1) ? 'working' : 'inactivity';
+
         $this->db->where('staffid', $id);
         $this->db->update(db_prefix() . 'staff', [
-            'active' => $status,
+            'active'      => $status,
+            'status_work' => $status_work,
         ]);
 
-        log_activity('Staff Status Changed [StaffID: ' . $id . ' - Status(Active/Inactive): ' . $status . ']');
+        log_activity('Staff Status Changed [StaffID: ' . $id . ' - Status(Active/Inactive): ' . $status . ' - Work Status: ' . $status_work . ']');
+
         hooks()->do_action('after_staff_status_change', $id);
     }
 
@@ -881,7 +886,7 @@ class Staff_model extends App_Model
         return $result;
     }
 
-    public function find_project_members($project_id) 
+    public function find_project_members($project_id)
     {
         $this->db->select(db_prefix() . 'staff.staffid as id, CONCAT(firstname," ",lastname) AS full_name', FALSE);
         $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'project_members.staff_id');
