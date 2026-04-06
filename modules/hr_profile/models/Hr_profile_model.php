@@ -7594,4 +7594,85 @@ class Hr_profile_model extends App_Model
 	}
 
 	//end file
+
+	public function get_staff_data($filters = [])
+	{
+		$this->db->select('*');
+
+		$this->db->from(db_prefix() . 'staff as staff');
+
+		/**
+		 * -----------------------------------------
+		 * APPLY FILTERS
+		 * -----------------------------------------
+		 */
+
+		// Status Work Filter
+		if (!empty($filters['status_work']) && is_array($filters['status_work'])) {
+			$this->db->where_in('staff.status_work', $filters['status_work']);
+		}
+
+		// Staff Role Filter
+		if (!empty($filters['staff_role']) && is_array($filters['staff_role'])) {
+			$this->db->where_in('staff.role', $filters['staff_role']);
+		}
+
+		// Department Filter
+		if (!empty($filters['department'])) {
+			$this->db->where('staff.department', $filters['department']);
+		}
+
+		/**
+		 * -----------------------------------------
+		 * ORDER
+		 * -----------------------------------------
+		 */
+		$this->db->order_by('staff.staffid', 'DESC');
+
+		return $this->db->get()->result_array();
+	}
+
+	public function get_workplace_name_by_id($id)
+	{
+		if (empty($id)) {
+			return '';
+		}
+
+		$this->db->where('id', $id);
+		$workplace = $this->db->get(db_prefix() . 'hr_workplace')->row_array();
+
+		if ($workplace) {
+			return $workplace['name']; // change 'name' if column is different
+		}
+
+		return '';
+	}
+
+	public function get_job_position_name_by_id($id)
+	{
+		if (empty($id) || !is_numeric($id)) {
+			return '';
+		}
+
+		$this->db->select('position_name'); // change if column name is different
+		$this->db->where('position_id', $id);
+
+		$result = $this->db->get(db_prefix() . 'hr_job_position')->row_array();
+
+		return $result ? $result['position_name'] : '';
+	}
+
+	public function get_role_name_by_id($id)
+	{
+		if (empty($id) || !is_numeric($id)) {
+			return '';
+		}
+
+		$this->db->select('name'); // roles table usually uses 'name'
+		$this->db->where('roleid', $id);
+
+		$result = $this->db->get(db_prefix() . 'roles')->row_array();
+
+		return $result ? $result['name'] : '';
+	}
 }
