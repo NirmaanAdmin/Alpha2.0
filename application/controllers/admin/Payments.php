@@ -249,6 +249,7 @@ class Payments extends AdminController
     /* Delete payment */
     public function delete($id)
     {
+        add_inv_payment_activity_log($id, false);
         if (staff_cant('delete', 'payments')) {
             access_denied('Delete Payment');
         }

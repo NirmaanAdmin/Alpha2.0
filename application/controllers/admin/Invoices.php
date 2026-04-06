@@ -536,6 +536,7 @@ class Invoices extends AdminController
             $this->load->model('payments_model');
             $id = $this->payments_model->process_payment($this->input->post(), '');
             if ($id) {
+                add_inv_payment_activity_log($id, true);
                 set_alert('success', _l('invoice_payment_recorded'));
                 redirect(admin_url('payments/payment/' . $id));
             } else {
