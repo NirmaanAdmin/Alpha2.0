@@ -385,3 +385,44 @@ function user_can_view_estimate($id, $staff_id = false)
 
     return false;
 }
+
+function add_estimates_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $estimates = $CI->db->get(db_prefix() . 'estimates')->row();
+        if (!empty($estimates)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Estimate <b>" . format_estimate_number($estimates->id) . "</b> has been " . $is_create_value . ".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'estimates',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
+
+function add_estimate_to_invoice_activity_log($id)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $estimates = $CI->db->get(db_prefix() . 'estimates')->row();
+        if (!empty($estimates->invoiceid)) {
+            $description = "Estimate <b>" . format_estimate_number($estimates->id) . "</b> has been converted to invoice <b>" . format_invoice_number($estimates->invoiceid) . "</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'estimates',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}

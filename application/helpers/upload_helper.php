@@ -639,6 +639,7 @@ function handle_sales_attachments($rel_id, $rel_type)
         }
 
         if ($file_uploaded == true) {
+            add_sales_attachment_activity_log($insert_id, true);
             echo json_encode([
                 'success'       => true,
                 'attachment_id' => $insert_id,
@@ -1576,5 +1577,41 @@ function handle_ckecklist_item_attachment_array($related, $form_id, $item_id, $i
     return false;
 }
 
-
-
+function add_sales_attachment_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $files = $CI->db->get(db_prefix() . 'files')->row();
+        if (!empty($files)) {
+            $is_create_value = $is_create ? 'added' : 'removed';
+            if ($files->rel_type == 'invoice') {
+                $CI->db->where('id', $files->rel_id);
+                $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
+                $description = "Attachment <b>" . $files->file_name . "</b> has been " . $is_create_value . " for invoice <b>" . format_invoice_number($invoices->id) . "</b>.";
+                $module_name = 'invoices';
+                $rel_id = $invoices->id;
+            } else if ($files->rel_type == 'estimate') {
+                $CI->db->where('id', $files->rel_id);
+                $estimates = $CI->db->get(db_prefix() . 'estimates')->row();
+                $description = "Attachment <b>" . $files->file_name . "</b> has been " . $is_create_value . " for estimate <b>" . format_estimate_number($estimates->id) . "</b>.";
+                $module_name = 'estimates';
+                $rel_id = $estimates->id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if (!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => $module_name,
+                    'rel_id' => $rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}

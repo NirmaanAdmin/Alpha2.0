@@ -729,6 +729,8 @@ function user_can_view_invoice($id, $staff_id = false)
 function add_inv_payment_activity_log($id, $is_create = true)
 {
     $CI = &get_instance();
+    $CI->load->model('currencies_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
     if(!empty($id)) {
         $CI->db->where('id', $id);
         $invoicepaymentrecords = $CI->db->get(db_prefix() . 'invoicepaymentrecords')->row();
@@ -737,7 +739,7 @@ function add_inv_payment_activity_log($id, $is_create = true)
             $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
             $is_create_value = $is_create ? 'added' : 'removed';
             if(!empty($invoices)) {
-                $description = "Payment has been ".$is_create_value." for invoice <b>".format_invoice_number($invoices->id)."</b>.";
+                $description = "Payment <b>".app_format_money($invoicepaymentrecords->amount, $base_currency->symbol)."</b> has been ".$is_create_value." for invoice <b>".format_invoice_number($invoices->id)."</b>.";
                 $CI->db->insert(db_prefix() . 'module_activity_log', [
                     'module_name' => 'inv_payment',
                     'rel_id' => $invoices->id,
@@ -848,6 +850,27 @@ function update_inv_payment_activity_log($id, $field, $old_value, $new_value)
                     'staffid' => get_staff_user_id()
                 ]);
             }
+        }
+    }
+    return true;
+}
+
+function add_invoices_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if (!empty($id)) {
+        $CI->db->where('id', $id);
+        $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
+        if (!empty($invoices)) {
+            $is_create_value = $is_create ? 'created' : 'deleted';
+            $description = "Invoice <b>" . format_invoice_number($invoices->id) . "</b> has been " . $is_create_value . ".";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'invoices',
+                'rel_id' => $id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
         }
     }
     return true;

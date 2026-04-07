@@ -283,6 +283,8 @@ class Estimates_model extends App_Model
             hooks()->do_action('estimate_converted_to_invoice', ['invoice_id' => $id, 'estimate_id' => $_estimate->id]);
         }
 
+        add_estimate_to_invoice_activity_log($_estimate->id);
+
         return $id;
     }
 
@@ -553,6 +555,8 @@ class Estimates_model extends App_Model
             if ($save_and_send === true) {
                 $this->send_estimate_to_client($insert_id, '', true, '', true);
             }
+
+            add_estimates_activity_log($insert_id, true);
 
             return $insert_id;
         }
@@ -933,6 +937,7 @@ class Estimates_model extends App_Model
             if (empty($attachment->external)) {
                 unlink(get_upload_path_by_type('estimate') . $attachment->rel_id . '/' . $attachment->file_name);
             }
+            add_sales_attachment_activity_log($attachment->id, false);
             $this->db->where('id', $attachment->id);
             $this->db->delete(db_prefix() . 'files');
             if ($this->db->affected_rows() > 0) {
@@ -977,6 +982,7 @@ class Estimates_model extends App_Model
 
         $this->clear_signature($id);
 
+        add_estimates_activity_log($id, false);
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'estimates');
 

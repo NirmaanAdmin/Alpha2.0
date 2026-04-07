@@ -3965,6 +3965,18 @@ function add_order_notes_activity_log($id, $is_create = true)
                 $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for vendor <b>" . $pur_vendor->company . "</b>.";
                 $module_name = 'ven';
                 $rel_id = $pur_vendor->userid;
+            } else if ($notes->rel_type == 'invoice') {
+                $CI->db->where('id', $notes->rel_id);
+                $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
+                $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for invoice <b>" . format_invoice_number($invoices->id) . "</b>.";
+                $module_name = 'invoices';
+                $rel_id = $invoices->id;
+            } else if ($notes->rel_type == 'estimate') {
+                $CI->db->where('id', $notes->rel_id);
+                $estimates = $CI->db->get(db_prefix() . 'estimates')->row();
+                $description = "Notes <b>" . $notes->description . "</b> has been " . $is_create_value . " for estimate <b>" . format_estimate_number($estimates->id) . "</b>.";
+                $module_name = 'estimates';
+                $rel_id = $estimates->id;
             } else {
                 $module_name = '';
                 $rel_id = '';
@@ -4011,6 +4023,18 @@ function update_order_notes_activity_log($id, $old_value, $new_value)
                 $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in vendor <b>" . $pur_vendor->company . "</b>.";
                 $module_name = 'ven';
                 $rel_id = $pur_vendor->userid;
+            } else if ($notes->rel_type == 'invoice') {
+                $CI->db->where('id', $notes->rel_id);
+                $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
+                $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in invoice <b>" . format_invoice_number($invoices->id) . "</b>.";
+                $module_name = 'invoices';
+                $rel_id = $invoices->id;
+            } else if ($notes->rel_type == 'estimate') {
+                $CI->db->where('id', $notes->rel_id);
+                $estimates = $CI->db->get(db_prefix() . 'estimates')->row();
+                $description = "Notes field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in estimate <b>" . format_estimate_number($estimates->id) . "</b>.";
+                $module_name = 'estimates';
+                $rel_id = $estimates->id;
             } else {
                 $module_name = '';
                 $rel_id = '';

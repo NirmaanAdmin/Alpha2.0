@@ -535,6 +535,8 @@ class Invoices_model extends App_Model
             }
             hooks()->do_action('after_invoice_added', $insert_id);
 
+            add_invoices_activity_log($insert_id, true);
+
             return $insert_id;
         }
 
@@ -1157,6 +1159,7 @@ class Invoices_model extends App_Model
             if (empty($attachment->external)) {
                 unlink(get_upload_path_by_type('invoice') . $attachment->rel_id . '/' . $attachment->file_name);
             }
+            add_sales_attachment_activity_log($attachment->id, false);
             $this->db->where('id', $attachment->id);
             $this->db->delete(db_prefix() . 'files');
             if ($this->db->affected_rows() > 0) {
@@ -1197,6 +1200,7 @@ class Invoices_model extends App_Model
 
         $invoice = $this->get($id);
 
+        add_invoices_activity_log($id, false);
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'invoices');
 

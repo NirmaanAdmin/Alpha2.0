@@ -436,6 +436,7 @@ class Payments_model extends App_Model
             'paymentid' => $id,
             'invoiceid' => $invoiceid,
         ]);
+        add_inv_payment_activity_log($id, false);
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'invoicepaymentrecords');
         if ($this->db->affected_rows() > 0) {
@@ -476,6 +477,7 @@ class Payments_model extends App_Model
 
             $this->db->insert(db_prefix() . 'invoicepaymentrecords', $data);
             $insert_id = $this->db->insert_id();
+            add_inv_payment_activity_log($insert_id, true);
 
             if ($insert_id) {
                 $paymentIds[] = $insert_id;
