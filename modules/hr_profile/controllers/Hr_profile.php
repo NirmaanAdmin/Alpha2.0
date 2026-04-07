@@ -8059,6 +8059,8 @@ class Hr_profile extends AdminController
 			$workplace = $this->hr_profile_model->get_workplace_name_by_id($staff['workplace']);
 			$position = $this->hr_profile_model->get_job_position_name_by_id($staff['job_position']);
 			$role = $this->hr_profile_model->get_role_name_by_id($staff['role']);
+			$manager = $this->hr_profile_model->get_team_managers_by_staff($staff['staffid']);
+			$manager = !empty($managerArr) ? implode(', ', $managerArr) : '';
 			$team_name = '';
 			if (!empty($team) && isset($team[0]['name'])) {
 				$team_name = $team[0]['name'];
@@ -8076,7 +8078,7 @@ class Hr_profile extends AdminController
 				$staff['sex'],
 				$position,
 				$role,
-				'', // manager (optional)
+				$manager, // manager (optional)
 				$staff['current_address'],
 				$staff['epf_no'],
 				$staff['uan_no']

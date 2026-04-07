@@ -7675,4 +7675,29 @@ class Hr_profile_model extends App_Model
 
 		return $result ? $result['name'] : '';
 	}
+
+	public function get_team_managers_by_staff($staffid)
+	{
+		if (empty($staffid)) {
+			return [];
+		}
+
+		$this->db->select('tm.team_manage_id, s.firstname, s.lastname');
+		$this->db->from(db_prefix() . 'staff_team_manage as tm');
+		$this->db->join(db_prefix() . 'staff as s', 's.staffid = tm.team_manage_id', 'left');
+		$this->db->where('tm.staffid', $staffid);
+
+		$result = $this->db->get()->result_array();
+
+		// Format names
+		$managers = [];
+
+		if (!empty($result)) {
+			foreach ($result as $row) {
+				$managers[] = trim($row['firstname'] . ' ' . $row['lastname']);
+			}
+		}
+
+		return $managers;
+	}
 }
