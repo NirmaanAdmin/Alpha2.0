@@ -8044,12 +8044,15 @@ class Hr_profile extends AdminController
 			'Date of Joining',
 			'Date of Exit',
 			'Gender',
+			'Date Of Birth',
 			'Job position',
 			'Role',
 			'Direct manager',
 			'Current address',
+			'Salary',
 			'EPF No',
-			'UAN No'
+			'UAN No',
+			
 		];
 
 		fputcsv($output, $headers);
@@ -8061,6 +8064,7 @@ class Hr_profile extends AdminController
 			$role = $this->hr_profile_model->get_role_name_by_id($staff['role']);
 			$manager = $this->hr_profile_model->get_team_managers_by_staff($staff['staffid']);
 			$manager = !empty($managerArr) ? implode(', ', $managerArr) : '';
+			$dob = !empty($staff['birthday']) ? date('d M, Y', strtotime($staff['birthday'])) : '';
 			$team_name = '';
 			if (!empty($team) && isset($team[0]['name'])) {
 				$team_name = $team[0]['name'];
@@ -8076,10 +8080,12 @@ class Hr_profile extends AdminController
 				$staff['joining_date'],
 				$staff['exit_date'],
 				$staff['sex'],
+				$dob,
 				$position,
 				$role,
 				$manager, // manager (optional)
 				$staff['current_address'],
+				$staff['salary'],
 				$staff['epf_no'],
 				$staff['uan_no']
 			];

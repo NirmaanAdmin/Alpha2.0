@@ -242,6 +242,10 @@
 					<tbody>
 
 						<tr class="project-overview">
+							<td class="bold"><?php echo _l('Salary'); ?></td>
+							<td><?php echo app_format_money($member->salary, '₹'); ?></td>
+						</tr>
+						<tr class="project-overview">
 							<td class="bold"><?php echo _l('hr_citizen_identification'); ?></td>
 							<td><?php echo new_html_entity_decode($member->identification ?? ''); ?></td>
 						</tr>

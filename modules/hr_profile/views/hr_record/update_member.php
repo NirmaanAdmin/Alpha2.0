@@ -345,6 +345,11 @@
                            </select>
                         </div>
                      </div>
+                     <div class="col-md-6">
+                        <?php
+                        $salary = (isset($member) ? $member->salary : '');
+                        echo render_input('salary', 'Salary', $salary, 'number'); ?>
+                     </div>
                      <div class="col-md-6" id='div_hourly_rate'>
                         <div class="form-group">
                            <label for="hourly_rate"><?php echo _l('staff_hourly_rate'); ?></label>

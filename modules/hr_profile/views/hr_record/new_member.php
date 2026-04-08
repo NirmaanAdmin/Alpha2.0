@@ -243,31 +243,35 @@
 										</div>
 									</div>
 
-									<?php if (is_admin() || has_permission('hrm_hr_records', '', 'edit')) { ?>
 
-										<?php
-										hooks()->do_action('staff_render_permissions');
-										$selected = '';
-										foreach ($roles_value as $role_value) {
-											if (isset($member)) {
-												if ($member->role == $role_value['roleid']) {
-													$selected = $role_value['roleid'];
-												}
-											} else {
-												$default_staff_role = get_option('default_staff_role');
-												if ($default_staff_role == $role_value['roleid']) {
-													$selected = $role_value['roleid'];
-												}
+
+									<?php
+									hooks()->do_action('staff_render_permissions');
+									$selected = '';
+									foreach ($roles_value as $role_value) {
+										if (isset($member)) {
+											if ($member->role == $role_value['roleid']) {
+												$selected = $role_value['roleid'];
+											}
+										} else {
+											$default_staff_role = get_option('default_staff_role');
+											if ($default_staff_role == $role_value['roleid']) {
+												$selected = $role_value['roleid'];
 											}
 										}
-										?>
+									}
+									?>
 
-										<div class="row">
-											<div class="col-md-12">
-												<?php echo render_select('role_v', $roles_value, array('roleid', 'name'), 'staff_add_edit_role', $selected); ?>
-											</div>
+									<div class="row">
+										<div class="col-md-6">
+											<?php echo render_select('role_v', $roles_value, array('roleid', 'name'), 'staff_add_edit_role', $selected); ?>
 										</div>
-									<?php } ?>
+										<div class="col-md-6">
+											<?php $value = (isset($member) ? $member->salary : ''); ?>
+											<?php echo render_input('salary', 'Salary', $value,'number'); ?>
+										</div>
+									</div>
+
 
 									<div class="row">
 										<div class="col-md-6">
@@ -343,8 +347,8 @@
 												<label for="work_at" class="control-label"><?php echo _l('Employee Stationed At?'); ?></label>
 												<select name="work_at" id="work_at" class="selectpicker" data-width="100%" data-none-selected-text="<?php echo _l('hr_not_required'); ?>">
 													<option value=""></option>
-													<option value="1">Site</option>												
-													<option value="2">Office</option>	
+													<option value="1">Site</option>
+													<option value="2">Office</option>
 												</select>
 											</div>
 										</div>
