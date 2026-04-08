@@ -695,6 +695,8 @@ function add_new_sales_item_post($item, $rel_id, $rel_type)
         handle_custom_fields_post($id, $custom_fields);
     }
 
+    add_sales_item_activity_log($id, true);
+
     return $id;
 }
 
@@ -745,6 +747,7 @@ function update_sales_item_post($item_id, $data, $field = '')
  */
 function handle_removed_sales_item_post($id, $rel_type)
 {
+    add_sales_item_activity_log($id, false);
     $CI = &get_instance();
 
     $CI->db->where('id', $id);
@@ -914,4 +917,114 @@ function amount_format($num, $type = 1)
         $thecash = $sign.$thecash;
         return $thecash; // writes the final format where $currency is the currency symbol.
     }
+}
+
+function add_sales_item_activity_log($id, $is_create = true)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $is_create_value = $is_create ? 'added' : 'removed';
+        $CI->db->where('id', $id);
+        $itemable = $CI->db->get(db_prefix() . 'itemable')->row();
+        if(!empty($itemable)) {
+            if($itemable->rel_type == 'invoice') {
+                $description = "Item <b>".$itemable->description."</b> has been ".$is_create_value." for invoice <b>".format_invoice_number($itemable->rel_id)."</b>.";
+                $module_name = 'invoices';
+                $rel_id = $itemable->rel_id;
+            } else if ($itemable->rel_type == 'estimate') {
+                $description = "Item <b>".$itemable->description."</b> has been ".$is_create_value." for estimate <b>".format_estimate_number($itemable->rel_id)."</b>.";
+                $module_name = 'estimates';
+                $rel_id = $itemable->rel_id;
+            } else {
+                $module_name = '';
+                $rel_id = '';
+                $description = '';
+            }
+            if(!empty($description)) {
+                $CI->db->insert(db_prefix() . 'module_activity_log', [
+                    'module_name' => 'invoices',
+                    'rel_id' => $itemable->rel_id,
+                    'description' => $description,
+                    'date' => date('Y-m-d H:i:s'),
+                    'staffid' => get_staff_user_id()
+                ]);
+            }
+        }
+    }
+    return true;
+}
+
+function update_sales_item_activity_log($new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('currencies_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    $old_data = array();
+    $itemable = $CI->db->where('id', $new_data['itemid'])
+        ->get(db_prefix() . 'itemable')
+        ->row();
+    if (!$itemable) {
+        return false;
+    }
+    $old_data = (array) $itemable;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'description' => _l('invoice_table_item_heading'),
+        'qty' => _l('invoice_table_quantity_heading'),
+        'unit' => _l('unit'),
+        'rate' => _l('invoice_table_rate_heading'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'rate') {
+            $old_value = app_format_money($old_value, $base_currency->symbol);
+            $new_value = app_format_money($new_value, $base_currency->symbol);
+        }
+        if($itemable->rel_type == 'invoice') {
+            $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$itemable->description."</b> in invoice <b>".format_invoice_number($itemable->rel_id)."</b>.";
+            $module_name = 'invoices';
+            $rel_id = $itemable->rel_id;
+        } else if($itemable->rel_type == 'estimate') {
+            $description = "".$field_map[$field]." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> for item <b>".$itemable->description."</b> in estimate <b>".format_estimate_number($itemable->rel_id)."</b>.";
+            $module_name = 'estimates';
+            $rel_id = $itemable->rel_id;
+        } else {
+            $module_name = '';
+            $rel_id = '';
+            $description = '';
+        }
+        if(!empty($description)) {
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => $module_name,
+                'rel_id' => $rel_id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
 }

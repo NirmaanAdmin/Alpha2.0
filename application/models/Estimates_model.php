@@ -657,6 +657,7 @@ class Estimates_model extends App_Model
 
         unset($data['removed_items']);
 
+        update_all_sale_estimate_fields_activity_log($id, $data);
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'estimates', $data);
 
@@ -682,6 +683,7 @@ class Estimates_model extends App_Model
         }
 
         foreach ($items as $key => $item) {
+            update_sales_item_activity_log($item);
             $original_item = $this->get_estimate_item($item['itemid']);
 
             if (update_sales_item_post($item['itemid'], $item, 'item_order')) {

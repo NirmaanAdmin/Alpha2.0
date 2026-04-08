@@ -869,6 +869,7 @@ class Invoices_model extends App_Model
 
         unset($data['removed_items']);
 
+        update_all_sale_invoice_fields_activity_log($id, $data);
         $this->db->where('id', $id)->update('invoices', $data);
 
         if ($this->db->affected_rows() > 0) {
@@ -1047,6 +1048,7 @@ class Invoices_model extends App_Model
     {
         $updated = false;
         foreach ($items as $item) {
+            update_sales_item_activity_log($item);
             $original_item = $this->get_invoice_item($item['itemid']);
 
             if (update_sales_item_post($item['itemid'], $item, 'item_order')) {

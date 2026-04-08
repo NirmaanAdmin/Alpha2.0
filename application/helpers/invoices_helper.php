@@ -875,3 +875,142 @@ function add_invoices_activity_log($id, $is_create = true)
     }
     return true;
 }
+
+function update_all_sale_invoice_fields_activity_log($id, $new_data)
+{
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('currencies_model');
+    $base_currency = $CI->currencies_model->get_base_currency();
+    if (empty($id)) {
+        return false;
+    }
+    $invoices = $CI->db->where('id', $id)
+        ->get(db_prefix() . 'invoices')
+        ->row();
+    if (!$invoices) {
+        return false;
+    }
+    $old_data = (array)$invoices;
+    $normalize = function ($value) {
+        $value = trim((string)$value);
+        if (in_array(strtolower($value), ['null', 'none', 'nil', 'n/a', '-', '--'])) {
+            return '';
+        }
+        if ($value === '0000-00-00') {
+            return '';
+        }
+        if (is_numeric($value)) {
+            $num = (float)$value;
+            return ($num == 0.0) ? '' : $num;
+        }
+        return strtolower($value);
+    };
+    $norm_old = array_map($normalize, $old_data);
+    $norm_new = array_map($normalize, $new_data);
+    $changes = array_diff_assoc($norm_new, $norm_old);
+    if (empty($changes)) {
+        return true;
+    }
+    $field_map = [
+        'clientid' => _l('invoice_select_customer'),
+        'project_id' => _l('project'),
+        'allowed_payment_modes' => _l('invoice_add_edit_allowed_payment_modes'),
+        'billing_street' => _l('billing_street'),
+        'billing_city' => _l('billing_city'),
+        'billing_state' => _l('billing_state'),
+        'billing_zip' => _l('billing_zip'),
+        'billing_country' => _l('billing_country'),
+        'shipping_street' => _l('shipping_street'),
+        'shipping_city' => _l('shipping_city'),
+        'shipping_state' => _l('shipping_state'),
+        'shipping_zip' => _l('shipping_zip'),
+        'shipping_country' => _l('shipping_country'),
+        'sale_agent' => _l('sale_agent_string'),
+        'discount_type' => _l('discount_type'),
+        'adminnote' => _l('invoice_add_edit_admin_note'),
+        'date' => _l('invoice_add_edit_date'),
+        'duedate' => _l('invoice_add_edit_duedate'),
+        'clientnote' => _l('invoice_add_edit_client_note'),
+        'terms' => _l('terms_and_conditions'),
+    ];
+    foreach ($changes as $field => $dummy) {
+        if (!isset($field_map[$field])) {
+            continue;
+        }
+        $old_value = $old_data[$field] ?? '';
+        $new_value = $new_data[$field] ?? '';
+        if ($field === 'clientid') {
+            $old_value = !empty($old_value) ? get_company_name($old_value) : '';
+            $new_value = !empty($new_value) ? get_company_name($new_value) : '';
+        }
+        if ($field === 'project_id') {
+            $old_value = !empty($old_value) ? get_project_name_by_id($old_value) : '';
+            $new_value = !empty($new_value) ? get_project_name_by_id($new_value) : '';
+        }
+        if ($field === 'allowed_payment_modes') {
+            $old_arr = is_array($old_value) ? $old_value : @unserialize($old_value);
+            $new_arr = is_array($new_value) ? $new_value : @unserialize($new_value);
+            if (!is_array($old_arr)) $old_arr = [];
+            if (!is_array($new_arr)) $new_arr = [];
+            $payment_modes = $CI->db->select('id, name')
+                ->from(db_prefix().'payment_modes')
+                ->get()->result_array();
+            $opts = array_column($payment_modes, 'name', 'id');
+            $old_value = implode(', ', array_map(function($id) use ($opts) {
+                return $opts[$id] ?? '';
+            }, $old_arr));
+            $new_value = implode(', ', array_map(function($id) use ($opts) {
+                return $opts[$id] ?? '';
+            }, $new_arr));
+        }
+        if ($field === 'billing_country' || $field === 'shipping_country') {
+            $countries = get_all_countries();
+            $opts = array_column($countries, 'short_name', 'country_id');
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'sale_agent') {
+            $staff_list = $CI->staff_model->get('', ['active' => 1]);
+            $opts = array_combine(
+                array_column($staff_list, 'staffid'),
+                array_map(fn($a) => $a['firstname'] . ' ' . $a['lastname'], $staff_list)
+            );
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        if ($field === 'discount_type') {
+            $opts = [
+                '' => _l('no_discount'),
+                'before_tax' => _l('discount_type_before_tax'),
+                'after_tax' => _l('discount_type_after_tax'),
+            ];
+            $old_value = $opts[$old_value] ?? '';
+            $new_value = $opts[$new_value] ?? '';
+        }
+        update_sale_invoice_activity_log($id, $field_map[$field], $old_value, $new_value);
+    }
+    return true;
+}
+
+function update_sale_invoice_activity_log($id, $field, $old_value, $new_value)
+{
+    $CI = &get_instance();
+    if(!empty($id)) {
+        $CI->db->where('id', $id);
+        $invoices = $CI->db->get(db_prefix() . 'invoices')->row();
+        if(!empty($invoices)) {
+            $old_value = !empty($old_value) ? $old_value : 'None';
+            $new_value = !empty($new_value) ? $new_value : 'None';
+            $description = "".$field." field has been updated from <b>".$old_value."</b> to <b>".$new_value."</b> in invoice <b>".format_invoice_number($invoices->id)."</b>.";
+            $CI->db->insert(db_prefix() . 'module_activity_log', [
+                'module_name' => 'invoices',
+                'rel_id' => $invoices->id,
+                'description' => $description,
+                'date' => date('Y-m-d H:i:s'),
+                'staffid' => get_staff_user_id()
+            ]);
+        }
+    }
+    return true;
+}
