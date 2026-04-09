@@ -1975,6 +1975,8 @@ class timesheets_model extends app_model
 						]);
 					}
 				}
+				// Add activity log
+				$this->add_requisition_activity_log($insert_id, true);
 				return $insert_id;
 			} else {
 				return false;
@@ -1998,11 +2000,81 @@ class timesheets_model extends app_model
 					}
 				}
 				$this->update_approve_request($insert_id, $type, $data['status']);
+				// Add activity log
+				$this->add_requisition_activity_log($insert_id, true);
 				return $insert_id;
 			} else {
 				return false;
 			}
 		}
+	}
+
+	/**
+	 * Add activity log for requisition
+	 */
+	function add_requisition_activity_log($id, $is_create = true)
+	{
+		$CI = &get_instance();
+		$staff_id = get_staff_user_id();
+
+		if (!empty($id)) {
+			$CI->db->where('id', $id);
+			$requisition = $CI->db->get(db_prefix() . 'timesheets_requisition_leave')->row();
+
+			if (!empty($requisition)) {
+				// Get staff name
+				$CI->db->where('staffid', $requisition->staff_id);
+				$staff = $CI->db->get(db_prefix() . 'staff')->row();
+				$staff_name = !empty($staff) ? $staff->firstname . ' ' . $staff->lastname : 'Unknown Staff';
+
+				// Get requisition type name
+				$type_name = $this->get_requisition_type_name($requisition->rel_type, $requisition->type_of_leave);
+
+				$is_create_value = $is_create ? 'created' : 'deleted';
+				if($is_create) {
+					$description = "<b>" . $staff_name . "</b> has applied for <b>" . $type_name . "</b> leave.";
+				} else {
+					$description = "<b>" . get_last_action_full_name($staff_id) . "</b> has deleted the leave request titled <b>" . $requisition->subject . "</b>.";
+				}
+
+				$CI->db->insert(db_prefix() . 'module_activity_log', [
+					'module_name' => 'timesheets',
+					'rel_id' => $id,
+					'description' => $description,
+					'date' => date('Y-m-d H:i:s'),
+					'staffid' => $staff_id
+				]);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Get requisition type name for display
+	 */
+	function get_requisition_type_name($rel_type, $type_of_leave = null)
+	{
+		$type_names = [
+			'1' => 'Leave',
+			'2' => 'Late',
+			'3' => 'Go Out',
+			'4' => 'Business Trip',
+			'5' => 'Quit Job',
+			'6' => 'Early'
+		];
+
+		if ($rel_type == '1' && !empty($type_of_leave)) {
+			$leave_types = [
+				'8' => 'Annual Leave',
+				'2' => 'Maternity Leave',
+				'4' => 'Private Work Without Pay',
+				'1' => 'Sick Leave'
+			];
+
+			return isset($leave_types[$type_of_leave]) ? $leave_types[$type_of_leave] : 'Custom Leave';
+		}
+
+		return isset($type_names[$rel_type]) ? $type_names[$rel_type] : 'Unknown Type';
 	}
 
 	/**
@@ -2047,6 +2119,8 @@ class timesheets_model extends app_model
 			$this->db->where('relate_type', 'leave');
 			$this->db->delete(db_prefix() . 'timesheets_timesheet');
 		}
+		// Add activity log
+		$this->add_requisition_activity_log($id, false);
 		$this->db->where('id', $id);
 		$this->db->delete(db_prefix() . 'timesheets_requisition_leave');
 		if ($this->db->affected_rows() > 0) {
