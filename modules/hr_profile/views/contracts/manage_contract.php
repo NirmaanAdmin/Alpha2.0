@@ -23,7 +23,7 @@
 						foreach($duration as $d){
 							echo form_hidden('contracts_by_duration_'.$d['duration'].'_'.$d['unit']);
 						}
-						?>
+						?> 
 					</div>
 					<div class="panel-body">
 						<?php if(has_permission('hrm_contract','','create') || is_admin()){ { ?>

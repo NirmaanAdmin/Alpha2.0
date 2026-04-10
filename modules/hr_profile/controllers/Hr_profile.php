@@ -3342,6 +3342,9 @@ class Hr_profile extends AdminController
 					'touserid' => get_staff_user_id(),
 				]);
 				$data['total_pages'] = ceil($total_notifications / $this->misc_model->get_notifications_limit());
+				$contract_id = $this->hr_profile_model->get_contract_by_staffid($id);
+				$contract_detail = $this->hr_profile_model->get_contract_detail($contract_id);
+				$data['contract_details'] = $contract_detail;
 			}
 			if ($data['group'] == 'dependent_person') {
 				$data['dependent_person'] = $this->hr_profile_model->get_dependent_person_bytstaff($id);
@@ -8052,29 +8055,54 @@ class Hr_profile extends AdminController
 			'Salary',
 			'EPF No',
 			'UAN No',
-			
+
 		];
 
 		fputcsv($output, $headers);
+		$salary = 0;
 
 		foreach ($staff_data as $staff) {
+
 			$team = $this->hr_profile_model->get_staff_departments($staff['staffid']);
 			$workplace = $this->hr_profile_model->get_workplace_name_by_id($staff['workplace']);
 			$position = $this->hr_profile_model->get_job_position_name_by_id($staff['job_position']);
 			$role = $this->hr_profile_model->get_role_name_by_id($staff['role']);
-			$manager = $this->hr_profile_model->get_team_managers_by_staff($staff['staffid']);
+
+			// ✅ FIX: Manager handling
+			$managerArr = $this->hr_profile_model->get_team_managers_by_staff($staff['staffid']);
 			$manager = !empty($managerArr) ? implode(', ', $managerArr) : '';
+
 			$dob = !empty($staff['birthday']) ? date('d M, Y', strtotime($staff['birthday'])) : '';
+
+			// ✅ FIX: Get contract ID safely
+			$contract = $this->hr_profile_model->get_contract_by_staffid($staff['staffid']);
+			
+
+			// ✅ FIX: Default salary
+			$salary = 0;
+
+			if ($contract) {
+				$contract_detail = $this->hr_profile_model->get_contract_detail($contract);
+
+				if (!empty($contract_detail)) {
+					$salary = array_sum(array_map(function ($item) {
+						return (float)$item['rel_value'];
+					}, $contract_detail));
+				}
+			}
+
+			// ✅ FIX: Team name safe
 			$team_name = '';
 			if (!empty($team) && isset($team[0]['name'])) {
 				$team_name = $team[0]['name'];
 			}
+
 			$row = [
 				$staff['firstname'] . ' ' . $staff['lastname'],
 				$staff['staff_identifi'],
 				$staff['email'],
 				$staff['phonenumber'],
-				$team_name, // Use the retrieved department information
+				$team_name,
 				$workplace,
 				$staff['status_work'],
 				$staff['joining_date'],
@@ -8083,9 +8111,9 @@ class Hr_profile extends AdminController
 				$dob,
 				$position,
 				$role,
-				$manager, // manager (optional)
+				$manager,
 				$staff['current_address'],
-				$staff['salary'],
+				$salary,
 				$staff['epf_no'],
 				$staff['uan_no']
 			];

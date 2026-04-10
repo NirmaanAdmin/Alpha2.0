@@ -7700,4 +7700,11 @@ class Hr_profile_model extends App_Model
 
 		return $managers;
 	}
+
+	public function get_contract_by_staffid($staffid)
+	{
+		$this->db->select('id_contract');
+		$this->db->where('staff', $staffid);
+		return $this->db->get(db_prefix() . 'hr_staff_contract')->row()->id_contract ?? null;
+	}
 }
