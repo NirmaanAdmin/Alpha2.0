@@ -14541,4 +14541,84 @@ class Purchase_model extends App_Model
 
         return $custom_date_select;
     }
+
+    /**
+     * Get activity_log dashboard
+     *
+     * @param  array  $data  Dashboard filter data
+     * @return array
+     */
+    public function get_activity_log_charts($data = array())
+    {
+        $response = array();
+        $module_name = isset($data['module_name']) ? $data['module_name'] : '';
+        $staff = isset($data['staff']) ? $data['staff'] : '';
+
+        $response['total_activities_logged'] = $response['active_staff_count'] = $response['activities_today'] = 0;
+        $response['most_active_person'] = 'None';
+        $response['last_updated'] = 'None';
+        $response['bar_top_staff_name'] = $response['bar_top_staff_value'] = array();
+        $response['line_order_date'] = $response['line_order_total'] = array();
+
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'module_activity_log');
+        if (!empty($module_name) && is_array($module_name)) {
+            $this->db->where_in(db_prefix() . 'module_activity_log.module_name', $module_name);
+        }
+        if (!empty($staff) && is_array($staff)) {
+            $this->db->where_in(db_prefix() . 'module_activity_log.staffid', $staff);
+        }
+        $this->db->where(db_prefix() . 'module_activity_log.staffid !=', 1);
+        $this->db->order_by(db_prefix() . 'module_activity_log.date', 'asc');
+        $module_activity_log = $this->db->get()->result_array();
+
+        if (!empty($module_activity_log)) {
+            $response['total_activities_logged'] = count($module_activity_log);
+            $response['active_staff_count'] = count(
+                array_unique(
+                    array_column(
+                        array_filter($module_activity_log, fn($r) => strpos($r['date'], date('Y-m-d', strtotime('-1 day'))) === 0), 'staffid'
+                    )
+                )
+            );
+            $most_active_person_id = ($c = array_count_values(array_column(array_filter($module_activity_log, fn($r)=>strpos($r['date'], date('Y-m-d')) === 0), 'staffid'))) ? array_search(max($c), $c) : null;
+            if(!empty($most_active_person_id)) {
+                $response['most_active_person'] = get_staff_full_name($most_active_person_id);
+            }
+            $response['activities_today'] = count(
+                array_filter($module_activity_log, fn($r) => strpos($r['date'], date('Y-m-d')) === 0)
+            );
+            $response['last_updated'] = ($dates = array_column($module_activity_log, 'date')) ? date('d M, Y h:i A', strtotime(max($dates))) : 'None';
+            $bar_top_staffs = array();
+            $line_order_total = array();
+            foreach ($module_activity_log as $key => $value) {
+                $staff_id = $value['staffid'];
+                if (!isset($bar_top_staffs[$staff_id])) {
+                    $bar_top_staffs[$staff_id]['name'] = get_staff_full_name($staff_id);
+                    $bar_top_staffs[$staff_id]['value'] = 0;
+                }
+                $bar_top_staffs[$staff_id]['value'] += 1;
+                $timestamp = strtotime($value['date']);
+                $week = date('d M', strtotime('monday this week', $timestamp)) . ' - ' . date('d M', strtotime('sunday this week', $timestamp));
+                if (!isset($line_order_total[$week])) {
+                    $line_order_total[$week] = 0;
+                }
+                $line_order_total[$week] += 1;
+            }
+            if (!empty($bar_top_staffs)) {
+                usort($bar_top_staffs, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_staffs = array_slice($bar_top_staffs, 0, 10);
+                $response['bar_top_staff_name'] = array_column($bar_top_staffs, 'name');
+                $response['bar_top_staff_value'] = array_column($bar_top_staffs, 'value');
+            }
+            if (!empty($line_order_total)) {
+                $response['line_order_date'] = array_keys($line_order_total);
+                $response['line_order_total'] = array_values($line_order_total);
+            }
+        }
+
+        return $response;
+    }
 }

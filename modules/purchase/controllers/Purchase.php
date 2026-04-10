@@ -8780,4 +8780,12 @@ class purchase extends AdminController
     {
         $this->app->get_table_data(module_views_path('purchase', 'activity_log/table_activity_log'));
     }
+
+    public function get_activity_log_charts()
+    {
+        $data = $this->input->post();
+        $result = $this->purchase_model->get_activity_log_charts($data);
+        echo json_encode($result);
+        die;
+    }
 }

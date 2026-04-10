@@ -2,6 +2,16 @@
 <?php init_head();
 $module_name = 'module_activity_log'; ?>
 <style>
+   .n_width {
+      width: 20% !important;
+   }
+   .dashboard_stat_title {
+      font-size: 19px;
+      font-weight: bold;
+   }
+   .dashboard_stat_value {
+      font-size: 19px;
+   }
    b{
       font-weight: 700;
    }
@@ -18,6 +28,114 @@ $module_name = 'module_activity_log'; ?>
                         <div class="col-md-12">
                            <h4 class="no-margin font-bold"><i class="fa fa-clipboard" aria-hidden="true"></i> <?php echo _l('activity_log'); ?></h4>
                            <hr />
+                        </div>
+                        <div class="col-md-12">
+                           <button class="btn btn-info display-block" type="button" data-toggle="collapse" data-target="#ac-charts-section" aria-expanded="true" aria-controls="ac-charts-section">
+                              <?php echo _l('Activity Log Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
+                           </button>
+                        </div>
+                     </div>
+
+                     <div id="ac-charts-section" class="collapse in">
+                        <div class="row">
+                           <div class="col-md-12 mtop20">
+                              <div class="row">
+                                 <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                   <div class="top_stats_wrapper">
+                                     <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_title">Total Activities Logged</span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                     <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_value total_activities_logged"></span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                   </div>
+                                 </div>
+                                 <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                   <div class="top_stats_wrapper">
+                                     <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_title">Active Staff Count</span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                     <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_value active_staff_count"></span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                   </div>
+                                 </div>
+                                 <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                   <div class="top_stats_wrapper">
+                                     <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_title">Most Active Person</span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                     <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_value most_active_person"></span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                   </div>
+                                 </div>
+                                 <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                   <div class="top_stats_wrapper">
+                                     <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_title">Activities Today</span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                     <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_value activities_today"></span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                   </div>
+                                 </div>
+                                 <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                   <div class="top_stats_wrapper">
+                                     <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_title">Last Updated (timestamp)</span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                     <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                       <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                         <span class="tw-truncate dashboard_stat_value last_updated"></span>
+                                       </div>
+                                       <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                     </div>
+                                   </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="row mtop20">
+                           <div class="col-md-6">
+                              <p class="mbot15 dashboard_stat_title">Staff Contribution</p>
+                              <div style="width: 100%; height: 400px;">
+                                <canvas id="barChartTopStaffs"></canvas>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <p class="mbot15 dashboard_stat_title">Activity Type Breakdown</p>
+                              <div style="width: 100%; height: 400px;">
+                                <canvas id="lineChartOverTime"></canvas>
+                              </div>
+                           </div>
                         </div>
                      </div>
 
@@ -223,8 +341,152 @@ $module_name = 'module_activity_log'; ?>
         }
         table_activity_log.DataTable().ajax.reload();
       });
+
+      $('#ac-charts-section').on('shown.bs.collapse', function () {
+         $('.toggle-icon').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+      });
+
+      $('#ac-charts-section').on('hidden.bs.collapse', function () {
+         $('.toggle-icon').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+      });
+
+      get_activity_log_dashboard();
+
+      $(document).on('change', 'select[name="module_name[]"], select[name="staff[]"]', function() {
+        get_activity_log_dashboard();
+      });
+
+      var lineChartOverTime;
+
+      function get_activity_log_dashboard() {
+        "use strict";
+
+        var data = {
+          module_name: $('select[name="module_name[]"]').val(),
+          staff: $('select[name="staff[]"]').val(),
+        }
+
+        $.post(admin_url + 'purchase/get_activity_log_charts', data).done(function(response){
+          response = JSON.parse(response);
+
+          // Update value summaries
+          $('.total_activities_logged').text(response.total_activities_logged);
+          $('.active_staff_count').text(response.active_staff_count);
+          $('.most_active_person').text(response.most_active_person);
+          $('.activities_today').text(response.activities_today);
+          $('.last_updated').text(response.last_updated);
+
+          // Staff Contribution
+          var staffBarCtx = document.getElementById('barChartTopStaffs').getContext('2d');
+          var staffLabels = response.bar_top_staff_name;
+          var staffData = response.bar_top_staff_value;
+
+          if (window.barTopStaffsChart) {
+            barTopStaffsChart.data.labels = staffLabels;
+            barTopStaffsChart.data.datasets[0].data = staffData;
+            barTopStaffsChart.update();
+          } else {
+            window.barTopStaffsChart = new Chart(staffBarCtx, {
+              type: 'bar',
+              data: {
+                labels: staffLabels,
+                datasets: [{
+                  label: 'Total Count',
+                  data: staffData,
+                  backgroundColor: '#1E90FF',
+                  borderColor: '#1E90FF',
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false
+                  }
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Total Count'
+                    }
+                  },
+                  y: {
+                    ticks: {
+                      autoSkip: false
+                    },
+                    title: {
+                      display: true,
+                      text: 'Staffs'
+                    }
+                  }
+                }
+              }
+            });
+          }
+
+          // Activity Type Breakdown
+          var lineCtx = document.getElementById('lineChartOverTime').getContext('2d');
+
+          if (lineChartOverTime) {
+            lineChartOverTime.data.labels = response.line_order_date;
+            lineChartOverTime.data.datasets[0].data = response.line_order_total;
+            lineChartOverTime.update();
+          } else {
+            lineChartOverTime = new Chart(lineCtx, {
+              type: 'line',
+              data: {
+                labels: response.line_order_date,
+                datasets: [{
+                  label: 'Total Count',
+                  data: response.line_order_total,
+                  fill: false,
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  tension: 0.3
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    mode: 'index',
+                    intersect: false
+                  }
+                },
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Weekly'
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Total Count'
+                    }
+                  }
+                }
+              }
+            });
+          }
+
+        });
+      }
    });
 </script>
+<script src="<?php echo module_dir_url(PURCHASE_MODULE_NAME, 'assets/plugins/charts/chart.js'); ?>?v=<?php echo PURCHASE_REVISION; ?>"></script>
 </body>
 
 </html>
