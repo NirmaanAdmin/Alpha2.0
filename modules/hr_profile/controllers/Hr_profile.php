@@ -3343,8 +3343,13 @@ class Hr_profile extends AdminController
 				]);
 				$data['total_pages'] = ceil($total_notifications / $this->misc_model->get_notifications_limit());
 				$contract_id = $this->hr_profile_model->get_contract_by_staffid($id);
-				$contract_detail = $this->hr_profile_model->get_contract_detail($contract_id);
-				$data['contract_details'] = $contract_detail;
+
+				if (!empty($contract_id) && $contract_id > 0) {
+					$contract_detail = $this->hr_profile_model->get_contract_detail($contract_id);
+					$data['contract_details'] = $contract_detail;
+				} else {
+					$data['contract_details'] = null; // or [] depending on your usage
+				}
 			}
 			if ($data['group'] == 'dependent_person') {
 				$data['dependent_person'] = $this->hr_profile_model->get_dependent_person_bytstaff($id);
@@ -8076,7 +8081,7 @@ class Hr_profile extends AdminController
 
 			// ✅ FIX: Get contract ID safely
 			$contract = $this->hr_profile_model->get_contract_by_staffid($staff['staffid']);
-			
+
 
 			// ✅ FIX: Default salary
 			$salary = 0;
