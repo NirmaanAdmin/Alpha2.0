@@ -229,3 +229,27 @@
 
 </html>
 <?php require 'modules/timesheets/assets/js/timesheets.php'; ?>
+<script>
+  $(document).on('change', '#remove_late_mark', function() {
+    let isChecked = $(this).is(':checked') ? 1 : 2;
+
+    let staffid = $(this).data('staffid');
+    let date = $(this).data('date');
+
+    $.ajax({
+      url: admin_url + 'timesheets/update_late_mark',
+      type: 'POST',
+      data: {
+        staffid: staffid,
+        date: date,
+        late_mark: isChecked
+      },
+      success: function(response) {
+        response = JSON.parse(response);
+        if (response.status) {
+          alert('Late mark updated');
+        }
+      }
+    });
+  });
+</script>

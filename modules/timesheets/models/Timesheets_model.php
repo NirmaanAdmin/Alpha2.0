@@ -2031,7 +2031,7 @@ class timesheets_model extends app_model
 				$type_name = $this->get_requisition_type_name($requisition->rel_type, $requisition->type_of_leave);
 
 				$is_create_value = $is_create ? 'created' : 'deleted';
-				if($is_create) {
+				if ($is_create) {
 					$description = "<b>" . $staff_name . "</b> has applied for <b>" . $type_name . "</b> leave.";
 				} else {
 					$description = "<b>" . get_last_action_full_name($staff_id) . "</b> has deleted the leave request titled <b>" . $requisition->subject . "</b>.";
@@ -6980,7 +6980,7 @@ class timesheets_model extends app_model
 					$list_dtts[$day] = $val;
 				}
 			}
-			
+
 			foreach ($list_date as $key => $value) {
 				$date_s = date('D d', strtotime($value));
 				$date_md = date('m-d', strtotime($value));
@@ -8840,18 +8840,40 @@ class timesheets_model extends app_model
 	 * @return array          
 	 */
 
+
 	// public function list_cell_color_checkin_out($staffid, $list_date, $from_date, $to_date)
 	// {
 	// 	$list_color = [];
 
-	// 	// First, get staff gender
-	// 	$this->db->select('sex');
+	// 	// Get staff details including gender and work location
+	// 	$this->db->select('sex, work_at');
 	// 	$this->db->where('staffid', $staffid);
 	// 	$staff = $this->db->get(db_prefix() . 'staff')->row();
-	// 	$is_female = ($staff && isset($staff->sex) && $staff->sex == 'female');
 
-	// 	// Set late threshold based on gender: 60 seconds for female, 300 seconds for others
-	// 	$late_threshold_seconds = $is_female ? 60 : 300; // 1 minute for female, 5 minutes for others
+	// 	$is_female = ($staff && isset($staff->sex) && $staff->sex == 'female');
+	// 	$work_location = ($staff && isset($staff->work_at)) ? $staff->work_at : null;
+
+	// 	// Determine late thresholds based on work location and gender
+	// 	$late_threshold_seconds = 300; // Default 5 minutes
+
+	// 	if ($work_location == 1) {
+	// 		// Site: 15 minutes for everyone regardless of gender
+	// 		$late_threshold_seconds = 900; // 15 minutes
+	// 	} elseif ($work_location == 2) {
+	// 		// Office: gender-based thresholds
+	// 		if ($is_female) {
+	// 			$late_threshold_seconds = 60; // 1 minute for female
+	// 		} else {
+	// 			$late_threshold_seconds = 300; // 5 minutes for male
+	// 		}
+	// 	} else {
+	// 		// If work location not specified, use office rules
+	// 		if ($is_female) {
+	// 			$late_threshold_seconds = 60; // 1 minute for female
+	// 		} else {
+	// 			$late_threshold_seconds = 300; // 5 minutes for male
+	// 		}
+	// 	}
 
 	// 	// Get all check-in/out records for the period
 	// 	$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check, date as full_date FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '" ORDER BY date ASC')->result_array();
@@ -8861,6 +8883,7 @@ class timesheets_model extends app_model
 	// 	foreach ($list_date as $date) {
 	// 		$shift_data[$date] = $this->get_shift_work_staff_by_date($staffid, $date);
 	// 	}
+
 	// 	$has_check_in = [];
 	// 	$has_check_out = [];
 	// 	$late_check_ins = []; // To track dates with late check-ins
@@ -8879,7 +8902,7 @@ class timesheets_model extends app_model
 	// 						$shift_start_time = strtotime($date . ' ' . $shift_type->time_start_work);
 	// 						$check_in_time = strtotime($value['full_date']);
 
-	// 						// Use gender-specific late threshold
+	// 						// Use the determined late threshold
 	// 						if ($check_in_time > ($shift_start_time + $late_threshold_seconds)) {
 	// 							$late_check_ins[$date] = true;
 	// 						}
@@ -8898,11 +8921,15 @@ class timesheets_model extends app_model
 
 	// 		if (isset($has_check_in[$date])) {
 	// 			if (isset($late_check_ins[$date])) {
-	// 				// You can use different colors for male/female late if desired
-	// 				if ($is_female) {
-	// 					$color = '#f3d1d1ff'; // Red color for late check-in (female)
+	// 				// Use different colors based on work location for late check-ins
+	// 				if ($work_location == 1) {
+	// 					$color = '#ffcccc'; // Orange color for late check-in at site
 	// 				} else {
-	// 					$color = '#ffcccc'; // Light red for male late check-in
+	// 					if ($is_female) {
+	// 						$color = '#ffcccc'; // Red color for late check-in (female)
+	// 					} else {
+	// 						$color = '#ffcccc'; // Light red for male late check-in
+	// 					}
 	// 				}
 	// 			} else {
 	// 				$color = '#f8e3d3'; // Normal check-in color (orange)
@@ -8930,32 +8957,50 @@ class timesheets_model extends app_model
 		$is_female = ($staff && isset($staff->sex) && $staff->sex == 'female');
 		$work_location = ($staff && isset($staff->work_at)) ? $staff->work_at : null;
 
-		// Determine late thresholds based on work location and gender
+		// Determine late thresholds
 		$late_threshold_seconds = 300; // Default 5 minutes
 
 		if ($work_location == 1) {
-			// Site: 15 minutes for everyone regardless of gender
 			$late_threshold_seconds = 900; // 15 minutes
 		} elseif ($work_location == 2) {
-			// Office: gender-based thresholds
 			if ($is_female) {
-				$late_threshold_seconds = 60; // 1 minute for female
+				$late_threshold_seconds = 60; // 1 min
 			} else {
-				$late_threshold_seconds = 300; // 5 minutes for male
+				$late_threshold_seconds = 300; // 5 min
 			}
 		} else {
-			// If work location not specified, use office rules
 			if ($is_female) {
-				$late_threshold_seconds = 60; // 1 minute for female
+				$late_threshold_seconds = 60;
 			} else {
-				$late_threshold_seconds = 300; // 5 minutes for male
+				$late_threshold_seconds = 300;
 			}
 		}
 
-		// Get all check-in/out records for the period
-		$check_in_out = $this->db->query('SELECT DISTINCT date_format(date, \'%Y-%m-%d\') as date, type_check, date as full_date FROM ' . db_prefix() . 'check_in_out WHERE date BETWEEN \'' . $from_date . '\' AND \'' . $to_date . '\' AND staff_id = "' . $staffid . '" ORDER BY date ASC')->result_array();
+		// ✅ Fetch late_mark data
+		$late_mark_data = $this->db->query("
+        SELECT DATE(date) as date, late_mark 
+        FROM " . db_prefix() . "check_in_out 
+        WHERE date BETWEEN '" . $from_date . "' 
+        AND '" . $to_date . "' 
+        AND staff_id = '" . $staffid . "'
+    ")->result_array();
 
-		// Get shift data for all dates at once for better performance
+		$late_mark_map = [];
+		foreach ($late_mark_data as $row) {
+			$late_mark_map[$row['date']] = $row['late_mark']; // last entry wins
+		}
+
+		// Get check-in/out records
+		$check_in_out = $this->db->query("
+        SELECT DISTINCT DATE_FORMAT(date, '%Y-%m-%d') as date, type_check, date as full_date 
+        FROM " . db_prefix() . "check_in_out 
+        WHERE date BETWEEN '" . $from_date . "' 
+        AND '" . $to_date . "' 
+        AND staff_id = '" . $staffid . "' 
+        ORDER BY date ASC
+    ")->result_array();
+
+		// Shift data
 		$shift_data = [];
 		foreach ($list_date as $date) {
 			$shift_data[$date] = $this->get_shift_work_staff_by_date($staffid, $date);
@@ -8963,25 +9008,28 @@ class timesheets_model extends app_model
 
 		$has_check_in = [];
 		$has_check_out = [];
-		$late_check_ins = []; // To track dates with late check-ins
+		$late_check_ins = [];
 
 		foreach ($check_in_out as $value) {
 			$date = $value['date'];
 
 			if ($value['type_check'] == 1 && !isset($has_check_in[$date])) {
-				$has_check_in[$date] = $value['full_date']; // Store the full datetime
+				$has_check_in[$date] = $value['full_date'];
 
-				// Check if check-in is late
-				if (isset($shift_data[$date])) {
-					foreach ($shift_data[$date] as $shift) {
-						$shift_type = $this->get_shift_type($shift);
-						if ($shift_type) {
-							$shift_start_time = strtotime($date . ' ' . $shift_type->time_start_work);
-							$check_in_time = strtotime($value['full_date']);
+				// ✅ Check late_mark before marking late
+				$late_mark = isset($late_mark_map[$date]) ? $late_mark_map[$date] : 0;
 
-							// Use the determined late threshold
-							if ($check_in_time > ($shift_start_time + $late_threshold_seconds)) {
-								$late_check_ins[$date] = true;
+				if ($late_mark != 1) {
+					if (isset($shift_data[$date])) {
+						foreach ($shift_data[$date] as $shift) {
+							$shift_type = $this->get_shift_type($shift);
+							if ($shift_type) {
+								$shift_start_time = strtotime($date . ' ' . $shift_type->time_start_work);
+								$check_in_time = strtotime($value['full_date']);
+
+								if ($check_in_time > ($shift_start_time + $late_threshold_seconds)) {
+									$late_check_ins[$date] = true;
+								}
 							}
 						}
 					}
@@ -8994,25 +9042,18 @@ class timesheets_model extends app_model
 		}
 
 		foreach ($list_date as $date) {
-			$color = '#fff'; // Default color (no check-in)
+			$color = '#fff';
 
 			if (isset($has_check_in[$date])) {
 				if (isset($late_check_ins[$date])) {
-					// Use different colors based on work location for late check-ins
-					if ($work_location == 1) {
-						$color = '#ffcccc'; // Orange color for late check-in at site
-					} else {
-						if ($is_female) {
-							$color = '#ffcccc'; // Red color for late check-in (female)
-						} else {
-							$color = '#ffcccc'; // Light red for male late check-in
-						}
-					}
+					// Late color
+					$color = '#ffcccc';
 				} else {
-					$color = '#f8e3d3'; // Normal check-in color (orange)
+					// Normal
+					$color = '#f8e3d3';
 
 					if (isset($has_check_out[$date])) {
-						$color = '#dff0d8'; // Check-in and check-out color (green)
+						$color = '#dff0d8';
 					}
 				}
 			}

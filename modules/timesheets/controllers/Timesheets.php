@@ -1376,6 +1376,28 @@ class timesheets extends AdminController
 			</ul></li>';
 			}
 		}
+		$late_mark = 2; // default (unchecked)
+
+		$check_in = $this->db
+			->where('staff_id', $data['staffid'])
+			->where('DATE(date)', $time)
+			->get(db_prefix() . 'check_in_out')
+			->row();
+		
+		if ($check_in) {
+			$late_mark = $check_in->late_mark;
+		}
+		$checked = ($late_mark == 1) ? 'checked' : '';
+		
+		$html .= '<li class="list-group-item">
+						<label>
+							<input type="checkbox" 
+								id="remove_late_mark" 
+								data-staffid="' . $data['staffid'] . '"
+								data-date="' . $time . '"
+								value="1" '.$checked.'> Remove Late Mark
+						</label>
+				</li>';
 		echo json_encode([
 			'title' => $title,
 			'html' => $html,
@@ -7633,4 +7655,21 @@ class timesheets extends AdminController
 
 	// 	// log_message('info', 'Sunday-overtime processing complete from 2025-05-01 to ' . date('Y-m-d'));
 	// }
+	public function update_late_mark()
+	{
+		$staffid = $this->input->post('staffid');
+		$date = $this->input->post('date');
+		$late_mark = $this->input->post('late_mark');
+
+		$this->db->where('staff_id', $staffid);
+		$this->db->where('DATE(date)', $date);
+
+		$update = $this->db->update(db_prefix() . 'check_in_out', [
+			'late_mark' => $late_mark
+		]);
+
+		echo json_encode([
+			'status' => $update ? true : false
+		]);
+	}
 }
