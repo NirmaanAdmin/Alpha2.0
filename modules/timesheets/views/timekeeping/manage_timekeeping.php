@@ -247,7 +247,7 @@
       success: function(response) {
         response = JSON.parse(response);
         if (response.status) {
-          alert_float('success', 'Late mark Removed');
+          alert_float('success', 'Late mark updated successfully');
         }
       }
     });
