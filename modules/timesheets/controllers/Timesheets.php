@@ -1376,28 +1376,28 @@ class timesheets extends AdminController
 			</ul></li>';
 			}
 		}
-		$late_mark = 2; // default (unchecked)
+		// $late_mark = 2; // default (unchecked)
 
-		$check_in = $this->db
-			->where('staff_id', $data['staffid'])
-			->where('DATE(date)', $time)
-			->get(db_prefix() . 'check_in_out')
-			->row();
+		// $check_in = $this->db
+		// 	->where('staff_id', $data['staffid'])
+		// 	->where('DATE(date)', $time)
+		// 	->get(db_prefix() . 'check_in_out')
+		// 	->row();
 		
-		if ($check_in) {
-			$late_mark = $check_in->late_mark;
-		}
-		$checked = ($late_mark == 1) ? 'checked' : '';
+		// if ($check_in) {
+		// 	$late_mark = $check_in->late_mark;
+		// }
+		// $checked = ($late_mark == 1) ? 'checked' : '';
 		
-		$html .= '<li class="list-group-item">
-						<label>
-							<input type="checkbox" 
-								id="remove_late_mark" 
-								data-staffid="' . $data['staffid'] . '"
-								data-date="' . $time . '"
-								value="1" '.$checked.'> Remove Late Mark
-						</label>
-				</li>';
+		// $html .= '<li class="list-group-item">
+		// 				<label>
+		// 					<input type="checkbox" 
+		// 						id="remove_late_mark" 
+		// 						data-staffid="' . $data['staffid'] . '"
+		// 						data-date="' . $time . '"
+		// 						value="1" '.$checked.'> Remove Late Mark
+		// 				</label>
+		// 		</li>';
 		echo json_encode([
 			'title' => $title,
 			'html' => $html,
