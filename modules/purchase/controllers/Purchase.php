@@ -8717,13 +8717,15 @@ class purchase extends AdminController
                         $rel_type = $options['rel_type'];
                         $project = $options['project'];
                         $requester = $options['requester'];
-
                         $this->purchase_model->send_mail_to_approver($rel_type, $rel_name, $insert_id, $user_id, $status, $project, $requester);
                     }
                     if(isset($options['sender'])) {
                         if($status == 2 || $status == 3) {
                             $this->purchase_model->send_mail_to_sender($rel_name, $status, $insert_id, $user_id);
                         }
+                    }
+                    if(isset($options['approved_by_staff'])) {
+                        $this->purchase_model->send_mail_approved_by_staff($rel_name, $status, $insert_id, $user_id);
                     }
                     $this->purchase_model->delete_cron_email_option($value['id']);
                 }

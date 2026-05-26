@@ -3642,6 +3642,19 @@ class Purchase_model extends App_Model
                 $this->update_item_pur_request($rel_id);
                 $this->db->where('id', $rel_id);
                 $this->db->update(db_prefix() . 'pur_request', $data_update);
+                if(get_staff_user_id() == 11 && $status == 2) {
+                    $cron_email = array();
+                    $cron_email_options = array();
+                    $cron_email['type'] = "purchase";
+                    $cron_email_options['rel_type'] = 'pur_request';
+                    $cron_email_options['rel_name'] = 'purchase_request';
+                    $cron_email_options['insert_id'] = $rel_id;
+                    $cron_email_options['user_id'] = get_staff_user_id();
+                    $cron_email_options['status'] = 2;
+                    $cron_email_options['approved_by_staff'] = 'yes';
+                    $cron_email['options'] = json_encode($cron_email_options, true);
+                    $this->db->insert(db_prefix() . 'cron_email', $cron_email);
+                }
                 return true;
                 break;
             case 'pur_quotation':
@@ -14620,5 +14633,31 @@ class Purchase_model extends App_Model
         }
 
         return $response;
+    }
+
+    public function send_mail_approved_by_staff($type, $status, $id, $user_id)
+    {
+        if ($type == 'purchase_request') {
+            $this->db->select('email, firstname, lastname');
+            $this->db->where('staffid', 8);
+            $staffs = $this->db->get('tblstaff')->result_array();
+            if (!empty($staffs)) {
+                $this->db->where('staffid', $user_id);
+                $login_staff = $this->db->get('tblstaff')->row();
+                foreach ($staffs as $key => $value) {
+                    $data = array();
+                    $data['contact_firstname'] = $login_staff->firstname;
+                    $data['contact_lastname'] = $login_staff->lastname;
+                    if ($type == 'purchase_request') {
+                        $data['mail_to'] = $value['email'];
+                        $data['pur_request_id'] = $id;
+                        $data = (object) $data;
+                        $template = mail_template('purchase_request_to_sender', 'purchase', $data);
+                        $template->send();
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
