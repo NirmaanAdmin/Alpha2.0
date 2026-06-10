@@ -1995,7 +1995,7 @@ class Forms_model extends App_Model
 
             /* === MAIN FORM UPDATE === */
             if (!empty($dpr_form)) {
-                
+
                 $old_dpr_form = $this->db
                     ->where('form_id', $data['formid'])
                     ->get(db_prefix() . 'dpr_form')
@@ -4082,6 +4082,7 @@ class Forms_model extends App_Model
         $projects   = $data['projects']   ?? null;
         $start_date = $data['start_date'] ?? null;
         $end_date   = $data['end_date']   ?? null;
+        $agency = $data['agency'] ?? null;
 
         // normalize dates to Y-m-d
         if ($start_date) {
@@ -4134,6 +4135,13 @@ class Forms_model extends App_Model
             }
         }
 
+        if ($agency !== null && $agency !== '') {
+            if (is_array($agency)) {
+                $this->db->where_in('d.agency', $agency);
+            } else {
+                $this->db->where('d.agency', $agency);
+            }
+        }
         if ($start_date) {
             $this->db->where('DATE(f.date) >=', $start_date);
         }
@@ -4161,6 +4169,13 @@ class Forms_model extends App_Model
                 $this->db->where_in('f.project_id', $projects);
             } else {
                 $this->db->where('f.project_id', $projects);
+            }
+        }
+        if ($agency !== null && $agency !== '') {
+            if (is_array($agency)) {
+                $this->db->where_in('d.agency', $agency);
+            } else {
+                $this->db->where('d.agency', $agency);
             }
         }
 

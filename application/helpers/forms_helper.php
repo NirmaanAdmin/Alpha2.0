@@ -1117,3 +1117,22 @@ function get_progress_report_machinery_listing_byid($machinery)
     }
     return '';
 }
+
+function get_vendor_list_dpr()
+{
+    $CI = &get_instance();
+
+    $CI->db->select('userid, company');
+
+    if (!has_permission('purchase_vendors', '', 'view') && is_staff_logged_in()) {
+        $CI->db->where(
+            'userid IN (SELECT vendor_id FROM ' . db_prefix() . 'pur_vendor_admin WHERE staff_id=' . get_staff_user_id() . ')',
+            null,
+            false
+        );
+    }
+
+    $CI->db->order_by('company', 'ASC');
+
+    return $CI->db->get(db_prefix() . 'pur_vendor')->result_array();
+}

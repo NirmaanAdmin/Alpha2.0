@@ -72,6 +72,12 @@
                 echo render_date_input('start_date', 'Start Date', $start_date_value);
                 ?>
               </div>
+              <div class="col-md-2 pull-right" style="padding-right: 0px;">
+                <?php
+                $get_agency = get_vendor_list_dpr();
+                echo render_select('agency', $get_agency, array('userid', 'company'), 'Agency', '');
+                ?>
+              </div>
             </div>
           </div>
 
@@ -249,6 +255,10 @@
   $('select[name="projects"]').on('change', function() {
     get_dpr_dashboard();
   });
+  $('select[name="agency"]').on('change', function() {
+    get_dpr_dashboard();
+  });
+
 
   $('input[name="start_date"]').on('change', function() {
     get_dpr_dashboard();
@@ -265,7 +275,8 @@
     var data = {
       projects: $('select[name="projects"]').val(),
       start_date: $('input[name="start_date"]').val(),
-      end_date: $('input[name="end_date"]').val()
+      end_date: $('input[name="end_date"]').val(),
+      agency: $('select[name="agency"]').val()
     };
     $.post(admin_url + 'forms/get_dpr_dashboard', data).done(function(res) {
       var response = JSON.parse(res);
