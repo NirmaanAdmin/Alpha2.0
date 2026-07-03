@@ -1268,6 +1268,7 @@ $lang['expense_add_edit_reference_no']                = 'Reference #';
 $lang['expense_receipt']                              = 'Expense Receipt';
 $lang['expense_receipt_lowercase']                    = 'expense receipt';
 $lang['expense_dt_table_heading_category']            = 'Category';
+$lang['expense_dt_table_heading_vendor']            = 'Vendor';
 $lang['expense_dt_table_heading_amount']              = 'Amount';
 $lang['expense_dt_table_heading_date']                = 'Date';
 $lang['expense_dt_table_heading_reference_no']        = 'Reference #';
