@@ -129,7 +129,7 @@ $table_data = [
   ],
   _l('the_number_sign'),
   _l('expense_dt_table_heading_category'),
-  _('expense_dt_table_heading_vendor'),
+  _l('expense_dt_table_heading_vendor'),
   _l('expense_dt_table_heading_amount'),
   _l('expense_name'),
   _l('receipt'),
