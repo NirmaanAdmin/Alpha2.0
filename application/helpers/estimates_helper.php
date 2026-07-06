@@ -554,3 +554,27 @@ function update_sale_estimate_activity_log($id, $field, $old_value, $new_value)
     }
     return true;
 }
+if (!function_exists('estimate_statuses')) {
+    function estimate_statuses()
+    {
+        return hooks()->apply_filters('estimate_statuses', [
+            1 => _l('estimate_status_draft'),
+            2 => _l('estimate_status_sent'),
+            3 => _l('estimate_status_declined'),
+            4 => _l('estimate_status_accepted'),
+            5 => _l('estimate_status_expired'),
+            'not_sent' => _l('not_sent_indicator'),
+        ]);
+    }
+}
+
+if (!function_exists('estimate_status_by_id')) {
+    function estimate_status_by_id($id)
+    {
+        $statuses = estimate_statuses();
+
+        $status = isset($statuses[$id]) ? $statuses[$id] : '';
+
+        return hooks()->apply_filters('estimate_status_label', $status, $id);
+    }
+}

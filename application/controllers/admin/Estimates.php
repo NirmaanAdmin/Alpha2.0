@@ -10,6 +10,8 @@ class Estimates extends AdminController
     {
         parent::__construct();
         $this->load->model('estimates_model');
+        $this->load->model('clients_model');
+        $this->load->model('projects_model');
     }
 
     /* Get all estimates in case user go on index page */
@@ -29,7 +31,7 @@ class Estimates extends AdminController
 
         $data['estimate_statuses'] = $this->estimates_model->get_statuses();
         $data['estimates_table'] = App_table::find('estimates');
-        
+         
         if ($isPipeline && !$this->input->get('status') && !$this->input->get('filter')) {
             $data['title']           = _l('estimates_pipeline');
             $data['bodyclass']       = 'estimates-pipeline estimates-total-manual';
@@ -55,20 +57,17 @@ class Estimates extends AdminController
             $data['bodyclass']             = 'estimates-total-manual';
             $data['estimates_years']       = $this->estimates_model->get_estimates_years();
             $data['estimates_sale_agents'] = $this->estimates_model->get_sale_agents();
-        
+            $data['clients']               = $this->clients_model->get();
+            $data['projects']              = $this->projects_model->get();
             $this->load->view('admin/estimates/manage', $data);
         }
     }
 
-    public function table($clientid = '')
+    public function table_new()
     {
-        if (staff_cant('view', 'estimates') && staff_cant('view_own', 'estimates') && get_option('allow_staff_view_estimates_assigned') == '0') {
-            ajax_access_denied();
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('estimates_new');
         }
-
-        App_table::find('estimates')->output([
-            'clientid' => $clientid,
-        ]);
     }
 
     /* Add new estimate or update existing */
