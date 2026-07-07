@@ -9,6 +9,8 @@ class Invoices extends AdminController
         parent::__construct();
         $this->load->model('invoices_model');
         $this->load->model('credit_notes_model');
+        $this->load->model('clients_model');
+        $this->load->model('projects_model');
     }
 
     /* Get all invoices in case user go on index page */
@@ -35,6 +37,8 @@ class Invoices extends AdminController
         $data['invoices_years']       = $this->invoices_model->get_invoices_years();
         $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
         $data['invoices_statuses']    = $this->invoices_model->get_statuses();
+        $data['clients']               = $this->clients_model->get();
+        $data['projects']              = $this->projects_model->get();
         $data['invoices_table'] = App_table::find('invoices');
         $data['bodyclass']            = 'invoices-total-manual';
         $this->load->view('admin/invoices/manage', $data);
@@ -58,26 +62,10 @@ class Invoices extends AdminController
         $this->load->view('admin/invoices/recurring/list', $data);
     }
 
-    public function table($clientid = '')
+    public function table_new()
     {
-        if (staff_cant('view', 'invoices')
-            && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
-            ajax_access_denied();
-        }
-        
-        $this->load->model('payment_modes_model');
-        $data['payment_modes'] = $this->payment_modes_model->get('', [], true);
-
-        if($this->input->get('recurring')) {
-            $this->app->get_table_data('recurring_invoices', [
-                'data'     => $data,
-            ]);
-        } else {
-            App_table::find('invoices')->output([
-                'clientid' => $clientid,
-                'data'     => $data,
-            ]);
+        if ($this->input->is_ajax_request()) {
+             $this->app->get_table_data('invoices_new');
         }
     }
 

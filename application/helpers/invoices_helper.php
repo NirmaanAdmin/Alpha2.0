@@ -1014,3 +1014,27 @@ function update_sale_invoice_activity_log($id, $field, $old_value, $new_value)
     }
     return true;
 }
+
+if (!function_exists('invoice_statuses')) {
+    function invoice_statuses()
+    {
+        return hooks()->apply_filters('invoice_statuses', [
+            1 => _l('Unpaid'),
+            2 => _l('Paid'),
+            3 => _l('Partially Paid'),
+            5 => _l('Cancelled'),
+        ]);
+    }
+}
+
+if (!function_exists('invoice_status_by_id')) {
+    function invoice_status_by_id($id)
+    {
+        $statuses = invoice_statuses();
+
+        $status = isset($statuses[$id]) ? $statuses[$id] : '';
+
+        return hooks()->apply_filters('invoice_status_label', $status, $id);
+    }
+}
+

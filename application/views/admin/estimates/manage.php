@@ -38,7 +38,7 @@
             "report_to": '[name="report-to"]',
             "year_requisition": "[name='year_requisition']",
         };
-        initDataTable('.table-estimates', admin_url + 'estimates/table_new', [0], [0], Params,
+        initDataTable('.table-estimates', admin_url + 'estimates/table_new', [], [], Params,
                 [0, 'desc']);
         $.each(Params, function(i, obj) {
             $('select' + obj).on('change', function() {
