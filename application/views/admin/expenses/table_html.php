@@ -122,7 +122,7 @@ if ($withBulkActions === true && $hasPermission) { ?>
   </div>
 </div>
 <?php
-$table_data = [
+$table_data = [ 
   [
     'name'     => '<span class="hide"> - </span><div class="checkbox mass_select_all_wrap"><input type="checkbox" id="mass_select_all" data-to-table="expenses"><label></label></div>',
     'th_attrs' => ['class' => $withBulkActions === true && $hasPermission ? '' : 'not_visible'],

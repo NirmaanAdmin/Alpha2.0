@@ -12,6 +12,8 @@ class Payments extends AdminController
     {
         parent::__construct();
         $this->load->model('payments_model');
+        $this->load->model('payment_modes_model');
+        $this->load->model('clients_model');
     }
 
     public function batch_payment_modal() {
@@ -53,7 +55,8 @@ class Payments extends AdminController
             && get_option('allow_staff_view_invoices_assigned') == '0') {
             access_denied('payments');
         }
-
+        $data['payment_modes'] = $this->payment_modes_model->get('', [], true);
+        $data['inv_clients']       = $this->clients_model->get();
         $data['title'] = _l('payments');
         $this->load->view('admin/payments/manage', $data);
     }
@@ -65,7 +68,7 @@ class Payments extends AdminController
             && get_option('allow_staff_view_invoices_assigned') == '0') {
             ajax_access_denied();
         }
-
+ 
         $this->app->get_table_data('payments', [
             'clientid' => $clientid,
         ]);
