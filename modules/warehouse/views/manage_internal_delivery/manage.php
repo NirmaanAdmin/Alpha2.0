@@ -91,7 +91,7 @@
 								</select>
 							</div>
 
-							<div class="col-md-1 form-group pull-right">
+							<div class="col-md-1 form-group " style="margin-top: 22px;">
 								<a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_ot_filters">
 									<?php echo _l('reset_filter'); ?>
 								</a>
