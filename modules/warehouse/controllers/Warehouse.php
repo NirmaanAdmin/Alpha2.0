@@ -4923,8 +4923,12 @@ class warehouse extends AdminController {
 	 */
 	public function manage_internal_delivery($id = '')
 	{
+		$this->load->model('projects_model');
 		$data['internal_id'] = $id;
 		$data['title'] = _l('internal_delivery_note');
+		$data['staff_list'] = $this->warehouse_model->get_staff();
+		$data['projects'] = $this->projects_model->get();
+		
 		$this->load->view('manage_internal_delivery/manage', $data);
 	}
 

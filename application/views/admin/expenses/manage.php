@@ -151,7 +151,7 @@ echo '<script src="' . base_url('modules/project_roadmap/assets/js/plugins/highc
                 table_rec_task.DataTable().ajax.reload();
             }
         });
-
+ 
         $('select[name="year_requisition"]').on('change', function() {
             table_rec_task.DataTable().ajax.reload();
         });

@@ -1,7 +1,11 @@
 <?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
+$module_name = 'internal_delivery_note';
 
+$staff_id_name = 'staff_id';
+$project_name = 'project';
+$status_name = 'status';
 $aColumns = [
 
     'internal_delivery_code',
@@ -27,7 +31,35 @@ if (isset($day_vouchers)) {
     
 }
 
+if($this->ci->input->post('staff_id') && count($this->ci->input->post('staff_id')) > 0){
+    $staff_id = $this->ci->input->post('staff_id');
+    if($staff_id != ''){
+        $where[] = ' AND tblinternal_delivery_note.staff_id IN (' . implode(', ', $staff_id) . ')';
+    }
+}
 
+if($this->ci->input->post('project') && count($this->ci->input->post('project')) > 0){
+    $project = $this->ci->input->post('project');
+    if($project != ''){
+        $where[] = ' AND tblinternal_delivery_note.project IN (' . implode(', ', $project) . ')';
+    }
+}
+
+if($this->ci->input->post('status') && count($this->ci->input->post('status')) > 0){
+    $status = $this->ci->input->post('status');
+    if($status != ''){
+        $where[] = ' AND tblinternal_delivery_note.approval IN (' . implode(', ', $status) . ')';
+    }
+}
+
+$staff_id_value = !empty($this->ci->input->post('staff_id')) ? implode(',', $this->ci->input->post('staff_id')) : NULL;
+update_module_filter($module_name, $staff_id_name, $staff_id_value);
+
+$project_value = !empty($this->ci->input->post('project')) ? implode(',', $this->ci->input->post('project')) : NULL;
+update_module_filter($module_name, $project_name, $project_value);
+
+$status_value = !empty($this->ci->input->post('status')) ? implode(',', $this->ci->input->post('status')) : NULL;
+update_module_filter($module_name, $status_name, $status_value);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['id','date_add','internal_delivery_name','internal_delivery_code','description','date_c','date_add','datecreated']);
 
