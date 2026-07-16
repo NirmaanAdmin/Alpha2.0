@@ -4647,7 +4647,8 @@ class purchase extends AdminController
         $data['contracts'] = $this->purchase_model->get_contract();
         $data['pur_orders'] = $this->purchase_model->get_list_pur_orders();
         $data['vendors'] = $this->purchase_model->get_vendor();
-        $this->load->view('invoices/manage',$data);
+        $data['projects'] = $this->projects_model->get_items();
+        $this->load->view('invoices/manage',$data); 
     }
 
     /**

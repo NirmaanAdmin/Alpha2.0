@@ -45,6 +45,20 @@
                              <div class="col-md-2 form-group">
                                 <?php echo render_select('vendor_ft[]',$vendors,array('userid','company'),'','',array('data-width'=>'100%','data-none-selected-text'=>_l('vendors'),'multiple'=>true,'data-actions-box'=>true),array(),'no-mbot','',false); ?>
                             </div>
+                            <div class="col-md-2 form-group">
+                                <?php echo render_select('project_ft[]',$projects,array('id','name'),'','',array('data-width'=>'100%','data-none-selected-text'=>_l('projects'),'multiple'=>true,'data-actions-box'=>true),array(),'no-mbot','',false); ?>
+                            </div>
+                            <div class="col-md-2 form-group">
+                              
+                                <?php 
+                                $payment_statuses = [
+                                    ['id' => 'paid', 'name' => _l('Paid')],
+                                    ['id' => 'partially_paid', 'name' => _l('Partially Paid')],
+                                    ['id' => 'unpaid', 'name' => _l('Unpaid')],
+                                ];
+                                echo render_select('payment_status[]',$payment_statuses,array('id','name'),'','',array('data-width'=>'100%','data-none-selected-text'=>_l('payment_status'),'multiple'=>true,'data-actions-box'=>true),array(),'no-mbot','',false); ?>
+                            </div>
+
                         </div>
                       </div>
                     

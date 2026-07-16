@@ -6,7 +6,9 @@
         "to_date": 'input[name="to_date"]',
         "contract": "[name='contract[]']",
         "pur_orders": "[name='pur_orders[]']",
-        "vendors": "[name='vendor_ft[]']"
+        "vendors": "[name='vendor_ft[]']",
+        "projects": "[name='project_ft[]']",
+        "status": "[name='payment_status[]']",
     };
 
 	initDataTable(table_invoice, admin_url+'purchase/table_pur_invoices',[], [], Params);
