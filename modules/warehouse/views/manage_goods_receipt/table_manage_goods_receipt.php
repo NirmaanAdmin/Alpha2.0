@@ -1,7 +1,12 @@
 <?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
+$module_name = 'stock_received';
 
+$staff_id_name = 'staff_id';
+$vendor_name = 'vendor';
+$status_name = 'status';
+$pur_order_name = 'pur_order';
 $aColumns = [
     'id',
     'goods_receipt_code',
@@ -30,9 +35,45 @@ if (isset($day_vouchers)) {
     
 }
 
+if($this->ci->input->post('staff_id') && count($this->ci->input->post('staff_id')) > 0){
+    $staff_id = $this->ci->input->post('staff_id');
+    if($staff_id != ''){
+        $where[] = ' AND tblgoods_receipt.buyer_id IN (' . implode(', ', $staff_id) . ')';
+    }
+}
 
+if($this->ci->input->post('vendor') && count($this->ci->input->post('vendor')) > 0){
+    $vendor = $this->ci->input->post('vendor');
+    if($vendor != ''){
+        $where[] = ' AND tblgoods_receipt.supplier_code IN (' . implode(', ', $vendor) . ')';
+    }
+}
 
+if($this->ci->input->post('status') && count($this->ci->input->post('status')) > 0){
+    $status = $this->ci->input->post('status');
+    if($status != ''){
+        $where[] = ' AND tblgoods_receipt.approval IN (' . implode(', ', $status) . ')';
+    }
+}
 
+if($this->ci->input->post('pur_order') && count($this->ci->input->post('pur_order')) > 0){
+    $pur_order = $this->ci->input->post('pur_order');
+    if($pur_order != ''){
+        $where[] = ' AND tblgoods_receipt.pr_order_id IN (' . implode(', ', $pur_order) . ')';
+    }
+}
+
+$staff_id_value = !empty($this->ci->input->post('staff_id')) ? implode(',', $this->ci->input->post('staff_id')) : NULL;
+update_module_filter($module_name, $staff_id_name, $staff_id_value);
+
+$vendor_value = !empty($this->ci->input->post('vendor')) ? implode(',', $this->ci->input->post('vendor')) : NULL;
+update_module_filter($module_name, $vendor_name, $vendor_value);
+
+$status_value = !empty($this->ci->input->post('status')) ? implode(',', $this->ci->input->post('status')) : NULL;
+update_module_filter($module_name, $status_name, $status_value);
+
+$pue_order_value = !empty($this->ci->input->post('pur_order')) ? implode(',', $this->ci->input->post('pur_order')) : NULL;
+update_module_filter($module_name, $pur_order_name, $pue_order_value);
 
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['id','date_add','date_c','goods_receipt_code', 'supplier_code']);

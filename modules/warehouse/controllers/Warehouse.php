@@ -686,6 +686,9 @@ class warehouse extends AdminController {
 	public function manage_purchase($id = '') {
 		$data['title'] = _l('stock_received_manage');
 		$data['purchase_id'] = $id;
+		$data['vendors'] = $this->warehouse_model->get_vendor();
+		$data['staff_list'] = $this->warehouse_model->get_staff();
+		$data['pr_orders'] = $this->warehouse_model->get_pr_order_delivered();
 		$this->load->view('manage_goods_receipt/manage_purchase', $data);
 	}
 
