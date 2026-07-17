@@ -146,7 +146,7 @@
                               </thead>
                               <tbody class="ui-sortable">
                                 
-                              <?php 
+                              <?php  
                               foreach ($internal_delivery_detail as $internal_delivery_key => $internal_delivery_value) {
 
                               $internal_delivery_key++;

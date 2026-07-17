@@ -19900,4 +19900,184 @@ class Warehouse_model extends App_Model
 		}
 		return $arr_inventory_number;
 	}
+
+	// public function get_internal_delivery_note_detail_pdf()
+	// {
+	// 	$CI = &get_instance();
+
+	// 	// Base Query
+	// 	$baseSql = "
+	//     SELECT
+	//         idn.id AS internal_delivery_id,
+	//         idn.internal_delivery_code,
+	//         idn.internal_delivery_name,
+	//         idn.date_c,
+	//         idn.project,
+	//         pr.id AS project_id,
+	//         pr.name AS project_name,
+
+	//         idnd.id AS internal_delivery_detail_id,
+	//         idnd.commodity_code,
+	//         idnd.commodity_name,
+	//         idnd.serial_number,
+	//         idnd.from_stock_name,
+	//         idnd.to_stock_name,
+	//         idnd.unit_id,
+	//         idnd.available_quantity,
+	//         idnd.quantities,
+	//         idnd.unit_price,
+	//         idnd.into_money,
+	//         idnd.note
+
+	//     FROM " . db_prefix() . "internal_delivery_note_detail idnd
+
+	//     INNER JOIN " . db_prefix() . "internal_delivery_note idn
+	//         ON idn.id = idnd.internal_delivery_id
+
+	//     LEFT JOIN " . db_prefix() . "projects pr
+	//         ON pr.id = idn.project
+
+	//     WHERE 1=1
+	// 	";
+
+	// 	// Load Saved Filters
+	// 	$filters = $CI->db
+	// 		->where('module_name', 'internal_delivery_note')
+	// 		->where('staff_id', get_staff_user_id())
+	// 		->get(db_prefix() . 'module_filter')
+	// 		->result_array();
+
+	// 	$whereClauses = [];
+
+	// 	foreach ($filters as $filter) {
+
+	// 		$name  = $filter['filter_name'];
+	// 		$value = trim($filter['filter_value']);
+
+	// 		if ($value == '') {
+	// 			continue;
+	// 		}
+
+	// 		$val = $CI->db->escape_str($value);
+
+	// 		switch ($name) {
+
+	// 			case 'project':
+	// 				$whereClauses[] = "project = '{$val}'";
+	// 				break;
+	// 			case 'staff_id':
+	// 				$whereClauses[] = "staff_id = '{$val}'";
+	// 				break;
+	// 			case 'status':
+	// 				$whereClauses[] = "approval = '{$val}'";
+	// 		}
+	// 	}
+
+	// 	if (!empty($whereClauses)) {
+
+	// 		$sql = "
+	//         SELECT *
+	//         FROM (
+	//             {$baseSql}
+	//         ) AS delivery_data
+	//         WHERE " . implode(' AND ', $whereClauses);
+	// 	} else {
+
+	// 		$sql = $baseSql;
+	// 	}
+
+	// 	return $CI->db->query($sql)->result_array();
+	// }
+
+	public function get_internal_delivery_note_detail_pdf()
+	{
+		$CI = &get_instance();
+
+		// Base Query
+		$baseSql = "
+        SELECT
+            idn.id AS internal_delivery_id,
+            idn.internal_delivery_code,
+            idn.internal_delivery_name,
+            idn.date_c,
+            idn.project,
+            idn.staff_id,
+            idn.approval,
+
+            pr.id AS project_id,
+            pr.name AS project_name,
+
+            idnd.id AS internal_delivery_detail_id,
+            idnd.commodity_code,
+            idnd.commodity_name,
+            idnd.serial_number,
+            idnd.from_stock_name,
+            idnd.to_stock_name,
+            idnd.unit_id,
+            idnd.available_quantity,
+            idnd.quantities,
+            idnd.unit_price,
+            idnd.into_money,
+            idnd.note
+
+        FROM " . db_prefix() . "internal_delivery_note_detail idnd
+
+        INNER JOIN " . db_prefix() . "internal_delivery_note idn
+            ON idn.id = idnd.internal_delivery_id
+
+        LEFT JOIN " . db_prefix() . "projects pr
+            ON pr.id = idn.project
+    ";
+
+		// Load Saved Filters
+		$filters = $CI->db
+			->where('module_name', 'internal_delivery_note')
+			->where('staff_id', get_staff_user_id())
+			->get(db_prefix() . 'module_filter')
+			->result_array();
+
+		$whereClauses = [];
+
+		foreach ($filters as $filter) {
+
+			$name  = $filter['filter_name'];
+			$value = trim($filter['filter_value']);
+
+			if ($value === '') {
+				continue;
+			}
+
+			$val = $CI->db->escape_str($value);
+
+			switch ($name) {
+
+				case 'project':
+					$whereClauses[] = "project_id = '{$val}'";
+					break;
+
+				case 'staff_id':
+					$whereClauses[] = "staff_id = '{$val}'";
+					break;
+
+				case 'status':
+					$whereClauses[] = "approval = '{$val}'";
+					break;
+			}
+		}
+
+		if (!empty($whereClauses)) {
+
+			$sql = "
+            SELECT *
+            FROM (
+                {$baseSql}
+            ) AS delivery_data
+            WHERE " . implode(' AND ', $whereClauses);
+		} else {
+
+			$sql = $baseSql;
+		}
+
+		return $CI->db->query($sql)->result_array();
+	}
 }

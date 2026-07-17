@@ -35,7 +35,7 @@
             filterArea.find('select').selectpicker("val", "");
             table_internal_delivery.DataTable().ajax.reload();
         });
-
+        $('.buttons-collection').hide();
     });
 
     init_internal_delivery();

@@ -1,5 +1,12 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+	.export-btn-div {
+		position: absolute;
+		z-index: 999;
+		left: 141px;
+	}
+</style>
 <div id="wrapper">
 	<div class="content">
 		<div class="row">
@@ -94,6 +101,19 @@
 							<div class="col-md-1 form-group " style="margin-top: 22px;">
 								<a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_ot_filters">
 									<?php echo _l('reset_filter'); ?>
+								</a>
+							</div>
+						</div>
+						<div class="btn-group export-btn-div" id="export-btn-div">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
+								<i class="fa fa-download"></i> <?php echo _l('Export'); ?> <span class="caret"></span>
+							</button>
+							<div class="dropdown-menu" style="padding: 10px;min-width: 94px;">
+								<!-- <a class="dropdown-item export-btn" href="<?php echo admin_url('purchase/order_tracker_pdf'); ?>" data-type="pdf">
+									<i class="fa fa-file-pdf text-danger"></i> PDF
+								</a><br> -->
+								<a class="dropdown-item export-btn" href="<?php echo admin_url('warehouse/internal_delivery_excel'); ?>" data-type="excel">
+									<i class="fa fa-file-excel text-success"></i> Excel
 								</a>
 							</div>
 						</div>
