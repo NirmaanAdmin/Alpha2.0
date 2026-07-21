@@ -1550,10 +1550,10 @@ class Purchase_model extends App_Model
         if ($status == 2) {
             $this->update_item_pur_request($id);
         }
-        
+
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'pur_request', ['status' => $status]);
-      
+
         if ($this->db->affected_rows() > 0) {
             if ($status == 2 || $status == 3) {
                 // $this->send_mail_to_sender('purchase_request', $status, $id);
@@ -1570,7 +1570,7 @@ class Purchase_model extends App_Model
                 $this->db->insert(db_prefix() . 'cron_email', $cron_email);
             }
         }
-        
+
         if ($status == 2) {
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'pur_request');
@@ -1616,7 +1616,7 @@ class Purchase_model extends App_Model
             }
             return true;
         }
-        
+
         return false;
     }
 
@@ -3615,7 +3615,7 @@ class Purchase_model extends App_Model
      */
     public function update_approve_request($rel_id, $rel_type, $status)
     {
-        if(get_staff_user_id() != 11 && $status != 3) {
+        if (get_staff_user_id() != 11 && $status != 3) {
             $summary = $this->db->query("
                 SELECT 
                     SUM(approve = 2) AS approved_count,
@@ -3633,7 +3633,7 @@ class Purchase_model extends App_Model
                 return false;
             }
         }
-        
+
         $data_update = [];
 
         switch ($rel_type) {
@@ -3642,7 +3642,7 @@ class Purchase_model extends App_Model
                 $this->update_item_pur_request($rel_id);
                 $this->db->where('id', $rel_id);
                 $this->db->update(db_prefix() . 'pur_request', $data_update);
-                if(get_staff_user_id() == 11 && $status == 2) {
+                if (get_staff_user_id() == 11 && $status == 2) {
                     $cron_email = array();
                     $cron_email_options = array();
                     $cron_email['type'] = "purchase";
@@ -4594,7 +4594,7 @@ class Purchase_model extends App_Model
         if (get_option('smtp_email')) {
             $email = '<span><b>Email :</b> ' . get_option('smtp_email') . '<br /></span>';
         }
-        if(get_option('main_domain')){
+        if (get_option('main_domain')) {
             $domain = '<span><b>Website :</b> ' . get_option('main_domain') . '<br /></span>';
         }
 
@@ -14170,7 +14170,7 @@ class Purchase_model extends App_Model
             return $intersect;
         } else {
             if (!empty($intersect)) {
-                if(empty($creator_id)) {
+                if (empty($creator_id)) {
                     $intersect = array_filter($intersect, function ($var) use ($user_id) {
                         return ($var['id'] == $user_id);
                     });
@@ -14359,10 +14359,10 @@ class Purchase_model extends App_Model
                 $data['file_name'] = $file['file_name'];
                 $data['filetype']  = $file['filetype'];
                 $this->db->insert(db_prefix() . 'purchase_files', $data);
-                if($related == 'pur_request') {
+                if ($related == 'pur_request') {
                     add_pr_attachment_activity_log($id, $file['file_name'], true);
                 }
-                if($related == 'pur_order') {
+                if ($related == 'pur_order') {
                     add_po_attachment_activity_log($id, $file['file_name'], true);
                 }
             }
@@ -14400,10 +14400,10 @@ class Purchase_model extends App_Model
             if (count($other_attachments) == 0) {
                 delete_dir(get_upload_path_by_type('purchase') . $attachment->rel_type . '/' . $attachment->rel_id);
             }
-            if($attachment->rel_type == 'pur_request') {
+            if ($attachment->rel_type == 'pur_request') {
                 add_pr_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
-            if($attachment->rel_type == 'pur_order') {
+            if ($attachment->rel_type == 'pur_order') {
                 add_po_attachment_activity_log($attachment->rel_id, $attachment->file_name, false);
             }
         }
@@ -14429,7 +14429,7 @@ class Purchase_model extends App_Model
         $this->db->select('id');
         $pur_orders = $this->db->get(db_prefix() . 'pur_orders')->result_array();
 
-        if(!empty($pur_orders)) {
+        if (!empty($pur_orders)) {
             foreach ($pur_orders as $key => $value) {
                 $delivery_status = 0;
                 $pur_order_qty = 0;
@@ -14437,14 +14437,14 @@ class Purchase_model extends App_Model
                 $this->db->select_sum('quantity');
                 $this->db->where('pur_order', $value['id']);
                 $pur_order_detail = $this->db->get(db_prefix() . 'pur_order_detail')->row();
-                
+
                 $pur_order_qty = !empty($pur_order_detail->quantity) ? $pur_order_detail->quantity : 0;
 
                 $this->db->select('id');
                 $this->db->where('pr_order_id', $value['id']);
                 $goods_receipt = $this->db->get(db_prefix() . 'goods_receipt')->result_array();
 
-                if(!empty($goods_receipt)) {
+                if (!empty($goods_receipt)) {
                     $goods_receipt = implode(',', array_column($goods_receipt, 'id'));
                     $goods_receipt = explode(",", $goods_receipt);
 
@@ -14454,13 +14454,13 @@ class Purchase_model extends App_Model
 
                     $goods_receipt_qty = !empty($goods_receipt_detail->quantities) ? $goods_receipt_detail->quantities : 0;
 
-                    if($pur_order_qty == 0 && $goods_receipt_qty == 0) {
+                    if ($pur_order_qty == 0 && $goods_receipt_qty == 0) {
                         $delivery_status = 0;
-                    } else if($pur_order_qty > $goods_receipt_qty) {
+                    } else if ($pur_order_qty > $goods_receipt_qty) {
                         $delivery_status = 3;
-                    } else if($pur_order_qty < $goods_receipt_qty) {
+                    } else if ($pur_order_qty < $goods_receipt_qty) {
                         $delivery_status = 1;
-                    } else if($pur_order_qty == $goods_receipt_qty) {
+                    } else if ($pur_order_qty == $goods_receipt_qty) {
                         $delivery_status = 1;
                     }
 
@@ -14533,14 +14533,14 @@ class Purchase_model extends App_Model
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' . date('Y-m-01') . '" AND "' . date('Y-m-t') . '")';
             } elseif ($months_report == 'this_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                date('Y-m-d', strtotime(date('Y-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date('Y-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date('Y-12-31'))) . '")';
             } elseif ($months_report == 'last_year') {
                 $custom_date_select = 'AND (' . $field . ' BETWEEN "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
-                '" AND "' .
-                date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-01-01'))) .
+                    '" AND "' .
+                    date('Y-m-d', strtotime(date(date('Y', strtotime('last year')) . '-12-31'))) . '")';
             } elseif ($months_report == 'custom') {
                 $from_date = to_sql_date($this->input->post('report_from'));
                 $to_date   = to_sql_date($this->input->post('report_to'));
@@ -14590,12 +14590,13 @@ class Purchase_model extends App_Model
             $response['active_staff_count'] = count(
                 array_unique(
                     array_column(
-                        array_filter($module_activity_log, fn($r) => strpos($r['date'], date('Y-m-d', strtotime('-1 day'))) === 0), 'staffid'
+                        array_filter($module_activity_log, fn($r) => strpos($r['date'], date('Y-m-d', strtotime('-1 day'))) === 0),
+                        'staffid'
                     )
                 )
             );
-            $most_active_person_id = ($c = array_count_values(array_column(array_filter($module_activity_log, fn($r)=>strpos($r['date'], date('Y-m-d')) === 0), 'staffid'))) ? array_search(max($c), $c) : null;
-            if(!empty($most_active_person_id)) {
+            $most_active_person_id = ($c = array_count_values(array_column(array_filter($module_activity_log, fn($r) => strpos($r['date'], date('Y-m-d')) === 0), 'staffid'))) ? array_search(max($c), $c) : null;
+            if (!empty($most_active_person_id)) {
                 $response['most_active_person'] = get_staff_full_name($most_active_person_id);
             }
             $response['activities_today'] = count(
@@ -14659,5 +14660,128 @@ class Purchase_model extends App_Model
             }
         }
         return true;
+    }
+
+    /**
+     * Get vendors dashboard
+     *
+     * @param  array  $data  Dashboard filter data
+     * @return array
+     */
+    public function get_vendors_charts($data = array())
+    {
+        $response = array();
+
+        $response['total_vendors'] = $response['total_active'] = $response['total_inactive'] = $response['onboarded_this_week'] = 0;
+        $response['bar_state_name'] = $response['bar_state_value'] = array();
+        $response['bar_category_name'] = $response['bar_category_value'] = array();
+
+        $this->db->select('userid, active, state, category, datecreated');
+        $this->db->from(db_prefix() . 'pur_vendor');
+        $pur_vendors = $this->db->get()->result_array();
+
+        if (!empty($pur_vendors)) {
+            $response['total_vendors'] = count($pur_vendors);
+            $response['total_active'] = count(array_filter($pur_vendors, function ($item) {
+                return isset($item['active']) && $item['active'] == 1;
+            }));
+            $response['total_inactive'] = count(array_filter($pur_vendors, function ($item) {
+                return isset($item['active']) && $item['active'] == 0;
+            }));
+            $sevenDaysAgo = strtotime('-7 days');
+            $response['onboarded_this_week'] = count(array_filter($pur_vendors, function ($item) use ($sevenDaysAgo) {
+                return strtotime($item['datecreated']) >= $sevenDaysAgo;
+            }));
+
+            $bar_top_states = array();
+            $bar_top_category = array();
+            foreach ($pur_vendors as $item) {
+                $state = !empty($item['state']) ? $item['state'] : 'None';
+                if (!isset($bar_top_states[$state])) {
+                    $bar_top_states[$state]['name'] = $state;
+                    $bar_top_states[$state]['value'] = 0;
+                }
+                $bar_top_states[$state]['value'] += 1;
+
+                $category_group = $this->get_vendor_category($item['category']);
+                $category = !empty($item['category']) ? $category_group->category_name : 'None';
+                if (!isset($bar_top_category[$category])) {
+                    $bar_top_category[$category]['name'] = $category;
+                    $bar_top_category[$category]['value'] = 0;
+                }
+                $bar_top_category[$category]['value'] += 1;
+            }
+            if (isset($bar_top_states['None'])) {
+                unset($bar_top_states['None']);
+            }
+            if (!empty($bar_top_states)) {
+                usort($bar_top_states, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_states = array_slice($bar_top_states, 0, 10);
+                $response['bar_state_name'] = array_column($bar_top_states, 'name');
+                $response['bar_state_value'] = array_column($bar_top_states, 'value');
+            }
+            if (isset($bar_top_category['None'])) {
+                unset($bar_top_category['None']);
+            }
+            if (!empty($bar_top_category)) {
+                usort($bar_top_category, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_category = array_slice($bar_top_category, 0, 10);
+                $response['bar_category_name'] = array_column($bar_top_category, 'name');
+                $response['bar_category_value'] = array_column($bar_top_category, 'value');
+            }
+        }
+
+        return $response;
+    }
+
+    public function vendors_missing_info()
+    {
+        $aColumns = [
+           'userid',
+            'company',
+            'vat',
+            'phonenumber',
+            'website',
+            'category',
+            'address',
+            'city',
+            'state',
+            'zip',
+            'bank_detail'
+        ];
+
+        $sIndexColumn = 'userid';
+        $sTable       = db_prefix() . 'pur_vendor';
+        $join         = [];
+
+        // Fixed WHERE condition - checks for NULL OR empty strings
+        $where = [
+            'AND (vat IS NULL OR vat = "")',
+            'AND (phonenumber IS NULL OR phonenumber = "")',
+            'AND (website IS NULL OR website = "")',
+            'AND (category IS NULL OR category = "")',
+            'AND (address IS NULL OR address = "")',
+            'AND (city IS NULL OR city = "")',
+            'AND (state IS NULL OR state = "")',
+            'AND (zip IS NULL OR zip = "")',
+            'AND (bank_detail IS NULL OR bank_detail = "")'
+        ];
+
+        $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where);
+        $output  = $result['output'];
+        $rResult = $result['rResult'];
+
+        foreach ($rResult as $key => $aRow) {
+            $row = [];
+            $row[] = $aRow['userid'];
+            $row[] = '<a href="' . admin_url('purchase/vendor/' . $aRow['userid']) . '">' . $aRow['company'] . '</a>';
+            $output['aaData'][] = $row;
+        }
+
+        return $output;
     }
 }
