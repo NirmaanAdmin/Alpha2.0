@@ -8805,4 +8805,12 @@ class purchase extends AdminController
         echo json_encode($output);
         die();
     }
+
+    public function get_po_charts()
+    {
+        $data = $this->input->post();
+        $result = $this->purchase_model->get_po_charts($data);
+        echo json_encode($result);
+        die;
+    }
 }

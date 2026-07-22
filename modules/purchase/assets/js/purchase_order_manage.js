@@ -10,7 +10,7 @@ var expenseDropzone;
         "to_date": 'input[name="to_date"]',
         "vendor": "[name='vendor_ft[]']",
         "status": "[name='status[]']",
-        "item_filter": "[name='item_filter[]']",
+        "item_filter": "[name='item_filter[]']", 
         "type": "[name='type[]']",
         "project": "[name='project[]']",
         "department": "[name='department[]']",
@@ -61,7 +61,10 @@ var expenseDropzone;
           amount: 'required'
     }, projectExpenseSubmitHandler);
 
-
+     $(document).on('change', 'select[name="vendor_ft[]"], select[name="project[]"]', function() {
+        get_purchase_order_dashboard();
+    });
+    get_purchase_order_dashboard();
 })(jQuery);
 function init_pur_order(id) {
     "use strict";
@@ -184,4 +187,156 @@ function change_delivery_status(status, id){
       }
     });
   }
+}
+
+var pieChartPOStatus;
+var lineChartOverTime;
+
+function get_purchase_order_dashboard() {
+  "use strict";
+
+  var data = {
+    vendors: $('select[name="vendor_ft[]"]').val(),
+    projects: $('select[name="project[]"]').val(),
+    group_pur: $('select[name="group_pur[]"]').val(),
+  }
+
+  $.post(admin_url + 'purchase/get_po_charts', data).done(function(response){
+    response = JSON.parse(response);
+
+    // Update value summaries
+    $('.total_po_value').html(response.total_po_value);
+    $('.approved_po_value').html(response.approved_po_value);
+    $('.draft_po_value').html(response.draft_po_value);
+
+    // PIE CHART - Approval Status
+    var pieCtx = document.getElementById('pieChartForPOApprovalStatus').getContext('2d');
+    var pieData = [response.approved_po_count, response.draft_po_count, response.rejected_po_count];
+
+    if (pieChartPOStatus) {
+      pieChartPOStatus.data.datasets[0].data = pieData;
+      pieChartPOStatus.update();
+    } else {
+      pieChartPOStatus = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Approved', 'Draft', 'Rejected'],
+          datasets: [{
+            data: pieData,
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(255, 99, 132, 0.7)'
+            ],
+            borderColor: [
+              'rgba(75, 192, 192, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    // PIE CHART - Po Distribution by Budget
+    // var poPieCtx = document.getElementById('pieChartForPoByBudget').getContext('2d');
+    // var poData = response.pie_total_value;
+    // var budgetLabels = response.pie_budget_name;
+
+    // if (window.poByBudgetChart) {
+    //   poByBudgetChart.data.labels = budgetLabels;
+    //   poByBudgetChart.data.datasets[0].data = poData;
+    //   poByBudgetChart.update();
+    // } else {
+    //   window.poByBudgetChart = new Chart(poPieCtx, {
+    //     type: 'pie',
+    //     data: {
+    //       labels: budgetLabels,
+    //       datasets: [{
+    //         data: poData,
+    //         backgroundColor: budgetLabels.map((_, i) => `hsl(${i * 35 % 360}, 70%, 60%)`),
+    //         borderColor: '#fff',
+    //         borderWidth: 1
+    //       }]
+    //     },
+    //     options: {
+    //       responsive: true,
+    //       plugins: {
+    //         legend: {
+    //           position: 'bottom'
+    //         },
+    //         tooltip: {
+    //           callbacks: {
+    //             label: function(context) {
+    //               return context.label + ': ' + context.formattedValue;
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
+
+    // Total Amount Over Time
+    var lineCtx = document.getElementById('lineChartOverTime').getContext('2d');
+    if (lineChartOverTime) {
+      lineChartOverTime.data.labels = response.line_order_date;
+      lineChartOverTime.data.datasets[0].data = response.line_order_total;
+      lineChartOverTime.update();
+    } else {
+      lineChartOverTime = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: response.line_order_date,
+          datasets: [{
+            label: 'Amount',
+            data: response.line_order_total,
+            fill: false,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom'
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Month'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Amount'
+              }
+            }
+          }
+        }
+      });
+    }
+
+  });
 }

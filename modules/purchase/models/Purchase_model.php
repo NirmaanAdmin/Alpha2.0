@@ -14741,7 +14741,7 @@ class Purchase_model extends App_Model
     public function vendors_missing_info()
     {
         $aColumns = [
-           'userid',
+            'userid',
             'company',
             'vat',
             'phonenumber',
@@ -14783,5 +14783,119 @@ class Purchase_model extends App_Model
         }
 
         return $output;
+    }
+    /**
+     * Get purchase order dashboard
+     *
+     * @param  array  $data  Dashboard filter data
+     * @return array
+     */
+    public function get_po_charts($data = array())
+    {
+        $response = array();
+        $vendors = isset($data['vendors']) ? $data['vendors'] : '';
+        $projects = isset($data['projects']) ? $data['projects'] : '';
+        $this->load->model('currencies_model');
+        
+        $response['total_po_value'] = $response['approved_po_value'] = $response['draft_po_value'] = $response['draft_po_count'] = $response['approved_po_count'] = $response['rejected_po_count'] = 0;
+        $response['pie_budget_name'] = $response['pie_tax_value'] = array();
+        $response['line_order_date'] = $response['line_order_total'] = array();
+        $this->db->select('id, pur_order_number, approve_status, total, order_date, total_tax, vendor, project, currency');
+        
+        if (!empty($vendors) && is_array($vendors)) {
+            $this->db->where_in(db_prefix() . 'pur_orders.vendor', $vendors);
+        }
+        if (!empty($projects) && is_array($projects)) {
+            $this->db->where_in(db_prefix() . 'pur_orders.project', $projects);
+        }
+        $this->db->order_by('order_date', 'asc');
+        $pur_orders = $this->db->get(db_prefix() . 'pur_orders')->result_array();
+       
+        if (!empty($pur_orders)) {
+            $draft_po_value = 0;
+            $approved_po_value = 0;
+            $draft_po_array = array_filter($pur_orders, function ($item) {
+                return in_array($item['approve_status'], [1]);
+            });
+
+            if (!empty($draft_po_array)) {
+                $draft_po_value = array_reduce($draft_po_array, function ($carry, $item) {
+                    return $carry + (float)$item['total'];
+                }, 0);
+            }
+            $response['draft_po_value'] = app_format_money($draft_po_value,'₹');
+
+            $approved_po_array = array_filter($pur_orders, function ($item) {
+                return in_array($item['approve_status'], [2]);
+            });
+
+            if (!empty($approved_po_array)) {
+                $approved_po_value = array_reduce($approved_po_array, function ($carry, $item) {
+                    return $carry + (float)$item['total'];
+                }, 0);
+            }
+            $response['approved_po_value'] = app_format_money($approved_po_value, '₹');
+
+            $total_po_value = array_reduce($pur_orders, function ($carry, $item) {
+                return $carry + (float)$item['total'];
+            }, 0);
+            $response['total_po_value'] = app_format_money($total_po_value, '₹');
+
+            $response['draft_po_count'] = count(array_filter($pur_orders, function ($item) {
+                return isset($item['approve_status']) && $item['approve_status'] == 1;
+            }));
+            $response['approved_po_count'] = count(array_filter($pur_orders, function ($item) {
+                return isset($item['approve_status']) && $item['approve_status'] == 2;
+            }));
+            $response['rejected_po_count'] = count(array_filter($pur_orders, function ($item) {
+                return isset($item['approve_status']) && $item['approve_status'] == 3;
+            }));
+
+            if (!empty($pur_orders)) {
+                $grouped = array_reduce($pur_orders, function ($carry, $item) {
+                    $items_group = get_group_name_item($item['group_pur']);
+                    $group = $items_group->name;
+                    $carry[$group] = ($carry[$group] ?? 0) + (float) $item['total'];
+                    return $carry;
+                }, []);
+                if (!empty($grouped)) {
+                    $response['pie_budget_name'] = array_keys($grouped);
+                    $response['pie_total_value'] = array_values($grouped);
+                }
+            }
+
+            $line_order_total = array();
+            foreach ($pur_orders as $key => $value) {
+                if (!empty($value['order_date'])) {
+                    $timestamp = strtotime($value['order_date']);
+                    if ($timestamp !== false && $timestamp > 0) {
+                        $month = date('Y-m', $timestamp);
+                    } elseif ($timestamp === false || $timestamp <= 0) {
+                        $month = date('Y') . '-01';
+                    }
+                } else {
+                    $month = date('Y') . '-01';
+                }
+                if (!isset($line_order_total[$month])) {
+                    $line_order_total[$month] = 0;
+                }
+                $line_order_total[$month] += $value['total'];
+            }
+
+            if (!empty($line_order_total)) {
+                ksort($line_order_total);
+                $cumulative = 0;
+                foreach ($line_order_total as $month => $value) {
+                    $cumulative += $value;
+                    $line_order_total[$month] = $cumulative;
+                }
+                $response['line_order_date'] = array_map(function ($month) {
+                    return date('M-y', strtotime($month . '-01'));
+                }, array_keys($line_order_total));
+                $response['line_order_total'] = array_values($line_order_total);
+            }
+        }
+
+        return $response;
     }
 }
