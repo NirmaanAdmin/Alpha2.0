@@ -9174,4 +9174,12 @@ class warehouse extends AdminController
 		fclose($output);
 		exit;
 	}
+
+	public function get_stock_received_dashboard()
+	{
+		$data = $this->input->post();
+		$result = $this->warehouse_model->get_stock_received_dashboard($data);
+		echo json_encode($result);
+		die;
+	}
 }

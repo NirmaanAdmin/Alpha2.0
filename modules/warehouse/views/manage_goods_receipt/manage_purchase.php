@@ -20,11 +20,140 @@
                                         <?php echo _l('stock_received_docket'); ?>
                                     </a>
                                 <?php } ?>
+                                <button class="btn btn-info pull-left mleft10 display-block" type="button" data-toggle="collapse" data-target="#sr-charts-section" aria-expanded="true" aria-controls="sr-charts-section">
+                                    <?php echo _l('Stock Received Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
+                                </button>
                             </div>
                             <div class="col-md-1 pull-right">
                                 <a href="#" class="btn btn-default pull-right btn-with-tooltip toggle-small-view hidden-xs" onclick="toggle_small_view_proposal('.purchase_sm','#purchase_sm_view'); return false;" data-toggle="tooltip" title="<?php echo _l('invoices_toggle_table_tooltip'); ?>"><i class="fa fa-angle-double-left"></i></a>
                             </div>
 
+
+                        </div>
+                        <div id="sr-charts-section" class="collapse in">
+                            <div class="row">
+                                <div class="col-md-12 mtop20">
+                                    <div class="row">
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Total Receipts (By period)</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_receipts"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Received PO / Total PO</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_received_po"></span> / <span class="tw-truncate dashboard_stat_value total_po"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Total Quantity Received</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_quantity_received"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Client Supply / Bought out items</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_client_supply"></span> / <span class="tw-truncate dashboard_stat_value total_bought_out_items"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mtop20">
+                                    <div class="row">
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Amount vs Order value in %</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value amount_vs_order_value"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title">Nos vs Order items in %</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value nos_vs_order_items"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mtop20">
+                                <div class="col-md-6">
+                                    <p class="mbot15 dashboard_stat_title">Receipts Over Time</p>
+                                    <div style="width: 100%; height: 400px;">
+                                        <canvas id="lineChartOverTime"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mbot15 dashboard_stat_title">Top 10 Suppliers by Receipts</p>
+                                    <div style="width: 100%; height: 400px;">
+                                        <canvas id="barChartTopVendors"></canvas>
+                                    </div>
+                                </div>
+                                
+                            </div>
                         </div>
                         <br />
                         <div class="row all_ot_filters">
@@ -101,7 +230,7 @@
                                             <?php if (in_array($pr_order['id'], $pur_order_filter_val)) {
                                                 echo 'selected';
                                             } ?>>
-                                            <?php echo pur_html_entity_decode($pr_order['pur_order_number']) .'-'. pur_html_entity_decode($pr_order['pur_order_name'])  ; ?>
+                                            <?php echo pur_html_entity_decode($pr_order['pur_order_number']) . '-' . pur_html_entity_decode($pr_order['pur_order_name']); ?>
                                         </option>
                                     <?php } ?>
                                 </select>
@@ -198,3 +327,5 @@
 </body>
 
 </html>
+
+<script src="<?php echo module_dir_url(PURCHASE_MODULE_NAME, 'assets/plugins/charts/chart.js'); ?>?v=<?php echo PURCHASE_REVISION; ?>"></script>
