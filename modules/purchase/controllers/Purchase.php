@@ -8813,4 +8813,12 @@ class purchase extends AdminController
         echo json_encode($result);
         die;
     }
+
+    public function get_pr_charts()
+    {
+        $data = $this->input->post();
+        $result = $this->purchase_model->get_pr_charts($data);
+        echo json_encode($result);
+        die;
+    }
 }

@@ -14898,4 +14898,86 @@ class Purchase_model extends App_Model
 
         return $response;
     }
+
+    /**
+     * Get purchase request dashboard
+     *
+     * @param  array  $data  Dashboard filter data
+     * @return array
+     */
+    public function get_pr_charts($data = array())
+    {
+        $response = array();
+        $projects = isset($data['projects']) ? $data['projects'] : '';
+        $group_pur = isset($data['group_pur']) ? $data['group_pur'] : '';
+        $this->load->model('departments_model');
+        $response['total_purchase_requests'] = $response['total_approved_requests'] = $response['total_draft_requests'] = $response['total_closed_requests'] = 0;
+        $response['budget_head_name'] = $response['budget_head_value'] = array();
+        $response['department_name'] = $response['department_value'] = array();
+        $response['line_order_date'] = $response['line_order_total'] = array();
+        $response['pie_status_name'] = $response['pie_status_value'] = array();
+
+        $this->db->select('id, pur_rq_code, status, total, total_tax, project, department, request_date');
+        if (!empty($projects) && is_array($projects)) {
+            $this->db->where_in(db_prefix() . 'pur_request.project', $projects);
+        }
+        
+        $this->db->order_by('request_date', 'asc');
+        $pur_request = $this->db->get(db_prefix() . 'pur_request')->result_array();
+
+        if (!empty($pur_request)) {
+            $response['total_purchase_requests'] = count($pur_request);
+            $response['total_approved_requests'] = count(array_filter($pur_request, function ($item) {
+                return isset($item['status']) && $item['status'] == 2;
+            }));
+            $response['total_draft_requests'] = count(array_filter($pur_request, function ($item) {
+                return isset($item['status']) && $item['status'] == 1;
+            }));
+            $response['total_closed_requests'] = count(array_filter($pur_request, function ($item) {
+                return isset($item['status']) && $item['status'] == 4;
+            }));
+
+            $line_order_total = array();
+            foreach ($pur_request as $key => $value) {
+                $month = date('M-y', strtotime($value['request_date']));
+                if (!isset($line_order_total[$month])) {
+                    $line_order_total[$month] = 0;
+                }
+                $line_order_total[$month] += 1;
+            }
+            if (!empty($line_order_total)) {
+                $response['line_order_date'] = array_keys($line_order_total);
+                $response['line_order_total'] = array_values($line_order_total);
+            }
+
+            
+
+            $department_grouped = array_reduce($pur_request, function ($carry, $item) {
+                $items_group = $this->departments_model->get($item['department']);
+                $group = !empty($items_group) ? $items_group->name : '';
+                if (!isset($carry[$group])) {
+                    $carry[$group] = 0;
+                }
+                $carry[$group]++;
+                return $carry;
+            }, []);
+            if (!empty($department_grouped)) {
+                $response['department_name'] = array_keys($department_grouped);
+                $response['department_value'] = array_values($department_grouped);
+            }
+
+            $status_grouped = array_reduce($pur_request, function ($carry, $item) {
+                $group = get_status_approve_str($item['status']);
+                $carry[$group] = ($carry[$group] ?? 0) + 1;
+                return $carry;
+            }, []);
+
+            if (!empty($status_grouped)) {
+                $response['pie_status_name'] = array_keys($status_grouped);
+                $response['pie_status_value'] = array_values($status_grouped);
+            }
+        }
+
+        return $response;
+    }
 }

@@ -19,17 +19,108 @@
                     <?php echo _l('new_pur_request'); ?>
                   </a>
                 <?php } ?>
+                <button class="btn btn-info pull-left mleft10 display-block" type="button" data-toggle="collapse" data-target="#pr-charts-section" aria-expanded="true" aria-controls="pr-charts-section">
+                  <?php echo _l('PR Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
+                </button>
+              </div>
+
+            </div>
+            <div id="pr-charts-section" class="collapse in">
+              <div class="row">
+                <div class="col-md-12 mtop20">
+                  <div class="row">
+                    <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                      <div class="top_stats_wrapper">
+                        <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_title">Total Purchase Requests</span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                        <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_value total_purchase_requests"></span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                      <div class="top_stats_wrapper">
+                        <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_title">Approved Requests</span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                        <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_value total_approved_requests"></span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                      <div class="top_stats_wrapper">
+                        <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_title">Draft Requests</span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                        <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_value total_draft_requests"></span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                      <div class="top_stats_wrapper">
+                        <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_title">Closed Requests</span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                        <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                          <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                            <span class="tw-truncate dashboard_stat_value total_closed_requests"></span>
+                          </div>
+                          <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mtop20">
+                    <div class="col-md-8">
+                      <p class="mbot15 dashboard_stat_title">Purchase Request per month</p>
+                      <div style="width: 100%; height: 450px;">
+                        <canvas id="lineChartOverTime"></canvas>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                      <p class="mbot15 dashboard_stat_title">Doughnut Chart for PR per Department</p>
+                      <div style="width: 100%; height: 450px; display: flex; justify-content: left;">
+                        <canvas id="doughnutChartDepartment"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-
             <div class="row">
               <hr>
               <div class="col-md-3">
                 <select name="department_filter[]" id="department_filter" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('department'); ?>">
                   <?php foreach ($departments as $s) { ?>
                     <option value="<?php echo pur_html_entity_decode($s['departmentid']); ?>" <?php if (isset($pur_request) && $s['departmentid'] == $pur_request->department) {
-                      echo 'selected';
-                    } ?>><?php echo pur_html_entity_decode($s['name']); ?></option>
+                                                                                                echo 'selected';
+                                                                                              } ?>><?php echo pur_html_entity_decode($s['name']); ?></option>
                   <?php } ?>
                 </select>
               </div>
@@ -145,8 +236,8 @@
 
               <?php foreach ($vendors as $s) { ?>
                 <option value="<?php echo pur_html_entity_decode($s['userid']); ?>" <?php if (isset($pur_request) && in_array($s['userid'], $vendors_arr)) {
-                  echo 'selected';
-                } ?>><?php echo pur_html_entity_decode($s['company']); ?></option>
+                                                                                      echo 'selected';
+                                                                                    } ?>><?php echo pur_html_entity_decode($s['company']); ?></option>
               <?php } ?>
 
             </select>
@@ -165,3 +256,4 @@
 </body>
 
 </html>
+<script src="<?php echo module_dir_url(PURCHASE_MODULE_NAME, 'assets/plugins/charts/chart.js'); ?>?v=<?php echo PURCHASE_REVISION; ?>"></script>
