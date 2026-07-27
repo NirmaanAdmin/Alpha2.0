@@ -198,7 +198,7 @@ function get_purchase_request_dashboard() {
     // Update value summaries
     $('.total_purchase_requests').text(response.total_purchase_requests);
     $('.total_approved_requests').text(response.total_approved_requests);
-    // $('.total_draft_requests').text(response.total_draft_requests);
+    $('.total_draft_requests').text(response.total_draft_requests);
     $('.total_closed_requests').text(response.total_closed_requests);
     var lineChartOverTime = null;
     // Purchase Request per month
