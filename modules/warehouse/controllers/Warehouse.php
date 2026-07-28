@@ -9121,6 +9121,9 @@ class warehouse extends AdminController
 		$get_internal_delivery_note_detail = $this->warehouse_model->get_internal_delivery_note_detail_pdf();
 		// CSV Headers (same as PDF table columns)
 		$headers = [
+			'Challann Number',
+			'Date',
+			'Item  Name',
 			'Commodity Code',
 			'From stock name',
 			'To stock name',
@@ -9135,6 +9138,7 @@ class warehouse extends AdminController
 
 		// Data rows
 		$serial_no = 1;
+
 		foreach ($get_internal_delivery_note_detail as $internal_delivery_key => $internal_delivery_value) {
 			$availale_quantity = (isset($internal_delivery_value) ? $internal_delivery_value['available_quantity'] : '');
 			$quantities = (isset($internal_delivery_value) ? $internal_delivery_value['quantities'] : '');
@@ -9159,9 +9163,19 @@ class warehouse extends AdminController
 			if (strlen($commodity_name) == 0) {
 				$commodity_name = wh_get_item_variatiom($internal_delivery_value['commodity_code']);
 			}
+			$parts = explode('_', $commodity_name, 2);
+
+			$item_code = $parts[0];
+			$item_name = $parts[1];
+
+			$challan_no = $internal_delivery_value['internal_delivery_code'];
+			$date = $internal_delivery_value['date_c'];
 			// Write row data
 			fputcsv($output, [
-				$commodity_name,
+				$challan_no,
+				$date,
+				$item_name,
+				$item_code,
 				$from_stock_name,
 				$to_stock_name,
 				$unit_name,
