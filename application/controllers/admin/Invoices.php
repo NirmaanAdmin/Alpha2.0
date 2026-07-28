@@ -22,9 +22,11 @@ class Invoices extends AdminController
     /* List all invoices datatables */
     public function list_invoices($id = '')
     {
-        if (staff_cant('view', 'invoices')
+        if (
+            staff_cant('view', 'invoices')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('invoices');
         }
 
@@ -47,9 +49,11 @@ class Invoices extends AdminController
     /* List all recurring invoices */
     public function recurring($id = '')
     {
-        if (staff_cant('view', 'invoices')
+        if (
+            staff_cant('view', 'invoices')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('invoices');
         }
 
@@ -65,7 +69,7 @@ class Invoices extends AdminController
     public function table_new()
     {
         if ($this->input->is_ajax_request()) {
-             $this->app->get_table_data('invoices_new');
+            $this->app->get_table_data('invoices_new');
         }
     }
 
@@ -404,9 +408,11 @@ class Invoices extends AdminController
     /* Get all invoice data used when user click on invoiec number in a datatable left side*/
     public function get_invoice_data_ajax($id)
     {
-        if (staff_cant('view', 'invoices')
+        if (
+            staff_cant('view', 'invoices')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             echo _l('access_denied');
             die;
         }
@@ -479,9 +485,9 @@ class Invoices extends AdminController
         $total_credits_applied = 0;
         foreach ($this->input->post('amount') as $credit_id => $amount) {
             $success = $this->credit_notes_model->apply_credits($credit_id, [
-            'invoice_id' => $invoice_id,
-            'amount'     => $amount,
-        ]);
+                'invoice_id' => $invoice_id,
+                'amount'     => $amount,
+            ]);
             if ($success) {
                 $total_credits_applied++;
             }
@@ -735,5 +741,13 @@ class Invoices extends AdminController
         if ($this->input->is_ajax_request()) {
             echo json_encode($this->invoices_model->get_payment_modes_by_project($project_id));
         }
+    }
+
+    public function get_client_invoices_dashboard()
+    {
+        $data = $this->input->post();
+        $result = $this->invoices_model->get_client_invoices_dashboard($data);
+        echo json_encode($result);
+        die;
     }
 }

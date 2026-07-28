@@ -22,6 +22,9 @@
                     <?php echo _l('invoices_list_recurring'); ?>
                 </a>
             <?php } ?>
+            <button class="btn btn-info pull-left mleft5 display-block" type="button" data-toggle="collapse" data-target="#ci-charts-section" aria-expanded="true" aria-controls="ci-charts-section">
+                <?php echo _l('Client Invoices Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
+            </button>
             <div class="display-block pull-right tw-space-x-0 sm:tw-space-x-1.5">
                 <a href="#" class="btn btn-default btn-with-tooltip toggle-small-view hidden-xs"
                     onclick="toggle_small_view('.table-invoices','#invoice'); return false;" data-toggle="tooltip"
@@ -36,6 +39,86 @@
 
             </div>
             <div class="clearfix"></div>
+        </div>
+    </div>
+    <div id="ci-charts-section" class="collapse in">
+        <div class="row">
+            <div class="col-md-12 mtop20">
+                <div class="panel_s">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                <div class="top_stats_wrapper">
+                                    <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Total Invoices Raised</span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                    <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_value total_invoices_raised" style="font-size: 19px; font-weight: bold;"></span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                <div class="top_stats_wrapper">
+                                    <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Total Invoiced Amount</span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                    <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_value total_invoiced_amount" style="font-size: 19px; font-weight: bold;"></span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                <div class="top_stats_wrapper">
+                                    <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Average Invoice Value</span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                    <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                        <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                            <span class="tw-truncate dashboard_stat_value average_invoice_value" style="font-size: 19px; font-weight: bold;"></span>
+                                        </div>
+                                        <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mtop20">
+                            <div class="col-md-5">
+                                <p class="mbot15 dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Invoicing Trends Over Time</p>
+                                <div style="width: 100%; height: 400px;">
+                                    <canvas id="lineChartOverTime"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mbot15 dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Top 10 Vendors by Amount</p>
+                                <div style="width: 100%; height: 400px;">
+                                    <canvas id="barChartTopVendors"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mbot15 dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Pie Chart for Invoice per Status</p>
+                                <div style="width: 100%; height: 450px; display: flex; justify-content: left;">
+                                    <canvas id="pieChartForStatus"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">

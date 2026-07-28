@@ -459,7 +459,7 @@ class Invoices_model extends App_Model
             foreach ($billed_tasks as $key => $tasks) {
                 foreach ($tasks as $t) {
                     $this->db->select('status')
-                    ->where('id', $t);
+                        ->where('id', $t);
 
                     $_task = $this->db->get(db_prefix() . 'tasks')->row();
 
@@ -738,13 +738,13 @@ class Invoices_model extends App_Model
         $invoices_to_merge         = isset($data['invoices_to_merge']) ? $data['invoices_to_merge'] : [];
         $billed_tasks              = isset($data['billed_tasks']) ? $data['billed_tasks'] : [];
         $billed_expenses           = isset($data['billed_expenses']) ?
-        array_map('unserialize', array_unique(array_map('serialize', $data['billed_expenses']))) :
-        [];
+            array_map('unserialize', array_unique(array_map('serialize', $data['billed_expenses']))) :
+            [];
         $data['cancel_overdue_reminders'] = isset($data['cancel_overdue_reminders']) ? 1 : 0;
         $data['cycles']                   = !isset($data['cycles']) ? 0 : $data['cycles'];
         $data['allowed_payment_modes']    = isset($data['allowed_payment_modes']) ?
-        serialize($data['allowed_payment_modes']) :
-        serialize([]);
+            serialize($data['allowed_payment_modes']) :
+            serialize([]);
 
         if (isset($data['recurring'])) {
             if ($data['recurring'] == 'custom') {
@@ -828,7 +828,7 @@ class Invoices_model extends App_Model
 
         $data              = $hook['data'];
         $items             = $hook['items'];
-	    $newitems         = $hook['new_items'];
+        $newitems         = $hook['new_items'];
         $removed_items     = $hook['removed_items'];
         $custom_fields     = $hook['custom_fields'];
         $billed_tasks      = $hook['billed_tasks'];
@@ -1189,9 +1189,11 @@ class Invoices_model extends App_Model
      */
     public function delete($id, $simpleDelete = false)
     {
-        if (get_option('delete_only_on_last_invoice') == 1 &&
+        if (
+            get_option('delete_only_on_last_invoice') == 1 &&
             $simpleDelete == false &&
-            !is_last_invoice($id)) {
+            !is_last_invoice($id)
+        ) {
             return false;
         }
 
@@ -1211,10 +1213,12 @@ class Invoices_model extends App_Model
                 app_archive_short_link($invoice->short_link);
             }
 
-            if (get_option('invoice_number_decrement_on_delete') == 1 &&
-            get_option('next_invoice_number') > 1 &&
-            $simpleDelete == false &&
-            !$isDraft) {
+            if (
+                get_option('invoice_number_decrement_on_delete') == 1 &&
+                get_option('next_invoice_number') > 1 &&
+                $simpleDelete == false &&
+                !$isDraft
+            ) {
                 // Decrement next invoice number to
                 $this->decrement_next_number();
             }
@@ -1222,32 +1226,32 @@ class Invoices_model extends App_Model
             if ($simpleDelete == false) {
                 $this->db->where('invoiceid', $id);
                 $this->db->update(db_prefix() . 'expenses', [
-            'invoiceid' => null,
-        ]);
+                    'invoiceid' => null,
+                ]);
 
                 $this->db->where('invoice_id', $id);
                 $this->db->update(db_prefix() . 'proposals', [
-            'invoice_id'     => null,
-            'date_converted' => null,
-        ]);
+                    'invoice_id'     => null,
+                    'date_converted' => null,
+                ]);
 
                 $this->db->where('invoice_id', $id);
                 $this->db->update(db_prefix() . 'tasks', [
-            'invoice_id' => null,
-            'billed'     => 0,
-        ]);
+                    'invoice_id' => null,
+                    'billed'     => 0,
+                ]);
 
                 // if is converted from estimate set the estimate invoice to null
                 if (total_rows(db_prefix() . 'estimates', [
-            'invoiceid' => $id,
-        ]) > 0) {
+                    'invoiceid' => $id,
+                ]) > 0) {
                     $this->db->where('invoiceid', $id);
                     $estimate = $this->db->get(db_prefix() . 'estimates')->row();
                     $this->db->where('id', $estimate->id);
                     $this->db->update(db_prefix() . 'estimates', [
-                'invoiceid'     => null,
-                'invoiced_date' => null,
-            ]);
+                        'invoiceid'     => null,
+                        'invoiced_date' => null,
+                    ]);
                     $this->load->model('estimates_model');
                     $this->estimates_model->log_estimate_activity($estimate->id, 'not_estimate_invoice_deleted');
                 }
@@ -1311,8 +1315,8 @@ class Invoices_model extends App_Model
 
             $this->db->where('is_recurring_from', $id);
             $this->db->update(db_prefix() . 'invoices', [
-        'is_recurring_from' => null,
-    ]);
+                'is_recurring_from' => null,
+            ]);
 
             // Delete the custom field values
             $this->db->where('relid', $id);
@@ -1329,9 +1333,9 @@ class Invoices_model extends App_Model
             foreach ($tasks as $task) {
                 $this->db->where('id', $task['id']);
                 $this->db->update(db_prefix() . 'tasks', [
-            'invoice_id' => null,
-            'billed'     => 0,
-        ]);
+                    'invoice_id' => null,
+                    'billed'     => 0,
+                ]);
             }
 
             $attachments = $this->get_attachments($id);
@@ -1456,8 +1460,10 @@ class Invoices_model extends App_Model
                 $email_sent = true;
             }
 
-            if (can_send_sms_based_on_creation_date($invoice->datecreated)
-                && $this->app_sms->trigger(SMS_TRIGGER_INVOICE_OVERDUE, $contact['phonenumber'], $merge_fields)) {
+            if (
+                can_send_sms_based_on_creation_date($invoice->datecreated)
+                && $this->app_sms->trigger(SMS_TRIGGER_INVOICE_OVERDUE, $contact['phonenumber'], $merge_fields)
+            ) {
                 $sms_sent = true;
                 array_push($sms_reminder_log, $contact['firstname'] . ' (' . $contact['phonenumber'] . ')');
             }
@@ -1466,22 +1472,22 @@ class Invoices_model extends App_Model
         if ($email_sent || $sms_sent) {
             if ($email_sent) {
                 $this->log_invoice_activity($id, 'user_sent_overdue_reminder', false, serialize([
-                '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
-                defined('CRON') ? ' ' : get_staff_full_name(),
-            ]));
+                    '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
+                    defined('CRON') ? ' ' : get_staff_full_name(),
+                ]));
             }
 
             if ($sms_sent) {
                 $this->log_invoice_activity($id, 'sms_reminder_sent_to', false, serialize([
-               implode(', ', $sms_reminder_log),
-           ]));
+                    implode(', ', $sms_reminder_log),
+                ]));
             }
 
             hooks()->do_action('invoice_overdue_reminder_sent', [
-            'invoice_id' => $id,
-            'sent_to'    => $emails_sent,
-            'sms_send'   => $sms_sent,
-        ]);
+                'invoice_id' => $id,
+                'sent_to'    => $emails_sent,
+                'sms_send'   => $sms_sent,
+            ]);
 
             return true;
         }
@@ -1540,8 +1546,10 @@ class Invoices_model extends App_Model
                 $email_sent = true;
             }
 
-            if (can_send_sms_based_on_creation_date($invoice->datecreated)
-                && $this->app_sms->trigger(SMS_TRIGGER_INVOICE_DUE, $contact['phonenumber'], $merge_fields)) {
+            if (
+                can_send_sms_based_on_creation_date($invoice->datecreated)
+                && $this->app_sms->trigger(SMS_TRIGGER_INVOICE_DUE, $contact['phonenumber'], $merge_fields)
+            ) {
                 $sms_sent = true;
                 array_push($sms_reminder_log, $contact['firstname'] . ' (' . $contact['phonenumber'] . ')');
             }
@@ -1550,22 +1558,22 @@ class Invoices_model extends App_Model
         if ($email_sent || $sms_sent) {
             if ($email_sent) {
                 $this->log_invoice_activity($id, 'activity_due_reminder_is_sent', false, serialize([
-                '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
-                defined('CRON') ? ' ' : get_staff_full_name(),
-            ]));
+                    '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
+                    defined('CRON') ? ' ' : get_staff_full_name(),
+                ]));
             }
 
             if ($sms_sent) {
                 $this->log_invoice_activity($id, 'sms_reminder_sent_to', false, serialize([
-               implode(', ', $sms_reminder_log),
-           ]));
+                    implode(', ', $sms_reminder_log),
+                ]));
             }
 
             hooks()->do_action('invoice_due_reminder_sent', [
-            'invoice_id' => $id,
-            'sent_to'    => $emails_sent,
-            'sms_send'   => $sms_sent,
-        ]);
+                'invoice_id' => $id,
+                'sent_to'    => $emails_sent,
+                'sms_send'   => $sms_sent,
+            ]);
 
             return true;
         }
@@ -1596,8 +1604,8 @@ class Invoices_model extends App_Model
 
         if ($template_name == '') {
             $template_name = $invoice->sent == 0 ?
-            'invoice_send_to_customer' :
-            'invoice_send_to_customer_already_sent';
+                'invoice_send_to_customer' :
+                'invoice_send_to_customer_already_sent';
 
             $template_name = hooks()->apply_filters('after_invoice_sent_template_statement', $template_name);
         }
@@ -1880,19 +1888,135 @@ class Invoices_model extends App_Model
     protected function get_contacts_for_invoice_emails($client_id)
     {
         return $this->clients_model->get_contacts($client_id, [
-            'active' => 1, 'invoice_emails' => 1,
+            'active' => 1,
+            'invoice_emails' => 1,
         ]);
     }
 
     public function get_payment_modes_by_project($project_id)
     {
         $result = array();
-        $payment_modes = $this->db->query("SELECT GROUP_CONCAT(id SEPARATOR ',') as payment_mode_id FROM ".db_prefix()."payment_modes WHERE FIND_IN_SET(".$project_id.", project)")->row();
-        if(!empty($payment_modes)) {
+        $payment_modes = $this->db->query("SELECT GROUP_CONCAT(id SEPARATOR ',') as payment_mode_id FROM " . db_prefix() . "payment_modes WHERE FIND_IN_SET(" . $project_id . ", project)")->row();
+        if (!empty($payment_modes)) {
             $result['data'] = $payment_modes->payment_mode_id;
         } else {
             $result['data'] = NULL;
         }
         return $result;
+    }
+
+    public function get_client_invoices_dashboard($data = array())
+    {
+        $response = array();
+
+        $response['total_invoices_raised'] = $response['total_invoiced_amount'] = $response['average_invoice_value'] = 0;
+        $response['line_order_date'] = $response['line_order_total'] = array();
+        $response['pie_status_name'] = $response['pie_status_value'] = array();
+        $response['bar_top_vendor_name'] = $response['bar_top_vendor_value'] = array();
+
+        $this->db->select('id, total, date, project_id, status');
+
+        $this->db->order_by(db_prefix() . 'invoices.date', 'asc');
+        $invoices = $this->db->get(db_prefix() . 'invoices')->result_array();
+
+        if (!empty($invoices)) {
+            $total_invoices_raised = count($invoices);
+            $response['total_invoices_raised'] = $total_invoices_raised;
+            $total_invoiced_amount = array_reduce($invoices, function ($carry, $item) {
+                return $carry + (float)$item['total'];
+            }, 0);
+            $response['total_invoiced_amount'] = app_format_money($total_invoiced_amount, '₹');
+            if ($total_invoices_raised > 0) {
+                $average_invoice_value = $total_invoiced_amount / $total_invoices_raised;
+                $response['average_invoice_value'] = app_format_money($average_invoice_value, '₹');
+            }
+
+            $line_order_total = array();
+            foreach ($invoices as $key => $value) {
+                if (!empty($value['date'])) {
+                    $timestamp = strtotime($value['date']);
+                    if ($timestamp !== false && $timestamp > 0) {
+                        $month = date('Y-m', $timestamp);
+                    } elseif ($timestamp === false || $timestamp <= 0) {
+                        $month = date('Y') . '-01';
+                    }
+                } else {
+                    $month = date('Y') . '-01';
+                }
+                if (!isset($line_order_total[$month])) {
+                    $line_order_total[$month] = 0;
+                }
+                $line_order_total[$month] += $value['total'];
+            }
+
+            if (!empty($line_order_total)) {
+                ksort($line_order_total);
+                $cumulative = 0;
+                foreach ($line_order_total as $month => $value) {
+                    $cumulative += $value;
+                    $line_order_total[$month] = $cumulative;
+                }
+                $response['line_order_date'] = array_map(function ($month) {
+                    return date('M-y', strtotime($month . '-01'));
+                }, array_keys($line_order_total));
+                $response['line_order_total'] = array_values($line_order_total);
+            }
+
+            $status_grouped = array_reduce($invoices, function ($carry, $item) {
+                $group = format_invoice_status($item['status'], '', false);
+                $carry[$group] = ($carry[$group] ?? 0) + (float) $item['total'];
+                return $carry;
+            }, []);
+            if (!empty($status_grouped)) {
+                $response['pie_status_name'] = array_keys($status_grouped);
+                $response['pie_status_value'] = array_values($status_grouped);
+            }
+
+            $invoices_ids = array_column($invoices, 'id');
+            $this->db->select(
+                db_prefix() . 'pur_invoices.vendor, ' .
+                    db_prefix() . 'itemable.qty, ' .
+                    db_prefix() . 'itemable.rate, (' .
+                    db_prefix() . 'itemable.qty * ' . db_prefix() . 'itemable.rate) AS amount'
+            );
+
+            $this->db->from(db_prefix() . 'itemable');
+
+            $this->db->join(
+                db_prefix() . 'pur_invoices',
+                db_prefix() . 'pur_invoices.id = ' . db_prefix() . 'itemable.rel_id',
+                'left'
+            );
+
+            $this->db->where_in(db_prefix() . 'itemable.rel_id', $invoices_ids);
+            $this->db->where(db_prefix() . 'itemable.rel_type', 'invoice');
+
+            $this->db->group_by(db_prefix() . 'itemable.id');
+            $this->db->order_by(db_prefix() . 'itemable.id', 'ASC');
+
+            $itemable = $this->db->get()->result_array();
+
+            $bar_top_vendors = array();
+            if (!empty($itemable)) {
+                foreach ($itemable as $key => $value) {
+                    $vendor = $value['vendor'];
+                    if (!isset($bar_top_vendors[$vendor])) {
+                        $bar_top_vendors[$vendor]['name'] = get_vendor_company_name($vendor);
+                        $bar_top_vendors[$vendor]['value'] = 0;
+                    }
+                    $bar_top_vendors[$vendor]['value'] += $value['amount'];
+                }
+            }
+            if (!empty($bar_top_vendors)) {
+                usort($bar_top_vendors, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_vendors = array_slice($bar_top_vendors, 0, 10);
+                $response['bar_top_vendor_name'] = array_column($bar_top_vendors, 'name');
+                $response['bar_top_vendor_value'] = array_column($bar_top_vendors, 'value');
+            }
+        }
+
+        return $response;
     }
 }
