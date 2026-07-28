@@ -477,4 +477,11 @@ class Expenses extends AdminController
             access_denied('expenses');
         }
     }
+    public function get_expenses_dashboard()
+    {
+        $data = $this->input->post();
+        $result = $this->expenses_model->get_expenses_dashboard($data);
+        echo json_encode($result);
+        die;
+    }
 }

@@ -37,7 +37,7 @@ class Expenses_model extends App_Model
             $this->db->join(db_prefix() . 'projects', '' . db_prefix() . 'projects.id = ' . db_prefix() . 'expenses.project_id', 'left');
         }
         $this->db->where($where);
-        if($group_by) {
+        if ($group_by) {
             $this->db->group_by($group_by);
         }
 
@@ -711,9 +711,9 @@ class Expenses_model extends App_Model
         if (is_dir(get_upload_path_by_type('expense') . $id)) {
             if (delete_dir(get_upload_path_by_type('expense') . $id)) {
                 $file = $this->db->where('rel_id', $id)
-                ->where('rel_type', 'expense')
-                ->get(db_prefix() . 'files')
-                ->row();
+                    ->where('rel_type', 'expense')
+                    ->get(db_prefix() . 'files')
+                    ->row();
                 $this->db->where('rel_id', $id);
                 $this->db->where('rel_type', 'expense');
                 $this->db->delete(db_prefix() . 'files');
@@ -815,12 +815,12 @@ class Expenses_model extends App_Model
 
     public function add_expense_activity_log($id, $is_create = true)
     {
-        if(!empty($id)) {
+        if (!empty($id)) {
             $this->db->where('id', $id);
             $expenses = $this->db->get(db_prefix() . 'expenses')->row();
-            if(!empty($expenses)) {
+            if (!empty($expenses)) {
                 $is_create_value = $is_create ? 'created' : 'deleted';
-                $description = "Expense <b>".$expenses->expense_name."</b> has been ".$is_create_value.".";
+                $description = "Expense <b>" . $expenses->expense_name . "</b> has been " . $is_create_value . ".";
                 $this->db->insert(db_prefix() . 'module_activity_log', [
                     'module_name' => 'ex',
                     'rel_id' => $id,
@@ -835,12 +835,12 @@ class Expenses_model extends App_Model
 
     public function add_expense_receipt_activity_log($id, $file_name, $is_create = true)
     {
-        if(!empty($id)) {
+        if (!empty($id)) {
             $this->db->where('id', $id);
             $expenses = $this->db->get(db_prefix() . 'expenses')->row();
-            if(!empty($expenses)) {
+            if (!empty($expenses)) {
                 $is_create_value = $is_create ? 'added' : 'removed';
-                $description = "Expense Receipt <b>".$file_name."</b> has been ".$is_create_value." for expense <b>".$expenses->expense_name."</b>.";
+                $description = "Expense Receipt <b>" . $file_name . "</b> has been " . $is_create_value . " for expense <b>" . $expenses->expense_name . "</b>.";
                 $this->db->insert(db_prefix() . 'module_activity_log', [
                     'module_name' => 'ex',
                     'rel_id' => $id,
@@ -949,13 +949,13 @@ class Expenses_model extends App_Model
 
     public function update_expense_activity_log($id, $field, $old_value, $new_value)
     {
-        if(!empty($id)) {
+        if (!empty($id)) {
             $this->db->where('id', $id);
             $expenses = $this->db->get(db_prefix() . 'expenses')->row();
-            if(!empty($expenses)) {
+            if (!empty($expenses)) {
                 $old_value = !empty($old_value) ? $old_value : 'None';
                 $new_value = !empty($new_value) ? $new_value : 'None';
-                $description = "".$field." field is updated from <b>".$old_value."</b> to <b>".$new_value."</b> in expense <b>".$expenses->expense_name."</b>.";
+                $description = "" . $field . " field is updated from <b>" . $old_value . "</b> to <b>" . $new_value . "</b> in expense <b>" . $expenses->expense_name . "</b>.";
                 $this->db->insert(db_prefix() . 'module_activity_log', [
                     'module_name' => 'ex',
                     'rel_id' => $id,
@@ -966,5 +966,137 @@ class Expenses_model extends App_Model
             }
         }
         return true;
+    }
+
+    public function get_expenses_dashboard($data = array())
+    {
+        $response = array();
+
+        $response['total_expenses'] = $response['total_average_expenses'] = $response['total_expenses_without_receipts'] = $response['total_untagged_expenses'] = 0;
+        $response['line_order_date'] = $response['line_order_total'] = array();
+        $response['pie_category_name'] = $response['pie_category_value'] = array();
+        $response['bar_top_vendor_name'] = $response['bar_top_vendor_value'] = array();
+
+        $this->db->select(
+            db_prefix() . 'expenses.id,
+            ' . db_prefix() . 'expenses.expense_name,
+            ' . db_prefix() . 'expenses.category,
+            ' . db_prefix() . 'expenses.invoiceid,
+            ' . db_prefix() . 'expenses.project_id,
+            ' . db_prefix() . 'expenses.date,
+            ' . db_prefix() . 'files.file_name,
+            CASE
+                WHEN ' . db_prefix() . 'expenses.currency = 3 THEN
+                    ' . db_prefix() . 'expenses.amount
+                ELSE
+                    ' . db_prefix() . 'expenses.amount * COALESCE(' . db_prefix() . 'currencies.reference_value, 1)
+            END AS amount,
+            ' . db_prefix() . 'expenses.vendor,
+            ' . db_prefix() . 'expenses_categories.name AS category_name'
+        );
+        $this->db->from(db_prefix() . 'expenses');
+        $this->db->join(db_prefix() . 'currencies', '' . db_prefix() . 'currencies.id = ' . db_prefix() . 'expenses.currency', 'left');
+        $this->db->join(
+            db_prefix() . 'files',
+            db_prefix() . 'files.rel_id = ' . db_prefix() . 'expenses.id AND ' . db_prefix() . 'files.rel_type = "expense"',
+            'left'
+        );
+        $this->db->join(
+            db_prefix() . 'expenses_categories',
+            db_prefix() . 'expenses_categories.id = ' . db_prefix() . 'expenses.category',
+            'left'
+        );
+        $this->db->where(db_prefix() . 'expenses.invoiceid IS NULL', null, false);
+        
+        $this->db->group_by(db_prefix() . 'expenses.id');
+        $this->db->order_by(db_prefix() . 'expenses.date', 'asc');
+        $expenses = $this->db->get()->result_array();
+
+        if (!empty($expenses)) {
+            $total_expenses_raised = count($expenses);
+            $total_expenses = array_reduce($expenses, function ($carry, $item) {
+                return $carry + (float)$item['amount'];
+            }, 0);
+            $response['total_expenses'] = app_format_money($total_expenses,'₹');
+            if ($total_expenses_raised > 0) {
+                $total_average_expenses = $total_expenses / $total_expenses_raised;
+                $response['total_average_expenses'] = app_format_money($total_average_expenses,'₹');
+            }
+            $response['total_expenses_without_receipts'] = count(array_filter(
+                $expenses,
+                fn($item) =>
+                empty($item['file_name'])
+            ));
+            $response['total_expenses_without_receipts'] = count(array_filter(
+                $expenses,
+                fn($item) =>
+                empty($item['file_name'])
+            ));
+            // $response['total_untagged_expenses'] = count(array_filter(
+            //     $expenses,
+            //     fn($item) =>
+            //     empty($item['vbt_id'])
+            // ));
+
+            $line_order_total = array();
+            $bar_top_vendors = array();
+            foreach ($expenses as $key => $value) {
+                if (!empty($value['date'])) {
+                    $timestamp = strtotime($value['date']);
+                    if ($timestamp !== false && $timestamp > 0) {
+                        $month = date('Y-m', $timestamp);
+                    } elseif ($timestamp === false || $timestamp <= 0) {
+                        $month = date('Y') . '-01';
+                    }
+                } else {
+                    $month = date('Y') . '-01';
+                }
+                if (!isset($line_order_total[$month])) {
+                    $line_order_total[$month] = 0;
+                }
+                $line_order_total[$month] += $value['amount'];
+
+                $vendor = $value['vendor'];
+                if (!isset($bar_top_vendors[$vendor])) {
+                    $bar_top_vendors[$vendor]['name'] = get_vendor_company_name($vendor);
+                    $bar_top_vendors[$vendor]['value'] = 0;
+                }
+                $bar_top_vendors[$vendor]['value'] += $value['amount'];
+            }
+
+            if (!empty($line_order_total)) {
+                ksort($line_order_total);
+                $cumulative = 0;
+                foreach ($line_order_total as $month => $value) {
+                    $cumulative += $value;
+                    $line_order_total[$month] = $cumulative;
+                }
+                $response['line_order_date'] = array_map(function ($month) {
+                    return date('M-y', strtotime($month . '-01'));
+                }, array_keys($line_order_total));
+                $response['line_order_total'] = array_values($line_order_total);
+            }
+
+            $category_grouped = array_reduce($expenses, function ($carry, $item) {
+                $group = $item['category_name'];
+                $carry[$group] = ($carry[$group] ?? 0) + (float) $item['amount'];
+                return $carry;
+            }, []);
+            if (!empty($category_grouped)) {
+                $response['pie_category_name'] = array_keys($category_grouped);
+                $response['pie_category_value'] = array_values($category_grouped);
+            }
+
+            if (!empty($bar_top_vendors)) {
+                usort($bar_top_vendors, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_vendors = array_slice($bar_top_vendors, 0, 10);
+                $response['bar_top_vendor_name'] = array_column($bar_top_vendors, 'name');
+                $response['bar_top_vendor_value'] = array_column($bar_top_vendors, 'value');
+            }
+        }
+
+        return $response;
     }
 }

@@ -27,6 +27,9 @@
                             onclick="toggle_small_view('.table-expenses','#expense'); return false;"
                             data-toggle="tooltip" title="<?php echo _l('invoices_toggle_table_tooltip'); ?>"><i
                                 class="fa fa-angle-double-left"></i></a>
+                        <button class="btn btn-primary mleft5" type="button" data-toggle="collapse" data-target="#ex-charts-section" aria-expanded="true" aria-controls="ex-charts-section">
+                            <?php echo _l('Expenses Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
+                        </button>
                         <div id="stats-top" class="hide">
                             <hr />
                             <div id="expenses_total"></div>
@@ -40,6 +43,102 @@
                                 </select>
                             </div>
                             <div id="expense_chart" style="width:100%; height:400px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ex-charts-section" class="collapse in">
+                    <div class="row">
+                        <div class="col-md-12 mtop20">
+                            <div class="panel_s">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="quick-stats-invoices col-md-4 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Total Expenses Raised</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_expenses" style="font-size: 19px; font-weight: bold;"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-4 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Average Expenses</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_average_expenses" style="font-size: 19px; font-weight: bold;"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="quick-stats-invoices col-md-4 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Expenses without Receipts</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_expenses_without_receipts" style="font-size: 19px; font-weight: bold;"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="quick-stats-invoices col-md-3 tw-mb-2 sm:tw-mb-0 n_width">
+                                            <div class="top_stats_wrapper">
+                                                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Total Untagged Expenses</span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                                <div class="tw-text-neutral-800 mtop15 tw-flex tw-items-center tw-justify-between">
+                                                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate">
+                                                        <span class="tw-truncate dashboard_stat_value total_untagged_expenses" style="font-size: 19px; font-weight: bold;"></span>
+                                                    </div>
+                                                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0"></span>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                    <div class="row mtop20">
+                                        <div class="col-md-4">
+                                            <p class="mbot15 dashboard_stat_title" style="font-size: 18px; font-weight: bold;">Expenses Over Time</p>
+                                            <div style="width: 100%; height: 400px;">
+                                                <canvas id="lineChartOverTime"></canvas>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mbot15 dashboard_stat_title" style="font-size: 18px; font-weight: bold;">Top 10 Vendors by Amount</p>
+                                            <div style="width: 100%; height: 400px;">
+                                                <canvas id="barChartTopVendors"></canvas>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mbot15 dashboard_stat_title" style="font-size: 18px; font-weight: bold;">Pie Chart for Expense per Category</p>
+                                            <div style="width: 100%; height: 470px; display: flex; justify-content: left;">
+                                                <canvas id="pieChartForCategory"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,7 +250,7 @@ echo '<script src="' . base_url('modules/project_roadmap/assets/js/plugins/highc
                 table_rec_task.DataTable().ajax.reload();
             }
         });
- 
+
         $('select[name="year_requisition"]').on('change', function() {
             table_rec_task.DataTable().ajax.reload();
         });
@@ -288,7 +387,172 @@ echo '<script src="' . base_url('modules/project_roadmap/assets/js/plugins/highc
         };
         xhr.send();
     }
+    get_expenses_dashboard();
+
+    var lineChartOverTime;
+
+    function get_expenses_dashboard() {
+        "use strict";
+        var data = {}
+
+        $.post(admin_url + 'expenses/get_expenses_dashboard', data).done(function(response) {
+            response = JSON.parse(response);
+
+            // Update value summaries
+            $('.total_expenses').html(response.total_expenses);
+            $('.total_average_expenses').html(response.total_average_expenses);
+            $('.total_expenses_without_receipts').text(response.total_expenses_without_receipts);
+            $('.total_untagged_expenses').text(response.total_untagged_expenses);
+
+            // LINE CHART - Certified Value Over Time
+            var lineCtx = document.getElementById('lineChartOverTime').getContext('2d');
+
+            if (lineChartOverTime) {
+                lineChartOverTime.data.labels = response.line_order_date;
+                lineChartOverTime.data.datasets[0].data = response.line_order_total;
+                lineChartOverTime.update();
+            } else {
+                lineChartOverTime = new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: response.line_order_date,
+                        datasets: [{
+                            label: 'Certified Value',
+                            data: response.line_order_total,
+                            fill: false,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Month'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Certified Value'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // BAR CHART - Top 10 Vendors by Amount
+            var vendorBarCtx = document.getElementById('barChartTopVendors').getContext('2d');
+            var vendorLabels = response.bar_top_vendor_name;
+            var vendorData = response.bar_top_vendor_value;
+
+            if (window.barTopVendorsChart) {
+                barTopVendorsChart.data.labels = vendorLabels;
+                barTopVendorsChart.data.datasets[0].data = vendorData;
+                barTopVendorsChart.update();
+            } else {
+                window.barTopVendorsChart = new Chart(vendorBarCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: vendorLabels,
+                        datasets: [{
+                            label: 'Amount',
+                            data: vendorData,
+                            backgroundColor: '#1E90FF',
+                            borderColor: '#1E90FF',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Amount'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    autoSkip: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Vendors'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // PIE CHART - Pie Chart for Invoice per Category
+            var categoryPieCtx = document.getElementById('pieChartForCategory').getContext('2d');
+            var categoryData = response.pie_category_value;
+            var categoryLabels = response.pie_category_name;
+
+            if (window.poByCategoryChart) {
+                poByCategoryChart.data.labels = categoryLabels;
+                poByCategoryChart.data.datasets[0].data = categoryData;
+                poByCategoryChart.update();
+            } else {
+                window.poByCategoryChart = new Chart(categoryPieCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: categoryLabels,
+                        datasets: [{
+                            data: categoryData,
+                            backgroundColor: categoryLabels.map((_, i) => `hsl(${i * 35 % 360}, 70%, 60%)`),
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.formattedValue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    }
 </script>
+<script src="<?php echo module_dir_url(PURCHASE_MODULE_NAME, 'assets/plugins/charts/chart.js'); ?>?v=<?php echo PURCHASE_REVISION; ?>"></script>
 </body>
 
 </html>
