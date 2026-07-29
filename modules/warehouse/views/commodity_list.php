@@ -1,6 +1,12 @@
 <?php init_head(); ?>
 
-
+<style>
+  .export-btn-div {
+    position: absolute;
+    z-index: 999;
+    left: 510px;
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -321,7 +327,16 @@
                   </div>
                 </div>
               </div>
-
+              <div class="btn-group export-btn-div" id="export-btn-div">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
+                  <i class="fa fa-download"></i> <?php echo _l('Export'); ?> <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu" style="padding: 10px;min-width: 94px;">
+                  <a class="dropdown-item export-btn" href="<?php echo admin_url('warehouse/export_items_excel'); ?>" data-type="excel">
+                    <i class="fa fa-file-excel text-success"></i> Excel
+                  </a>
+                </div>
+              </div>
               <div class="col-md-12">
                 <?php
                 $table_data = array(

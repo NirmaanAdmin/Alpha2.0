@@ -9196,4 +9196,132 @@ class warehouse extends AdminController
 		echo json_encode($result);
 		die;
 	}
+
+	public function export_items_excel()
+	{
+		header('Content-Type: text/csv');
+		header('Content-Disposition: attachment; filename="Items_Export.csv"');
+
+		$output = fopen('php://output', 'w');
+
+		// Get all warehouses first
+		$this->db->select('warehouse_id, warehouse_name');
+		$this->db->from(db_prefix() . 'warehouse');
+		$warehouses = $this->db->get()->result_array();
+
+		// Build dynamic headers
+		$headers = [
+			'Commodity Code',
+			'Commodity Name',
+			'SKU Code',
+			'Group Name',
+			'Sale Price',
+			'Purchase Price',
+			'Unit Name',
+			'Tax 1',
+			'Tax 2',
+			'Price After Tax',
+		];
+
+		// Add each warehouse as a column header
+		foreach ($warehouses as $wh) {
+			$headers[] = $wh['warehouse_name'] . ' (Qty)';
+		}
+
+		// Add total quantity column
+		$headers[] = 'Total Quantity';
+
+		fputcsv($output, $headers);
+
+		// Get all items
+		$this->db->select('
+        i.id,
+        i.commodity_code,
+        i.description,
+        i.sku_code,
+        i.rate,
+        i.purchase_price,
+        ig.name as group_name,
+		i.unit_id,
+		t1.taxrate as taxrate_1,
+    	t2.taxrate as taxrate_2,
+    	');
+		$this->db->from(db_prefix() . 'items i');
+		$this->db->join(db_prefix() . 'items_groups ig', 'ig.id = i.group_id', 'left');
+		$this->db->join(db_prefix() . 'taxes t1', 't1.id = i.tax', 'left');
+		$this->db->join(db_prefix() . 'taxes t2', 't2.id = i.tax2', 'left');
+		$this->db->where('i.active', 1);
+		$this->db->order_by('i.commodity_code', 'ASC');
+		$items = $this->db->get()->result_array();
+		$arr_tax_rate = [];
+		$get_tax_rate = get_tax_rate();
+		foreach ($get_tax_rate as $key => $value) {
+			$arr_tax_rate[$value['id']] = $value;
+		}
+		foreach ($items as $item) {
+			// Get inventory quantities for each warehouse
+			$warehouse_quantities = $this->get_item_warehouse_quantities($item['id']);
+
+			// Get stock levels
+
+			// Start building row
+			$tax_value = 0;
+			if ($item['taxrate_1'] != 0 && $item['taxrate_1'] != '') {
+				if (isset($arr_tax_rate[$item['taxrate_1']])) {
+					$tax_value = $arr_tax_rate[$item['taxrate_1']]['taxrate'];
+				}
+			}
+
+			if ($item['taxrate_2'] != 0 && $item['taxrate_2'] != '') {
+				if (isset($arr_tax_rate[$item['taxrate_2']])) {
+					$tax_value += (float)$arr_tax_rate[$item['taxrate_2']]['taxrate'];
+				}
+			}
+
+			$price_after_tax = (float)$item['rate'] + (float)$item['rate'] * $tax_value / 100;
+			$row = [
+				$item['commodity_code'] ?? '',
+				$item['description'] ?? '',
+				$item['sku_code'] ?? '',
+				$item['group_name'] ?? '',
+				$item['rate'] ?? '',
+				$item['purchase_price'] ?? '',
+				wh_get_unit_name($item['unit_id']) ?? '',
+				$item['taxrate_1'] ?? '',
+				$item['taxrate_2'] ?? '',
+				$price_after_tax
+			];
+
+			$total_qty = 0;
+
+			// Add quantity for each warehouse
+			foreach ($warehouses as $wh) {
+				$qty = $warehouse_quantities[$wh['warehouse_id']] ?? 0;
+				$row[] = $qty;
+				$total_qty += $qty;
+			}
+
+			// Add total quantity
+			$row[] = $total_qty;
+
+			fputcsv($output, $row);
+		}
+
+		fclose($output);
+		exit;
+	}
+
+	private function get_item_warehouse_quantities($item_id)
+	{
+		$this->db->select('warehouse_id, inventory_number');
+		$this->db->from(db_prefix() . 'inventory_manage');
+		$this->db->where('commodity_id', $item_id);
+		$results = $this->db->get()->result_array();
+
+		$quantities = [];
+		foreach ($results as $row) {
+			$quantities[$row['warehouse_id']] = $row['inventory_number'];
+		}
+		return $quantities;
+	}
 }
