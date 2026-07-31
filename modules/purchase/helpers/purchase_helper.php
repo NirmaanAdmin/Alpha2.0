@@ -4831,3 +4831,19 @@ function add_vendor_attachment_activity_log($id, $file_name, $is_create = true)
     }
     return true;
 }
+
+function get_vbt_payment_status($id = '')
+{
+    $payment_statuses = [
+        ['id' => 'paid', 'name' => _l('Paid')],
+        ['id' => 'unpaid', 'name' => _l('Unpaid')],
+        ['id' => 'partially_paid', 'name' => _l('Partially Paid')],
+    ];
+    if ($id === '') {
+        return $payment_statuses;
+    } else {
+        $index = array_search($id, array_column($payment_statuses, 'id'));
+        return $index !== false ? $payment_statuses[$index]['name'] : null;
+    }
+    return '';
+}

@@ -1,5 +1,15 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+  .dashboard_stat_title {
+    font-size: 19px;
+    font-weight: bold;
+  }
+
+  .dashboard_stat_value {
+    font-size: 19px;
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -102,7 +112,7 @@
                         <canvas id="lineChartOverTime"></canvas>
                       </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                       <p class="mbot15 dashboard_stat_title">Doughnut Chart for PR per Department</p>
                       <div style="width: 100%; height: 450px; display: flex; justify-content: left;">

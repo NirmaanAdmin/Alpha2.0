@@ -14796,12 +14796,12 @@ class Purchase_model extends App_Model
         $vendors = isset($data['vendors']) ? $data['vendors'] : '';
         $projects = isset($data['projects']) ? $data['projects'] : '';
         $this->load->model('currencies_model');
-        
+
         $response['total_po_value'] = $response['approved_po_value'] = $response['draft_po_value'] = $response['draft_po_count'] = $response['approved_po_count'] = $response['rejected_po_count'] = 0;
         $response['pie_budget_name'] = $response['pie_tax_value'] = array();
         $response['line_order_date'] = $response['line_order_total'] = array();
         $this->db->select('id, pur_order_number, approve_status, total, order_date, total_tax, vendor, project, currency');
-        
+
         if (!empty($vendors) && is_array($vendors)) {
             $this->db->where_in(db_prefix() . 'pur_orders.vendor', $vendors);
         }
@@ -14810,7 +14810,7 @@ class Purchase_model extends App_Model
         }
         $this->db->order_by('order_date', 'asc');
         $pur_orders = $this->db->get(db_prefix() . 'pur_orders')->result_array();
-       
+
         if (!empty($pur_orders)) {
             $draft_po_value = 0;
             $approved_po_value = 0;
@@ -14823,7 +14823,7 @@ class Purchase_model extends App_Model
                     return $carry + (float)$item['total'];
                 }, 0);
             }
-            $response['draft_po_value'] = app_format_money($draft_po_value,'₹');
+            $response['draft_po_value'] = app_format_money($draft_po_value, '₹');
 
             $approved_po_array = array_filter($pur_orders, function ($item) {
                 return in_array($item['approve_status'], [2]);
@@ -14921,7 +14921,7 @@ class Purchase_model extends App_Model
         if (!empty($projects) && is_array($projects)) {
             $this->db->where_in(db_prefix() . 'pur_request.project', $projects);
         }
-        
+
         $this->db->order_by('request_date', 'asc');
         $pur_request = $this->db->get(db_prefix() . 'pur_request')->result_array();
 
@@ -14950,7 +14950,7 @@ class Purchase_model extends App_Model
                 $response['line_order_total'] = array_values($line_order_total);
             }
 
-            
+
 
             $department_grouped = array_reduce($pur_request, function ($carry, $item) {
                 $items_group = $this->departments_model->get($item['department']);
@@ -14975,6 +14975,85 @@ class Purchase_model extends App_Model
             if (!empty($status_grouped)) {
                 $response['pie_status_name'] = array_keys($status_grouped);
                 $response['pie_status_value'] = array_values($status_grouped);
+            }
+        }
+
+        return $response;
+    }
+
+    
+
+    public function get_vbt_dashboard($data = array())
+    {
+        $response = array();
+        $vendors = isset($data['vendors']) ? $data['vendors'] : '';
+        $is_expense = isset($data['is_expense']) ? $data['is_expense'] : '';
+
+        // Initialize response with only the needed fields
+        $response['total_amount'] = 0;
+        $response['paid_count'] = 0;
+        $response['unpaid_count'] = 0;
+        $response['partially_paid_count'] = 0;
+
+        $this->db->select('
+        ' . db_prefix() . 'pur_invoices.id,
+        ' . db_prefix() . 'pur_invoices.vendor,
+        ' . db_prefix() . 'pur_invoices.project_id,
+        ' . db_prefix() . 'pur_invoices.total,
+        ' . db_prefix() . 'pur_invoices.subtotal,
+        ' . db_prefix() . 'pur_invoices.pur_order,
+        ' . db_prefix() . 'pur_invoices.payment_status
+    ');
+        $this->db->from(db_prefix() . 'pur_invoices');
+
+        if (!empty($vendors) && is_array($vendors)) {
+            $this->db->where_in(db_prefix() . 'pur_invoices.vendor', $vendors);
+        }
+
+        $this->db->group_by(db_prefix() . 'pur_invoices.id');
+        $pur_invoices = $this->db->get()->result_array();
+
+        if (!empty($pur_invoices)) {
+
+            $bar_top_vendors = array();
+            foreach ($pur_invoices as $key => $value) {
+                $vendor_id = $value['vendor'];
+                if (!isset($bar_top_vendors[$vendor_id])) {
+                    $bar_top_vendors[$vendor_id]['name'] = get_vendor_company_name($vendor_id);
+                    $bar_top_vendors[$vendor_id]['value'] = 0;
+                }
+                $bar_top_vendors[$vendor_id]['value'] += $value['total'];
+            }
+
+            if (!empty($bar_top_vendors)) {
+                usort($bar_top_vendors, function ($a, $b) {
+                    return $b['value'] <=> $a['value'];
+                });
+                $bar_top_vendors = array_slice($bar_top_vendors, 0, 10);
+                $response['bar_top_vendor_name'] = array_column($bar_top_vendors, 'name');
+                $response['bar_top_vendor_value'] = array_column($bar_top_vendors, 'value');
+            }
+            // Calculate total amount sum
+            $total_amount = array_reduce($pur_invoices, function ($carry, $item) {
+                return $carry + (float)$item['total'];
+            }, 0);
+            $response['total_amount'] = app_format_money($total_amount,'₹');
+
+            // Count payment statuses
+            foreach ($pur_invoices as $invoice) {
+                $payment_status = $invoice['payment_status'];
+
+                // Get the group/status using your existing function
+                $status_group = get_vbt_payment_status($payment_status);
+
+                // Count based on payment status
+                if ($status_group === 'Paid' || $payment_status === 'Paid') {
+                    $response['paid_count']++;
+                } elseif ($status_group === 'Unpaid' || $payment_status === 'Unpaid' || $payment_status === 'Not Paid') {
+                    $response['unpaid_count']++;
+                } elseif ($status_group === 'Partially Paid' || $payment_status === 'Partially Paid') {
+                    $response['partially_paid_count']++;
+                }
             }
         }
 

@@ -1,5 +1,15 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+    .dashboard_stat_title {
+        font-size: 19px;
+        font-weight: bold;
+    }
+
+    .dashboard_stat_value {
+        font-size: 19px;
+    }
+</style>
 <div id="wrapper">
     <div class="content">
         <div id="vueApp">
