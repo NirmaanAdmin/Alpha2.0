@@ -88,7 +88,7 @@ class Payments_model extends App_Model
 
             return false;
 
-        // Is online payment mode request by client or staff
+            // Is online payment mode request by client or staff
         } elseif (!is_numeric($data['paymentmode']) && !empty($data['paymentmode'])) {
             // This request will come from admin area only
             // If admin clicked the button that dont want to pay the invoice from the getaways only want
@@ -253,7 +253,8 @@ class Payments_model extends App_Model
             $payment_pdf_filename = mb_strtoupper(slug_it(_l('payment') . '-' . $payment->paymentid), 'UTF-8') . '.pdf';
             $attach               = $paymentpdf->Output($payment_pdf_filename, 'S');
 
-            if (!isset($do_not_send_email_template)
+            if (
+                !isset($do_not_send_email_template)
                 || ($subscription != false && $after_success == 'send_invoice_and_receipt')
                 || ($subscription != false && $after_success == 'send_invoice')
             ) {
@@ -301,10 +302,10 @@ class Payments_model extends App_Model
 
                     if ($attachPaymentReceipt) {
                         $template->add_attachment([
-                                'attachment' => $attach,
-                                'filename'   => $payment_pdf_filename,
-                                'type'       => 'application/pdf',
-                            ]);
+                            'attachment' => $attach,
+                            'filename'   => $payment_pdf_filename,
+                            'type'       => 'application/pdf',
+                        ]);
                     }
 
                     if ($pdfInvoiceAttachment) {
@@ -325,8 +326,8 @@ class Payments_model extends App_Model
 
                 if (count($emails_sent) > 0) {
                     $additional_activity_data = serialize([
-                       implode(', ', $emails_sent),
-                     ]);
+                        implode(', ', $emails_sent),
+                    ]);
                     $activity_lang_key = 'invoice_activity_record_payment_email_to_customer';
                     if ($subscription != false) {
                         $activity_lang_key = 'invoice_activity_subscription_payment_succeeded';
@@ -348,14 +349,14 @@ class Payments_model extends App_Model
                     // E.q. had permissions create not don't have, so we must re-check this
                     if (user_can_view_invoice($invoice->id, $member['staffid'])) {
                         $notified = add_notification([
-                        'fromcompany'     => true,
-                        'touserid'        => $member['staffid'],
-                        'description'     => 'not_invoice_payment_recorded',
-                        'link'            => 'payments/payment/' . $insert_id,
-                        'additional_data' => serialize([
-                            format_invoice_number($invoice->id),
-                        ]),
-                    ]);
+                            'fromcompany'     => true,
+                            'touserid'        => $member['staffid'],
+                            'description'     => 'not_invoice_payment_recorded',
+                            'link'            => 'payments/payment/' . $insert_id,
+                            'additional_data' => serialize([
+                                format_invoice_number($invoice->id),
+                            ]),
+                        ]);
                         if ($notified) {
                             array_push($notifiedUsers, $member['staffid']);
                         }
@@ -600,7 +601,255 @@ class Payments_model extends App_Model
         }
 
         return $this->clients_model->get_contacts($client_id, [
-            'active' => 1, 'invoice_emails' => 1,
+            'active' => 1,
+            'invoice_emails' => 1,
         ]);
+    }
+
+    // public function get_client_invoices_payment_dashboard()
+    // {
+    //     $response = array();
+
+    //     $response['client_name'] = [];
+    //     $response['client_value'] = [];
+
+    //     $this->db->select('
+    //     ' . db_prefix() . 'invoicepaymentrecords.id,
+    //     ' . db_prefix() . 'invoicepaymentrecords.amount,
+    //     ' . db_prefix() . 'clients.userid as client_id,
+    //     ' . db_prefix() . 'clients.company as client_name
+    //     ');
+
+    //     $this->db->from(db_prefix() . 'invoicepaymentrecords');
+
+    //     // Invoice
+    //     $this->db->join(
+    //         db_prefix() . 'invoices',
+    //         db_prefix() . 'invoices.id = ' . db_prefix() . 'invoicepaymentrecords.invoiceid',
+    //         'left'
+    //     );
+
+    //     // Client
+    //     $this->db->join(
+    //         db_prefix() . 'clients',
+    //         db_prefix() . 'clients.userid = ' . db_prefix() . 'invoices.clientid',
+    //         'left'
+    //     );
+
+    //     // Payment mode
+    //     $this->db->join(
+    //         db_prefix() . 'payment_modes',
+    //         db_prefix() . 'payment_modes.id = ' . db_prefix() . 'invoicepaymentrecords.paymentmode',
+    //         'left'
+    //     );
+
+    //     $payments = $this->db->get()->result_array();
+
+    //     if (!empty($payments)) {
+
+    //         /*
+    //      * =========================
+    //      * Client Payment Group
+    //      * =========================
+    //      */
+    //         $client_grouped = array_reduce($payments, function ($carry, $item) {
+
+    //             $client = !empty($item['client_name'])
+    //                 ? $item['client_name']
+    //                 : 'Unknown';
+
+    //             if (!isset($carry[$client])) {
+    //                 $carry[$client] = 0;
+    //             }
+
+    //             $carry[$client] += (float) $item['amount'];
+
+    //             return $carry;
+    //         }, []);
+
+    //         /*
+    //      * =========================
+    //      * Sort by Payment DESC
+    //      * =========================
+    //      */
+    //         arsort($client_grouped);
+
+    //         /*
+    //      * =========================
+    //      * TOP 10 Clients
+    //      * =========================
+    //      */
+    //         $client_grouped = array_slice(
+    //             $client_grouped,
+    //             0,
+    //             10,
+    //             true
+    //         );
+
+    //         if (!empty($client_grouped)) {
+
+    //             $response['client_name'] = array_keys(
+    //                 $client_grouped
+    //             );
+
+    //             $response['client_value'] = array_values(
+    //                 $client_grouped
+    //             );
+    //         }
+    //     }
+
+    //     return $response;
+    // }
+
+    public function get_client_invoices_payment_dashboard()
+    {
+        $response = array();
+
+        /*
+     * =========================
+     * Client Payment Chart
+     * =========================
+     */
+        $response['client_name'] = [];
+        $response['client_value'] = [];
+
+        /*
+     * =========================
+     * Payment Mode Chart
+     * =========================
+     */
+        $response['payment_mode_name'] = [];
+        $response['payment_mode_value'] = [];
+
+        $this->db->select('
+        ' . db_prefix() . 'invoicepaymentrecords.id,
+        ' . db_prefix() . 'invoicepaymentrecords.amount,
+        ' . db_prefix() . 'clients.userid as client_id,
+        ' . db_prefix() . 'clients.company as client_name,
+        ' . db_prefix() . 'payment_modes.name as payment_mode_name
+    ');
+
+        $this->db->from(db_prefix() . 'invoicepaymentrecords');
+
+        // Invoice
+        $this->db->join(
+            db_prefix() . 'invoices',
+            db_prefix() . 'invoices.id = ' . db_prefix() . 'invoicepaymentrecords.invoiceid',
+            'left'
+        );
+
+        // Client
+        $this->db->join(
+            db_prefix() . 'clients',
+            db_prefix() . 'clients.userid = ' . db_prefix() . 'invoices.clientid',
+            'left'
+        );
+
+        // Payment Mode
+        $this->db->join(
+            db_prefix() . 'payment_modes',
+            db_prefix() . 'payment_modes.id = ' . db_prefix() . 'invoicepaymentrecords.paymentmode',
+            'left'
+        );
+
+        $payments = $this->db->get()->result_array();
+
+        if (!empty($payments)) {
+
+            /*
+         * =========================
+         * Client Payment Group
+         * =========================
+         */
+            $client_grouped = array_reduce($payments, function ($carry, $item) {
+
+                $client = !empty($item['client_name'])
+                    ? $item['client_name']
+                    : 'Unknown';
+
+                if (!isset($carry[$client])) {
+                    $carry[$client] = 0;
+                }
+
+                $carry[$client] += (float) $item['amount'];
+
+                return $carry;
+            }, []);
+
+            /*
+         * Sort by Payment DESC
+         */
+            arsort($client_grouped);
+
+            /*
+         * TOP 10 Clients
+         */
+            $client_grouped = array_slice(
+                $client_grouped,
+                0,
+                10,
+                true
+            );
+
+            if (!empty($client_grouped)) {
+
+                $response['client_name'] = array_keys(
+                    $client_grouped
+                );
+
+                $response['client_value'] = array_values(
+                    $client_grouped
+                );
+            }
+
+
+            /*
+         * =========================
+         * Payment Mode Group
+         * =========================
+         */
+            $payment_mode_grouped = array_reduce($payments, function ($carry, $item) {
+
+                $payment_mode = !empty($item['payment_mode_name'])
+                    ? $item['payment_mode_name']
+                    : 'Unknown';
+
+                if (!isset($carry[$payment_mode])) {
+                    $carry[$payment_mode] = 0;
+                }
+
+                $carry[$payment_mode] += (float) $item['amount'];
+
+                return $carry;
+            }, []);
+
+            /*
+         * Sort by Payment DESC
+         */
+            arsort($payment_mode_grouped);
+
+            /*
+         * TOP 10 Payment Modes
+         */
+            $payment_mode_grouped = array_slice(
+                $payment_mode_grouped,
+                0,
+                10,
+                true
+            );
+
+            if (!empty($payment_mode_grouped)) {
+
+                $response['payment_mode_name'] = array_keys(
+                    $payment_mode_grouped
+                );
+
+                $response['payment_mode_value'] = array_values(
+                    $payment_mode_grouped
+                );
+            }
+        }
+
+        return $response;
     }
 }

@@ -16,7 +16,8 @@ class Payments extends AdminController
         $this->load->model('clients_model');
     }
 
-    public function batch_payment_modal() {
+    public function batch_payment_modal()
+    {
         $this->load->model('invoices_model');
         $data['invoices'] = $this->invoices_model->get_unpaid_invoices();
         $data['customers'] = $this->db->select('userid,' . get_sql_select_client_company())
@@ -25,22 +26,22 @@ class Payments extends AdminController
         $this->load->view('admin/payments/batch_payment_modal', $data);
     }
 
-	public function add_batch_payment()
-	{
-		if ($this->input->method() !== 'post') {
-			show_404();
-		}
+    public function add_batch_payment()
+    {
+        if ($this->input->method() !== 'post') {
+            show_404();
+        }
 
-		if (staff_cant('create', 'payment')) {
-			access_denied('Create Payment');
-		}
-		$totalAdded = $this->payments_model->add_batch_payment($this->input->post());
+        if (staff_cant('create', 'payment')) {
+            access_denied('Create Payment');
+        }
+        $totalAdded = $this->payments_model->add_batch_payment($this->input->post());
         if ($totalAdded > 0) {
             set_alert('success', _l('batch_payment_added_successfully', $totalAdded));
             return redirect(admin_url('payments'));
         }
         return redirect(admin_url('invoices'));
-	}
+    }
 
     /* In case if user go only on /payments */
     public function index()
@@ -50,9 +51,11 @@ class Payments extends AdminController
 
     public function list_payments()
     {
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('payments');
         }
         $data['payment_modes'] = $this->payment_modes_model->get('', [], true);
@@ -63,12 +66,14 @@ class Payments extends AdminController
 
     public function table($clientid = '')
     {
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             ajax_access_denied();
         }
- 
+
         $this->app->get_table_data('payments', [
             'clientid' => $clientid,
         ]);
@@ -77,9 +82,11 @@ class Payments extends AdminController
     /* Update payment data */
     public function payment($id = '')
     {
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('payments');
         }
 
@@ -133,17 +140,21 @@ class Payments extends AdminController
      */
     public function pdf($id)
     {
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('View Payment');
         }
 
         $payment = $this->payments_model->get($id);
 
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && !user_can_view_invoice($payment->invoiceid)) {
+            && !user_can_view_invoice($payment->invoiceid)
+        ) {
             access_denied('View Payment');
         }
 
@@ -182,17 +193,21 @@ class Payments extends AdminController
      */
     public function send_to_email($id)
     {
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && get_option('allow_staff_view_invoices_assigned') == '0') {
+            && get_option('allow_staff_view_invoices_assigned') == '0'
+        ) {
             access_denied('Send Payment');
         }
 
         $payment = $this->payments_model->get($id);
 
-        if (staff_cant('view', 'payments')
+        if (
+            staff_cant('view', 'payments')
             && staff_cant('view_own', 'invoices')
-            && !user_can_view_invoice($payment->invoiceid)) {
+            && !user_can_view_invoice($payment->invoiceid)
+        ) {
             access_denied('Send Payment');
         }
 
@@ -216,10 +231,10 @@ class Payments extends AdminController
                     $template = mail_template('invoice_payment_recorded_to_customer', (array) $contact, $payment->invoice_data, false, $payment->paymentid);
 
                     $template->add_attachment([
-                            'attachment' => $attach,
-                            'filename'   => $filename,
-                            'type'       => 'application/pdf',
-                        ]);
+                        'attachment' => $attach,
+                        'filename'   => $filename,
+                        'type'       => 'application/pdf',
+                    ]);
 
 
                     if (get_option('attach_invoice_to_payment_receipt_email') == 1) {
@@ -265,5 +280,12 @@ class Payments extends AdminController
             set_alert('warning', _l('problem_deleting', _l('payment_lowercase')));
         }
         redirect(admin_url('payments'));
+    }
+
+    public function get_client_invoices_payment_dashboard()
+    {
+        $data = $this->payments_model->get_client_invoices_payment_dashboard();
+        echo json_encode($data);
+        die;
     }
 }

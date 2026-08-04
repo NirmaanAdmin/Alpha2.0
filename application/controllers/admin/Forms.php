@@ -278,7 +278,7 @@ class Forms extends AdminController
                 $this->db->where('formid', $data['id']);
                 $this->db->update(db_prefix() . 'forms', [
                     'message' => $data['data'],
-                ]); 
+                ]);
             }
             if ($this->db->affected_rows() > 0) {
                 set_alert('success', _l('form_message_updated_successfully'));
@@ -980,6 +980,28 @@ class Forms extends AdminController
         add_admin_progress_reports_js_assets();
         $data['default_forms_list_statuses'] = hooks()->apply_filters('default_forms_list_statuses', [1, 2, 4]);
         $data['module'] = $module;
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+        $this->db->select('p.id, p.name');
+        $this->db->from(db_prefix() . 'projects p');
+
+        $this->db->where('p.status', 2);
+
+        $this->db->where(
+            "NOT EXISTS (
+                SELECT 1
+                FROM " . db_prefix() . "forms f
+                WHERE f.project_id = p.id
+                AND f.date >= " . $this->db->escape($yesterday . ' 00:00:00') . "
+                AND f.date <= " . $this->db->escape($yesterday . ' 23:59:59') . "
+            )",
+            NULL,
+            FALSE
+        );
+
+        $missing_dpr_projects = $this->db->get()->result_array();
+
+        $data['missing_dpr_projects'] = $missing_dpr_projects;
         $this->load->view('admin/progress_reports/report_listing', $data);
     }
     public function table_drp_details()
@@ -1054,7 +1076,7 @@ class Forms extends AdminController
 
             $data['message'] = html_purify($this->input->post('message', false));
             $id              = $this->forms_model->add($data, get_staff_user_id());
-            if ($id) { 
+            if ($id) {
                 set_alert('success', _l('dpr_added_successfully', $id));
                 redirect(admin_url('forms/progress_report_setting/dpr'));
             }

@@ -1,6 +1,33 @@
 <?php
 
 defined('BASEPATH') or exit('No direct script access allowed'); ?>
+
+<div id="ci-charts-section" class="collapse in">
+    <div class="row">
+        <div class="col-md-12 mtop20">
+            <div class="panel_s">
+                <div class="panel-body">
+                    
+                    <div class="row mtop20">
+                        
+                        <div class="col-md-6">
+                            <p class="mbot15 dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Top 10 Clients by Payment</p>
+                            <div style="width: 100%; height: 450px; display: flex; justify-content: left;">
+                                <canvas id="pieChartForStatus"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mbot15 dashboard_stat_title" style="font-size: 19px; font-weight: bold;">Top 10 Payments by Payment Mode</p>
+                            <div style="width: 100%; height: 450px; display: flex; justify-content: left;">
+                                <canvas id="pieChartForPaymentMode"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row all_ot_filters">
 
     <?php

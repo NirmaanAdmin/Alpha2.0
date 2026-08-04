@@ -13070,7 +13070,7 @@ class fixed_equipment_model extends app_model
 		' . db_prefix() . 'fe_assets.asset_location,
 		' . db_prefix() . 'fe_asset_manufacturers.name as manufacturer_name,
 		' . db_prefix() . 'fe_categories.category_name as category_name
-	');
+			');
 
 		$this->db->from(db_prefix() . 'fe_assets');
 
