@@ -13011,4 +13011,249 @@ class fixed_equipment_model extends app_model
 
 		return $this->db->get(db_prefix() . 'fe_checkin_assets')->row(); // Use row() instead of result() to get single object
 	}
+
+	// public function get_asset_charts($data = array())
+	// {
+	// 	$response = array();
+	// 	$response['total_assets'] = $response['total_operational_assets']  = 0;
+	//     $response['department_name'] = $response['department_value'] = [];
+	//     $response['manufacturer_name'] = $response['manufacturer_value'] = [];
+	// 	$this->db->select('id,status,asset_location,manufacturer');
+	// 	$this->db->where('type', 'asset');
+
+	// 	$asset = $this->db->get(db_prefix() . 'fe_assets')->result_array();
+
+	// 	if (!empty($asset)) {
+	// 		$response['total_assets'] = count($asset);
+	// 		$response['total_operational_assets'] = count(array_filter($asset, function ($item) {
+	// 			return isset($item['status']) && $item['status'] == 1;
+	// 		}));
+
+
+	// 		$department_grouped = array_reduce($asset, function ($carry, $item) {
+	// 			$locations_group = $this->get_locations($item['asset_location']);
+	// 			$group = !empty($locations_group) ? $locations_group->location_name : '';
+	// 			if (!isset($carry[$group])) {
+	// 				$carry[$group] = 0;
+	// 			}
+	// 			$carry[$group]++;
+	// 			return $carry;
+	// 		}, []);
+	// 		if (!empty($department_grouped)) {
+	// 			$response['department_name'] = array_keys($department_grouped);
+	// 			$response['department_value'] = array_values($department_grouped);
+	// 		}
+	// 	}
+
+	// 	return $response;
+	// }
+
+	public function get_asset_charts($data = array())
+	{
+		$response = array();
+
+		$response['total_assets'] = 0;
+		$response['total_operational_assets'] = 0;
+
+		$response['department_name'] = [];
+		$response['department_value'] = [];
+
+		$response['manufacturer_name'] = [];
+		$response['manufacturer_value'] = [];
+
+		$response['category_name'] = [];
+		$response['category_value'] = [];
+
+		$this->db->select('
+		' . db_prefix() . 'fe_assets.id,
+		' . db_prefix() . 'fe_assets.status,
+		' . db_prefix() . 'fe_assets.asset_location,
+		' . db_prefix() . 'fe_asset_manufacturers.name as manufacturer_name,
+		' . db_prefix() . 'fe_categories.category_name as category_name
+	');
+
+		$this->db->from(db_prefix() . 'fe_assets');
+
+		// Model
+		$this->db->join(
+			db_prefix() . 'fe_models',
+			db_prefix() . 'fe_models.id = ' . db_prefix() . 'fe_assets.model_id',
+			'left'
+		);
+
+		// Manufacturer
+		$this->db->join(
+			db_prefix() . 'fe_asset_manufacturers',
+			db_prefix() . 'fe_asset_manufacturers.id = ' . db_prefix() . 'fe_models.manufacturer',
+			'left'
+		);
+
+		// Category
+		$this->db->join(
+			db_prefix() . 'fe_categories',
+			db_prefix() . 'fe_categories.id = ' . db_prefix() . 'fe_models.category',
+			'left'
+		);
+
+		$this->db->where(
+			db_prefix() . 'fe_assets.type',
+			'asset'
+		);
+
+		// Only active assets
+		$this->db->where(
+			db_prefix() . 'fe_assets.active',
+			1
+		);
+
+		$asset = $this->db->get()->result_array();
+
+		if (!empty($asset)) {
+
+			/*
+		 * =========================
+		 * Total Assets
+		 * =========================
+		 */
+			$response['total_assets'] = count($asset);
+
+
+			/*
+		 * =========================
+		 * Operational Assets
+		 * =========================
+		 */
+			$response['total_operational_assets'] = count(
+				array_filter($asset, function ($item) {
+					return isset($item['status']) && $item['status'] == 1;
+				})
+			);
+
+
+			/*
+		 * =========================
+		 * Department / Location
+		 * =========================
+		 */
+			$department_grouped = array_reduce($asset, function ($carry, $item) {
+
+				$locations_group = $this->get_locations(
+					$item['asset_location']
+				);
+
+				$group = !empty($locations_group)
+					? $locations_group->location_name
+					: 'Unknown';
+
+				if (!isset($carry[$group])) {
+					$carry[$group] = 0;
+				}
+
+				$carry[$group]++;
+
+				return $carry;
+			}, []);
+
+			if (!empty($department_grouped)) {
+
+				$response['department_name'] = array_keys(
+					$department_grouped
+				);
+
+				$response['department_value'] = array_values(
+					$department_grouped
+				);
+			}
+
+
+			/*
+		 * =========================
+		 * Manufacturer - TOP 10
+		 * =========================
+		 */
+			$manufacturer_grouped = array_reduce($asset, function ($carry, $item) {
+
+				$manufacturer = !empty($item['manufacturer_name'])
+					? $item['manufacturer_name']
+					: 'Unknown';
+
+				if (!isset($carry[$manufacturer])) {
+					$carry[$manufacturer] = 0;
+				}
+
+				$carry[$manufacturer]++;
+
+				return $carry;
+			}, []);
+
+
+			// Sort by asset count DESC
+			arsort($manufacturer_grouped);
+
+			// Keep only TOP 10
+			$manufacturer_grouped = array_slice(
+				$manufacturer_grouped,
+				0,
+				10,
+				true
+			);
+
+			if (!empty($manufacturer_grouped)) {
+
+				$response['manufacturer_name'] = array_keys(
+					$manufacturer_grouped
+				);
+
+				$response['manufacturer_value'] = array_values(
+					$manufacturer_grouped
+				);
+			}
+
+
+			/*
+		 * =========================
+		 * Category - TOP 10
+		 * =========================
+		 */
+			$category_grouped = array_reduce($asset, function ($carry, $item) {
+
+				$category = !empty($item['category_name'])
+					? $item['category_name']
+					: 'Unknown';
+
+				if (!isset($carry[$category])) {
+					$carry[$category] = 0;
+				}
+
+				$carry[$category]++;
+
+				return $carry;
+			}, []);
+
+
+			// Sort by asset count DESC
+			arsort($category_grouped);
+
+			// Keep only TOP 10
+			$category_grouped = array_slice(
+				$category_grouped,
+				0,
+				10,
+				true
+			);
+
+			if (!empty($category_grouped)) {
+
+				$response['category_name'] = array_keys(
+					$category_grouped
+				);
+
+				$response['category_value'] = array_values(
+					$category_grouped
+				);
+			}
+		}
+
+		return $response;
+	}
 }

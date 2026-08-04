@@ -199,7 +199,7 @@
 
 			appValidateForm($('#assets-form'), data_validate)
 		});
-
+		get_asset_dashboard();
 	})(jQuery);
 
 	/**
@@ -623,6 +623,166 @@
 			error: function() {
 				alert_float('danger', 'Error fetching bulk checkout details.');
 			}
+		});
+	}
+
+	function get_asset_dashboard() {
+		"use strict";
+
+		var data = {
+
+		}
+
+		$.post(admin_url + 'fixed_equipment/get_asset_charts', data).done(function(response) {
+			response = JSON.parse(response);
+
+			// Update value summaries
+			$('.total_assets').text(response.total_assets);
+			$('.total_operational_assets').text(response.total_operational_assets);
+			
+
+			var departmentCtx = document.getElementById('doughnutChartlocationwithassets').getContext('2d');
+			var departmentLabels = response.department_name;
+			var departmentData = response.department_value;
+			var backgroundColors = [];
+			var borderColors = [];
+			for (var i = 0; i < departmentLabels.length; i++) {
+				var hue = (i * 45) % 360;
+				backgroundColors.push(`hsl(${hue}, 70%, 70%)`);
+				borderColors.push(`hsl(${hue}, 70%, 50%)`);
+			}
+
+			if (window.departmentChart) {
+				departmentChart.data.labels = departmentLabels;
+				departmentChart.data.datasets[0].data = departmentData;
+				departmentChart.data.datasets[0].backgroundColor = backgroundColors;
+				departmentChart.data.datasets[0].borderColor = borderColors;
+				departmentChart.update();
+			} else {
+				window.departmentChart = new Chart(departmentCtx, {
+					type: 'doughnut',
+					data: {
+						labels: departmentLabels,
+						datasets: [{
+							data: departmentData,
+							backgroundColor: backgroundColors,
+							borderColor: borderColors,
+							borderWidth: 1
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: {
+							legend: {
+								position: 'bottom'
+							},
+							tooltip: {
+								callbacks: {
+									label: function(context) {
+										return context.label + ': ' + context.formattedValue;
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+
+
+			var manufacturerCtx = document.getElementById('doughnutChartManufacturer').getContext('2d');
+			var manufacturerLabels = response.manufacturer_name;
+			var manufacturerData = response.manufacturer_value;
+			var backgroundColors = [];
+			var borderColors = [];
+			for (var i = 0; i < manufacturerLabels.length; i++) {
+				var hue = (i * 45) % 360;
+				backgroundColors.push(`hsl(${hue}, 70%, 70%)`);
+				borderColors.push(`hsl(${hue}, 70%, 50%)`);
+			}
+
+			if (window.manufacturerChart) {
+				manufacturerChart.data.labels = manufacturerLabels;
+				manufacturerChart.data.datasets[0].data = manufacturerData;
+				manufacturerChart.data.datasets[0].backgroundColor = backgroundColors;
+				manufacturerChart.data.datasets[0].borderColor = borderColors;
+				manufacturerChart.update();
+			} else {
+				window.manufacturerChart = new Chart(manufacturerCtx, {
+					type: 'doughnut',
+					data: {
+						labels: manufacturerLabels,
+						datasets: [{
+							data: manufacturerData,
+							backgroundColor: backgroundColors,
+							borderColor: borderColors,
+							borderWidth: 1
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: {
+							legend: {
+								position: 'bottom'
+							},
+							tooltip: {
+								callbacks: {
+									label: function(context) {
+										return context.label + ': ' + context.formattedValue;
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+
+			var categoryCtx = document.getElementById('doughnutChartCategory').getContext('2d');
+			var categoryLabels = response.category_name;
+			var categoryData = response.category_value;
+			var backgroundColors = [];
+			var borderColors = [];
+			for (var i = 0; i < categoryLabels.length; i++) {
+				var hue = (i * 45) % 360;
+				backgroundColors.push(`hsl(${hue}, 70%, 70%)`);
+				borderColors.push(`hsl(${hue}, 70%, 50%)`);
+			}
+
+			if (window.categoryChart) {
+				categoryChart.data.labels = categoryLabels;
+				categoryChart.data.datasets[0].data = categoryData;
+				categoryChart.data.datasets[0].backgroundColor = backgroundColors;
+				categoryChart.data.datasets[0].borderColor = borderColors;
+				categoryChart.update();
+			} else {
+				window.categoryChart = new Chart(categoryCtx, {
+					type: 'doughnut',
+					data: {
+						labels: categoryLabels,
+						datasets: [{
+							data: categoryData,
+							backgroundColor: backgroundColors,
+							borderColor: borderColors,
+							borderWidth: 1
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: {
+							legend: {
+								position: 'bottom'
+							},
+							tooltip: {
+								callbacks: {
+									label: function(context) {
+										return context.label + ': ' + context.formattedValue;
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+
 		});
 	}
 </script>

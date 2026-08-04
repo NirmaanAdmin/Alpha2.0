@@ -1681,7 +1681,7 @@ class fixed_equipment extends AdminController
 		$data['custom_field_lists'] = get_custom_fields('fixed_equipment');
 		$data['field_sets'] = $this->fixed_equipment_model->get_field_set();
 		// $data['models'] = $this->fixed_equipment_model->get_models('');
- 
+
 		$this->load->view('asset_management', $data);
 	}
 
@@ -2109,9 +2109,9 @@ class fixed_equipment extends AdminController
 					array_push($where, 'AND asset_location = ' . $location);
 				}
 				if ($location2 != '') {
-				// Changed to check against location ID, not name
-				array_push($where, 'AND (' . db_prefix() . 'fe_assets.location_id = ' . $this->db->escape($location2) . ')');
-			}
+					// Changed to check against location ID, not name
+					array_push($where, 'AND (' . db_prefix() . 'fe_assets.location_id = ' . $this->db->escape($location2) . ')');
+				}
 
 				if (!is_admin() && has_permission('fixed_equipment_assets', '', 'view_own')) {
 					array_push($where, 'AND requestable = 1');
@@ -2267,11 +2267,11 @@ class fixed_equipment extends AdminController
 					$get_checkin_info = $this->fixed_equipment_model->get_checkin_option($aRow[db_prefix() . 'fe_assets.id']);
 					if ($get_checkin_info->type == 'checkin') {
 						$checkin = get_staff_full_name($get_checkin_info->staff_id);
-					}else{
+					} else {
 						$checkin = '';
 					}
-					
-				
+
+
 					$row[] = $checkin;
 					$row[] = '<span class="text-nowrap">' . $data_location_info->curent_location . '</span>';
 					$row[] = '<span class="text-nowrap">' . $data_location_info->default_location . '</span>';
@@ -13212,5 +13212,13 @@ class fixed_equipment extends AdminController
 			}
 			redirect(admin_url('fixed_equipment/assets'));
 		}
+	}
+
+	public function get_asset_charts()
+	{
+		$data = $this->input->post();
+		$result = $this->fixed_equipment_model->get_asset_charts($data);
+		echo json_encode($result);
+		die;
 	}
 }
