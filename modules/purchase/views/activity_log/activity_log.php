@@ -185,6 +185,9 @@ $module_name = 'module_activity_log'; ?>
                            if (isset($_GET['module']) && $_GET['module'] == 'forms') {
                               $module_name_filter_val = $_GET['module'];
                            }
+                           if (isset($_GET['module']) && $_GET['module'] == 'assets') {
+                              $module_name_filter_val = $_GET['module'];
+                           }
                            $module_name_list = [
                               ['id' => 'pr', 'name' => _l('purchase_request')],
                               ['id' => 'pur_app', 'name' => _l('Purchase approval')],
@@ -200,6 +203,7 @@ $module_name = 'module_activity_log'; ?>
                               ['id' => 'estimates', 'name' => _l('estimates')],
                               ['id' => 'timesheets', 'name' => _l('Leaves')],
                               ['id' => 'forms', 'name' => _l('Progress Report')],
+                              ['id' => 'assets', 'name' => _l('Assets')],
                            ];
                            echo render_select('module_name[]', $module_name_list, array('id', 'name'), '', $module_name_filter_val, array('data-width' => '100%', 'data-none-selected-text' => _l('module'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false);
                            ?>
