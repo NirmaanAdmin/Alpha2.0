@@ -204,6 +204,9 @@ $module_name = 'module_activity_log'; ?>
                               ['id' => 'timesheets', 'name' => _l('Leaves')],
                               ['id' => 'forms', 'name' => _l('Progress Report')],
                               ['id' => 'assets', 'name' => _l('Assets')],
+                              ['id' => 'sign_manager', 'name' => _l('Sign Manager')],
+                              ['id' => 'consumables', 'name' => _l('Consumables')],
+                              ['id' => 'licenses', 'name' => _l('Licenses')],
                            ];
                            echo render_select('module_name[]', $module_name_list, array('id', 'name'), '', $module_name_filter_val, array('data-width' => '100%', 'data-none-selected-text' => _l('module'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false);
                            ?>
