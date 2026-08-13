@@ -40,7 +40,202 @@
     .laber-type .dropdown-toggle {
         width: 90px !important;
     }
+
+    /* Responsive Stacked Layout */
+    @media (max-width: 768px) {
+        .dpr-items-table {
+            display: block;
+        }
+
+        .dpr-items-table thead {
+            display: none;
+        }
+
+        .dpr-items-table tbody {
+            display: block;
+        }
+
+        .dpr-items-table tbody tr {
+            display: block;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .dpr-items-table tbody tr td {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 5px;
+            border: none;
+            border-bottom: 1px solid #eee;
+            width: 100%;
+        }
+
+        .dpr-items-table tbody tr td:last-child {
+            border-bottom: none;
+        }
+
+        .dpr-items-table tbody tr td:before {
+            content: attr(data-label);
+            font-weight: bold;
+            min-width: 120px;
+            padding-right: 10px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .dpr-items-table tbody tr td input,
+        .dpr-items-table tbody tr td select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .dpr-items-table tbody tr td .bootstrap-select {
+            width: 100% !important;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .dpr-items-table tbody tr td .dropdown-toggle {
+            width: 100% !important;
+        }
+
+        .dpr-items-table tbody tr td .btn-group {
+            width: 100% !important;
+        }
+
+        /* Action button */
+        .dpr-items-table tbody tr td:last-child {
+            justify-content: flex-end;
+        }
+
+        .dpr-items-table tbody tr td:last-child:before {
+            display: none;
+        }
+
+        /* Header row */
+        .dpr-items-table tbody tr.item {
+            display: block;
+        }
+
+        /* Remove button styling */
+        .dpr-items-table tbody tr td .btn-danger {
+            margin-left: auto;
+        }
+
+        /* Header sections */
+        .table-main-dpr-edit {
+            display: block;
+        }
+
+        /* Project and submission date */
+        .table-main-dpr-edit thead tr:first-child th,
+        .table-main-dpr-edit thead tr:nth-child(2) th,
+        .table-main-dpr-edit thead tr:nth-child(3) th,
+        .table-main-dpr-edit thead tr:nth-child(4) th {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table-main-dpr-edit thead tr:first-child th {
+            text-align: center;
+        }
+
+        .table-main-dpr-edit thead tr:nth-child(2) th,
+        .table-main-dpr-edit thead tr:nth-child(3) th,
+        .table-main-dpr-edit thead tr:nth-child(4) th {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label input,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label input,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label input {
+            width: auto !important;
+            min-width: 120px;
+            flex: 1;
+        }
+
+        /* Activity header */
+        .table-main-dpr-edit thead tr:nth-child(5) th {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Hide the second header row with column labels */
+        .table-main-dpr-edit thead tr:nth-child(6) {
+            display: none;
+        }
+
+        /* Data labels for each column */
+        .dpr-items-table tbody tr td:nth-child(1):before { content: "Location"; }
+        .dpr-items-table tbody tr td:nth-child(2):before { content: "Agency"; }
+        .dpr-items-table tbody tr td:nth-child(3):before { content: "Type"; }
+        .dpr-items-table tbody tr td:nth-child(4):before { content: "Sub Type"; }
+        .dpr-items-table tbody tr td:nth-child(5):before { content: "Work Execute"; }
+        .dpr-items-table tbody tr td:nth-child(6):before { content: "Material Consumption"; }
+        .dpr-items-table tbody tr td:nth-child(7):before { content: "Male"; }
+        .dpr-items-table tbody tr td:nth-child(8):before { content: "Female"; }
+        .dpr-items-table tbody tr td:nth-child(9):before { content: "Total"; }
+        .dpr-items-table tbody tr td:nth-child(10):before { content: "Machinery"; }
+        .dpr-items-table tbody tr td:nth-child(11):before { content: "Total Machinery"; }
+        .dpr-items-table tbody tr td:nth-child(12):before { content: "Actions"; }
+    }
+
+    /* For very small screens */
+    @media (max-width: 480px) {
+        .dpr-items-table tbody tr td:before {
+            min-width: 80px;
+            font-size: 12px;
+        }
+
+        .dpr-items-table tbody tr td input,
+        .dpr-items-table tbody tr td select {
+            min-width: 100px;
+            font-size: 12px;
+        }
+
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label select,
+        .table-main-dpr-edit thead tr:nth-child(2) th .daily_report_label input,
+        .table-main-dpr-edit thead tr:nth-child(3) th .daily_report_label input,
+        .table-main-dpr-edit thead tr:nth-child(4) th .daily_report_label input {
+            width: 100% !important;
+        }
+    }
 </style>
+
 <div class="col-md-12">
     <hr class="hr-panel-separator" />
 </div>
