@@ -253,7 +253,7 @@ $(function () {
     "undefined",
     "undefined",
     Expenses_ServerParams,
-    [5, "desc"]
+    [6, "desc"]
   );
 
   if (_table_api) {

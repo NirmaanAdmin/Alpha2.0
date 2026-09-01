@@ -40,14 +40,11 @@ class Projects extends AdminController
 
     public function expenses($id)
     {
-        $this->load->model('expenses_model');
-        $this->load->model('payment_modes_model');
-        $data['payment_modes'] = $this->payment_modes_model->get('', [], true);
-
-        App_table::find('project_expenses')->output([
-            'project_id' => $id,
-            'data'       => $data,
-        ]);
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('project_expenses_new', [
+                'project_id' => $id
+            ]);
+        }
     }
 
     public function add_expense()
@@ -315,7 +312,6 @@ class Projects extends AdminController
                 $data['taxes']              = $this->taxes_model->get();
                 $data['expense_categories'] = $this->expenses_model->get_category();
                 $data['currencies']         = $this->currencies_model->get();
-                $data['expenses_table'] = App_table::find('project_expenses');
             } elseif ($group == 'project_activity') {
                 $data['activity'] = $this->projects_model->get_activity($id);
             } elseif ($group == 'project_notes') {

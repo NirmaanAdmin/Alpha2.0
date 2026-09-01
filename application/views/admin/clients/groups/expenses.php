@@ -12,5 +12,6 @@
 <?php $this->load->view('admin/expenses/table_html', [
     'class'           => 'expenses-single-client',
     'withBulkActions' => false,
+    'show_filters' => false,
 ]); ?>
 <?php } ?>

@@ -160,7 +160,7 @@
                                 <!-- if expenseid found in url -->
                                 <?php echo form_hidden('expenseid', $expenseid); ?>
                                 <div class="panel-table-full">
-                                    <?php $this->load->view('admin/expenses/table_html', ['withBulkActions' => true]); ?>
+                                    <?php $this->load->view('admin/expenses/table_html', ['withBulkActions' => true, 'show_filters' => true]); ?>
                                 </div>
                             </div>
                         </div>

@@ -9,15 +9,6 @@
     </a>
 <?php } ?>
 
-<div id="vueApp" class="tw-inline pull-right tw-ml-0 sm:tw-ml-1.5">
-    <app-filters 
-            id="<?php echo $expenses_table->id(); ?>" 
-            view="<?php echo $expenses_table->viewName(); ?>"
-            :saved-filters="<?php echo $expenses_table->filtersJs(); ?>"
-            :available-rules="<?php echo $expenses_table->rulesJs(); ?>">
-    </app-filters>
-</div>
-
 <div class="clearfix"></div>
 <div class="panel_s panel-table-full">
     <div class="panel-body">
@@ -26,6 +17,7 @@
         $this->load->view('admin/expenses/table_html', [
             'class'           => 'project-expenses',
             'withBulkActions' => false,
+            'show_filters' => false,
             'table_id'=>'project_expenses'
         ]);
     ?>
