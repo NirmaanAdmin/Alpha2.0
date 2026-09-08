@@ -131,10 +131,12 @@ $(function() {
     }
     /* Customer profile invoices table */
     initDataTable('.table-invoices-single-client',
-        admin_url + 'invoices/table/' + customer_id,
+        admin_url + 'invoices/table_new',
         'undefined',
         'undefined',
-        'undefined', [
+        {
+          "customer_id": '[name="userid"]'
+        }, [
             [3, 'desc'],
             [0, 'desc']
         ]);

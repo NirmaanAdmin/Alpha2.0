@@ -68,6 +68,14 @@ if ($CI->input->post('project') && count($CI->input->post('project')) > 0) {
     array_push($where, 'AND ' . db_prefix() . 'invoices.project_id IN (' . implode(',', $CI->input->post('project')) . ')');
 }
 
+if ($CI->input->post('project_id')) {
+    array_push($where, 'AND ' . db_prefix() . 'invoices.project_id = ' . (int) $CI->input->post('project_id'));
+}
+
+if ($CI->input->post('customer_id')) {
+    array_push($where, 'AND ' . db_prefix() . 'invoices.clientid = ' . (int) $CI->input->post('customer_id'));
+}
+
 if ($CI->input->post('status') && count($CI->input->post('status')) > 0) {
     array_push($where, 'AND ' . db_prefix() . 'invoices.status IN (' . implode(',', $CI->input->post('status')) . ')');
 }

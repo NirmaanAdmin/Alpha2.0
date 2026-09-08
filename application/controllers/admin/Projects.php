@@ -293,7 +293,7 @@ class Projects extends AdminController
                 $data['invoices_years']       = $this->invoices_model->get_invoices_years();
                 $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
                 $data['invoices_statuses']    = $this->invoices_model->get_statuses();
-                $data['invoices_table'] = App_table::find('project_invoices');
+                $data['invoices_table'] = App_table::find('invoices');
             } elseif ($group == 'project_gantt') {
                 $gantt_type         = (!$this->input->get('gantt_type') ? 'milestones' : $this->input->get('gantt_type'));
                 $taskStatus         = (!$this->input->get('gantt_task_status') ? null : $this->input->get('gantt_task_status'));
