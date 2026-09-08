@@ -166,10 +166,12 @@ $(function() {
 
     /* Customer profile expenses table */
     initDataTable('.table-expenses-single-client',
-        admin_url + 'expenses/table/' + customer_id,
+        admin_url + 'expenses/table',
         'undefined',
         'undefined',
-        'undefined', [6, 'desc']);
+        {
+          "customer_id": '[name="userid"]'
+        }, [7, 'desc']);
 
     /* Customer profile proposals table */
     initDataTable('.table-proposals-client-profile',

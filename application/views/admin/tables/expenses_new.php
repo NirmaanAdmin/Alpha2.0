@@ -72,6 +72,10 @@ if ($this->ci->input->post('vendor') && count($this->ci->input->post('vendor')) 
     array_push($where, 'AND ' . db_prefix() . 'expenses.vendor IN (' . implode(',', $this->ci->input->post('vendor')) . ')');
 }
 
+if ($CI->input->post('customer_id')) {
+    array_push($where, 'AND ' . db_prefix() . 'expenses.clientid = ' . (int) $CI->input->post('customer_id'));
+}
+
 $custom_date_select = $this->ci->purchase_model->get_where_report_period('' . db_prefix() . 'expenses.date');
 if ($custom_date_select != '') {
     $custom_date_select = trim($custom_date_select);
