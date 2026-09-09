@@ -147,10 +147,12 @@ $(function() {
 
     /* Customer profile Estimates table */
     initDataTable('.table-estimates-single-client',
-        admin_url + 'estimates/table/' + customer_id,
+        admin_url + 'estimates/table_new',
         'undefined',
         'undefined',
-        'undefined', [
+        {
+          "customer_id": '[name="userid"]'
+        }, [
             [3, 'desc'],
             [0, 'desc']
         ]);

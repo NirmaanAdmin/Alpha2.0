@@ -5,7 +5,7 @@
         <div class="row">
             <div class="panel-table-full">
                 <div>
-                    <?php $this->load->view('admin/estimates/list_template'); ?>
+                    <?php $this->load->view('admin/estimates/list_template', ['show_filters' => true]); ?>
                 </div>
             </div>
         </div>

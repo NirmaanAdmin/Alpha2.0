@@ -326,7 +326,7 @@ class Projects extends AdminController
                 $data['estimates_years']       = $this->estimates_model->get_estimates_years();
                 $data['estimates_sale_agents'] = $this->estimates_model->get_sale_agents();
                 $data['estimate_statuses']     = $this->estimates_model->get_statuses();
-                $data['estimates_table'] = App_table::find('project_estimates');
+                $data['estimates_table'] = App_table::find('estimates');
                 $data['estimateid']            = '';
                 $data['switch_pipeline']       = '';
             } elseif ($group == 'project_proposals') {
