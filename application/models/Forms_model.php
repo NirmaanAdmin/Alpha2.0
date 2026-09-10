@@ -4400,4 +4400,67 @@ class Forms_model extends App_Model
             return true;
         }
     }
+
+    public function dpr_download_excel()
+    {
+        $ids = $this->input->post('ids');
+        $ids = array_filter(array_map('intval', explode(',', $ids)));
+        $column_labels = [
+            'location' => 'Location',
+            'agency' => 'Agency',
+            'type' => 'Type',
+            'sub_type' => 'Sub Type',
+            'work_execute' => 'Work Execute (smt/Rmt/Cmt)',
+            'material_consumption' => 'Material Consumption',
+            'male' => 'Male',
+            'female' => 'Female',
+            'total' => 'Total',
+            'machinery' => 'Machinery',
+            'total_machinery' => 'Total Machinery',
+        ];
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="DPR.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $output = fopen('php://output', 'w');
+        fwrite($output, "\xEF\xBB\xBF");
+
+        $this->db->where_in('form_id', $ids);
+        $dpr_form = $this->db->get(db_prefix() . 'dpr_form')->result_array();
+        if(!empty($dpr_form)) {
+            foreach ($dpr_form as $dkey => $dvalue) {
+                if ($dkey > 0) {
+                    fputcsv($output, []);
+                }
+                fputcsv($output, ['DPR Details']);
+                fputcsv($output, array_values($column_labels));
+                $this->db->where_in('form_id', $dvalue['form_id']);
+                $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
+                if(!empty($dpr_form_detail)) {
+                    foreach ($dpr_form_detail as $key => $value) {
+                        $data_row = [
+                            $value['location'] ?? '',
+                            get_vendor_company_name($value['agency']) ?? '',
+                            get_progress_report_type_name($value['type']) ?? '',
+                            get_progress_report_sub_type_name($value['sub_type']) ?? '',
+                            $value['work_execute'] ?? '',
+                            $value['material_consumption'] ?? '',
+                            $value['male'] ?? '',
+                            $value['female'] ?? '',
+                            $value['total'] ?? '',
+                            get_progress_report_machinary_name($value['machinery']) ?? '',
+                            $value['total_machinery'] ?? '',
+                        ];
+                        fputcsv($output, $data_row);
+                    }
+                }
+            }
+        }
+        fclose($output);
+        exit;
+    }
 }

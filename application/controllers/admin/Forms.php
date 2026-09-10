@@ -1507,4 +1507,9 @@ class Forms extends AdminController
             die();
         }
     }
+
+    public function dpr_download_excel()
+    {
+        $this->forms_model->dpr_download_excel();
+    }
 }

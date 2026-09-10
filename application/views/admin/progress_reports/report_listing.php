@@ -127,6 +127,7 @@ $module_name = 'dpr_module';
                                 <a href="#" data-toggle="modal" data-target="#forms_bulk_actions"
                                     class="bulk-actions-btn table-btn hide"
                                     data-table=".table-forms"><?php echo _l('bulk_actions'); ?></a>
+                                <a onclick="dpr_download_excel(); return false;" data-table=".table-forms" class="bulk-actions-btn table-btn hide">Download excel</a>
                                 <div class="clearfix"></div>
                                 <div class="panel-table-full">
                                     <?php echo AdminReportsTableStructure('', true); ?>
@@ -262,6 +263,48 @@ $module_name = 'dpr_module';
                     }
                 }
             });
+        }
+
+        function dpr_download_excel() {
+            "use strict";
+            var print_id = '';
+            $('.table-forms tbody tr').each(function () {
+                var checkbox = $(this).find('td').eq(0).find('input');
+                if (checkbox.prop('checked') === true) {
+                    if (print_id !== '') {
+                        print_id += ',';
+                    }
+                    print_id += checkbox.val();
+                }
+            });
+            if (print_id === '') {
+                alert_float('danger', 'Please select at least one item from the list');
+                return false;
+            }
+            var form = $('<form>', {
+                method: 'POST',
+                action: admin_url + 'forms/dpr_download_excel'
+            });
+            form.append(
+                $('<input>', {
+                    type: 'hidden',
+                    name: 'ids',
+                    value: print_id
+                })
+            );
+            if (typeof csrfData !== 'undefined') {
+                form.append(
+                    $('<input>', {
+                        type: 'hidden',
+                        name: csrfData.token_name,
+                        value: csrfData.hash
+                    })
+                );
+            }
+            $('body').append(form);
+            form[0].submit();
+            form.remove();
+            return false;
         }
     </script>
     </body>
