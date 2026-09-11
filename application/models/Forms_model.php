@@ -4408,6 +4408,8 @@ class Forms_model extends App_Model
         $column_labels = [
             'location' => 'Location',
             'agency' => 'Agency',
+            'date' => 'Date',
+            'project' => 'Project',
             'type' => 'Type',
             'sub_type' => 'Sub Type',
             'work_execute' => 'Work Execute (smt/Rmt/Cmt)',
@@ -4433,13 +4435,11 @@ class Forms_model extends App_Model
         $dpr_form = $this->db->get(db_prefix() . 'dpr_form')->result_array();
         if(!empty($dpr_form)) {
             foreach ($dpr_form as $dkey => $dvalue) {
-                if ($dkey > 0) {
-                    fputcsv($output, []);
+                if ($dkey == 0) {
+                    fputcsv($output, array_values($column_labels));
                 }
                 $this->db->where('formid', $dvalue['form_id']);
                 $form_data = $this->db->get(db_prefix() . 'forms')->row();
-                fputcsv($output, ['DPR Details', 'Project: '.get_project_name_by_id($form_data->project_id), 'Submission Date: '.date('d M, Y', strtotime($form_data->date))]);
-                fputcsv($output, array_values($column_labels));
                 $this->db->where_in('form_id', $dvalue['form_id']);
                 $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
                 if(!empty($dpr_form_detail)) {
@@ -4447,6 +4447,8 @@ class Forms_model extends App_Model
                         $data_row = [
                             $value['location'] ?? '',
                             get_vendor_company_name($value['agency']) ?? '',
+                            date('d-m-Y', strtotime($form_data->date)) ?? '',
+                            get_project_name_by_id($form_data->project_id) ?? '',
                             get_progress_report_type_name($value['type']) ?? '',
                             get_progress_report_sub_type_name($value['sub_type']) ?? '',
                             $value['work_execute'] ?? '',
