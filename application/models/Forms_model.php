@@ -4436,7 +4436,9 @@ class Forms_model extends App_Model
                 if ($dkey > 0) {
                     fputcsv($output, []);
                 }
-                fputcsv($output, ['DPR Details']);
+                $this->db->where('formid', $dvalue['form_id']);
+                $form_data = $this->db->get(db_prefix() . 'forms')->row();
+                fputcsv($output, ['DPR Details', 'Project: '.get_project_name_by_id($form_data->project_id), 'Submission Date: '.date('d M, Y', strtotime($form_data->date))]);
                 fputcsv($output, array_values($column_labels));
                 $this->db->where_in('form_id', $dvalue['form_id']);
                 $dpr_form_detail = $this->db->get(db_prefix() . 'dpr_form_detail')->result_array();
