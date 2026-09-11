@@ -237,6 +237,10 @@ class timesheets extends AdminController
 		$data['data_timekeeping_form'] = $data_timekeeping_form;
 		$data['staff_row_tk'] = [];
 		$staffs = $this->timesheets_model->get_staff_timekeeping_applicable_object();
+		$staffs = array_values(array_filter(
+		    $staffs,
+		    fn($row) => (int)($row['staffid'] ?? 0) !== 1
+		));
 		$data['staffs'] = $staffs;
 		$data['cell_background'] = [];
 		if ($data_timekeeping_form == 'timekeeping_task' && $data['check_latch_timesheet'] == false) {
@@ -250,7 +254,7 @@ class timesheets extends AdminController
 				$data['staff_row_tk'] = $result['staff_row_tk'];
 				if ($result['staff_row_tk'][0]['Staff'] == 'Admin N360') {
 					// Remove the first element (Admin N360)
-					unset($data['staff_row_tk'][0]);
+					// unset($data['staff_row_tk'][0]);
 					// Optional: Reset array keys (if needed)
 					$data['staff_row_tk'] = array_values($data['staff_row_tk']);
 				}
@@ -260,7 +264,7 @@ class timesheets extends AdminController
 				$data['cell_background'] = $result['cell_background'];
 				if ($result['staff_row_tk'][0]['Staff'] == 'Admin N360') {
 					// Remove the first element (Admin N360)
-					unset($data['cell_background'][0]);
+					// unset($data['cell_background'][0]);
 					// // Optional: Reset array keys (if needed)
 					$data['cell_background'] = array_values($data['cell_background']);
 				}
@@ -661,6 +665,10 @@ class timesheets extends AdminController
 		$data['staff_row_tk'] = [];
 
 		$staffs = $this->timesheets_model->getStaff('', $newquerystring);
+		$staffs = array_values(array_filter(
+		    $staffs,
+		    fn($row) => (int)($row['staffid'] ?? 0) !== 1
+		));
 		$data['staffs_setting'] = $this->staff_model->get();
 		$data['staffs'] = $staffs;
 		if ($data_timekeeping_form == 'timekeeping_task' && $data['check_latch_timesheet'] == false) {
@@ -672,13 +680,13 @@ class timesheets extends AdminController
 				$result = $this->timesheets_model->get_attendance_manual($staffs, $g_month, $year);
 				$data['staff_row_tk'] = $result['staff_row_tk'];
 				// Remove the first element (Admin N360)
-				unset($data['staff_row_tk'][0]);
+				// unset($data['staff_row_tk'][0]);
 
 				// Optional: Reset array keys (if needed)
 				$data['staff_row_tk'] = array_values($data['staff_row_tk']);
 				$data['cell_background'] = $result['cell_background'];
 				// Remove the first element (Admin N360)
-				unset($data['cell_background'][0]);
+				// unset($data['cell_background'][0]);
 
 				// // Optional: Reset array keys (if needed)
 				$data['cell_background'] = array_values($data['cell_background']);
