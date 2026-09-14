@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'fe_licenses'; ?>
+<style>
+.reset-filter-wrapper {
+    padding-top: 23px;
+}
+</style>
 <div id="wrapper">
 	<div class="content">
 		<div class="row panel_s">
@@ -10,7 +16,7 @@
 					</h4>
 					<hr>
 					<div class="row">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<?php 
 							if(is_admin() || has_permission('fixed_equipment_licenses', '', 'create')){
 								?>
@@ -18,17 +24,23 @@
 								<a class="btn btn-warning mleft10" href="<?php echo admin_url('fixed_equipment/bulk_upload/license'); ?>"><?php echo _l('fe_bulk_upload'); ?></a>
 							<?php } ?>
 						</div>
-
-						<div class="col-md-3">
-						</div>
-
-						<div class="col-md-3">
-						</div>
-
-						<div class="col-md-3">
-							<?php echo render_select('manufacturer_filter', $manufacturers, array('id', 'name'), 'fe_manufacturer'); ?>
-						</div>
 					</div>
+					<hr>
+					<div class="row all_filters">
+						<div class="col-md-3">
+							<?php
+							$manufacturer = get_module_filter($module_name, 'manufacturer');
+                     		$manufacturer_filter_val = !empty($manufacturer) ? $manufacturer->filter_value : '';
+							echo render_select('manufacturer_filter', $manufacturers, array('id', 'name'), 'fe_manufacturer', $manufacturer_filter_val);
+							?>
+						</div>
+						<div class="col-md-1 form-group reset-filter-wrapper">
+		                    <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+		                        <?php echo _l('reset_filter'); ?>
+		                    </a>
+		                </div>
+					</div>
+					<hr>
 					<?php 
 					if(is_admin() || has_permission('fixed_equipment_components', '', 'delete')){
 						?>

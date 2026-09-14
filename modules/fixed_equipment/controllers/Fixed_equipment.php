@@ -2654,6 +2654,10 @@ class fixed_equipment extends AdminController
 				if (isset($base_currency)) {
 					$currency_name = $base_currency->name;
 				}
+
+				$module_name = 'fe_licenses';
+				$manufacturer_filter_name = 'manufacturer';
+
 				$select = [
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
@@ -2678,6 +2682,10 @@ class fixed_equipment extends AdminController
 				}
 				array_push($where, 'AND type = "license"');
 				array_push($where, 'AND active = 1');
+
+				$manufacturer_filter_name_value = !empty($manufacturer) ? $manufacturer : NULL;
+				update_module_filter($module_name, $manufacturer_filter_name, $manufacturer_filter_name_value);
+				
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					db_prefix() . 'fe_assets.id',
 					'assets_name',
@@ -3191,6 +3199,11 @@ class fixed_equipment extends AdminController
 					$currency_name = $base_currency->name;
 				}
 
+				$module_name = 'fe_accessories';
+				$manufacturer_filter_name = 'manufacturer';
+				$category_filter_name = 'category';
+				$location_filter_name = 'location';
+				
 				$select = [
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
@@ -3231,6 +3244,16 @@ class fixed_equipment extends AdminController
 				}
 				array_push($where, 'AND active = 1');
 				array_push($where, 'AND ' . db_prefix() . 'fe_assets.type = "accessory"');
+
+				$manufacturer_filter_name_value = !empty($manufacturer) ? $manufacturer : NULL;
+				update_module_filter($module_name, $manufacturer_filter_name, $manufacturer_filter_name_value);
+
+				$category_filter_name_value = !empty($category) ? $category : NULL;
+				update_module_filter($module_name, $category_filter_name, $category_filter_name_value);
+
+				$location_filter_name_value = !empty($location) ? $location : NULL;
+				update_module_filter($module_name, $location_filter_name, $location_filter_name_value);
+
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.type',
