@@ -4,7 +4,18 @@
     <div class="scroller arrow-right !tw-py-[18px] tw-mt-px tw-border-0"><i class="fa fa-angle-right"></i></div>
     <div class="horizontal-tabs">
         <ul class="nav nav-tabs tw-mb-0 project-tabs nav-tabs-horizontal tw-border-b-0" role="tablist">
-            <?php
+        <?php
+        $always_visible_features = [
+            'project_proposals',
+            'project_estimates',
+            'project_invoices',
+            'project_subscriptions',
+            'project_expenses',
+            'project_credit_notes',
+        ];
+        foreach ($always_visible_features as $feature) {
+            $project->settings->available_features[$feature] = 1;
+        }
         foreach (filter_project_visible_tabs($tabs, $project->settings->available_features) as $key => $tab) {
             $dropdown = isset($tab['collapse']) ? true : false; ?>
             <li class="<?php if ($key == 'project_overview' && !$this->input->get('group')) {
