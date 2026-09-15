@@ -6751,6 +6751,13 @@ class fixed_equipment extends AdminController
 		if ($this->input->is_ajax_request()) {
 			if ($this->input->post()) {
 				$current_user = get_staff_user_id();
+
+				$module_name = 'fe_audit';
+				$auditor_filter_name = 'auditor';
+				$status_filter_name = 'status';
+				$from_date_filter_name = 'from_date';
+				$to_date_filter_name = 'to_date';
+
 				$select = [
 					'id',
 					'id',
@@ -6802,6 +6809,18 @@ class fixed_equipment extends AdminController
 					$from_date = fe_format_date($audit_from_date);
 					array_push($where, 'AND date(audit_date) = "' . $from_date . '"');
 				}
+
+				$auditor_filter_name_value = !empty($auditor) ?  implode(',', $auditor) : NULL;
+				update_module_filter($module_name, $auditor_filter_name, $auditor_filter_name_value);
+
+				$status_filter_name_value = !empty($status) ? $status : NULL;
+				update_module_filter($module_name, $status_filter_name, $status_filter_name_value);
+
+				$audit_from_date_filter_name_value = !empty($audit_from_date) ? $audit_from_date : NULL;
+				update_module_filter($module_name, $from_date_filter_name, $audit_from_date_filter_name_value);
+
+				$audit_to_date_filter_name_value = !empty($audit_to_date) ? $audit_to_date : NULL;
+				update_module_filter($module_name, $to_date_filter_name, $audit_to_date_filter_name_value);
 
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					'id',

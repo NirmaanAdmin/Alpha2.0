@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'fe_audit'; ?>
 <div id="wrapper">
   <div class="content">
     <div class="row panel">
@@ -14,36 +15,65 @@
          ?>
          <a href="<?php echo admin_url('fixed_equipment/audit_request'); ?>" class="btn btn-primary" onclick="add();"><?php echo _l('add'); ?></a>
          <div class="clearfix"></div>
-         <br>
+         <hr>
        <?php } ?>
-       <div class="row">
+       <div class="row all_filters">
         <?php 
         if(has_permission('fixed_equipment_audit', '', 'view') || is_admin()){ ?>
           <div class="col-md-3">
-            <?php echo render_select('auditor_filter[]', $staffs, array('staffid', array('firstname', 'lastname')), 'fe_auditor','',array('multiple' => true, 'data-actions-box' => true),[],'','',false); ?>
+            <?php
+            $auditor = get_module_filter($module_name, 'auditor');
+            $auditor_filter_val = !empty($auditor) ? explode(",", $auditor->filter_value) : [];
+            echo render_select('auditor_filter[]', $staffs, array('staffid', array('firstname', 'lastname')), 'fe_auditor', $auditor_filter_val, array('multiple' => true, 'data-actions-box' => true),[],'','',false);
+            ?>
           </div>
         <?php } ?>
 
         <div class="col-md-3">
           <?php
+          $status = get_module_filter($module_name, 'status');
+          $status_filter_val = !empty($status) ? $status->filter_value : '';
           $status_approve = [
             ['id' => 3, 'label' => _l('fe_new')],
             ['id' => 1, 'label' => _l('fe_approved')],
             ['id' => 2, 'label' => _l('fe_rejected')],
           ];
-          echo render_select('status_filter', $status_approve, array('id', 'label'), 'fe_status'); ?>
+          echo render_select('status_filter', $status_approve, array('id', 'label'), 'fe_status', $status_filter_val); ?>
         </div>
 
         <div class="col-md-3">
-          <?php echo render_date_input('audit_from_date_filter', 'fe_audit_from_date'); ?>
+          <?php
+          $from_date = get_module_filter($module_name, 'from_date');
+          $from_date_filter_val = '';
+          if(!empty($from_date)) {
+            if(!empty($from_date->filter_value)) {
+              $from_date_filter_val = date('d-m-Y', strtotime($from_date->filter_value));
+            }
+          }
+          echo render_date_input('audit_from_date_filter', 'fe_audit_from_date', $from_date_filter_val);
+          ?>
         </div>
 
         <div class="col-md-3">
-          <?php echo render_date_input('audit_to_date_filter', 'fe_audit_to_date'); ?>
+          <?php
+          $to_date = get_module_filter($module_name, 'to_date');
+          $to_date_filter_val = '';
+          if(!empty($to_date)) {
+            if(!empty($to_date->filter_value)) {
+              $to_date_filter_val = date('d-m-Y', strtotime($to_date->filter_value));
+            }
+          }
+          echo render_date_input('audit_to_date_filter', 'fe_audit_to_date', $to_date_filter_val);
+          ?>
         </div>
-      </div> 
 
-
+        <div class="col-md-1 form-group reset-filter-wrapper">
+          <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+            <?php echo _l('reset_filter'); ?>
+          </a>
+        </div>
+      </div>
+      <hr>
       <div class="clearfix"></div>
       <?php 
       if(is_admin() || has_permission('fixed_equipment_audit', '', 'delete')){
