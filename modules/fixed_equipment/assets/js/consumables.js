@@ -10,6 +10,12 @@
 		$('.table-consumables').DataTable().ajax.reload()
 		.columns.adjust();
 	});
+	$(document).on('click', '.reset_all_filters', function() {
+    	var filterArea = $('.all_filters');
+    	filterArea.find('input').val("");
+    	filterArea.find('select').selectpicker("val", "");
+    	$('.table-consumables').DataTable().ajax.reload();
+  	});
 	
 	appValidateForm($('#consumables-form'), {
 		'assets_name': 'required',
