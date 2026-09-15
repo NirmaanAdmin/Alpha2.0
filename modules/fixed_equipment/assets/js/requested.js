@@ -12,6 +12,12 @@
 			$('.table-request').DataTable().ajax.reload()
 			.columns.adjust();
 		});
+		$(document).on('click', '.reset_all_filters', function() {
+	    	var filterArea = $('.all_filters');
+	    	filterArea.find('input').val("");
+	    	filterArea.find('select').selectpicker("val", "");
+	    	$('.table-request').DataTable().ajax.reload();
+	  	});
 		appValidateForm($('#add_new_request-form'), {
 			'request_title': 'required',
 			'item_id': 'required',

@@ -5498,6 +5498,13 @@ class fixed_equipment extends AdminController
 				if (isset($base_currency)) {
 					$currency_name = $base_currency->name;
 				}
+
+				$module_name = 'fe_requested';
+				$checkout_for_filter_name = 'checkout_for';
+				$status_filter_name = 'status';
+				$from_date_filter_name = 'from_date';
+				$to_date_filter_name = 'to_date';
+
 				$select = [
 					db_prefix() . 'fe_checkin_assets.id',
 					db_prefix() . 'fe_checkin_assets.id',
@@ -5554,6 +5561,18 @@ class fixed_equipment extends AdminController
 				}
 				array_push($where, 'AND ' . db_prefix() . 'fe_checkin_assets.type = "checkout"');
 				array_push($where, 'AND ' . db_prefix() . 'fe_checkin_assets.requestable = 1');
+
+				$checkout_for_filter_name_value = !empty($checkout_for) ?  implode(',', $checkout_for) : NULL;
+				update_module_filter($module_name, $checkout_for_filter_name, $checkout_for_filter_name_value);
+
+				$status_filter_name_value = !empty($status) ? $status : NULL;
+				update_module_filter($module_name, $status_filter_name, $status_filter_name_value);
+
+				$create_from_date_filter_name_value = !empty($create_from_date) ? $create_from_date : NULL;
+				update_module_filter($module_name, $from_date_filter_name, $create_from_date_filter_name_value);
+
+				$create_to_date_filter_name_value = !empty($create_to_date) ? $create_to_date : NULL;
+				update_module_filter($module_name, $to_date_filter_name, $create_to_date_filter_name_value);
 
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					db_prefix() . 'fe_checkin_assets.id',
