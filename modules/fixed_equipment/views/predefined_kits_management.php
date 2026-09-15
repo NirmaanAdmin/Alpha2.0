@@ -14,9 +14,9 @@
 					?>
 						<button class="btn btn-primary" onclick="add();"><?php echo _l('add'); ?></button>
 						<div class="clearfix"></div>
-						<br>
 						<div class="clearfix"></div>
 					<?php } ?>
+					<hr>
 					<table class="table table-predefined_kits scroll-responsive">
 						<thead>
 							<tr>
