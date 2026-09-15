@@ -5112,6 +5112,11 @@ class fixed_equipment extends AdminController
 					$currency_name = $base_currency->name;
 				}
 
+				$module_name = 'fe_maintenances';
+				$maintenance_type_filter_name = 'maintenance_type';
+				$from_date_filter_name = 'from_date';
+				$to_date_filter_name = 'to_date';
+
 				$select = [
 					'id',
 					'id',
@@ -5149,6 +5154,15 @@ class fixed_equipment extends AdminController
 					$to_date = fe_format_date($to_date);
 					array_push($where, ' AND date(start_date) between "' . $from_date . '" AND "' . $to_date . '"');
 				}
+
+				$maintenance_type_filter_name_value = !empty($maintenance_type) ? $maintenance_type : NULL;
+				update_module_filter($module_name, $maintenance_type_filter_name, $maintenance_type_filter_name_value);
+
+				$from_date_filter_name_value = !empty($from_date) ? $from_date : NULL;
+				update_module_filter($module_name, $from_date_filter_name, $from_date_filter_name_value);
+
+				$to_date_filter_name_value = !empty($to_date) ? $to_date : NULL;
+				update_module_filter($module_name, $to_date_filter_name, $to_date_filter_name_value);
 
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					'id',

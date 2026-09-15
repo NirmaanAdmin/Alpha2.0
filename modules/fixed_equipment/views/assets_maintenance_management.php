@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'fe_maintenances'; ?>
+<style>
+  .reset-filter-wrapper {
+    padding-top: 23px;
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row panel">
@@ -12,13 +18,15 @@
         <?php 
         if(is_admin() || has_permission('fixed_equipment_maintenances', '', 'create')){
          ?>
-         <button class="btn btn-primary mbot20" onclick="add();"><?php echo _l('add'); ?></button>          
+         <button class="btn btn-primary" onclick="add();"><?php echo _l('add'); ?></button>
          <div class="clearfix"></div>
+         <hr>
        <?php } ?>
-
-       <div class="row">
+       <div class="row all_filters">
         <div class="col-md-3">
-          <?php 
+          <?php
+          $maintenance_type = get_module_filter($module_name, 'maintenance_type');
+          $maintenance_type_filter_val = !empty($maintenance_type) ? $maintenance_type->filter_value : '';
           $maintenances = [
             ['id' => 'maintenance', 'maintenance_name' => _l('fe_maintenance')],
             ['id' => 'repair', 'maintenance_name' => _l('fe_repair')],
@@ -28,22 +36,43 @@
             ['id' => 'software_support', 'maintenance_name' => _l('fe_software_support')],
             ['id' => 'hardware_support', 'maintenance_name' => _l('fe_hardware_support')]
           ];
-          echo render_select('maintenance_type_filter', $maintenances, array('id', 'maintenance_name'), 'fe_maintenance_type');
+          echo render_select('maintenance_type_filter', $maintenances, array('id', 'maintenance_name'), 'fe_maintenance_type', $maintenance_type_filter_val);
           ?>
         </div>
 
         <div class="col-md-3">
-          <?php echo render_date_input('from_date_filter', 'fe_from_date'); ?>
+          <?php
+          $from_date = get_module_filter($module_name, 'from_date');
+          $from_date_filter_val = '';
+          if(!empty($from_date)) {
+            if(!empty($from_date->filter_value)) {
+              $from_date_filter_val = date('d-m-Y', strtotime($from_date->filter_value));
+            }
+          }
+          echo render_date_input('from_date_filter', 'fe_from_date', $from_date_filter_val);
+          ?>
         </div>
 
         <div class="col-md-3">
-          <?php echo render_date_input('to_date_filter', 'fe_to_date'); ?>
+          <?php
+          $to_date = get_module_filter($module_name, 'to_date');
+          $to_date_filter_val = '';
+          if(!empty($to_date)) {
+            if(!empty($to_date->filter_value)) {
+              $to_date_filter_val = date('d-m-Y', strtotime($to_date->filter_value));
+            }
+          }
+          echo render_date_input('to_date_filter', 'fe_to_date', $to_date_filter_val);
+          ?>
         </div>
-        <div class="col-md-3"></div>
-      </div>
 
-      <div class="clearfix"></div>
-      <br>
+        <div class="col-md-1 form-group reset-filter-wrapper">
+          <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+            <?php echo _l('reset_filter'); ?>
+          </a>
+        </div>
+      </div>
+      <hr>
       <div class="clearfix"></div>
       <?php 
       if(is_admin() || has_permission('fixed_equipment_maintenances', '', 'delete')){

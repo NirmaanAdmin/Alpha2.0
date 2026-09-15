@@ -11,6 +11,12 @@
 		$('.table-assets_maintenances').DataTable().ajax.reload()
 		.columns.adjust();
 	});
+	$(document).on('click', '.reset_all_filters', function() {
+    	var filterArea = $('.all_filters');
+    	filterArea.find('input').val("");
+    	filterArea.find('select').selectpicker("val", "");
+    	$('.table-assets_maintenances').DataTable().ajax.reload();
+  	});
 	appValidateForm($('#assets_maintenances-form'), {
 		'asset_id': 'required',
 		'supplier_id': 'required',
