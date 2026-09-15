@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'fe_components'; ?>
+<style>
+.reset-filter-wrapper {
+    padding-top: 23px;
+}
+</style>
 <div id="wrapper">
 	<div class="content">
 		<div class="row panel_s">
@@ -9,9 +15,8 @@
 						<?php echo fe_htmldecode($title); ?>
 					</h4>
 					<hr>
-
 					<div class="row">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<?php 
 							if(is_admin() || has_permission('fixed_equipment_components', '', 'create')){
 								?>
@@ -20,18 +25,31 @@
 
 							<?php } ?>
 						</div>
-
-						<div class="col-md-3">
-						</div>
-
-						<div class="col-md-3">
-							<?php echo render_select('category_filter', $categories, array('id', 'category_name'), 'fe_categories'); ?>
-						</div>
-
-						<div class="col-md-3">
-							<?php echo render_select('location_filter', $locations, array('id', 'location_name'), 'fe_location'); ?>
-						</div>
 					</div>
+					<hr>
+					<div class="row all_filters">
+						<div class="col-md-3">
+							<?php
+							$category = get_module_filter($module_name, 'category');
+                     		$category_filter_val = !empty($category) ? $category->filter_value : '';
+							echo render_select('category_filter', $categories, array('id', 'category_name'), 'fe_categories', $category_filter_val);
+							?>
+						</div>
+
+						<div class="col-md-3">
+							<?php
+							$location = get_module_filter($module_name, 'location');
+                     		$location_filter_val = !empty($location) ? $location->filter_value : '';
+							echo render_select('location_filter', $locations, array('id', 'location_name'), 'fe_location', $location_filter_val);
+							?>
+						</div>
+						<div class="col-md-1 form-group reset-filter-wrapper">
+		                    <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+		                        <?php echo _l('reset_filter'); ?>
+		                    </a>
+		                </div>
+					</div>
+					<hr>
 					<?php 
 					if(is_admin() || has_permission('fixed_equipment_components', '', 'delete')){
 						?>
