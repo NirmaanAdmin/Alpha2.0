@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();
+$module_name = 'fe_checkout_managements';
 $create_for_view_own = false;
 if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own') && has_permission('fixed_equipment_sign_manager', '', 'create')) {
   $create_for_view_own = true;
@@ -10,6 +11,9 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
     position: absolute;
     z-index: 999;
     left: 350px
+  }
+  .reset-filter-wrapper {
+    padding-top: 23px;
   }
 </style>
 <div id="wrapper">
@@ -48,10 +52,13 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
               <input type="hidden" name="show_checkbox_column" value="<?php echo ($create_for_view_own ? true : false); ?>">
               <input type="hidden" name="can_create" value="<?php echo has_permission('fixed_equipment_sign_manager', '', 'create'); ?>">
 
-              <div class="row" id="filter">
+              <div class="row all_filters" id="filter">
                 <div class="col-md-6 col-lg-3">
                   <?php
-                  echo render_select('location_id', $locations, array('id', 'location_name'), 'fe_location') ?>
+                  $location = get_module_filter($module_name, 'location');
+                  $location_filter_val = !empty($location) ? $location->filter_value : '';
+                  echo render_select('location_id', $locations, array('id', 'location_name'), 'fe_location', $location_filter_val);
+                  ?>
                 </div>
                 <?php
                 if ((is_admin() ||
@@ -62,36 +69,70 @@ if (!is_admin() && has_permission('fixed_equipment_sign_manager', '', 'view_own'
                 ) { ?>
                   <div class="col-md-6 col-lg-3">
                     <?php
-                    echo render_select('staff_id', $staffs, array('staffid', array('firstname', 'lastname')), 'staff');
+                    $staff = get_module_filter($module_name, 'staff');
+                    $staff_filter_val = !empty($staff) ? $staff->filter_value : '';
+                    echo render_select('staff_id', $staffs, array('staffid', array('firstname', 'lastname')), 'staff', $staff_filter_val);
                     ?>
                   </div>
                 <?php } else { ?>
                   <input type="hidden" id="staff_id" name="staff_id" value="<?php echo get_staff_user_id(); ?>">
                 <?php } ?>
                 <div class="col-md-6 col-lg-3">
-                  <?php echo render_select('asset_id', $assets, array('id', 'assets_name'), 'fe_asset') ?>
+                  <?php
+                  $asset = get_module_filter($module_name, 'asset');
+                  $asset_filter_val = !empty($asset) ? $asset->filter_value : '';
+                  echo render_select('asset_id', $assets, array('id', 'assets_name'), 'fe_asset', $asset_filter_val);
+                  ?>
                 </div>
                 <div class="col-md-6 col-lg-3">
                   <?php
+                  $check_type = get_module_filter($module_name, 'check_type');
+                  $check_type_filter_val = !empty($check_type) ? $check_type->filter_value : '';
                   $arr_check_type = [
                     ['id' => 'checkout', 'name' => _l('fe_checkout')],
                     ['id' => 'checkin', 'name' => _l('fe_checkin')]
                   ];
-                  echo render_select('check_type', $arr_check_type, array('id', 'name'), 'fe_check_type') ?>
+                  echo render_select('check_type', $arr_check_type, array('id', 'name'), 'fe_check_type', $check_type_filter_val);
+                  ?>
                 </div>
                 <div class="col-md-6 col-lg-3">
-                  <?php echo render_date_input('from_date', 'fe_from_date') ?>
+                  <?php
+                  $from_date = get_module_filter($module_name, 'from_date');
+                  $from_date_filter_val = '';
+                  if(!empty($from_date)) {
+                    if(!empty($from_date->filter_value)) {
+                      $from_date_filter_val = date('d-m-Y', strtotime($from_date->filter_value));
+                    }
+                  }
+                  echo render_date_input('from_date', 'fe_from_date', $from_date_filter_val);
+                  ?>
                 </div>
                 <div class="col-md-6 col-lg-3">
-                  <?php echo render_date_input('to_date', 'fe_to_date') ?>
+                  <?php
+                  $to_date = get_module_filter($module_name, 'to_date');
+                  $to_date_filter_val = '';
+                  if(!empty($to_date)) {
+                    if(!empty($to_date->filter_value)) {
+                      $to_date_filter_val = date('d-m-Y', strtotime($to_date->filter_value));
+                    }
+                  }
+                  echo render_date_input('to_date', 'fe_to_date', $to_date_filter_val);
+                  ?>
                 </div>
                 <div class="col-md-6 col-lg-3">
-                  <?php echo render_select('sign_document', $sign_documents, array('id', 'reference'), 'fe_sign_document'); ?>
+                  <?php
+                  $sign_document = get_module_filter($module_name, 'sign_document');
+                  $sign_document_filter_val = !empty($sign_document) ? $sign_document->filter_value : '';
+                  echo render_select('sign_document', $sign_documents, array('id', 'reference'), 'fe_sign_document', $sign_document_filter_val);
+                  ?>
                 </div>
-                <div class="col-md-6 col-lg-3">
-
+                <div class="col-md-1 form-group reset-filter-wrapper">
+                  <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+                    <?php echo _l('reset_filter'); ?>
+                  </a>
                 </div>
               </div>
+              <hr>
               <?php if (is_admin() || has_permission('fixed_equipment_sign_manager', '', 'create')) {  ?>
                 <a href="#" onclick="bulk_sign(); return false;" data-toggle="modal" data-table=".table-checkout_managements" data-target="#leads_bulk_actions" class=" hide bulk-actions-btn table-btn"><?php echo _l('fe_create_sign_document'); ?></a>
               <?php } ?>

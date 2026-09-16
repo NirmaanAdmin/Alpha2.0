@@ -43,6 +43,13 @@ var signaturePad = new SignaturePad(canvas, {
 		$('input[name="check"]').val('');
 	});
 
+	$(document).on('click', '.reset_all_filters', function() {
+    	var filterArea = $('.all_filters');
+    	filterArea.find('input').val("");
+    	filterArea.find('select').selectpicker("val", "");
+    	$('.table-checkout_managements').DataTable().ajax.reload();
+  	});
+
 	if ($('input[name="show_checkbox_column"]').val() == true) {
 		var _table = $('.table-checkout_managements').DataTable();
 		hidden_columns = [];

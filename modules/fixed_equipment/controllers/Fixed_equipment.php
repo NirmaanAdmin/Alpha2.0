@@ -9447,6 +9447,15 @@ class fixed_equipment extends AdminController
 				if (isset($base_currency)) {
 					$currency_name = $base_currency->name;
 				}
+
+				$module_name = 'fe_checkout_managements';
+				$location_filter_name = 'location';
+				$asset_filter_name = 'asset';
+				$check_type_filter_name = 'check_type';
+				$from_date_filter_name = 'from_date';
+				$to_date_filter_name = 'to_date';
+				$sign_document_filter_name = 'sign_document';
+
 				$select = [
 					db_prefix() . 'fe_checkin_assets.id',
 					db_prefix() . 'fe_checkin_assets.id',
@@ -9503,6 +9512,25 @@ class fixed_equipment extends AdminController
 					array_push($where, ' AND ' . db_prefix() . 'fe_sign_documents.id = "' . $sign_document . '"');
 				}
 				array_push($where, ' AND ((' . db_prefix() . 'fe_checkin_assets.request_status = 1 AND ' . db_prefix() . 'fe_checkin_assets.requestable = 1) OR ' . db_prefix() . 'fe_checkin_assets.requestable = 0)');
+
+				$location_filter_name_value = !empty($location_id) ? $location_id : NULL;
+				update_module_filter($module_name, $location_filter_name, $location_filter_name_value);
+
+				$asset_filter_name_value = !empty($asset_id) ? $asset_id : NULL;
+				update_module_filter($module_name, $asset_filter_name, $asset_filter_name_value);
+
+				$check_type_filter_name_value = !empty($check_type) ? $check_type : NULL;
+				update_module_filter($module_name, $check_type_filter_name, $check_type_filter_name_value);
+
+				$from_date_filter_name_value = !empty($from_date) ? $from_date : NULL;
+				update_module_filter($module_name, $from_date_filter_name, $from_date_filter_name_value);
+
+				$to_date_filter_name_value = !empty($to_date) ? $to_date : NULL;
+				update_module_filter($module_name, $to_date_filter_name, $to_date_filter_name_value);
+
+				$sign_document_filter_name_value = !empty($sign_document) ? $sign_document : NULL;
+				update_module_filter($module_name, $sign_document_filter_name, $sign_document_filter_name_value);
+
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					db_prefix() . 'fe_checkin_assets.id',
 					db_prefix() . 'fe_checkin_assets.staff_id',
