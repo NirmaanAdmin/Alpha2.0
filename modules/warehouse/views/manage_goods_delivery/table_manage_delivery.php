@@ -2,6 +2,9 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$module_name = 'warehouse_goods_delivery';
+$day_vouchers_name = 'day_vouchers';
+
 $aColumns = [
     'id',
     'goods_delivery_code',
@@ -44,6 +47,8 @@ if($this->ci->input->post('invoice_id')){
 
 }
 
+$day_vouchers_name_value = !empty($this->ci->input->post('day_vouchers')) ? to_sql_date($this->ci->input->post('day_vouchers')) : '';
+update_module_filter($module_name, $day_vouchers_name, $day_vouchers_name_value);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, ['id','date_add','date_c','goods_delivery_code','total_money', 'type_of_delivery']);
 

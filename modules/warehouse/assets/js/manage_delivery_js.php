@@ -23,10 +23,16 @@ var table_manage_delivery = $('.table-table_manage_delivery');
 $('.delivery_sm').DataTable().columns([0]).visible(false, false);
 
 
- $('#date_add').on('change', function() {
+$('#date_add').on('change', function() {
     table_manage_delivery.DataTable().ajax.reload();
 });
 
+$(document).on('click', '.reset_all_filters', function() {
+    var filterArea = $('.all_filters');
+    filterArea.find('input').val("");
+    filterArea.find('select').selectpicker("val", "");
+    table_manage_delivery.DataTable().ajax.reload();
+});
 
  init_goods_delivery();
   function init_goods_delivery(id) {

@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'warehouse_goods_delivery'; ?>
 <div id="wrapper">
 	<div class="content">
 		<div class="row">
@@ -28,19 +29,25 @@
 		                        <a href="#" class="btn btn-default pull-right btn-with-tooltip toggle-small-view hidden-xs" onclick="toggle_small_view_proposal('.delivery_sm','#delivery_sm_view'); return false;" data-toggle="tooltip" title="<?php echo _l('invoices_toggle_table_tooltip'); ?>"><i class="fa fa-angle-double-left"></i></a>
 		                    </div>
                     	</div>
-                    	<br/>
-                        <div class="row">
-                            <div  class="col-md-3 pull-right">
-                                <?php 
-                                 $input_attr_e = [];
-                                 $input_attr_e['placeholder'] = _l('day_vouchers');
-
-                             echo render_date_input('date_add','','',$input_attr_e ); ?>
-                            </div> 
-
+                    	<hr>
+                      
+                      <div class="row mtop20 all_filters">
+                        <div class="col-md-3">
+                          <?php
+                          $input_attr_e = [];
+                          $input_attr_e['placeholder'] = _l('day_vouchers');
+                          $day_vouchers_filter = get_module_filter($module_name, 'day_vouchers');
+                          $day_vouchers_filter_val = !empty($day_vouchers_filter) ?  $day_vouchers_filter->filter_value : '';
+                          echo render_date_input('date_add', '', $day_vouchers_filter_val, $input_attr_e); ?>
                         </div>
+                        <div class="col-md-1 form-group">
+                          <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+                            <?php echo _l('reset_filter'); ?>
+                          </a>
+                        </div>
+                      </div>
 
-                    <br/>
+                    <hr>
                     <?php render_datatable(array(
                         _l('id'),
                         _l('goods_delivery_code'),
