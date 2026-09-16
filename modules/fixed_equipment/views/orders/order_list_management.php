@@ -24,8 +24,7 @@ $product_id = '';
         </div>
       </div>
     <?php } ?>
-
-    <br>
+    <hr>
     <div class="clearfix"></div>
     <div class="row">
       <div class="col-md-3">
@@ -111,6 +110,7 @@ $product_id = '';
       </div>
     </div>
     <div class="clearfix"></div>
+    <hr>
     <table class="table table-order_list scroll-responsive">
       <thead>
         <th>ID#</th>
