@@ -14,6 +14,12 @@
 			$('.table-assets_management').DataTable().ajax.reload()
 				.columns.adjust();
 		});
+		$(document).on('click', '.reset_all_filters', function() {
+	    	var filterArea = $('.all_filters');
+	    	filterArea.find('input').val("");
+	    	filterArea.find('select').selectpicker("val", "");
+	    	$('.table-assets_management').DataTable().ajax.reload();
+	  	});
 
 		$(document).on('click', '.serial-items button.add', function(e) {
 			var max_item = $('#amount').val();

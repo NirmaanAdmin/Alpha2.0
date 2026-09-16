@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();
+$module_name = 'fe_assets'; ?>
 <style>
   .show_hide_columns {
     position: absolute;
@@ -20,6 +21,10 @@
 
   .dashboard_stat_value {
     font-size: 19px;
+  }
+
+  .reset-filter-wrapper {
+    padding-top: 23px;
   }
 </style>
 <div id="wrapper">
@@ -121,29 +126,58 @@
         </div>
 
         <br><br><br><br>
-        <div class="row">
-          <div class="col-md-2">
-            <?php echo render_select('model_filter', $models, array('id', 'model_name'), 'fe_model'); ?>
-          </div>
-
-          <div class="col-md-2">
-            <?php echo render_select('status_filter', $status_labels, array('id', 'name'), 'fe_status'); ?>
-          </div>
-
-          <div class="col-md-2">
-            <?php echo render_select('supplier_filter', $suppliers, array('id', 'supplier_name'), 'fe_supplier'); ?>
+        <hr>
+        <div class="row all_filters">
+          <div class="col-md-3">
+            <?php
+            $model = get_module_filter($module_name, 'model');
+            $model_filter_val = !empty($model) ? $model->filter_value : '';
+            echo render_select('model_filter', $models, array('id', 'model_name'), 'fe_model', $model_filter_val);
+            ?>
           </div>
 
           <div class="col-md-3">
-            <?php echo render_select('location_filter', $locations, array('id', 'location_name'), 'fe_default_location'); ?>
+            <?php
+            $status = get_module_filter($module_name, 'status');
+            $status_filter_val = !empty($status) ? $status->filter_value : '';
+            echo render_select('status_filter', $status_labels, array('id', 'name'), 'fe_status', $status_filter_val);
+            ?>
           </div>
+
           <div class="col-md-3">
-            <?php echo render_select('location_filter_2', $locations, array('id', 'location_name'), 'Location'); ?>
+            <?php
+            $supplier = get_module_filter($module_name, 'supplier');
+            $supplier_filter_val = !empty($supplier) ? $supplier->filter_value : '';
+            echo render_select('supplier_filter', $suppliers, array('id', 'supplier_name'), 'fe_supplier', $supplier_filter_val);
+            ?>
+          </div>
+
+          <div class="col-md-3">
+            <?php
+            $location1 = get_module_filter($module_name, 'location1');
+            $location1_filter_val = !empty($location1) ? $location1->filter_value : '';
+            echo render_select('location_filter', $locations, array('id', 'location_name'), 'fe_default_location', $location1_filter_val);
+            ?>
+          </div>
+
+          <div class="col-md-3">
+            <?php
+            $location2 = get_module_filter($module_name, 'location2');
+            $location2_filter_val = !empty($location2) ? $location2->filter_value : '';
+            echo render_select('location_filter_2', $locations, array('id', 'location_name'), 'Location', $location2_filter_val);
+            ?>
+          </div>
+
+          <div class="col-md-1 form-group reset-filter-wrapper">
+            <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+              <?php echo _l('reset_filter'); ?>
+            </a>
           </div>
         </div>
 
         <div class="clearfix"></div>
         <a href="#" onclick="bulk_print(); return false;" data-toggle="modal" data-table=".table-assets_management" data-target="#leads_bulk_actions" class=" hide bulk-actions-btn table-btn"><?php echo _l('fe_print_qrcode'); ?></a>
+        <hr>
         <?php
         if (is_admin() || has_permission('fixed_equipment_components', '', 'delete')) {
         ?>

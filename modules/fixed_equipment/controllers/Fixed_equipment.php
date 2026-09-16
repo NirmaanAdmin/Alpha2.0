@@ -2037,6 +2037,14 @@ class fixed_equipment extends AdminController
 				if (isset($base_currency)) {
 					$currency_name = $base_currency->name;
 				}
+
+				$module_name = 'fe_assets';
+				$model_filter_name = 'model';
+				$status_filter_name = 'status';
+				$supplier_filter_name = 'supplier';
+				$location1_filter_name = 'location1';
+				$location2_filter_name = 'location2';
+
 				$select = [
 					db_prefix() . 'fe_assets.id',
 					db_prefix() . 'fe_assets.id',
@@ -2116,6 +2124,22 @@ class fixed_equipment extends AdminController
 				if (!is_admin() && has_permission('fixed_equipment_assets', '', 'view_own')) {
 					array_push($where, 'AND requestable = 1');
 				}
+
+				$model_filter_name_value = !empty($model) ? $model : NULL;
+				update_module_filter($module_name, $model_filter_name, $model_filter_name_value);
+
+				$status_filter_name_value = !empty($status) ? $status : NULL;
+				update_module_filter($module_name, $status_filter_name, $status_filter_name_value);
+
+				$supplier_filter_name_value = !empty($supplier) ? $supplier : NULL;
+				update_module_filter($module_name, $supplier_filter_name, $supplier_filter_name_value);
+
+				$location_filter_name_value = !empty($location) ? $location : NULL;
+				update_module_filter($module_name, $location1_filter_name, $location_filter_name_value);
+
+				$location2_filter_name_value = !empty($location2) ? $location2 : NULL;
+				update_module_filter($module_name, $location2_filter_name, $location2_filter_name_value);
+
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 					db_prefix() . 'fe_assets.id',
 					'assets_code',
