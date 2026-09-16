@@ -245,16 +245,13 @@
                                     <?php } ?>
                                 </select>
                             </div>
-                            <div class="col-md-1 form-group " style="margin-top: 22px;">
+                            <div class="col-md-1 form-group">
                                 <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_ot_filters">
                                     <?php echo _l('reset_filter'); ?>
                                 </a>
                             </div>
                         </div>
-
-
-
-                        <br />
+                        <hr>
                         <?php render_datatable(array(
                             _l('id'),
                             _l('stock_received_docket_code'),

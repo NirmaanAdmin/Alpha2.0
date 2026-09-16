@@ -104,6 +104,7 @@
 								</a>
 							</div>
 						</div>
+						<hr>
 						<div class="btn-group export-btn-div" id="export-btn-div">
 							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 4px 7px;">
 								<i class="fa fa-download"></i> <?php echo _l('Export'); ?> <span class="caret"></span>
