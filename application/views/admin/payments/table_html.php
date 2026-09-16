@@ -125,6 +125,7 @@ defined('BASEPATH') or exit('No direct script access allowed'); ?>
         </a>
     </div>
 </div>
+<hr>
 <?php render_datatable([
     _l('payments_table_number_heading'),
     _l('payments_table_invoicenumber_heading'),
