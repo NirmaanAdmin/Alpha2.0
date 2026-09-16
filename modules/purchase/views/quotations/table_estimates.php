@@ -2,6 +2,9 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$module_name = 'pur_quotations';
+$pur_request_filter_name = 'pur_request';
+$vendor_filter_name = 'vendor';
 
 $aColumns = [
     db_prefix() . 'pur_estimates.number',
@@ -78,6 +81,11 @@ $filter = [];
 
 $aColumns = hooks()->apply_filters('estimates_table_sql_columns', $aColumns);
 
+$pur_request_filter_name_value = !empty($this->ci->input->post('pur_request')) ? implode(',', $this->ci->input->post('pur_request')) : NULL;
+update_module_filter($module_name, $pur_request_filter_name, $pur_request_filter_name_value);
+
+$vendor_filter_name_value = !empty($this->ci->input->post('vendor')) ? implode(',', $this->ci->input->post('vendor')) : NULL;
+update_module_filter($module_name, $vendor_filter_name, $vendor_filter_name_value);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'pur_estimates.id',

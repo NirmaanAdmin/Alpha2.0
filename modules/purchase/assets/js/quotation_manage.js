@@ -16,6 +16,13 @@ var hidden_columns = [2,4,5,6];
                 .responsive.recalc();
         });
     });
+
+    $(document).on('click', '.reset_all_filters', function () {
+        var filterArea = $('.all_filters');
+        filterArea.find('input').val("");
+        filterArea.find('select').not('select[name="project[]"]').selectpicker("val", "");
+        table_estimates.DataTable().ajax.reload();
+    });
 })(jQuery);
 
 function init_pur_estimate(id) {
