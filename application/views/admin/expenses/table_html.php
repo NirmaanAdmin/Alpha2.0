@@ -10,7 +10,6 @@ if ($withBulkActions === true && $hasPermission) { ?>
 <?php
 if($show_filters === true) { ?>
   <div class="row all_ot_filters">
-    <hr style="margin-top: 0px !important;">
     <?php
     $module_name = 'expenses';
     $expense_category_filter = get_module_filter($module_name, 'expense_category');
@@ -117,12 +116,13 @@ if($show_filters === true) { ?>
     </div>
     
     
-    <div class="col-md-1 form-group pull-right">
+    <div class="col-md-1 form-group">
       <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_ot_filters">
         <?php echo _l('reset_filter'); ?>
       </a>
     </div>
   </div>
+  <hr>
 <?php } ?>
 <?php
 $table_data = [ 
