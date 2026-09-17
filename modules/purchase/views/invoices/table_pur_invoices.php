@@ -6,6 +6,14 @@ $custom_fields = get_custom_fields('pur_invoice', [
     'show_on_table' => 1,
 ]);
 
+$module_name = 'pur_invoices';
+$from_date_filter_name = 'from_date';
+$to_date_filter_name = 'to_date';
+$contract_filter_name = 'contract';
+$pur_orders_filter_name = 'pur_orders';
+$vendors_filter_name = 'vendors';
+$projects_filter_name = 'projects';
+$status_filter_name = 'status';
 
 $aColumns = [
     'invoice_number',
@@ -157,6 +165,27 @@ if (!empty($payment_status) && is_array($payment_status)) {
         $where[] = 'AND ' . db_prefix() . 'pur_invoices.payment_status IN (' . implode(',', $statuses) . ')';
     }
 }
+
+$from_date_filter_value = !empty($this->ci->input->post('from_date')) ? $this->ci->input->post('from_date') : NULL;
+update_module_filter($module_name, $from_date_filter_name, $from_date_filter_value);
+
+$to_date_filter_value = !empty($this->ci->input->post('to_date')) ? $this->ci->input->post('to_date') : NULL;
+update_module_filter($module_name, $to_date_filter_name, $to_date_filter_value);
+
+$contract_filter_value = !empty($contract) ? implode(',', $contract) : NULL;
+update_module_filter($module_name, $contract_filter_name, $contract_filter_value);
+
+$pur_orders_filter_value = !empty($pur_orders) ? implode(',', $pur_orders) : NULL;
+update_module_filter($module_name, $pur_orders_filter_name, $pur_orders_filter_value);
+
+$vendors_filter_value = !empty($vendors) ? implode(',', $vendors) : NULL;
+update_module_filter($module_name, $vendors_filter_name, $vendors_filter_value);
+
+$projects_filter_value = !empty($projects) ? implode(',', $projects) : NULL;
+update_module_filter($module_name, $projects_filter_name, $projects_filter_value);
+
+$payment_status_filter_value = !empty($payment_status) ? implode(',', $payment_status) : NULL;
+update_module_filter($module_name, $status_filter_name, $payment_status_filter_value);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'pur_invoices.id as id',

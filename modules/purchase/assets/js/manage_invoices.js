@@ -31,6 +31,13 @@
             .responsive.recalc();
     });
 
+    $(document).on('click', '.reset_all_filters', function () {
+        var filterArea = $('.all_filters');
+        filterArea.find('input').val("");
+        filterArea.find('select').selectpicker("val", "");
+        table_invoice.DataTable().ajax.reload();
+    });
+
     $(document).on('change', 'select[name="vendor_ft[]"]', function () {
         get_vbt_dashboard();
     });
