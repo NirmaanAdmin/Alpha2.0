@@ -10,10 +10,15 @@
      "type_filter": "[name='type_filter']"
    }
 
-     initDataTable('.table-loss_adjustment', admin_url + 'warehouse/loss_adjustment_table', false, false, fnServerParams, [0, 'desc']);
+   initDataTable('.table-loss_adjustment', admin_url + 'warehouse/loss_adjustment_table', false, false, fnServerParams, [0, 'desc']);
   
+  $(document).on('click', '.reset_all_filters', function() {
+    var filterArea = $('.all_filters');
+    filterArea.find('input').val("");
+    filterArea.find('select').selectpicker("val", "");
+    $('.table-loss_adjustment').DataTable().ajax.reload();
+  });
   
-
   $('select[name="type_filter"],select[name="status_filter"]').on('change', function() {
      $('.table-loss_adjustment').DataTable().ajax.reload();
   });

@@ -3094,6 +3094,13 @@ class warehouse extends AdminController
 				if ($status_filter != '') {
 					$query .= 'status = \'' . $status_filter . '\' and ';
 				}
+
+				$module_name = 'loss_adjustment';
+				$loss_time_filter_name = 'loss_time';
+				$loss_date_filter_name = 'loss_date';
+				$status_filter_name = 'status';
+				$type_filter_name = 'type';
+
 				$select = [
 
 					'id',
@@ -3111,6 +3118,18 @@ class warehouse extends AdminController
 				$sIndexColumn = 'id';
 				$sTable = db_prefix() . 'wh_loss_adjustment';
 				$join = [];
+
+				$loss_time_filter_name_value = !empty($time_filter) ? $time_filter : NULL;
+				update_module_filter($module_name, $loss_time_filter_name, $loss_time_filter_name_value);
+
+				$loss_date_filter_name_value = !empty($date_create) ? $date_create : NULL;
+				update_module_filter($module_name, $loss_date_filter_name, $loss_date_filter_name_value);
+
+				$status_filter_name_value = !empty($status_filter) ? $status_filter : NULL;
+				update_module_filter($module_name, $status_filter_name, $status_filter_name_value);
+
+				$type_filter_name_value = !empty($type_filter) ? $type_filter : NULL;
+				update_module_filter($module_name, $type_filter_name, $type_filter_name_value);
 
 				$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 
