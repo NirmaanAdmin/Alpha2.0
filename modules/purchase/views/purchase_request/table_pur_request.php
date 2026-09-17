@@ -2,6 +2,14 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$module_name = 'purchase_request';
+$department_filter_name = 'department';
+$from_date_filter_name = 'from_date';
+$to_date_filter_name = 'to_date';
+$project_filter_name = 'project';
+$requester_filter_name = 'requester';
+$status_filter_name = 'status';
+
 $aColumns = [
     'pur_rq_code',
     'pur_rq_name',
@@ -74,6 +82,24 @@ if (!has_permission('purchase_request', '', 'view')) {
 
     array_push($where, 'AND (' . db_prefix() . 'pur_request.requester = ' . get_staff_user_id() .  $or_where . ' OR ' . get_staff_user_id() . ' IN (SELECT staffid FROM ' . db_prefix() . 'pur_approval_details WHERE ' . db_prefix() . 'pur_approval_details.rel_type = "pur_request" AND ' . db_prefix() . 'pur_approval_details.rel_id = ' . db_prefix() . 'pur_request.id))');
 }
+
+$department_filter_name_value = !empty($this->ci->input->post('department')) ? implode(',', $this->ci->input->post('department')) : NULL;
+update_module_filter($module_name, $department_filter_name, $department_filter_name_value);
+
+$from_date_filter_name_value = !empty($this->ci->input->post('from_date')) ? $this->ci->input->post('from_date') : NULL;
+update_module_filter($module_name, $from_date_filter_name, $from_date_filter_name_value);
+
+$to_date_filter_name_value = !empty($this->ci->input->post('to_date')) ? $this->ci->input->post('to_date') : NULL;
+update_module_filter($module_name, $to_date_filter_name, $to_date_filter_name_value);
+
+$project_filter_name_value = !empty($this->ci->input->post('project')) ? implode(',', $this->ci->input->post('project')) : NULL;
+update_module_filter($module_name, $project_filter_name, $project_filter_name_value);
+
+$requester_filter_name_value = !empty($this->ci->input->post('requester')) ? implode(',', $this->ci->input->post('requester')) : NULL;
+update_module_filter($module_name, $requester_filter_name, $requester_filter_name_value);
+
+$status_filter_name_value = !empty($this->ci->input->post('status')) ? implode(',', $this->ci->input->post('status')) : NULL;
+update_module_filter($module_name, $status_filter_name, $status_filter_name_value);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     'id',

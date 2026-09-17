@@ -37,6 +37,13 @@ var Params = {
 
   appValidateForm($('#send_rq-form'), { subject: 'required', attachment: 'required' });
 
+  $(document).on('click', '.reset_all_filters', function () {
+    var filterArea = $('.all_filters');
+    filterArea.find('input').val("");
+    filterArea.find('select').selectpicker("val", "");
+    table_pur_request.DataTable().ajax.reload();
+  });
+
   $(document).on('change', 'select[name="project[]"]', function () {
     get_purchase_request_dashboard();
   });
