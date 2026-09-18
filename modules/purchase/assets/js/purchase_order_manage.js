@@ -61,6 +61,13 @@ var expenseDropzone;
           amount: 'required'
     }, projectExpenseSubmitHandler);
 
+    $(document).on('click', '.reset_all_filters', function () {
+      var filterArea = $('.all_filters');
+      filterArea.find('input').val("");
+      filterArea.find('select').selectpicker("val", "");
+      table_rec_campaign.DataTable().ajax.reload();
+    });
+
      $(document).on('change', 'select[name="vendor_ft[]"], select[name="project[]"]', function() {
         get_purchase_order_dashboard();
     });

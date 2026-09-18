@@ -9,7 +9,12 @@
    .dashboard_stat_value {
       font-size: 19px;
    }
+
+   .reset-filter-wrapper {
+      padding-top: 23px;
+   }
 </style>
+<?php $module_name = 'purchase_order'; ?>
 <div id="wrapper">
    <div class="content">
       <div class="row">
@@ -39,10 +44,6 @@
                         <?php echo _l('PO Charts'); ?> <i class="fa fa-chevron-down toggle-icon"></i>
                      </button>
                   </div>
-
-
-
-
                   <div class="_buttons col-md-1 pull-right">
                      <a href="#" class="btn btn-default btn-with-tooltip toggle-small-view hidden-xs pull-right" onclick="toggle_small_pur_order_view('.table-table_pur_order','#pur_order'); return false;" data-toggle="tooltip" title="<?php echo _l('estimates_toggle_table_tooltip'); ?>"><i class="fa fa-angle-double-left"></i></a>
                   </div>
@@ -118,79 +119,139 @@
                      </div>
                   </div>
                </div>
-               <div class="row">
+               <div class="row all_filters">
                   <hr>
-                  <div class="col-md-2">
-                     <?php echo render_date_input('from_date', _l('from_date'), ''); ?>
-                  </div>
-                  <div class="col-md-2">
-                     <?php echo render_date_input('to_date', _l('to_date'), ''); ?>
+                  <div class="col-md-3">
+                     <?php
+                     $from_date = get_module_filter($module_name, 'from_date');
+                     $from_date_filter_val = '';
+                     if(!empty($from_date)) {
+                       if(!empty($from_date->filter_value)) {
+                         $from_date_filter_val = date('d-m-Y', strtotime($from_date->filter_value));
+                       }
+                     }
+                     echo render_date_input('from_date', _l('from_date'), $from_date_filter_val);
+                     ?>
                   </div>
 
-                  <div class=" col-md-2 form-group">
+                  <div class="col-md-3">
+                     <?php
+                     $to_date = get_module_filter($module_name, 'to_date');
+                     $to_date_filter_val = '';
+                     if(!empty($to_date)) {
+                       if(!empty($to_date->filter_value)) {
+                         $to_date_filter_val = date('d-m-Y', strtotime($to_date->filter_value));
+                       }
+                     }
+                     echo render_date_input('to_date', _l('to_date'), $to_date_filter_val);
+                     ?>
+                  </div>
+
+                  <div class="col-md-3 form-group">
+                     <?php
+                     $pur_request_filter = get_module_filter($module_name, 'pur_request');
+                     $pur_request_filter_val = !empty($pur_request_filter) ? explode(",", $pur_request_filter->filter_value) : [];
+                     ?>
                      <label for="pur_request"><?php echo _l('pur_request'); ?></label>
                      <select name="pur_request[]" id="pur_request" class="selectpicker" onchange="coppy_pur_request(); return false;" data-live-search="true" multiple="true" data-width="100%" data-none-selected-text="<?php echo _l('ticket_settings_none_assigned'); ?>">
                         <?php foreach ($pur_request as $s) { ?>
-                           <option value="<?php echo pur_html_entity_decode($s['id']); ?>" <?php if (isset($pur_order) && $pur_order->pur_request != '' && $pur_order->pur_request == $s['id']) {
-                                                                                                echo 'selected';
-                                                                                             } ?>><?php echo pur_html_entity_decode($s['pur_rq_code'] . ' - ' . $s['pur_rq_name']); ?></option>
+                           <?php
+                           $is_selected = false;
+                           if (in_array($s['id'], $pur_request_filter_val)) {
+                              $is_selected = true;
+                           }
+                           if (isset($pur_order) && $pur_order->pur_request != '' && $pur_order->pur_request == $s['id']
+                           ) {
+                              $is_selected = true;
+                           }
+                           ?>
+                           <option value="<?php echo pur_html_entity_decode($s['id']); ?>"
+                              <?php echo $is_selected ? 'selected' : ''; ?>>
+                              <?php echo pur_html_entity_decode($s['pur_rq_code'] . ' - ' . $s['pur_rq_name']); ?>
+                           </option>
                         <?php } ?>
                      </select>
                   </div>
 
                   <div class="col-md-3 form-group">
                      <?php
+                     $status_filter = get_module_filter($module_name, 'status');
+                     $status_filter_val = !empty($status_filter) ? explode(",", $status_filter->filter_value) : [];
                      $statuses = [
                         0 => ['id' => '1', 'name' => _l('purchase_not_yet_approve')],
                         1 => ['id' => '2', 'name' => _l('purchase_approved')],
                         2 => ['id' => '3', 'name' => _l('purchase_reject')],
                         3 => ['id' => '4', 'name' => _l('cancelled')],
                      ];
-
-                     echo render_select('status[]', $statuses, array('id', 'name'), 'approval_status', '', array('data-width' => '100%', 'data-none-selected-text' => _l('leads_all'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false); ?>
-                  </div>
-                  <div class="col-md-3 form-group">
-                     <?php echo render_select('vendor_ft[]', $vendors, array('userid', 'company'), 'vendor', '', array('data-width' => '100%', 'data-none-selected-text' => _l('leads_all'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false); ?>
+                     echo render_select('status[]', $statuses, array('id', 'name'), 'approval_status', $status_filter_val, array('data-width' => '100%', 'data-none-selected-text' => _l('leads_all'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false); ?>
                   </div>
 
                   <div class="col-md-3 form-group">
+                     <?php
+                     $vendors_filter = get_module_filter($module_name, 'vendors');
+                     $vendors_filter_val = !empty($vendors_filter) ? explode(",", $vendors_filter->filter_value) : [];
+                     echo render_select('vendor_ft[]', $vendors, array('userid', 'company'), 'vendor', $vendors_filter_val, array('data-width' => '100%', 'data-none-selected-text' => _l('leads_all'), 'multiple' => true, 'data-actions-box' => true), array(), 'no-mbot', '', false);
+                     ?>
+                  </div>
+
+                  <div class="col-md-3 form-group">
+                     <?php
+                     $type_filter = get_module_filter($module_name, 'type');
+                     $type_filter_val = !empty($type_filter) ? explode(",", $type_filter->filter_value) : [];
+                     ?>
                      <label for="type"><?php echo _l('type'); ?></label>
                      <select name="type[]" id="type" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('leads_all'); ?>">
-                        <option value="capex"><?php echo _l('capex'); ?></option>
-                        <option value="opex"><?php echo _l('opex'); ?></option>
+                        <option value="capex" <?php echo in_array('capex', $type_filter_val) ? 'selected' : ''; ?>><?php echo _l('capex'); ?></option>
+                        <option value="opex" <?php echo in_array('opex', $type_filter_val) ? 'selected' : ''; ?>><?php echo _l('opex'); ?></option>
                      </select>
                   </div>
 
                   <div class="col-md-3 form-group">
+                     <?php
+                     $project_filter = get_module_filter($module_name, 'project');
+                     $project_filter_val = !empty($project_filter) ? explode(",", $project_filter->filter_value) : [];
+                     ?>
                      <label for="project"><?php echo _l('project'); ?></label>
                      <select name="project[]" id="project" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('leads_all'); ?>">
                         <?php foreach ($projects as $pj) { ?>
-                           <option value="<?php echo pur_html_entity_decode($pj['id']); ?>"><?php echo pur_html_entity_decode($pj['name']); ?></option>
+                           <option value="<?php echo pur_html_entity_decode($pj['id']); ?>" <?php echo in_array($pj['id'], $project_filter_val) ? 'selected' : ''; ?>><?php echo pur_html_entity_decode($pj['name']); ?></option>
                         <?php } ?>
                      </select>
                   </div>
 
                   <div class="col-md-3 form-group">
+                     <?php
+                     $department_filter = get_module_filter($module_name, 'department');
+                     $department_filter_val = !empty($department_filter) ? explode(",", $department_filter->filter_value) : [];
+                     ?>
                      <label for="department"><?php echo _l('department'); ?></label>
                      <select name="department[]" readonly="true" id="department" class="selectpicker" multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('leads_all'); ?>">
 
                         <?php foreach ($departments as $dpm) { ?>
-                           <option value="<?php echo pur_html_entity_decode($dpm['departmentid']); ?>"><?php echo pur_html_entity_decode($dpm['name']); ?></option>
+                           <option value="<?php echo pur_html_entity_decode($dpm['departmentid']); ?>" <?php echo in_array($dpm['departmentid'], $department_filter_val) ? 'selected' : ''; ?>><?php echo pur_html_entity_decode($dpm['name']); ?></option>
                         <?php } ?>
                      </select>
                   </div>
 
                   <div class="col-md-3 form-group">
+                     <?php
+                     $delivery_status_filter = get_module_filter($module_name, 'delivery_status');
+                     $delivery_status_filter_val = !empty($delivery_status_filter) ? explode(",", $delivery_status_filter->filter_value) : [];
+                     ?>
                      <label for="delivery_status"><?php echo _l('delivery_status'); ?></label>
                      <select name="delivery_status[]" id="delivery_status" class="selectpicker" multiple="true" data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('leads_all'); ?>">
-                        <option value="0"><?php echo _l('undelivered'); ?></option>
-                        <option value="1"><?php echo _l('completely_delivered'); ?></option>
-                        <option value="2"><?php echo _l('pending_delivered'); ?></option>
-                        <option value="3"><?php echo _l('partially_delivered'); ?></option>
+                        <option value="0" <?php echo in_array('0', $delivery_status_filter_val) ? 'selected' : ''; ?>><?php echo _l('undelivered'); ?></option>
+                        <option value="1" <?php echo in_array('1', $delivery_status_filter_val) ? 'selected' : ''; ?>><?php echo _l('completely_delivered'); ?></option>
+                        <option value="2" <?php echo in_array('2', $delivery_status_filter_val) ? 'selected' : ''; ?>><?php echo _l('pending_delivered'); ?></option>
+                        <option value="3" <?php echo in_array('3', $delivery_status_filter_val) ? 'selected' : ''; ?>><?php echo _l('partially_delivered'); ?></option>
                      </select>
                   </div>
 
-
+                  <div class="col-md-1 form-group reset-filter-wrapper">
+                     <a href="javascript:void(0)" class="btn btn-info btn-icon reset_all_filters">
+                       <?php echo _l('reset_filter'); ?>
+                     </a>
+                  </div>
                </div>
             </div>
          </div>
@@ -222,11 +283,9 @@
                         array_push($table_data, $field['name']);
                      }
                      render_datatable($table_data, 'table_pur_order'); ?>
-
                   </div>
                </div>
             </div>
-
             <div class="col-md-7 small-table-right-col">
                <div id="pur_order" class="hide">
                </div>
