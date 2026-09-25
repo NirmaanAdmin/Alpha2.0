@@ -14441,6 +14441,7 @@ class Purchase_model extends App_Model
                 SELECT gr.pr_order_id, SUM(grd.quantities) AS received_qty
                 FROM {$gr_table} gr
                 INNER JOIN {$grd_table} grd ON grd.goods_receipt_id = gr.id
+                WHERE gr.approval = 1
                 GROUP BY gr.pr_order_id
             ) gr ON gr.pr_order_id = po.id
             SET po.delivery_status =
