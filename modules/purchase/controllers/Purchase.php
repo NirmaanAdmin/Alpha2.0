@@ -1406,7 +1406,7 @@ class purchase extends AdminController
         if(!has_permission('purchase_orders', '', 'view') && !is_admin() && !has_permission('purchase_orders', '', 'view_own')){
             access_denied('purchase');
         }
-        // $this->purchase_model->update_delivery_status();
+        $this->purchase_model->update_delivery_status();
         $this->load->model('expenses_model');
         $this->load->model('payment_modes_model');
         $this->load->model('taxes_model');

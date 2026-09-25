@@ -14426,50 +14426,31 @@ class Purchase_model extends App_Model
 
     public function update_delivery_status()
     {
-        $this->db->select('id');
-        $pur_orders = $this->db->get(db_prefix() . 'pur_orders')->result_array();
-
-        if (!empty($pur_orders)) {
-            foreach ($pur_orders as $key => $value) {
-                $delivery_status = 0;
-                $pur_order_qty = 0;
-
-                $this->db->select_sum('quantity');
-                $this->db->where('pur_order', $value['id']);
-                $pur_order_detail = $this->db->get(db_prefix() . 'pur_order_detail')->row();
-
-                $pur_order_qty = !empty($pur_order_detail->quantity) ? $pur_order_detail->quantity : 0;
-
-                $this->db->select('id');
-                $this->db->where('pr_order_id', $value['id']);
-                $goods_receipt = $this->db->get(db_prefix() . 'goods_receipt')->result_array();
-
-                if (!empty($goods_receipt)) {
-                    $goods_receipt = implode(',', array_column($goods_receipt, 'id'));
-                    $goods_receipt = explode(",", $goods_receipt);
-
-                    $this->db->select_sum('quantities');
-                    $this->db->where_in('goods_receipt_id', $goods_receipt);
-                    $goods_receipt_detail = $this->db->get(db_prefix() . 'goods_receipt_detail')->row();
-
-                    $goods_receipt_qty = !empty($goods_receipt_detail->quantities) ? $goods_receipt_detail->quantities : 0;
-
-                    if ($pur_order_qty == 0 && $goods_receipt_qty == 0) {
-                        $delivery_status = 0;
-                    } else if ($pur_order_qty > $goods_receipt_qty) {
-                        $delivery_status = 3;
-                    } else if ($pur_order_qty < $goods_receipt_qty) {
-                        $delivery_status = 1;
-                    } else if ($pur_order_qty == $goods_receipt_qty) {
-                        $delivery_status = 1;
-                    }
-
-                    $this->db->where('id', $value['id']);
-                    $this->db->update(db_prefix() . 'pur_orders', ['delivery_status' => $delivery_status]);
-                }
-            }
-        }
-
+        $po_table  = db_prefix() . 'pur_orders';
+        $pod_table = db_prefix() . 'pur_order_detail';
+        $gr_table  = db_prefix() . 'goods_receipt';
+        $grd_table = db_prefix() . 'goods_receipt_detail';
+        $sql = "
+            UPDATE {$po_table} po
+            LEFT JOIN (
+                SELECT pur_order, SUM(quantity) AS ordered_qty
+                FROM {$pod_table}
+                GROUP BY pur_order
+            ) pod ON pod.pur_order = po.id
+            INNER JOIN (
+                SELECT gr.pr_order_id, SUM(grd.quantities) AS received_qty
+                FROM {$gr_table} gr
+                INNER JOIN {$grd_table} grd ON grd.goods_receipt_id = gr.id
+                GROUP BY gr.pr_order_id
+            ) gr ON gr.pr_order_id = po.id
+            SET po.delivery_status =
+            CASE
+                WHEN COALESCE(pod.ordered_qty, 0) = 0 AND COALESCE(gr.received_qty, 0) = 0 THEN 0
+                WHEN COALESCE(pod.ordered_qty, 0) > COALESCE(gr.received_qty, 0) THEN 3
+                ELSE 1
+            END
+        ";
+        $this->db->query($sql);
         return true;
     }
 
