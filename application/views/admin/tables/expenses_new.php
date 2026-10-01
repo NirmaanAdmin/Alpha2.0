@@ -166,7 +166,7 @@ foreach ($rResult as $aRow) {
         $categoryOutput .= ' | <a href="' . admin_url('expenses/expense/' . $aRow['id']) . '">' . _l('edit') . '</a>';
     }
 
-    if (staff_can('delete', 'expenses')) {
+    if (is_admin()) {
         $categoryOutput .= ' | <a href="' . admin_url('expenses/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 

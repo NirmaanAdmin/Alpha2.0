@@ -111,7 +111,7 @@ foreach ($rResult as $aRow) {
             if (has_permission('purchase_items', '', 'edit') || is_admin()) {
                 $code .= ' | <a href="#" onclick="edit_commodity_item(this); return false;"  data-commodity_id="'.$aRow[db_prefix().'items.id'].'" data-description="'.$aRow['description'].'" data-unit_id="'.$aRow['unit_id'].'" data-commodity_code="'.$aRow['commodity_code'].'" data-commodity_barcode="'.$aRow['commodity_barcode'].'" data-rate="'.$aRow['rate'].'" data-group_id="'.$aRow['group_id'].'" data-tax="'.$aRow['tax'].'" data-tax2="'.$aRow['tax2'].'"  data-sku_code="'.$aRow['sku_code'].'" data-sku_name="'.$aRow['sku_name'].'" data-purchase_price="'.$aRow['purchase_price'].'" >' . _l('edit') . '</a>';
             }
-            if (has_permission('purchase_items', '', 'delete') || is_admin()) {
+            if (is_admin()) {
                 $code .= ' | <a href="' . admin_url('purchase/delete_commodity/' . $aRow[db_prefix().'items.id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
             }
 

@@ -26,14 +26,15 @@
               <div class="col-md-12 ">
                 <?php if (has_permission('warehouse', '', 'create') || is_admin() || has_permission('warehouse', '', 'edit')) { ?>
 
+                  <?php if (is_admin()) { ?>
+                    <a href="#" onclick="new_commodity_item(); return false;" class="btn btn-info pull-left display-block mr-4 button-margin-r-b" data-toggle="sidebar-right" data-target=".commodity_list-add-edit-modal">
+                      <?php echo _l('add'); ?>
+                    </a>
 
-                  <a href="#" onclick="new_commodity_item(); return false;" class="btn btn-info pull-left display-block mr-4 button-margin-r-b" data-toggle="sidebar-right" data-target=".commodity_list-add-edit-modal">
-                    <?php echo _l('add'); ?>
-                  </a>
-
-                  <a href="<?php echo admin_url('warehouse/import_xlsx_commodity'); ?>" class="btn btn-success pull-left display-block  mr-4 button-margin-r-b" title="<?php echo _l('import_items') ?> ">
-                    <?php echo _l('import_items'); ?>
-                  </a>
+                    <a href="<?php echo admin_url('warehouse/import_xlsx_commodity'); ?>" class="btn btn-success pull-left display-block  mr-4 button-margin-r-b" title="<?php echo _l('import_items') ?> ">
+                      <?php echo _l('import_items'); ?>
+                    </a>
+                  <?php } ?>
 
                   <a href="#" id="dowload_items" class="btn btn-warning pull-left  mr-4 button-margin-r-b hide"><?php echo _l('dowload_items'); ?></a>
 

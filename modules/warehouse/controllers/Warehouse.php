@@ -642,6 +642,9 @@ class warehouse extends AdminController
 	 */
 	public function delete_commodity($id)
 	{
+		if (!is_admin()) {
+            access_denied('warehouse');
+        }
 		if (!$id) {
 			redirect(admin_url('warehouse/commodity_list'));
 		}
@@ -2371,6 +2374,9 @@ class warehouse extends AdminController
 	 */
 	public function import_xlsx_commodity()
 	{
+		if (!is_admin()) {
+            access_denied('warehouse');
+        }
 		if (!is_admin() && !has_permission('warehouse', '', 'create')) {
 			access_denied('warehouse');
 		}
