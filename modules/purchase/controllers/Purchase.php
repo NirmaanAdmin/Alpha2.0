@@ -3247,9 +3247,6 @@ class purchase extends AdminController
      * @return redirect
      */
     public function delete_commodity($id){
-        if (!is_admin()) {
-            access_denied('purchase');
-        }
         if (!$id) {
             redirect(admin_url('purchase/items'));
         }
@@ -5182,9 +5179,6 @@ class purchase extends AdminController
      * @return view
      */
     public function import_xlsx_commodity() {
-        if (!is_admin()) {
-            access_denied('purchase');
-        }
         if (!is_admin() && !has_permission('purchase_items', '', 'create')) {
             access_denied('purchase');
         }

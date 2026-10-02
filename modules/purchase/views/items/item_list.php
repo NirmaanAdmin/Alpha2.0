@@ -16,7 +16,7 @@
                   </div>
                   <div class="row row-margin-bottom">
                     <div class="col-md-5  ">
-                        <?php if (is_admin()) { ?>
+                        <?php if (has_permission('purchase_items', '', 'create') || is_admin()) { ?>
 
                           <!-- dung cho add 1 -->
                         <a href="#" onclick="new_commodity_item(); return false;" class="btn btn-info pull-left display-block mr-4 button-margin-r-b" data-toggle="sidebar-right" data-target=".commodity_list-add-edit-modal">

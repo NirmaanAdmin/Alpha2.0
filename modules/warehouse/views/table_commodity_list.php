@@ -272,7 +272,7 @@ $item_have_variation = $this->ci->warehouse_model->arr_item_have_variation();
 					$code .= ' | <a href="#" onclick="add_opening_stock_modal('. $aRow['id'].', '.$aRow['parent_id'].'); return false;">' . _l('add_opening_stock') . '</a>';
 				}
 				
-				if (is_admin()) {
+				if (has_permission('warehouse', '', 'delete') || is_admin()) {
 					$code .= ' | <a href="' . admin_url('warehouse/delete_commodity/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
 				}
 
