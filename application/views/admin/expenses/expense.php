@@ -56,7 +56,7 @@
                         <?php echo render_textarea('note', 'expense_add_edit_note', $value, ['rows' => 4], []); ?>
                         <?php
                      $selected = (isset($expense) ? $expense->category : '');
-                     if (is_admin() || get_option('staff_members_create_inline_expense_categories') == '1') {
+                     if (is_admin()) {
                          echo render_select_with_input_group('category', $categories, ['id', 'name'], 'expense_category', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" onclick="new_category();return false;"><i class="fa fa-plus"></i></a></div>');
                      } else {
                          echo render_select('category', $categories, ['id', 'name'], 'expense_category', $selected);
