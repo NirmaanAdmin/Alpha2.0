@@ -138,9 +138,6 @@ class Expenses extends AdminController
             die;
         }
         if ($id == '') {
-            if (!is_admin()) {
-                access_denied('expenses');
-            }
             $title = _l('add_new', _l('expense'));
         } else {
             $data['expense'] = $this->expenses_model->get($id);
@@ -174,9 +171,6 @@ class Expenses extends AdminController
 
     public function import()
     {
-        if (!is_admin()) {
-            access_denied('expenses');
-        }
         if (staff_cant('create', 'expenses')) {
             access_denied('Items Import');
         }
