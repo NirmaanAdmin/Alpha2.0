@@ -40,13 +40,22 @@ class Tasks extends AdminController
         }
 
         $data['title'] = _l('tasks');
-        $data['tasks_table'] = App_table::find('tasks');
+        // $data['tasks_table'] = App_table::find('tasks');
+        $data['staff'] = $this->staff_model->get('', ['active' => 1]);
+
         $this->load->view('admin/tasks/manage', $data);
     }
 
     public function table()
     {
         App_table::find('tasks')->output();
+    }
+
+    public function table_tasks_details()
+    {
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('tasks_new');
+        }
     }
 
     public function kanban()
