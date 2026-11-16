@@ -1,0 +1,316 @@
+var hidden_columns = [2, 3, 4, 5], table_rec_campaign;
+Dropzone.autoDiscover = false;
+var expenseDropzone;
+(function ($) {
+    "use strict";
+    table_rec_campaign = $('.table-table_pur_order');
+
+    var Params = {
+        "from_date": 'input[name="from_date"]',
+        "to_date": 'input[name="to_date"]',
+        "vendor": "[name='vendor_ft[]']",
+        "status": "[name='status[]']",
+        "item_filter": "[name='item_filter[]']",
+        "type": "[name='type[]']",
+        "project": "[name='project[]']",
+        "department": "[name='department[]']",
+        "delivery_status": "[name='delivery_status[]']",
+        "changee_request": "[name='co_request[]']"
+    };
+
+    initDataTable('.table-table_pur_order', admin_url + 'changee/table_pur_order', [], [], Params, [2, 'desc']);
+    init_pur_order();
+    $.each(Params, function (i, obj) {
+        $('select' + obj).on('change', function () {
+            table_rec_campaign.DataTable().ajax.reload();
+        });
+    });
+
+    $('input[name="from_date"]').on('change', function () {
+        table_rec_campaign.DataTable().ajax.reload();
+    });
+    $('input[name="to_date"]').on('change', function () {
+        table_rec_campaign.DataTable().ajax.reload();
+    });
+
+
+    if ($('#pur_order-expense-form').length > 0) {
+        expenseDropzone = new Dropzone("#pur_order-expense-form", appCreateDropzoneOptions({
+            autoProcessQueue: false,
+            clickable: '#dropzoneDragArea',
+            previewsContainer: '.dropzone-previews',
+            addRemoveLinks: true,
+            maxFiles: 1,
+            success: function (file, response) {
+                if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                    window.location.reload();
+                }
+            }
+        }));
+    }
+
+    $('.table-table_pur_order').on('draw.dt', function () {
+        var reportsTable = $(this).DataTable();
+        var sums = reportsTable.ajax.json().sums;
+        $(this).find('tfoot').addClass('bold');
+        $(this).find('tfoot td').eq(0).html("Total (Per Page)");
+        $(this).find('tfoot td.total_co_value').html(sums.total_co_value);
+        $(this).find('tfoot td.total_tax_value').html(sums.total_tax_value);
+        $(this).find('tfoot td.total_co_value_included_tax').html(sums.total_co_value_included_tax);
+    });
+
+    appValidateForm($('#pur_order-expense-form'), {
+        category: 'required',
+        date: 'required',
+        amount: 'required'
+    }, projectExpenseSubmitHandler);
+
+    $(document).on('click', '.reset_all_ot_filters', function () {
+        var filterArea = $('.all_ot_filters');
+        filterArea.find('input').val("");
+        filterArea.find('select').not('select[name="project[]"]').selectpicker("val", "");
+        table_rec_campaign.DataTable().ajax.reload();
+        get_change_order_dashboard();
+    });
+
+    $(document).on('change', 'select[name="vendor_ft[]"], select[name="project[]"]', function() {
+      get_change_order_dashboard();
+    });
+
+    get_change_order_dashboard();
+
+})(jQuery);
+function init_pur_order(id) {
+    "use strict";
+    load_small_pur_order_table_item(id, '#pur_order', 'pur_orderid', 'changee/get_pur_order_data_ajax', '.table-table_pur_order');
+}
+function load_small_pur_order_table_item(id, selector, input_name, url, table) {
+    "use strict";
+    var _tmpID = $('input[name="' + input_name + '"]').val();
+    // Check if id passed from url, hash is prioritized becuase is last
+    if (_tmpID !== '' && !window.location.hash) {
+        id = _tmpID;
+        // Clear the current id value in case user click on the left sidebar credit_note_ids
+        $('input[name="' + input_name + '"]').val('');
+    } else {
+        // check first if hash exists and not id is passed, becuase id is prioritized
+        if (window.location.hash && !id) {
+            id = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
+        }
+    }
+    if (typeof (id) == 'undefined' || id === '') { return; }
+    destroy_dynamic_scripts_in_element($(selector))
+    if (!$("body").hasClass('small-table')) { toggle_small_pur_order_view(table, selector); }
+    $('input[name="' + input_name + '"]').val(id);
+    do_hash_helper(id);
+    $(selector).load(admin_url + url + '/' + id);
+    if (is_mobile()) {
+        $('html, body').animate({
+            scrollTop: $(selector).offset().top + 150
+        }, 600);
+    }
+}
+
+function toggle_small_pur_order_view(table, main_data) {
+    "use strict";
+    $("body").toggleClass('small-table');
+    var tablewrap = $('#small-table');
+    if (tablewrap.length === 0) { return; }
+    var _visible = false;
+    if (tablewrap.hasClass('col-md-5')) {
+        tablewrap.removeClass('col-md-5').addClass('col-md-12');
+        _visible = true;
+        $('.toggle-small-view').find('i').removeClass('fa fa-angle-double-right').addClass('fa fa-angle-double-left');
+    } else {
+        tablewrap.addClass('col-md-5').removeClass('col-md-12');
+        $('.toggle-small-view').find('i').removeClass('fa fa-angle-double-left').addClass('fa fa-angle-double-right');
+    }
+    var _table = $(table).DataTable();
+    // Show hide hidden columns
+    _table.columns(hidden_columns).visible(_visible, false);
+    _table.columns.adjust();
+    $(main_data).toggleClass('hide');
+    $(window).trigger('resize');
+}
+
+function convert_expense(pur_order, total) {
+    "use strict";
+
+    $.post(admin_url + 'changee/get_project_info/' + pur_order).done(function (response) {
+        response = JSON.parse(response);
+        $('select[name="project_id"]').val(response.project_id).change();
+        $('select[name="clientid"]').val(response.customer).change();
+        $('select[name="currency"]').val(response.currency).change();
+        $('input[name="vendor"]').val(response.vendor);
+    });
+
+    $('#pur_order_expense').modal('show');
+    $('input[id="amount"]').val(total);
+    $('#pur_order_additional').html('');
+    $('#pur_order_additional').append(hidden_input('pur_order', pur_order));
+}
+
+function projectExpenseSubmitHandler(form) {
+    "use strict";
+    $.post(form.action, $(form).serialize()).done(function (response) {
+        response = JSON.parse(response);
+        if (response.expenseid) {
+            if (typeof (expenseDropzone) !== 'undefined') {
+                if (expenseDropzone.getQueuedFiles().length > 0) {
+                    expenseDropzone.options.url = admin_url + 'expenses/add_expense_attachment/' + response.expenseid;
+                    expenseDropzone.processQueue();
+                } else {
+                    window.location.assign(response.url);
+                }
+            } else {
+                window.location.assign(response.url);
+            }
+        } else {
+            window.location.assign(response.url);
+        }
+    });
+    return false;
+}
+
+function change_delivery_status(status, id) {
+    "use strict";
+    if (id > 0) {
+        $.post(admin_url + 'changee/change_delivery_status/' + status + '/' + id).done(function (response) {
+            response = JSON.parse(response);
+            if (response.success == true) {
+                if ($('#status_span_' + id).hasClass('label-danger')) {
+                    $('#status_span_' + id).removeClass('label-danger');
+                    $('#status_span_' + id).addClass(response.class);
+                    $('#status_span_' + id).html(response.status_str + ' ' + response.html);
+                } else if ($('#status_span_' + id).hasClass('label-success')) {
+                    $('#status_span_' + id).removeClass('label-success');
+                    $('#status_span_' + id).addClass(response.class);
+                    $('#status_span_' + id).html(response.status_str + ' ' + response.html);
+                } else if ($('#status_span_' + id).hasClass('label-info')) {
+                    $('#status_span_' + id).removeClass('label-info');
+                    $('#status_span_' + id).addClass(response.class);
+                    $('#status_span_' + id).html(response.status_str + ' ' + response.html);
+                } else if ($('#status_span_' + id).hasClass('label-warning')) {
+                    $('#status_span_' + id).removeClass('label-warning');
+                    $('#status_span_' + id).addClass(response.class);
+                    $('#status_span_' + id).html(response.status_str + ' ' + response.html);
+                }
+                alert_float('success', response.mess);
+            } else {
+                alert_float('warning', response.mess);
+            }
+        });
+    }
+}
+
+var pieChartCOStatus;
+var lineChartOverTime;
+
+function get_change_order_dashboard() {
+  "use strict";
+
+  var data = {
+    vendors: $('select[name="vendor_ft[]"]').val(),
+    projects: $('select[name="project[]"]').val()
+  }
+
+  $.post(admin_url + 'changee/get_co_charts', data).done(function(response){
+    response = JSON.parse(response);
+
+    // Update value summaries
+    $('.total_co_value').html(response.total_co_value);
+    $('.approved_co_value').html(response.approved_co_value);
+    $('.draft_co_value').html(response.draft_co_value);
+
+    // PIE CHART - Approval Status
+    var pieCtx = document.getElementById('pieChartForCOApprovalStatus').getContext('2d');
+    var pieData = [response.approved_co_count, response.draft_co_count, response.rejected_co_count];
+
+    if (pieChartCOStatus) {
+      pieChartCOStatus.data.datasets[0].data = pieData;
+      pieChartCOStatus.update();
+    } else {
+      pieChartCOStatus = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Approved', 'Draft', 'Rejected'],
+          datasets: [{
+            data: pieData,
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(255, 99, 132, 0.7)'
+            ],
+            borderColor: [
+              'rgba(75, 192, 192, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    // Total Amount Over Time
+    var lineCtx = document.getElementById('lineChartOverTime').getContext('2d');
+    if (lineChartOverTime) {
+      lineChartOverTime.data.labels = response.line_order_date;
+      lineChartOverTime.data.datasets[0].data = response.line_order_total;
+      lineChartOverTime.update();
+    } else {
+      lineChartOverTime = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: response.line_order_date,
+          datasets: [{
+            label: 'Amount',
+            data: response.line_order_total,
+            fill: false,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom'
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Month'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Amount'
+              }
+            }
+          }
+        }
+      });
+    }
+
+  });
+}

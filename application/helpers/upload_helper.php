@@ -1481,6 +1481,10 @@ function get_upload_path_by_type($type)
             $path = PURCHASE_ATTACHMENTS_FOLDER;
 
             break;
+        case 'changee':
+            $path = CHANGEE_ATTACHMENTS_FOLDER;
+
+            break;
         case 'contract':
             $path = CONTRACTS_UPLOADS_FOLDER;
 
@@ -1614,4 +1618,85 @@ function add_sales_attachment_activity_log($id, $is_create = true)
         }
     }
     return true;
+}
+
+/**
+ * Change order attachments upload array
+ * Multiple changee attachments can be upload if input type is array or dropzone plugin is used
+ * @param  mixed $related related
+ * @param  mixed $id id
+ * @param  string $index_name attachments index, in different forms different index name is used
+ * @return mixed
+ */
+function handle_changee_attachments_array($related, $id, $index_name = 'attachments')
+{
+    // Ensure the upload directory for "changee" exists
+    if (!is_dir(get_upload_path_by_type('changee'))) {
+        mkdir(get_upload_path_by_type('changee'), 0755);
+    }
+    if (!is_dir(get_upload_path_by_type('changee') . $related)) {
+        mkdir(get_upload_path_by_type('changee') . $related, 0755);
+    }
+
+    $uploaded_files = [];
+    $path           = get_upload_path_by_type('changee') . $related . '/' . $id . '/';
+    $CI             = &get_instance();
+
+    // Check if files are uploaded and process them
+    if (
+        isset($_FILES[$index_name]['name'])
+        && ($_FILES[$index_name]['name'] != '' || is_array($_FILES[$index_name]['name']) && count($_FILES[$index_name]['name']) > 0)
+    ) {
+        // Ensure $_FILES[$index_name] is treated as an array
+        if (!is_array($_FILES[$index_name]['name'])) {
+            $_FILES[$index_name]['name']     = [$_FILES[$index_name]['name']];
+            $_FILES[$index_name]['type']     = [$_FILES[$index_name]['type']];
+            $_FILES[$index_name]['tmp_name'] = [$_FILES[$index_name]['tmp_name']];
+            $_FILES[$index_name]['error']    = [$_FILES[$index_name]['error']];
+            $_FILES[$index_name]['size']     = [$_FILES[$index_name]['size']];
+        }
+
+        _file_attachments_index_fix($index_name);
+
+        // Process each uploaded file
+        for ($i = 0; $i < count($_FILES[$index_name]['name']); $i++) {
+            $tmpFilePath = $_FILES[$index_name]['tmp_name'][$i];
+
+            // Skip if the file path is empty
+            if (!empty($tmpFilePath) && $tmpFilePath != '') {
+                if (
+                    _perfex_upload_error($_FILES[$index_name]['error'][$i])
+                    || !_upload_extension_allowed($_FILES[$index_name]['name'][$i])
+                ) {
+                    continue;
+                }
+
+                // Ensure the upload path exists
+                _maybe_create_upload_path($path);
+
+                // Generate a unique filename and move the file
+                $filename    = unique_filename($path, $_FILES[$index_name]['name'][$i]);
+                $newFilePath = $path . $filename;
+
+                if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                    array_push($uploaded_files, [
+                        'file_name' => $filename,
+                        'filetype'  => $_FILES[$index_name]['type'][$i],
+                    ]);
+
+                    // Handle image thumbnails (optional)
+                    if (is_image($newFilePath)) {
+                        // create_img_thumb($path, $filename);
+                    }
+                }
+            }
+        }
+    }
+
+    // Return the list of uploaded files, or false if none were uploaded
+    if (count($uploaded_files) > 0) {
+        return $uploaded_files;
+    }
+
+    return false;
 }

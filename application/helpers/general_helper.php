@@ -1104,3 +1104,13 @@ function update_module_filter($module_name, $filter_name, $filter_value)
     }
     return true;
 }
+
+function get_currency_name($id)
+{
+    $CI =& get_instance();
+    $CI->db->select('name');
+    $CI->db->from(db_prefix() . 'currencies');
+    $CI->db->where('id', $id);
+    $result = $CI->db->get()->row();
+    return $result ? $result->name : 'INR';
+}
