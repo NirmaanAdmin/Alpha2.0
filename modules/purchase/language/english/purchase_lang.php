@@ -699,3 +699,4 @@ $lang['delivery_person'] = 'Delivered by';
 $lang['signature_pur_order'] = 'Signature';
 $lang['tax_percentage'] = 'Tax %';
 $lang['payment_for_pur_request']  = 'Payment for purchase request';
+$lang['change_order'] = 'Change Order';
