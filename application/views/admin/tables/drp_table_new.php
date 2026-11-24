@@ -42,7 +42,9 @@ $where = [];
 if ($CI->input->post('project_id') && count($CI->input->post('project_id')) > 0) {
     $where[] = 'AND ' . db_prefix() . 'forms.project_id IN (' . implode(',', $CI->input->post('project_id')) . ')';
 }
-
+if ($CI->input->post('project') && count($CI->input->post('project')) > 0) {
+    $where[] = 'AND ' . db_prefix() . 'forms.project_id IN (' . implode(',', $CI->input->post('project')) . ')';
+}
 
 // Module filter
 if (isset($module)) {
@@ -51,9 +53,10 @@ if (isset($module)) {
 
 // Save filters
 $project_filter_name_value = !empty($CI->input->post('project_id')) ? implode(',', $CI->input->post('project_id')) : NULL;
-update_module_filter($module_name, $project_filter_name, $project_filter_name_value);
-
-
+$current_url = current_url();
+if (strpos($current_url, 'progress_report_listing') !== false) {
+    update_module_filter($module_name, $project_filter_name, $project_filter_name_value);
+}
 
 // Custom fields
 $cfIndex = 0;

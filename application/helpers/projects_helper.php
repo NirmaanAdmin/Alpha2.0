@@ -167,6 +167,13 @@ function app_init_project_tabs()
         'visible'  => (staff_can('view',  'proposals') || staff_can('view_own',  'proposals') || (get_option('allow_staff_view_proposals_assigned') == 1 && staff_has_assigned_proposals())),
     ]);
 
+    $CI->app_tabs->add_project_tab('project_dpr', [
+        'name'     => _l('Daily Progress Report'),
+        'icon'     => 'fa-solid fa-receipt menu-icon',
+        'view'     => 'admin/projects/project_dpr',
+        'position' => 54,
+    ]);
+
     $CI->app_tabs->add_project_tab('project_notes', [
         'name'     => _l('project_notes'),
         'icon'     => 'fa-regular fa-note-sticky',
