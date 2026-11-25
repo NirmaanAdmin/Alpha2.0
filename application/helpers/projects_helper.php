@@ -171,6 +171,13 @@ function app_init_project_tabs()
         'name'     => _l('Daily Progress Report'),
         'icon'     => 'fa-solid fa-receipt menu-icon',
         'view'     => 'admin/projects/project_dpr',
+        'position' => 53,
+    ]);
+
+    $CI->app_tabs->add_project_tab('project_dpr_dashboard', [
+        'name'     => _l('DPR Dashboard'),
+        'icon'     => 'fa-solid fa-receipt menu-icon',
+        'view'     => 'admin/projects/project_dpr_dashboard',
         'position' => 54,
     ]);
 

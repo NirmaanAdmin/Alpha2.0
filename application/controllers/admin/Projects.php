@@ -350,6 +350,8 @@ class Projects extends AdminController
                 // Completed tasks are excluded from this list because you can't add timesheet on completed task.
                 $data['tasks']                = $this->projects_model->get_tasks($id, 'status != ' . Tasks_model::STATUS_COMPLETE . ' AND billed=0');
                 $data['timesheets_staff_ids'] = $this->projects_model->get_distinct_tasks_timesheets_staff($id);
+            } elseif ($group == 'project_dpr_dashboard') {
+                redirect(admin_url('forms/dpr_dashboard?projectid=' . $id . ''));
             }
 
             // Discussions

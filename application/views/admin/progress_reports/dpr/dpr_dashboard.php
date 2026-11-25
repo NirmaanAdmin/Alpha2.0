@@ -53,7 +53,11 @@
             <div class="col-md-12">
               <div class="col-md-2 pull-right" style="padding-right: 0px;">
                 <?php
-                $default_project = !empty($projects) ? $projects[0]['id'] : '';
+                if (isset($_GET['projectid']) && !empty($_GET['projectid'])) {
+                  $default_project = (int) $_GET['projectid'];
+                } else {
+                  $default_project = !empty($projects) ? $projects[0]['id'] : '';
+                }
                 echo render_select('projects', $projects, array('id', 'name'), 'projects', $default_project);
                 ?>
               </div>
